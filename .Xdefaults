@@ -1,0 +1,44 @@
+urxvt.font: xft:Tamzen:size=10:antialias=false
+!urxvt.font: xft:Terminus:size=8:antialias=false
+!urxvt.letterSpace: 1
+
+urxvt.foreground: #cccccc
+ 
+urxvt.depth: 32
+urxvt*background: #080808
+urxvt.boldFont:
+
+!urxvt*transparent: true
+!urxvt*blurRadius: 30
+!urxvt*shading: 20
+
+urxvt.saveLines:32767
+urxvt.scrollBar: false
+
+!  
+!  urxvt*font: xft:Terminus:pixelsize=12
+   
+!   urxvt.perl-ext-common: default,matcher
+!   urxvt.urlLauncher: uzbl-browser
+!   urxvt.matcher.button: 2
+!   urxvt.matcher.pattern.1: \\bwww\\.[\\w-]\\.[\\w./?&@#-]*[\\w/-]
+
+urxvt*colorUL: #c5f779
+urxvt*underlineColor: #c5f779
+
+urxvt*color0 : #343935
+urxvt*color1 : #cf3f61
+urxvt*color2 : #7bb75b
+urxvt*color3 : #e9b32a
+urxvt*color4 : #4c9ad4
+urxvt*color5 : #a57fc4
+urxvt*color6 : #6bbccc
+urxvt*color7 : #fafaf6
+urxvt*color8 : #595b59
+urxvt*color9 : #d18fa6
+urxvt*color10 : #637b3a
+urxvt*color11 : #78592f
+urxvt*color12 : #135979
+urxvt*color13 : #604291
+urxvt*color14 : #76bbca
+urxvt*color15 : #b2b5ae
