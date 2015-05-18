@@ -1,0 +1,15 @@
+#!/bin/bash
+IFS=$'\n'
+
+base=`pwd`
+
+for i in $(find $1 -type d)
+do
+		cd "$base"
+		cd "$i"
+		
+		for y in $(ls | grep -i .aif$)
+		do
+			ffmpeg -i "$y" "$y.wav"
+		done
+done

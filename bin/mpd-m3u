@@ -1,0 +1,43 @@
+#!/bin/sh
+
+IFS=$'\n'
+
+usage ()
+{
+	cat << EOF
+Usage: 	mpc-playlist [options] [playlist]
+
+OPTIONS:
+	-h		Help
+	-s 		Save when added
+EOF
+}
+
+m3u_handler ()
+{
+	cat "$1" | sed -e '/^#/D' | mpc add
+}
+
+pls_handler ()
+{
+	cat "$1" | grep '^File[0-9]*' $1 | sed -e 's/^File[0-9]*=//' | mpc add
+}
+
+save_playlist ()
+{
+	echo "Title: "
+	read TITLE1
+	mpc save $TITLE1
+}
+
+
+if [ "$1" = "" ]
+then 
+	usage
+else
+	mpc -q clear 
+	pls_handler $1
+	mpc -q play
+	
+	save_playlist 
+fi

@@ -1,0 +1,9 @@
+#!/bin/bash
+IFS=$'\n'
+
+base=`pwd`
+
+for y in $(ls | grep -i .mp4$)
+do
+	mkvmerge -o "$y".mkv "$y"
+done

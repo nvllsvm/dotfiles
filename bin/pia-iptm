@@ -1,0 +1,156 @@
+#!/bin/bash
+
+# PIA Iptables Manager
+# Version 0.4
+# Created by ShadowSpectre
+# shadowspectre@tormail.org
+# Donate: 1MMgC7fD91bGsc8AnFNAd2DfV9n1gBfMfn
+
+clear
+echo ".: PIA Iptables Manager v0.4 :."
+echo ""
+
+start() {
+  clear
+  echo ".: Warning :."
+  echo ""
+  echo "CONNECT TO VPN SERVER NOW."
+  echo ""
+  echo "YOU MUST BE CONNECTED TO THE VPN BEFORE PROCEEDING OR THE IPTABLES WILL NOT BE CONFIGURED PROPERLY."
+  echo ""
+  echo "Press ENTER to proceed."
+  read pause
+  clear
+  IP=$(wget https://duckduckgo.com/?q=whats+my+ip -q -O - | grep -Eo '\<[[:digit:]]{1,3}(\.[[:digit:]]{1,3}){3}\>')
+  iptables -F
+  iptables -t filter -P INPUT DROP
+  iptables -t filter -P OUTPUT DROP
+  iptables -A INPUT -i tun+ -j ACCEPT
+  iptables -A OUTPUT -o tun+ -j ACCEPT
+  iptables -A INPUT -s 127.0.0.1 -j ACCEPT
+  iptables -A OUTPUT -d 127.0.0.1 -j ACCEPT
+  iptables -A INPUT -s $IP -j ACCEPT
+  iptables -A OUTPUT -d $IP -j ACCEPT
+  echo "Iptables have been set."
+  sleep 2
+  clear
+}
+
+
+stop() {
+  iptables -F
+  iptables -A INPUT -j ACCEPT
+  iptables -A OUTPUT -j ACCEPT
+  clear
+  echo "Iptables have been cleared."
+  sleep 2
+  clear
+
+}
+
+status() {
+  clear
+  echo ".: Status :."
+  echo ""
+  IP=$(wget https://duckduckgo.com/?q=whats+my+ip -q -O - | grep -Eo '\<[[:digit:]]{1,3}(\.[[:digit:]]{1,3}){3}\>')
+  IPTABLES=$(iptables -S)
+  OFF="-P INPUT ACCEPT
+-P FORWARD ACCEPT
+-P OUTPUT ACCEPT
+-A INPUT -j ACCEPT
+-A OUTPUT -j ACCEPT"
+  ON="-P INPUT DROP
+-P FORWARD ACCEPT
+-P OUTPUT DROP
+-A INPUT -i tun+ -j ACCEPT
+-A INPUT -s 127.0.0.1/32 -j ACCEPT
+-A INPUT -s $IP/32 -j ACCEPT
+-A OUTPUT -o tun+ -j ACCEPT
+-A OUTPUT -d 127.0.0.1/32 -j ACCEPT
+-A OUTPUT -d $IP/32 -j ACCEPT"
+  if [ "$IPTABLES" = "$OFF" ]; then
+    echo "Status: Inactive"
+  elif [ "$IPTABLES" = "$ON" ]; then
+    echo "Status: Active"
+  else
+    echo "Status: Custom iptables configuration"
+    echo ""
+    echo "Either deactivate or reactivate. If you have another iptables firewall you may need to disable that while connected to the vpn."
+  fi
+
+  echo ""
+  echo "Press ENTER to return to the MENU."
+  read pause
+  clear
+}
+
+quit() {
+  stop
+  echo "PIA Iptables Manager will now close."
+  sleep 1
+  clear
+  exit
+}
+
+invalid() {
+  clear
+  echo ".: Invalid Option :."
+  echo ""
+  echo "I'm sorry, but that was an invalid option."
+  echo "Try entering a number like 1, 2, 3, 4, or 5."
+  echo ""
+  echo "Press ENTER to return to the MENU."
+  read pause
+  clear
+}
+
+custom_home() {
+  clear
+  echo ".: Custom - home :."
+  echo "This will allow access to: " 
+  echo " 192.168.1.1 "
+  echo " 192.168.1.102 "
+  echo " 192.168.1.103 "
+  echo " 192.168.1.104 "
+  echo ""
+  echo "Press ENTER to return to the MENU."
+  iptables -A INPUT -i eno+ -s 192.168.1.1 -j ACCEPT
+  iptables -A OUTPUT -o eno+ -d 192.168.1.1 -j ACCEPT
+  iptables -A INPUT -i eno+ -s 192.168.1.102 -j ACCEPT
+  iptables -A OUTPUT -o eno+ -d 192.168.1.102 -j ACCEPT
+  iptables -A INPUT -i eno+ -s 192.168.1.103 -j ACCEPT
+  iptables -A OUTPUT -o eno+ -d 192.168.1.103 -j ACCEPT
+  iptables -A INPUT -i eno+ -s 192.168.1.104 -j ACCEPT
+  iptables -A OUTPUT -o eno+ -d 192.168.1.104 -j ACCEPT
+  read pause 
+  clear
+}
+
+while : 
+do
+cat << !
+.: Menu :.
+
+1. Activate
+2. Deactivate
+3. Status
+5. Quit
+
+-- Custom Actions
+6. Activate @ home
+
+!
+
+echo -n "Command: "
+read choice
+
+case $choice in
+1) start ;;
+2) stop ;;
+3) status ;;
+5) quit ;;
+6) custom_home ;;
+*) invalid ;;
+esac
+done
+

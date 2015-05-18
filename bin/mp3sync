@@ -1,0 +1,2 @@
+#!/bin/bash 
+rsync -av --progress --delete /mnt/mp3fs/ /mnt/sol/storage1/Audio/MP3

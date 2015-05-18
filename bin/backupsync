@@ -1,0 +1,18 @@
+#!/bin/bash
+
+## 250GB Internal
+rsync -av --progress --delete --exclude="Torrent/" /storage/Downloads /mnt/backup/
+rsync -av --progress --delete /storage/Personal\ Creations/ /mnt/backup/Personal\ Creations/
+rsync -av --progress --delete /storage/Documents/ /mnt/backup/Documents/
+rsync -av --progress --delete /storage/Code/ /mnt/backup/Code/
+rsync -av --progress --delete /storage/Books/ /mnt/backup/Books/
+
+## 1TB External
+rsync -av --progress --delete /home/draje /mnt/portable/Arch/home/
+rsync -av --progress --delete /var/cache/pacman/pkg/ /mnt/portable/Arch/Package\ Cache/
+rsync -av --progress --delete --exclude="Torrent/" /storage/Downloads /mnt/portable/
+rsync -av --progress --delete /storage/Personal\ Creations /mnt/portable/
+rsync -av --progress --delete /storage/Documents /mnt/portable/
+rsync -av --progress --delete /storage/Code /mnt/portable/
+rsync -av --progress --delete /storage/Books /mnt/portable/
+rsync -av --progress --delete /storage/Audio /mnt/portable/

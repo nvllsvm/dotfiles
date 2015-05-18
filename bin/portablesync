@@ -1,0 +1,4 @@
+#!/bin/bash
+
+## 1TB External
+rsync -av --progress --delete --exclude="MP3" /mnt/storage1/Audio /mnt/portable1/

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+## 250GB Internal
+rsync -av --progress --delete /mnt/sol/storage1/Personal\ Creations/ /media/usb1/Personal\ Creations/
+rsync -av --progress --delete /mnt/sol/storage1/Documents/ /media/usb1/Documents/
+rsync -av --progress --delete /mnt/storage1/Code/ /media/usb1/Code/
+rsync -av --progress --delete /mnt/sol/storage1/Books/ /media/usb1/Books/
+rsync -av --progress --delete --exclude="Music/" /mnt/sol/storage1/Audio/ /media/usb1/Audio/
+rsync -av --progress --delete /mnt/storage1/Virtual\ Machines/ /media/usb1/Virtual\ Machines
+

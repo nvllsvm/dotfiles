@@ -1,0 +1,5 @@
+#!/bin/bash
+
+rsync -av --progress --delete /storage/Books/ /mnt/apophis/home/draje/Books/
+rsync -av --progress --delete /home/draje /mnt/apophis/home/
+rsync -av --progress --delete /var/cache/pacman/pkg/ /mnt/apophis/var/cache/pacman/pkg/
