@@ -22,6 +22,15 @@ caseTypes = imageTypes + audioTypes + infoTypes + tuple( switchType.keys())
 garbageTypes = ('.m3u','.m3u8','.md5','.accurip','.sfv','.fpl','.inf')
 
 
+def getCueTrackCount(root, cueFile):
+    inputCue = os.path.join(root, cueFile)
+    f = open(inputCue)
+
+    trackCount = sum([1 for line in f if line.strip().startswith('TRACK ')]) 
+
+    return trackCount
+
+
 def splitFlac(root, cueFile, flacFile):
     inputCue = os.path.join(root, cueFile)
     inputFlac = os.path.join(root, flacFile)
@@ -232,7 +241,8 @@ if __name__ == "__main__":
                 cueFile = f
 
         if flacCount == 1 & cueCount == 1:
-            splitFlac(root, cueFile, flacFile)
+            if getCueTrackCount(root, cueFile) > 1:
+                splitFlac(root, cueFile, flacFile)
 
     for error in sorted(errorList):
         print(error)
