@@ -1,0 +1,10 @@
+#!/bin/sh
+
+brightness=$(xbacklight)
+
+if [[ ${brightness%.*} -lt 10 ]] 
+then 
+	xbacklight -set 1 
+else 
+	xbacklight -dec 10 
+fi
