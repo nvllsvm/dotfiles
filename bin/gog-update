@@ -1,5 +1,0 @@
-#!/bin/sh
-cd /mnt/storage1/Games/PC/GOG.com
-lgogdownloader --update-check 
-lgogdownloader --download
-lgogdownloader --check-orphans

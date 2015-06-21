@@ -1,2 +1,0 @@
-#!/bin/bash
-rsync -av --progress --delete /home/draje/Code /storage/

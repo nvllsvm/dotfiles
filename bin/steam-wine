@@ -1,4 +1,0 @@
-#!/bin/bash
-cd ~/.wine/drive_c/Program\ Files\ \(x86\)/Steam
-WINEDEBUG=-all
-nice -n 19 wine Steam -no-dwrite

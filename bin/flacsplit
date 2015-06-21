@@ -1,8 +1,0 @@
-#!/bin/bash
-
-if [ $(ls -A | grep -i .flac$ | wc -l) -eq 1 -a $(ls -A | grep -i .cue$ | wc -l) -eq 1 ]
-then
-	shntool split -f *.cue -o 'flac flac --output-name=split%f -' -t '%n' *.flac
-else
-	echo "Shit meng, you can't do that!"
-fi
