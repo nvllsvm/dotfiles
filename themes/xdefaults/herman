@@ -1,0 +1,28 @@
+! Zenburn color-scheme
+urxvt*background:  #1c1c1c
+urxvt*foreground:  #cccccc
+! black + red
+urxvt*color0:      #666666
+urxvt*color1:      #ff8278
+! green + yellow
+urxvt*color2:      #bde077
+urxvt*color3:      #eadc84
+! blue + purple
+urxvt*color4:      #77bee0
+urxvt*color5:      #dd91f3
+! cyan + white
+urxvt*color6:      #ffc178
+urxvt*color7:      #dddddd
+! bright-black + bright-red
+urxvt*color8:      #888888
+urxvt*color9:      #ff8278
+! bright-green + bright-yellow
+urxvt*color10:     #bde077
+urxvt*color11:     #eadc84
+! bright-blue + bright-purple
+urxvt*color12:     #77bee0
+urxvt*color13:     #dd91f3
+! bright-cyan + bright-white
+urxvt*color14:     #ffc178
+urxvt*color15:     #cccccc
+!}}}

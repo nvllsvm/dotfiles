@@ -1,0 +1,123 @@
+/****************
+ * Applications *
+ ****************/
+
+/* nautilus 3.6 */
+.nautilus-canvas-item {
+    border-radius: 3px;
+}
+
+.nautilus-desktop.nautilus-canvas-item {
+    color: @theme_fg_color;
+    text-shadow: 1px 1px black;
+}
+
+.nautilus-desktop.nautilus-canvas-item:active {
+    color: @theme_text_color;
+}
+
+.nautilus-desktop.nautilus-canvas-item:selected {
+    color: @theme_selected_fg_color;
+}
+
+.nautilus-desktop.nautilus-canvas-item:active,
+.nautilus-desktop.nautilus-canvas-item:prelight,
+.nautilus-desktop.nautilus-canvas-item:selected {
+    text-shadow: none;
+}
+
+NautilusWindow .primary-toolbar.toolbar {
+	/* search-toolbar */
+    background-image: -gtk-gradient (linear,
+                                     left top, left bottom,
+                                     from (shade(@theme_bg_dark_color, 0.42)),
+                                     color-stop (0.20, shade(@theme_bg_dark_color, 0.50)),
+                                     to   (shade(@theme_bg_dark_color, 0.54)));
+
+    border-width: 1px 0px 1px 1px;
+    border-radius: 0px;
+    border-style: solid;
+    border-color: shade(@theme_bg_dark_color, 0.32) @transparent shade(@theme_bg_dark_color, 0.50) shade(@theme_bg_dark_color, 0.50);
+
+    padding: 3px 5px 4px;
+    -GtkWidget-window-dragging: true;
+    -GtkToolbar-button-relief: normal;    
+}
+
+
+NautilusWindow .toolbar {
+	/* secundary search-toolbar */
+    border-left-width: 1px;
+    border-left-color: shade(@toolbar_gradient_base, 0.84);
+/*
+    background-image: -gtk-gradient (linear,
+                                     left top, left bottom,
+                                     from (shade(@sidebar_background, 0.63)),
+                                     color-stop (0.20, shade(@sidebar_background, 0.68)),
+                                     to   (shade(@sidebar_background, 0.74)));
+
+
+    border-radius: 0px;
+    border-style: solid;
+    border-color: shade(@sidebar_background, 0.32) @transparent shade(@sidebar_background, 0.50) shade(@sidebar_background, 0.50);
+
+    padding: 3px 5px 4px;
+*/
+    -GtkWidget-window-dragging: true;
+    -GtkToolbar-button-relief: normal;    
+}
+
+NautilusFloatingBar {
+    background-image: -gtk-gradient (linear,
+                                     left top, left bottom,
+                                     from 	(shade(@theme_bg_color, 0.97)),
+                                     to 	(shade(@theme_bg_color, 0.90)));
+
+    border-color: shade (@notebook_tab_gradient_b, 0.80);
+
+    border-radius: 3px 3px 0px 0px;
+    border-width: 1px;
+    border-style: solid;
+}
+
+NautilusFloatingBar .button {
+    background-color: alpha (@theme_base_color, 0.0);
+    background-image: none;
+
+    border-style: none;
+    border-image: none;
+
+    -GtkButton-image-spacing: 0;
+    -GtkButton-inner-border: 0;
+}
+
+NautilusWindow .sidebar .scrollbar {
+	-GtkRange-trough-border: 	1;
+    -GtkRange-slider-width:     6;
+}
+
+NautilusWindow .sidebar .scrollbar.trough,
+NautilusWindow .sidebar .scrollbar.trough.vertical {
+    background-image: none;
+    background-color: @sidebar_background;	
+}
+
+NautilusWindow .sidebar .frame {
+    border-width: 0px;
+    border-style: none;	
+}
+
+
+NautilusWindow > GtkTable > .pane-separator,
+NautilusWindow .pane-separator {
+    background-color: @sidebar_background;
+    /* border-color: @sidebar_background; */
+    border-style: none;
+    border-width: 0px;
+    background-image: -gtk-gradient(linear,
+                                    left top, right top,
+                                    from (@sidebar_background),
+                                    color-stop (0.50, @sidebar_background),
+                                    to   (shade(@theme_bg_color, 0.70)));
+}
+

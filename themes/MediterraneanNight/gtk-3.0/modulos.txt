@@ -1,0 +1,15 @@
+
+						gnome_mdi
+							|
+						nautilus 3.6
+
+         gnome-shell							unity
+---------------------------------     ------------------------------
+	gnome-apps								unity-apps
+
+	nautilus 3.4 gnome-light				nautilus 3.4 unity-light
+	nautilus 3.4 gnome-gray					nautilus 3.4 unity-gray
+	nautilus 3.4 gnome-gray-light			nautilus 3.4 unity-gray-light
+
+
+

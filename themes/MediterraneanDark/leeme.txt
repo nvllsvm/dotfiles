@@ -1,0 +1,142 @@
+Autor: Rafa Cobreros rafacobreros@gmail.com
+Licencia: GPL
+Original theme en: http://gnome-look.org/content/show.php/MediterraneanNight?content=148398
+
+Personalización del tema:
+1.- Estilo de nautilus
+2.- Estilo de los botones de la barra de titulos (titlebar)
+3.- Estilo de tabs
+4.- Arreglar botones de Synaptic y Gimp
+5.- Habilitar/deshabilitar el uso de imagenes .svg para checkbox/radiobuttons (GTK2)
+
+NOTA:
+	- Algunos cambios requieren cerrar y abrir sesión despues de hacerlos
+
+-------------------------
+¡¡¡ MUY IMPORTANTE !!!  *
+-------------------------
+Para hacer que el tema se vea correctamente en UNITY, es necesario utilizar la opcion de unity en el fichero:
+../MediterraneanDark/gtk-3.0/gtk.css
+(solo hay que modificar una linea al final del archivo)
+
+	Para seleccionar tu entorno
+	---------------------------
+	1.- Gnome-shell y Cinnamon (es la opcion preconfigurada por defecto))
+	@import url("gnome-apps.css");
+
+	2.- Unity (GlobalMenu)
+	@import url("unity-apps.css");
+
+
+----------------------------------------
+* 1.- Seleccionar estilo para nautilus *
+----------------------------------------
+Editar (gedit) el archivo ../MediterraneanDark/gtk-3.0/gtk.css
+
+Ve a la ultima linea y encontraras 7 opciones para nautilus:
+
+	Nautilus 3.6.x para gnome-shell 3.6.x y/o unity (opcion por defecto)
+	@import url("nautilus36.css"); 
+
+	(3 para gnome-shell)
+	1.- "gnome-nautilus34-gray.css"  		(nautilus sidebar y pathbar gris oscuro)
+	2.- "gnome-nautilus34-light.css" 		(nautilus sidebar azulado y pathbar claro))
+	3.- "gnome-nautilus34-gray-light.css" 	(nautilus sidebar gris oscuro y pathbar claro)
+
+	(3 para UNITY)
+	1.- "unity-nautilus34-gray.css"  		(nautilus sidebar y pathbar gris oscuro)
+	2.- "unity-nautilus34-light.css" 		(nautilus sidebar azulado y pathbar claro)
+	3.- "unity-nautilus34-gray-light.css" 	(nautilus sidebar gris oscuro y pathbar claro)
+
+modifica la linea "@import" para que se corresponda con el estilo que buscas,
+de forma que quede como una de las siete lineas de abajo.
+(ten cuidado de dejar solo UNA de las siete)
+
+@import url("nautilus36.css"); 
+	o
+@import url("gnome-nautilus34-gray.css");
+	o
+@import url("gnome-nautilus34-light.css"); 
+	o
+@import url("gnome-nautilus34-gray-light.css"); 
+	o
+@import url("unity-nautilus34-gray.css");
+	o
+@import url("unity-nautilus34-light.css"); 
+	o
+@import url("unity-nautilus34-gray-light.css"); 
+
+
+------------------------------------------------------------------------------
+* 2.- Seleccionar estilo de los botones de la barra de titulos de la ventana *
+------------------------------------------------------------------------------
+Si prefieres tener los botones brillantes en la barra de titulos, al estilo de apple:
+
+Copia el contenido del archivo "metacity_buttons_glassy.tar.gz" en la carpeta "../MediterraneanDark/metacity-1/"
+
+Para restaurar los iniciales:
+
+Copia el contenido del archivo "metacity_buttons_normal.tar.gz" en la carpeta "../MediterraneanDark/metacity-1/"
+
+----------------------------------
+* 3.- Seleccionar estilo de TABS *
+----------------------------------
+Editar (gedit) el archivo ../MediterraneanDark/gtk-3.0/gtk.css
+
+Ve a la linea donde pone 
+@import url("tabs.css");
+
+y modificala segun la opcion que desees
+
+1.- tabs gris obscuro 
+@import url("tabs-dark.css");
+
+2.- tabs color azul del tema
+@import url("tabs-themed.css");
+
+3.- tabs grid claro con resalte azul 
+@import url("tabs.css");
+
+4.- tabs gris claro con resalte gris obscuro
+@import url("tabs-mono.css");
+
+5.- Estilo de tabs mas traditional style
+@import url("tabs-classic.css");
+
+(ten cuidado de dejar solo UNA de las cinco anteriores)
+
+
+-------------------------------------------
+* 4.- Arreglar botones de synaptic y Gimp *
+-------------------------------------------
+Nota: No he puesto el arreglo por defecto porque sacrifica la calidad de los radio-button de gtk2.
+
+Editar (gedit) el archivo:
+/MediterraneanDark/gtk-2.0/gtkrc
+
+Buscar la linea (por el final del archivo, cerca de la linea 800):
+widget_class "*<GtkRadioButton>*"				style:highest "radiobutton"
+
+y sustituirla por:
+widget_class "*<GtkRadioButton>*"				style:highest "checkradio"
+
+-------------------------------------------------------------------------------
+5.- Habilitar/deshabilitar el uso de imagenes .svg para checkbox/radiobuttons
+-------------------------------------------------------------------------------
+Editar (gedit) el archivo:
+/MediterraneanDark/gtk-2.0/gtkrc
+Busca la siguiente seccion (cerca del final, por la linea 800) y sigue las intrucciones
+##########################################################################
+# Radiobutton and Checkbox
+##########################################################################
+# Si tienes problemas para ver los checkbox y radiobuttons in gtk2
+# descomenta(habilita) las dos lineas de abajo (quita el simbolo # del principio de la linea)
+
+# widget_class "*<GtkCheckButton>*"				style "checkradio"
+# widget_class "*<GtkRadioButton>*"				style "checkradio"
+
+# Y comenta(deshabilita) estas de abajo (pon el simbolo # al principio de la linea)
+ widget_class "*<GtkCheckButton>*"				style "checkbutton"
+ widget_class "*<GtkRadioButton>*" 				style "radiobutton"
+##########################################################################
+

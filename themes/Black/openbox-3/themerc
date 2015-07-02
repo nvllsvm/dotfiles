@@ -1,0 +1,85 @@
+# End Of Light Openbox theme
+# mod of Neutrality II by gutterslob
+
+# Window geometry
+padding.width: 3
+padding.height: 3
+border.width: 1
+window.client.padding.width: 1
+window.client.padding.height: 0
+window.handle.width: 1
+
+#Menu geometry
+menu.border.width: 1
+menu.overlap: -4
+
+# Border colors
+window.*.border.color: #000000
+menu.border.color: #000000
+window.*.client.color: #101010
+window.*.title.separator.color: #000000
+
+# Text shadows
+window.active.label.text.font: shadow=n
+window.inactive.label.text.font: shadow=n
+menu.items.font: shadow=n
+menu.title.text.font: shadow=n
+
+# Window title justification
+window.label.text.justify: center
+
+# Windows
+window.*.title.bg: Flat Border
+window.*.title.bg.color: #080808
+window.*.title.bg.border.color: #101010
+window.*.label.bg: Parentrelative
+window.active.label.text.color: #777777
+window.inactive.label.text.color: #080808
+
+window.*.handle.bg: Flat
+window.*.handle.bg.color: #101010
+window.*.grip.bg: Flat
+window.*.grip.bg.color: #101010
+
+window.*.button.*.bg: Parentrelative
+window.*.button.*.image.color: #808080
+
+# Menus
+menu.title.bg: flat Border
+menu.title.bg.color: #080808
+menu.title.bg.border.color: #101010
+menu.title.text.color: #777777
+menu.title.text.justify: right
+
+menu.items.bg: Flat border
+menu.items.bg.color: #000
+menu.items.bg.border.color: #101010
+menu.items.text.color: #777777
+menu.items.disabled.text.color: #101010
+
+menu.items.active.bg: flat
+menu.items.active.bg.color: #101010
+menu.items.active.text.color: #8f8f8f
+menu.items.active.disabled.text.color: #080808
+
+#separator
+menu.separator.color: #151515
+menu.separator.width: 1
+menu.separator.padding.width: 3
+menu.separator.padding.height: 3
+
+
+#osd
+osd.border.width: 1
+osd.border.color:  #000
+
+osd.bg: flat border
+osd.bg.color: #000
+osd.bg.border.color: #101010
+
+osd.hilight.bg: flat 
+osd.hilight.bg.color: #101010
+
+osd.label.bg: parentrelative
+
+osd.label.text.color: #c0c0c0
