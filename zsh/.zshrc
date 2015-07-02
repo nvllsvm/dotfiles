@@ -20,8 +20,10 @@ bindkey "\e[5~" beginning-of-history # PageUp
 bindkey "\e[6~" end-of-history # PageDown
 bindkey "^[[A" history-beginning-search-backward
 bindkey "^[[B" history-beginning-search-forward
+#bindkey 0C history-beginning-search-backward
+#bindkey OD history-beginning-search-forward
 
-export PATH="${PATH}":/home/draje/.bin:/home/draje/.bin/tools:/home/draje/.bin/games:/usr/local/bin:/opt/android-sdk/platform-tools
+export PATH="${PATH}":/home/draje/.bin:/usr/local/bin:/opt/android-sdk/platform-tools
 export XDG_DATA_HOME="/home/draje/.config/"
 
 alias smount='sudo mount'
@@ -38,7 +40,7 @@ alias verynice="ionice -c3 schedtool -D -e"
 
 export PROMPT=$'%B%(?..[%?] )%b\e[1;32m%n\e[1;30m.\e[1;32m%M\e[0m>' 
 export PROMPT=$'%(?..[%?] )%{\e[1;32m%}%n%{\e[1;30m%}.%{\e[1;32m%}%m%{\e[0m%}  '
-export PROMPT=$'%{\e[1;32m%}%m%{\e[0m%} '
+#export PROMPT=$'%{\e[1;32m%}%m%{\e[0m%} '
 export RPROMPT=$'%{\e[0;36m%}%~%f'
 export TERM=screen
 export QT_STYLE_OVERRIDE=gtk
