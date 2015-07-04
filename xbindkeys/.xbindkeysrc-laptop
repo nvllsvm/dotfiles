@@ -34,3 +34,8 @@
 # Raise
 "xbacklight -inc 10"
   c:233
+
+
+## Swap resolutions
+"swap-res"
+  c:225
