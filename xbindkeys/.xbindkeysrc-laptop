@@ -4,11 +4,11 @@
   c:121
 
 # Lower
-"amixer set Master 5%-"
+"amixer set Master unmute && amixer set Master 5%-"
   c:122
 
 # Raise
-"amixer set Master 5%+"
+"amixer set Master unmute && amixer set Master 5%+"
   c:123
 
 
