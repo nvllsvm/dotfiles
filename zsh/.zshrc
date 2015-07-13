@@ -38,8 +38,7 @@ alias yup-devel='yaourt -Syu --noconfirm --aur --devel'
 alias ymount='sudo mount -o noatime,flush,gid=users,fmask=113,dmask=002'
 alias verynice="ionice -c3 schedtool -D -e"
 
-export PROMPT=$'%B%(?..[%?] )%b\e[1;32m%n\e[1;30m.\e[1;32m%M\e[0m>' 
-export PROMPT=$'%(?..[%?] )%{\e[1;32m%}%n%{\e[1;30m%}.%{\e[1;32m%}%m%{\e[0m%}  '
+export PROMPT=$'%(?..[%?] )%{\e[0;32m%}%n%{\e[0;30m%}.%{\e[0;32m%}%m%{\e[0m%}  '
 #export PROMPT=$'%{\e[1;32m%}%m%{\e[0m%} '
 export RPROMPT=$'%{\e[0;36m%}%~%f'
 export TERM=screen
