@@ -57,7 +57,7 @@ modkey = "Mod4"
 
 hostname = io.popen("cat /etc/hostname"):read("*a"):gsub("^%s*(.-)%s*$", "%1")
 battery = "BAT0"
-wifi_interface = "wlp3s0"
+wifi_interface = "wlp2s0"
 
 -- Table of layouts to cover with awful.layout.inc, order matters.
 local layouts =
@@ -496,14 +496,14 @@ for s = 1, screen.count() do
 			    left_layout:add(ohmy)
 			    left_layout:add(mypromptbox[s])
 			
-			    right_layout:add(wifiwidget)
-			    right_layout:add(batwidget)
-			    right_layout:add(cpuwidget)
-			    right_layout:add(memwidget)
-			    right_layout:add(micwidget)
-			    right_layout:add(volwidget)
-			    right_layout:add(widget_date(0,0))
-				right_layout:add(widget_time(0,0))
+--			    right_layout:add(wifiwidget)
+--			    right_layout:add(batwidget)
+--			    right_layout:add(cpuwidget)
+--			    right_layout:add(memwidget)
+--			    right_layout:add(micwidget)
+--			    right_layout:add(volwidget)
+--			    right_layout:add(widget_date(0,0))
+--				right_layout:add(widget_time(0,0))
 			    right_layout:add(mylayoutbox[s]) 
 		end
 -- }}}
@@ -549,7 +549,7 @@ for s = 1, screen.count() do
 	end
 
 	-- bottom wibox 
-    bottom_wibox[s] = awful.wibox({ position = "bottom", height = "12", screen = s })
+    bottom_wibox[s] = awful.wibox({ position = "bottom", height = beautiful.wibox_height, screen = s })
 
     mytasklist[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, mytasklist.buttons)
 
@@ -623,8 +623,7 @@ globalkeys = awful.util.table.join(
 
 	-- Application Shortcuts
 	awful.key({ modkey, }, "g", function () awful.util.spawn("lock_screen") end),
---  awful.key({ modkey, }, "F1", function () awful.util.spawn("chromium --scroll-pixels=400 --audio-buffer-size=4096 --disable-gpu") end),
-	awful.key({ modkey, }, "F1", function () awful.util.spawn("chromium --scroll-pixels=400 --audio-buffer-size=4096") end),
+	awful.key({ modkey, }, "F1", function () awful.util.spawn("chromium --force-device-scale-factor=1.75") end),
 	awful.key({ modkey, }, "F2", function () awful.util.spawn(terminal .. " -e ranger /mnt/storage1") end),
 	awful.key({ modkey, }, "F3", function () awful.util.spawn(terminal .. " -e tmux attach") end),
 	awful.key({ modkey, }, "F4", function () awful.util.spawn(terminal .. " -e ncmpcpp") end),
