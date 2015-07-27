@@ -496,14 +496,14 @@ for s = 1, screen.count() do
 			    left_layout:add(ohmy)
 			    left_layout:add(mypromptbox[s])
 			
---			    right_layout:add(wifiwidget)
---			    right_layout:add(batwidget)
---			    right_layout:add(cpuwidget)
---			    right_layout:add(memwidget)
---			    right_layout:add(micwidget)
---			    right_layout:add(volwidget)
---			    right_layout:add(widget_date(0,0))
---				right_layout:add(widget_time(0,0))
+			    right_layout:add(wifiwidget)
+			    right_layout:add(batwidget)
+			    right_layout:add(cpuwidget)
+			    right_layout:add(memwidget)
+			    right_layout:add(micwidget)
+			    right_layout:add(volwidget)
+			    right_layout:add(widget_date(0,0))
+				right_layout:add(widget_time(0,0))
 			    right_layout:add(mylayoutbox[s]) 
 		end
 -- }}}
