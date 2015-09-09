@@ -1,6 +1,6 @@
-urxvt*font: xft:Tamzen:size=10:antialias=false
+urxvt*font: xft:Tamzen:size=11:antialias=false
+!urxvt*font: xft:DejaVu Sans Mono:size=10:antialias=true
 urxvt*boldFont: 
-!urxvt*font: xft:Terminus:size=8:antialias=false
 !urxvt*letterSpace: 1
 
 !urxvt*transparent: true
@@ -11,8 +11,8 @@ urxvt*boldFont:
 urxvt*saveLines:32767
 urxvt*scrollBar: false
 
-urxvt*foreground: #cccccc
-urxvt*background: #080808
+urxvt*foreground: #999999
+urxvt*background: #191919
 urxvt*colorUL: #c5f779
 urxvt*underlineColor: #c5f779
 
@@ -31,4 +31,4 @@ urxvt*color11 : #78592f
 urxvt*color12 : #135979
 urxvt*color13 : #604291
 urxvt*color14 : #76bbca
-urxvt*color15 : #b2b5ae
+rxvt*color15 : #b2b5ae
