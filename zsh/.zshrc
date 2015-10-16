@@ -20,15 +20,9 @@ bindkey "\e[5~" beginning-of-history # PageUp
 bindkey "\e[6~" end-of-history # PageDown
 bindkey "^[[A" history-beginning-search-backward
 bindkey "^[[B" history-beginning-search-forward
-#bindkey 0C history-beginning-search-backward
-#bindkey OD history-beginning-search-forward
-
-export PATH="${PATH}":/home/draje/.bin:/usr/local/bin:/opt/android-sdk/platform-tools:~/.gem/ruby/2.2.0/bin
-export XDG_DATA_HOME="/home/draje/.config/"
 
 if [ -n "$RANGER_LEVEL" ]; then RANGER_PROMPT='(ranger)'; else RANGER_PROMPT=''; fi
-
-alias ranger='if [[ -n "$RANGER_LEVEL" ]] then; echo "Already in a ranger session"; else ranger; fi'
+alias ranger='if [ -n "$RANGER_LEVEL" ] ; then echo "Nope - already in a ranger shell" ; else ranger; fi'
 alias smount='sudo mount'
 alias umount='sudo umount'
 alias ls='ls --color=auto --group-directories-first'
@@ -36,16 +30,13 @@ alias ll='ls -lh'
 alias la='ls -A'
 alias halt='sudo halt'
 alias reboot='sudo reboot'
-alias yup='yaourt -Syu --noconfirm --aur && sudo pacman -Scc && sudo pacman-optimize'
-alias yup-devel='yaourt -Syu --noconfirm --aur --devel'
+alias pacman-maid='sudo pacman -Scc && sudo pacman-optimize'
+alias yup='yaourt -Syu --noconfirm --aur && pacman-maid'
+alias yup-devel='yaourt -Syu --noconfirm --aur --devel && pacman-maid'
+alias ymount='sudo mount -o noatime,flush,gid=users,fmask=113,dmask=002'
 
 export PROMPT=$RANGER_PROMPT$'%(?..[%?] )%{\e[0;32m%}%n%{\e[0;30m%}.%{\e[0;32m%}%m%{\e[0m%}  '
 export RPROMPT=$'%{\e[0;36m%}%~%f'
-export QT_STYLE_OVERRIDE=gtk
-
-#precmd () (
-#	echo -ne '\a'
-#)
 
 bindkey "\e[1~" beginning-of-line # Home
 bindkey "\e[4~" end-of-line # End
