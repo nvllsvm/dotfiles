@@ -1,6 +1,8 @@
+zstyle ':completion:*' list-colors "${(@s.:.)LS_COLORS}"
+zstyle ':completion:*' menu select
 autoload -U compinit
 compinit
-zstyle ':completion:*' menu select
+
 setopt completealiases
 
 # number of lines kept in history
@@ -30,7 +32,7 @@ alias ll='ls -lh'
 alias la='ls -A'
 alias halt='sudo halt'
 alias reboot='sudo reboot'
-alias pacman-maid='sudo pacman -Scc && sudo pacman-optimize'
+alias pacman-maid='sudo pacman -Scc --noconfirm && sudo rm /var/cache/pacman/pkg/* && sudo pacman-optimize'
 alias yup='yaourt -Syu --noconfirm --aur && pacman-maid'
 alias yup-devel='yaourt -Syu --noconfirm --aur --devel && pacman-maid'
 alias ymount='sudo mount -o noatime,flush,gid=users,fmask=113,dmask=002'
