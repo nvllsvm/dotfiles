@@ -33,4 +33,9 @@ nnoremap <C-F1> :if &go=~#'m'<Bar>set go-=m<Bar>else<Bar>set go+=m<Bar>endif<CR>
 
 call plug#begin('~/.config/nvim/plugged')
 Plug 'tmhedberg/SimpylFold'
+Plug 'Shougo/deoplete.nvim'
+Plug 'tpope/vim-eunuch'
 call plug#end()
+
+" deoplete
+let g:deoplete#enable_at_startup = 1
