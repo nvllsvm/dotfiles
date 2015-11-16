@@ -40,6 +40,16 @@ alias ymount='sudo mount -o noatime,flush,gid=users,fmask=113,dmask=002'
 export PROMPT=$RANGER_PROMPT$'%(?..[%?] )%{\e[0;32m%}%n%{\e[0;30m%}.%{\e[0;32m%}%m%{\e[0m%}  '
 export RPROMPT=$'%{\e[0;36m%}%~%f'
 
+typeset -U path
+path=(~/.bin $path)
+if [[ -d ~/.gem/ruby/ ]] && ls ~/.gem/ruby/ >/dev/null 2>&1; then
+    for dir in ~/.gem/ruby/*; do
+        if [[ -d $dir/bin ]]; then
+            path+=($dir/bin)
+        fi
+    done
+fi
+
 bindkey "\e[1~" beginning-of-line # Home
 bindkey "\e[4~" end-of-line # End
 bindkey "\e[5~" beginning-of-history # PageUp
