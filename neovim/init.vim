@@ -5,8 +5,15 @@ set history=50
 set incsearch
 set tabstop=4
 set expandtab
-set nu
+
+
 set mouse=a
+
+" line numbers
+set nu
+
+" case insensitive search
+set ic
 
 "if &t_Co > 2 || has ("gui_running")
 "	syntax on
@@ -35,6 +42,7 @@ call plug#begin('~/.config/nvim/plugged')
 Plug 'tmhedberg/SimpylFold'
 Plug 'Shougo/deoplete.nvim'
 Plug 'tpope/vim-eunuch'
+Plug 'scrooloose/nerdtree'
 call plug#end()
 
 " deoplete
