@@ -41,7 +41,7 @@ export PROMPT=$RANGER_PROMPT$'%(?..[%?] )%{\e[0;32m%}%n%{\e[0;30m%}.%{\e[0;32m%}
 export RPROMPT=$'%{\e[0;36m%}%~%f'
 
 typeset -U path
-path=(~/.bin $path)
+path=(~/.bin/* ~/.rvm/bin $path)
 if [[ -d ~/.gem/ruby/ ]] && ls ~/.gem/ruby/ >/dev/null 2>&1; then
     for dir in ~/.gem/ruby/*; do
         if [[ -d $dir/bin ]]; then
