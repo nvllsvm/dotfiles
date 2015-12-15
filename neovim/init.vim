@@ -1,6 +1,7 @@
 colorscheme wombat256mod
 set ruler
 set tabstop=4
+set shiftwidth=4
 set expandtab
 
 " line numbers
@@ -27,6 +28,7 @@ Plug 'tmhedberg/SimpylFold'
 Plug 'Shougo/deoplete.nvim'
 Plug 'tpope/vim-eunuch'
 Plug 'scrooloose/nerdtree'
+Plug 'jmcantrell/vim-virtualenv'
 call plug#end()
 
 " deoplete
