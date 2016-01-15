@@ -37,7 +37,9 @@ alias yup='yaourt -Syu --noconfirm --aur && pacman-maid'
 alias yup-devel='yaourt -Syu --noconfirm --aur --devel && pacman-maid'
 alias ymount='sudo mount -o noatime,flush,gid=users,fmask=113,dmask=002'
 
-export PROMPT=$RANGER_PROMPT$'%(?..[%?] )%{\e[0;32m%}%n%{\e[0;30m%}.%{\e[0;32m%}%m%{\e[0m%}  '
+export BASE_PROMPT=$RANGER_PROMPT$'%(?..[%?] )%{\e[0;32m%}%n%{\e[0;30m%}.%{\e[0;32m%}%m%{\e[0m%}  '
+export VI_PROMPT=$RANGER_PROMPT$'%(?..[%?] )%{\e[0;32m%}%n%{\e[0;30m%}.%{\e[0;35m%}%m%{\e[0m%}  '
+export PROMPT=$BASE_PROMPT
 export RPROMPT=$'%{\e[0;36m%}%~%f'
 
 typeset -U path
@@ -50,31 +52,14 @@ if [[ -d ~/.gem/ruby/ ]] && ls ~/.gem/ruby/ >/dev/null 2>&1; then
     done
 fi
 
-bindkey "\e[1~" beginning-of-line # Home
-bindkey "\e[4~" end-of-line # End
-bindkey "\e[5~" beginning-of-history # PageUp
-bindkey "\e[6~" end-of-history # PageDown
-bindkey "\e[2~" quoted-insert # Ins
-bindkey "\e[3~" delete-char # Del
-bindkey "\e[5C" forward-word
-bindkey "\eOc" emacs-forward-word
-bindkey "\e[5D" backward-word
-bindkey "\eOd" emacs-backward-word
-bindkey "\e\e[C" forward-word
-bindkey "\e\e[D" backward-word
-bindkey "\e[Z" reverse-menu-complete # Shift+Tab
-# for rxvt
-bindkey "\e[7~" beginning-of-line # Home
-bindkey "\e[8~" end-of-line # End
-# for non RH/Debian xterm, can't hurt for RH/Debian xterm
-bindkey "\eOH" beginning-of-line
-bindkey "\eOF" end-of-line
-# for freebsd console
-bindkey "\e[H" beginning-of-line
-bindkey "\e[F" end-of-line
-# for guake
-bindkey "\eOF" end-of-line
-bindkey "\eOH" beginning-of-line
-bindkey "^[[1;5D" backward-word
-bindkey "^[[1;5C" forward-word
-bindkey "\e[3~" delete-char # Del
+bindkey -v
+
+export KEYTIMEOUT=1
+
+function zle-line-init zle-keymap-select {
+    PROMPT="${${KEYMAP/vicmd/$VI_PROMPT}/(main|viins)/$BASE_PROMPT}"
+    zle reset-prompt
+}
+
+zle -N zle-line-init
+zle -N zle-keymap-select
