@@ -1,8 +1,3 @@
 . $HOME/.zshrc
 
-if [[ -z "$DISPLAY" ]] && [[ $(tty) = /dev/tty1 ]]; then
-//	startx &> /dev/null &
-	startx
-//  startx-awesome
-	logout
-fi
+[[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] && exec startx
