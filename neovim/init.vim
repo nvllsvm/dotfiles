@@ -39,6 +39,7 @@ Plug 'Shougo/deoplete.nvim'
 Plug 'tpope/vim-eunuch'
 Plug 'scrooloose/nerdtree'
 Plug 'jmcantrell/vim-virtualenv'
+Plug 'gregsexton/MatchTag'
 call plug#end()
 
 " deoplete
