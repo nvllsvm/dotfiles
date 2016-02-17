@@ -52,10 +52,6 @@ RPROMPT='$prompt_current_dir'
 
 typeset -U path
 
-if [[ -d ~/.rvm/bin/ ]]; then
-    path+=(~/.rvm/bin)
-fi
-
 if [[ -d ~/.bin/ ]]; then
     for dir in ~/.bin/*; do
         path+=($dir)
