@@ -1,3 +1,11 @@
+if !empty($ORIG_PYTHON2_BIN)
+    let g:python_host_prog=$ORIG_PYTHON2_BIN
+endif
+
+if !empty($ORIG_PYTHON3_BIN)
+    let g:python3_host_prog=$ORIG_PYTHON3_BIN
+endif
+
 colorscheme wombat256mod
 set ruler
 set tabstop=4
