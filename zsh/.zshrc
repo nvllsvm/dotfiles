@@ -41,7 +41,6 @@ prompt_separator='%F{black}.%f'
 prompt_exit_status='%(?..%K{yellow}%F{red}%?%k%f  )'
 prompt_current_dir='%F{cyan}%~%f'
 
-prompt_virtualenv_active='(venv)'
 prompt_ranger_active='(ranger)'
 
 if [ -n "$RANGER_LEVEL" ]; then prompt_ranger=$prompt_ranger_active; fi
@@ -89,7 +88,7 @@ function virtenv_indicator {
         unset ORIG_PYTHON2_BIN
         unset ORIG_PYTHON3_BIN
     else
-        prompt_virtualenv=$prompt_virtualenv_active
+        prompt_virtualenv="($(basename $VIRTUAL_ENV))"
 
         if [[ -n $PYTHON2_BIN ]] then
             export ORIG_PYTHON2_BIN=$PYTHON2_BIN
