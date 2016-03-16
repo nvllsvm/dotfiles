@@ -11,20 +11,29 @@ theme = {}
 -- }}}
 
 -- {{{ Wallpaper
-theme.wallpaper_color = "#080808"
+theme.wallpaper_color = "#0d0d0d"
+
+local gears = require("gears")
+for s = 1, screen.count() do
+    gears.wallpaper.set(theme.wallpaper_color)
+end
+
+--os.execute("nitrogen --restore")
+
 -- }}}
 
 -- {{{ Styles
-theme.font      = "Tamzen 10"
+theme.font      = "Tamzen 11"
 
-theme.wibox_height = "14"
+theme.wibox_height = "18"
 
 -- {{{ Colors
 theme.fg_normal  = "#666666"
 theme.fg_focus   = "#aaaaaa"
 theme.fg_urgent  = "#ffffff"
 
-theme.bg_normal  = "#030303"
+theme.bg_normal  = "#0d0d0d"
+theme.bg_normal  = "#000000"
 theme.bg_focus   = "#2f2f2f"
 theme.bg_urgent  = "#a17270"
 theme.bg_systray = theme.bg_normal
