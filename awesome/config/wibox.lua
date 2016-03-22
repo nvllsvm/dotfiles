@@ -41,7 +41,7 @@ for s = 1, screen.count() do
 		top_wibox[s].visible = false
 	end
 
-    bottom_wibox[s] = awful.wibox({ position = "bottom", height = "12", screen = s })
+    bottom_wibox[s] = awful.wibox({ position = "bottom", height = beautiful.wibox_height, screen = s })
 
     mytasklist[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, mytasklist.buttons)
 
