@@ -16,8 +16,10 @@ local layouts =
 
 local tags = {}
 
+tag_names = {' 1 ',' 2 ',' 3 ',' 4 ',' 5 ',' 6 ',' 7 ',' 8 ',' 9 '}
+
 for s = 1, screen.count() do
-	tags[s] = awful.tag({1,2,3,4,5,6,7,8,9}, s, layouts[1]) 
+	tags[s] = awful.tag(tag_names, s, layouts[1])
     tags[s][1].selected = true
 end
 
