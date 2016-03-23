@@ -41,6 +41,10 @@ function StripTrailingWhitespace()
   endif
 endfunction
 
+nmap <F8> :TagbarToggle<CR>
+nmap <C-n> :NERDTreeToggle<CR>
+map <F12> :silent! exec "!ctags -R 2> /dev/null"<CR>:echo<CR>
+
 call plug#begin('~/.config/nvim/plugged')
 Plug 'tmhedberg/SimpylFold'
 Plug 'Shougo/deoplete.nvim'
@@ -48,7 +52,11 @@ Plug 'tpope/vim-eunuch'
 Plug 'scrooloose/nerdtree'
 Plug 'jmcantrell/vim-virtualenv'
 Plug 'gregsexton/MatchTag'
+Plug 'majutsushi/tagbar'
 call plug#end()
 
 " deoplete
 let g:deoplete#enable_at_startup = 1
+
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
