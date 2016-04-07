@@ -53,6 +53,7 @@ Plug 'scrooloose/nerdtree'
 Plug 'jmcantrell/vim-virtualenv'
 Plug 'gregsexton/MatchTag'
 Plug 'majutsushi/tagbar'
+Plug 'vim-airline/vim-airline'
 call plug#end()
 
 " deoplete
