@@ -98,4 +98,11 @@ function virtenv_indicator {
 
 add-zsh-hook precmd virtenv_indicator
 
+up() {
+    for i in {1..$1};
+    do
+        cd ..
+    done
+}
+
 [[ -r ~/.zsh/local.zshrc ]] && . ~/.zsh/local.zshrc
