@@ -31,6 +31,7 @@ setopt PROMPT_SUBST
 
 insert_mode_color='magenta'
 default_mode_color='green'
+vi_mode_color=$default_mode_color
 
 prompt_host='%F{$vi_mode_color}%m%f'
 prompt_user='%F{green}%n%f'
@@ -42,9 +43,9 @@ prompt_ranger_active='(ranger)'
 
 if [ -n "$RANGER_LEVEL" ]; then prompt_ranger=$prompt_ranger_active; fi
 
-PROMPT='$prompt_virtualenv$prompt_ranger$prompt_user$prompt_separator$prompt_host  $prompt_exit_status'
+PROMPT="$prompt_virtualenv$prompt_ranger$prompt_user$prompt_separator$prompt_host  $prompt_exit_status"
 
-RPROMPT='$prompt_current_dir'
+RPROMPT="$prompt_current_dir"
 
 typeset -U path
 
