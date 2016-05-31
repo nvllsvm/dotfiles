@@ -14,6 +14,7 @@ set expandtab
 
 " line numbers
 set number
+set relativenumber
 
 " case insensitive search
 set ignorecase
