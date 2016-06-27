@@ -24,7 +24,6 @@ set grepprg=grep\ -nH\ $*
 let g:tex_flavor = "latex"
 
 au BufReadCmd   *.epub      call zip#Browse(expand("<amatch>"))
-au FileType javascript call JavaScriptFold()
 
 set foldmethod=syntax
 
@@ -54,7 +53,7 @@ Plug 'scrooloose/nerdtree'
 Plug 'jmcantrell/vim-virtualenv'
 Plug 'gregsexton/MatchTag'
 Plug 'majutsushi/tagbar'
-Plug 'vim-airline/vim-airline'
+Plug 'pangloss/vim-javascript'
 call plug#end()
 
 " deoplete
