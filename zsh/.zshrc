@@ -63,6 +63,10 @@ if [[ -d ~/.gem/ruby/ ]] && ls ~/.gem/ruby/ >/dev/null 2>&1; then
     done
 fi
 
+if [[ -d ~/.node_modules/bin/ ]]; then
+    path+=(~/.node_modules/bin/)
+fi
+
 bindkey -v
 
 KEYTIMEOUT=1
