@@ -54,6 +54,7 @@ Plug 'jmcantrell/vim-virtualenv'
 Plug 'gregsexton/MatchTag'
 Plug 'majutsushi/tagbar'
 Plug 'pangloss/vim-javascript'
+Plug 'freitass/todo.txt-vim'
 call plug#end()
 
 " deoplete
