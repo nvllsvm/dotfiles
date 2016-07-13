@@ -46,6 +46,8 @@ bindsym $mod+d exec dmenu_run -fn '$font-$fontSize'
 # installed.
 # bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
 
+bindsym $mod+x [class="^.*"] border toggle
+
 # change focus
 bindsym $mod+j focus left
 bindsym $mod+k focus down
@@ -165,7 +167,7 @@ bindsym $mod+r mode "resize"
 
 bar {
 #    output            LVDS1
-    status_command    i3status
+    status_command    i3blocks
     position          top
 #    mode              hide
     workspace_buttons yes
@@ -176,6 +178,7 @@ bar {
     colors {
         background #000000
         statusline #ffffff
+        separator #000000
 
         focused_workspace  #ffffff #285577
         active_workspace   #ffffff #333333
@@ -185,4 +188,9 @@ bar {
 }
 
 hide_edge_borders vertical
-hide_edge_borders both
+
+for_window [class="^.*"] border pixel 2
+
+bindsym $mod+b bar mode toggle
+
+exec --no-startup-id hsetroot -solid #00ff00
