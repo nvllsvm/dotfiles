@@ -15,7 +15,8 @@ bindsym $mod+Return exec open_in_current_dir
 bindsym $mod+Shift+q kill
 
 # start dmenu (a program launcher)
-bindsym $mod+d exec dmenu_run -fn '$font-$fontSize'
+#bindsym $mod+space exec dmenu_run -fn '$font-$fontSize'
+bindsym $mod+space exec rofi -show run
 
 bindsym $mod+x [class="^.*"] border toggle
 
@@ -49,7 +50,7 @@ bindsym $mod+e layout toggle split
 bindsym $mod+Shift+space floating toggle
 
 # change focus between tiling / floating windows
-bindsym $mod+space focus mode_toggle
+bindsym $mod+d focus mode_toggle
 
 # focus the parent container
 bindsym $mod+a focus parent
@@ -88,7 +89,7 @@ bindsym $mod+Shift+r restart
 # exit i3 (logs you out of your X session)
 bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
 
-bindsym $mod+F1 exec chromium --force-device-scale-factor=1.75
+bindsym $mod+F1 exec chromium
 
 # resize window
 mode "resize" {
