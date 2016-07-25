@@ -55,6 +55,7 @@ Plug 'gregsexton/MatchTag'
 Plug 'majutsushi/tagbar'
 Plug 'pangloss/vim-javascript'
 Plug 'freitass/todo.txt-vim'
+Plug 'nvie/vim-flake8'
 call plug#end()
 
 " deoplete
@@ -62,3 +63,5 @@ let g:deoplete#enable_at_startup = 1
 
 autocmd StdinReadPre * let s:std_in=1
 autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+
+autocmd BufWritePost *.py call Flake8()
