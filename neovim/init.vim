@@ -64,4 +64,7 @@ let g:deoplete#enable_at_startup = 1
 autocmd StdinReadPre * let s:std_in=1
 autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 
+" <Ctrl-l> redraws the screen and removes any search highlighting.
+nnoremap <silent> <C-l> :nohl<CR><C-l>
+
 autocmd BufWritePost *.py call Flake8()
