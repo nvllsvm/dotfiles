@@ -45,6 +45,8 @@ nmap <F8> :TagbarToggle<CR>
 nmap <C-n> :NERDTreeToggle<CR>
 map <F12> :silent! exec "!ctags -R 2> /dev/null"<CR>:echo<CR>
 
+let NERDTreeQuitOnOpen=1
+
 call plug#begin('~/.config/nvim/plugged')
 Plug 'tmhedberg/SimpylFold'
 Plug 'Shougo/deoplete.nvim'
@@ -55,16 +57,12 @@ Plug 'gregsexton/MatchTag'
 Plug 'majutsushi/tagbar'
 Plug 'pangloss/vim-javascript'
 Plug 'freitass/todo.txt-vim'
-Plug 'nvie/vim-flake8'
 call plug#end()
 
 " deoplete
 let g:deoplete#enable_at_startup = 1
 
 autocmd StdinReadPre * let s:std_in=1
-autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 
 " <Ctrl-l> redraws the screen and removes any search highlighting.
 nnoremap <silent> <C-l> :nohl<CR><C-l>
-
-autocmd BufWritePost *.py call Flake8()
