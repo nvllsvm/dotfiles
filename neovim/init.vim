@@ -46,7 +46,7 @@ nmap <C-n> :NERDTreeToggle<CR>
 map <F12> :silent! exec "!ctags -R 2> /dev/null"<CR>:echo<CR>
 
 let NERDTreeQuitOnOpen=1
-let NERDTreeIgnore=['^__pycache__$[[dir]]']
+let NERDTreeIgnore=['^__pycache__$[[dir]]', '\.pyc$']
 
 call plug#begin('~/.config/nvim/plugged')
 Plug 'tmhedberg/SimpylFold'
