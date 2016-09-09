@@ -28,7 +28,7 @@
 
 ## Backlight
 # Lower
-"lower-backlight"
+"/bin/zsh -c 'if [[ $(xbacklight -get) -gt 10 ]] then xbacklight -dec 10; else xbacklight -set 1; fi'"
   c:232
 
 # Raise
