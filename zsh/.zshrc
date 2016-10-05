@@ -10,12 +10,11 @@ HISTSIZE=1000
 SAVEHIST=1000
 HISTFILE=~/.zhistory
 
-setopt HIST_NO_STORE
-setopt HIST_IGNORE_ALL_DUPS
-setopt HIST_IGNORE_SPACE
-setopt INC_APPEND_HISTORY
-setopt SHARE_HISTORY
-setopt APPENDHISTORY
+setopt hist_no_store
+setopt hist_ignore_all_dups
+setopt hist_ignore_space
+setopt inc_append_history
+setopt share_history
 
 bindkey "\e[5~" beginning-of-history # PageUp
 bindkey "\e[6~" end-of-history # PageDown
@@ -26,6 +25,7 @@ alias ranger='if [ -n "$RANGER_LEVEL" ] ; then echo "Nope - already in a ranger 
 alias ls='ls --color=auto --group-directories-first'
 alias ll='ls -lh'
 alias la='ls -A'
+alias today='date +"%Y-%m-%d"'
 
 setopt PROMPT_SUBST
 
@@ -109,5 +109,19 @@ up() {
         cd ..
     done
 }
+
+sudo-command-line() {
+    [[ -z $BUFFER ]] && zle up-history
+    if [[ $BUFFER == sudo\ * ]]; then
+        LBUFFER="${LBUFFER#sudo }"
+    else
+        LBUFFER="sudo $LBUFFER"
+    fi
+}
+
+zle -N sudo-command-line
+# Defined shortcut keys: [Esc] [Esc]
+bindkey '^r' sudo-command-line
+bindkey -M vicmd '^r' sudo-command-line
 
 [[ -r ~/.zsh/local.zshrc ]] && . ~/.zsh/local.zshrc
