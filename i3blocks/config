@@ -1,7 +1,10 @@
-command=$SCRIPT_DIR/$BLOCK_NAME
+separator=true
+separator_block_width=50
 
 [battery]
-label=BAT
+command=acpi | awk '{print substr($3, 0, length($3)-1) " " substr($4, 0, length($4)-1)}'
+instance=1
+interval=30
 
 [time]
 command=date '+%Y-%m-%d %H:%M'
