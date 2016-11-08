@@ -71,5 +71,5 @@ nnoremap <silent> <C-l> :nohl<CR><C-l>
 " open all folds automatically
 autocmd BufWinEnter * normal zR
 
-" toggle numbering
-nmap <C-m> :set nu!<CR>:set norelativenumber!<CR>
+" show trailing spaces
+set list listchars=tab:»·,trail:·
