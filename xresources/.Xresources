@@ -1,0 +1,33 @@
+*facename: Tamzen
+*fontsize: 11
+*font: xft:Tamzen:size=11:antialias=false
+*boldFont: 
+
+Xcursor.size: 16
+
+urxvt*colorUL: #c5f779
+urxvt*saveLines:32767
+urxvt*scrollBar: false
+urxvt*underlineColor: #c5f779
+urxvt*pointerBlank: true
+
+*foreground: #eeeeee
+*background: #1c1e20
+*background: #000000
+
+*color0 : #282a2e
+*color1 : #a54242
+*color2 : #8c9440
+*color3 : #de935f
+*color4 : #5f819d
+*color5 : #85678f
+*color6 : #5e8d87
+*color7 : #707880
+*color8 : #595b59
+*color9 : #d18fa6
+*color10 : #637b3a
+*color11 : #78592f
+*color12 : #135979
+*color13 : #604291
+*color14 : #76bbca
+*color15 : #b2b5ae

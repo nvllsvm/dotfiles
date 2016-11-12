@@ -1,7 +1,27 @@
 set $mod Mod4
 
-set $font Tamzen
-set $fontSize 11
+set_from_resource $background background #000000
+set_from_resource $foreground foreground #000000
+
+set_from_resource $color0 color0 #000000
+set_from_resource $color1 color1 #000000
+set_from_resource $color2 color2 #000000
+set_from_resource $color3 color3 #000000
+set_from_resource $color4 color4 #000000
+set_from_resource $color5 color5 #000000
+set_from_resource $color6 color6 #000000
+set_from_resource $color7 color7 #000000
+set_from_resource $color8 color8 #000000
+set_from_resource $color9 color9 #000000
+set_from_resource $color10 color10 #000000
+set_from_resource $color11 color11 #000000
+set_from_resource $color12 color12 #000000
+set_from_resource $color13 color13 #000000
+set_from_resource $color14 color14 #000000
+set_from_resource $color15 color15 #000000
+
+set_from_resource $font facename Monospace
+set_from_resource $fontSize fontsize 11
 font pango:$font $fontSize
 
 # Use Mouse+$mod to drag floating windows to their wanted position
@@ -111,16 +131,18 @@ bar {
     tray_output       primary
     
     colors {
-        background #000000
-        statusline #ffffff
-        separator #000000
+        background $background
+        statusline $foreground
+        separator  $foreground
 
-        focused_workspace  #ffffff #285577
-        active_workspace   #ffffff #333333
-        inactive_workspace #888888 #222222
-        urgent_workspace   #ffffff #900000
+        focused_workspace  $foreground $color4
+        active_workspace   $foreground $color0
+        inactive_workspace $color8     $color0
+        urgent_workspace   $foreground $color1
     }
 }
+
+client.focused          $color4 $color12 $foreground $color15 $color4
 
 hide_edge_borders vertical
 
@@ -128,4 +150,6 @@ for_window [class="^.*"] border pixel 2
 
 bindsym $mod+b bar mode toggle
 
-exec --no-startup-id hsetroot -solid #00ff00
+exec --no-startup-id hsetroot -solid #000000
+
+for_window [title="Talos - Linux"] floating enable
