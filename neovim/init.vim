@@ -58,6 +58,7 @@ Plug 'gregsexton/MatchTag'
 Plug 'majutsushi/tagbar'
 Plug 'pangloss/vim-javascript'
 Plug 'freitass/todo.txt-vim'
+Plug 'zchee/deoplete-jedi'
 call plug#end()
 
 " deoplete
