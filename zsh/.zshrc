@@ -49,12 +49,6 @@ RPROMPT="$prompt_current_dir"
 
 typeset -U path
 
-if [[ -d ~/.bin/ ]]; then
-    for dir in ~/.bin/*; do
-        path+=($dir)
-    done
-fi
-
 if [[ -d ~/.gem/ruby/ ]] && ls ~/.gem/ruby/ >/dev/null 2>&1; then
     for dir in ~/.gem/ruby/*; do
         if [[ -d $dir/bin ]]; then
@@ -65,6 +59,24 @@ fi
 
 if [[ -d ~/.node_modules/bin/ ]]; then
     path+=(~/.node_modules/bin/)
+fi
+
+if $(test $(command -v python2)); then
+    temp_path="$(python2 -m site --user-base)/bin"
+    temp_path+=($path)
+    path=($temp_path)
+fi
+
+if $(test $(command -v python3)); then
+    temp_path="$(python3 -m site --user-base)/bin"
+    temp_path+=($path)
+    path=($temp_path)
+fi
+
+if [[ -d ~/.bin/ ]]; then
+    for dir in ~/.bin/*; do
+        path+=($dir)
+    done
 fi
 
 bindkey -v
