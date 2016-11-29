@@ -52,14 +52,6 @@ typeset -U path
 path=(~/.node_modules/bin/ "$path[@]")
 path=(~/.rbenv/shims/ "$path[@]")
 
-if $(test $(command -v python2)); then
-    path=("$(python2 -m site --user-base)/bin"  "$path[@]")
-fi
-
-if $(test $(command -v python3)); then
-    path=("$(python3 -m site --user-base)/bin"  "$path[@]")
-fi
-
 if [[ -d ~/.bin/ ]]; then
     for dir in ~/.bin/*; do
         path=($dir "$path[@]")
