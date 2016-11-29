@@ -49,33 +49,20 @@ RPROMPT="$prompt_current_dir"
 
 typeset -U path
 
-if [[ -d ~/.gem/ruby/ ]] && ls ~/.gem/ruby/ >/dev/null 2>&1; then
-    for dir in ~/.gem/ruby/*; do
-        if [[ -d $dir/bin ]]; then
-            path+=($dir/bin)
-        fi
-    done
-fi
-
-if [[ -d ~/.node_modules/bin/ ]]; then
-    path+=(~/.node_modules/bin/)
-fi
+path=(~/.node_modules/bin/ "$path[@]")
+path=(~/.rbenv/shims/ "$path[@]")
 
 if $(test $(command -v python2)); then
-    temp_path="$(python2 -m site --user-base)/bin"
-    temp_path+=($path)
-    path=($temp_path)
+    path=("$(python2 -m site --user-base)/bin"  "$path[@]")
 fi
 
 if $(test $(command -v python3)); then
-    temp_path="$(python3 -m site --user-base)/bin"
-    temp_path+=($path)
-    path=($temp_path)
+    path=("$(python3 -m site --user-base)/bin"  "$path[@]")
 fi
 
 if [[ -d ~/.bin/ ]]; then
     for dir in ~/.bin/*; do
-        path+=($dir)
+        path=($dir "$path[@]")
     done
 fi
 
