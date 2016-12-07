@@ -25,6 +25,7 @@ alias ranger='if [ -n "$RANGER_LEVEL" ] ; then echo "Nope - already in a ranger 
 alias ls='ls --color=auto --group-directories-first'
 alias ll='ls -lh'
 alias la='ls -A'
+alias grep='grep --color=auto'
 alias today='date +"%Y-%m-%d"'
 
 setopt PROMPT_SUBST
