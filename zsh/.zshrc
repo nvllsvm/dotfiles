@@ -37,14 +37,15 @@ vi_mode_color=$default_mode_color
 prompt_host='%F{$vi_mode_color}%m%f'
 prompt_user='%F{green}%n%f'
 prompt_separator='%F{black}.%f'
-prompt_exit_status='%(?..%K{yellow}%F{red}%?%k%f  )'
+prompt_exit_status='%(?..%K{yellow}%F{red}%?%k%f
+)'
 prompt_current_dir='%F{cyan}%~%f'
 
 prompt_ranger_active='(ranger)'
 
 if [ -n "$RANGER_LEVEL" ]; then prompt_ranger=$prompt_ranger_active; fi
 
-PROMPT='$prompt_virtualenv'"$prompt_ranger$prompt_user$prompt_separator$prompt_host  $prompt_exit_status"
+PROMPT='$prompt_exit_status$prompt_virtualenv'"$prompt_ranger$prompt_user$prompt_separator$prompt_host  "
 
 RPROMPT="$prompt_current_dir"
 
