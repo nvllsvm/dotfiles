@@ -51,8 +51,7 @@ RPROMPT="$prompt_current_dir"
 
 typeset -U path
 
-path=(~/.node_modules/bin/ "$path[@]")
-path=(~/.rbenv/shims/ "$path[@]")
+path=(~/.node_modules/bin "$path[@]")
 
 if [[ -d ~/.bin/ ]]; then
     for dir in ~/.bin/*; do
