@@ -98,7 +98,11 @@ add-zsh-hook precmd virtenv_indicator
 up() {
     for i in {1..$1};
     do
-        cd ..
+        if [[ -t 1 ]] then
+            cd ..
+        else
+            echo -n ../
+        fi
     done
 }
 
