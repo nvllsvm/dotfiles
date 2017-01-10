@@ -6,7 +6,7 @@ if $(test $(command -v python2)); then
 
     fn venv2() {
         if [[ -z $1 ]]; then
-            env="env"
+            env="env2"
         else
             env=$1
         fi
@@ -27,7 +27,7 @@ if $(test $(command -v python3)); then
 
     fn venv3() {
         if [[ -z $1 ]]; then
-            env="env"
+            env="env3"
         else
             env=$1
         fi
