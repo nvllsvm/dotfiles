@@ -1,0 +1,6 @@
+ranger/bookmarks
+ranger/tagged
+zsh/.zsh/local.zshrc
+neovim/plugged
+neovim/autoload/plug.vim.old
+neovim/autoload/plug.vim
