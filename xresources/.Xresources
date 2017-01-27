@@ -1,6 +1,6 @@
 *facename: Tamzen
-*fontsize: 11
-*font: xft:Tamzen:size=11:antialias=false
+*fontsize: 9
+*font: xft:Tamzen:size=9:antialias=false
 *boldFont: 
 
 Xcursor.size: 16
@@ -12,7 +12,6 @@ urxvt*underlineColor: #c5f779
 urxvt*pointerBlank: true
 
 *foreground: #eeeeee
-*background: #1c1e20
 *background: #000000
 
 *color0 : #282a2e
