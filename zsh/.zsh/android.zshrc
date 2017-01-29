@@ -1,4 +1,4 @@
-if [[ $(uname) -eq "Darwin" ]]; then
+if [[ $(uname) = "Darwin" ]]; then
     android_home=~/Library/Android
 else
     android_home=~/.android
