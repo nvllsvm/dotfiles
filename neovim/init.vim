@@ -59,6 +59,7 @@ Plug 'majutsushi/tagbar'
 Plug 'pangloss/vim-javascript'
 Plug 'freitass/todo.txt-vim'
 Plug 'zchee/deoplete-jedi'
+Plug 'w0rp/ale'
 call plug#end()
 
 " deoplete
