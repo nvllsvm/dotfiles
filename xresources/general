@@ -1,19 +1,13 @@
-*facename: DejaVu Sans Mono
-*fontsize: 7
-*font: xft:DejaVu Sans Mono:size=7
-*boldFont: 
+Xcursor.size: 16
 
-Xcursor.size: 32
-
-urxvt*colorUL: #c5f779
 urxvt*saveLines:32767
 urxvt*scrollBar: false
-urxvt*underlineColor: #c5f779
 urxvt*pointerBlank: true
 
 *foreground: #eeeeee
-*background: #1c1e20
 *background: #000000
+
+*underlineColor: #c5f779
 
 *color0 : #282a2e
 *color1 : #a54242

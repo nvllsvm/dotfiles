@@ -20,7 +20,9 @@ export SDL_AUDIODRIVER=alsa
 ~/.bin/general/starttriple &
 #~/.bin/general/startcompositing &
 
-xrdb ~/.Xresources &
+xrdb ~/Code/GitHub/nvllsvm/dotfiles/xresources/general
+xrdb -merge ~/Code/GitHub/nvllsvm/dotfiles/xresources/mars
+
 xbindkeys &
 nextcloud &
 

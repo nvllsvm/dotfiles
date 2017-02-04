@@ -32,7 +32,7 @@
   c:232
 
 # Raise
-"xbacklight -inc 10"
+"/bin/zsh -c 'if [[ $(xbacklight -get) -lt 10 ]] then xbacklight -set 10; else xbacklight -inc 10; fi'"
   c:233
 
 
