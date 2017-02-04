@@ -1,3 +1,5 @@
+dotfiles_dir=~/Code/GitHub/nvllsvm/dotfiles
+
 if [ -d /etc/X11/xinit/xinitrc.d ] ; then
     for f in /etc/X11/xinit/xinitrc.d/?*.sh ; do
         [ -x "$f" ] && . "$f"
@@ -6,7 +8,6 @@ if [ -d /etc/X11/xinit/xinitrc.d ] ; then
 fi
 
 setxkbmap -option terminate:ctrl_alt_bksp
-#xmodmap -e 'clear Lock' -e 'keycode 0x42 = Escape'
 
 xset -dpms; xset s off
 
@@ -20,10 +21,14 @@ export SDL_AUDIODRIVER=alsa
 ~/.bin/general/starttriple &
 #~/.bin/general/startcompositing &
 
-xrdb ~/Code/GitHub/nvllsvm/dotfiles/xresources/general
-xrdb -merge ~/Code/GitHub/nvllsvm/dotfiles/xresources/mars
+xrdb "$dotfiles_dir"/xresources/general
+xrdb -merge "$dotfiles_dir"/xresources/mars
 
-xbindkeys &
+xbindkeys -f "$dotfiles_dir"/xbindkeys/mars
 nextcloud &
+
+rm -rf ~/.config/i3
+mkdir ~/.config/i3
+cat "$dotfiles_dir"/i3/general > ~/.config/i3/config
 
 exec dbus-launch i3
