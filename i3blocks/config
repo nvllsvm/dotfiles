@@ -1,7 +1,9 @@
-command=$SCRIPT_DIR/$BLOCK_NAME
+separator=true
+separator_block_width=50
 
 [battery]
-label=BAT
+command=acpi | awk '{if (substr($3,0,1) == "C") {printf "+"} printf substr($4, 0, length($4)-1)}'
+interval=5
 
 [time]
 command=date '+%Y-%m-%d %H:%M'

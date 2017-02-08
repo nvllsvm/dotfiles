@@ -1,0 +1,12 @@
+## MPD
+# Toggle
+"mpc toggle"
+  XF86AudioPlay
+
+# Preivous
+"mpc prev"
+  XF86AudioPrev
+
+# Next
+"mpc next"
+  XF86AudioNext
