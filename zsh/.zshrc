@@ -37,15 +37,13 @@ vi_mode_color=$default_mode_color
 prompt_host='%F{$vi_mode_color}%m%f'
 prompt_user='%F{green}%n%f'
 prompt_separator='%F{black}.%f'
-prompt_exit_status='%(?..%K{yellow}%F{red}%?%k%f
-)'
 prompt_current_dir='%F{cyan}%~%f'
 
 prompt_ranger_active='(ranger)'
 
 if [ -n "$RANGER_LEVEL" ]; then prompt_ranger=$prompt_ranger_active; fi
 
-PROMPT='$prompt_exit_status$prompt_virtualenv'"$prompt_ranger$prompt_user$prompt_separator$prompt_host  "
+PROMPT='$prompt_virtualenv'"$prompt_ranger$prompt_user$prompt_separator$prompt_host  "
 
 RPROMPT="$prompt_current_dir"
 
@@ -94,6 +92,17 @@ function virtenv_indicator {
 }
 
 add-zsh-hook precmd virtenv_indicator
+add-zsh-hook precmd exit_status
+
+exit_status () {
+    exit_status=$?
+    if [[ $exit_status -gt 0 ]]; then
+        RED='\033[0;31m'
+        YELLOW_BG='\033[43m'
+        RESET_COLOR='\033[0m'
+        echo -e "${RED}${YELLOW_BG}$exit_status${RESET_COLOR}"
+    fi
+}
 
 up() {
     for i in {1..$1};
