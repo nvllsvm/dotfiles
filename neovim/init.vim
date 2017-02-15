@@ -59,7 +59,8 @@ Plug 'majutsushi/tagbar'
 Plug 'pangloss/vim-javascript'
 Plug 'freitass/todo.txt-vim'
 Plug 'zchee/deoplete-jedi'
-"Plug 'w0rp/ale'
+Plug 'Vimjas/vim-python-pep8-indent'
+Plug 'neomake/neomake'
 call plug#end()
 
 " deoplete
@@ -75,3 +76,9 @@ autocmd BufWinEnter * normal zR
 
 " show trailing spaces
 set list listchars=tab:»·,trail:·
+
+let g:neomake_python_enabled_makers = ['flake8']
+" E501 is line length of 80 characters
+let g:neomake_python_flake8_maker = { 'args': ['--ignore=E501'], }
+
+autocmd! BufWritePost * Neomake
