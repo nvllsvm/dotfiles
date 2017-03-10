@@ -61,10 +61,23 @@ Plug 'freitass/todo.txt-vim'
 Plug 'zchee/deoplete-jedi'
 Plug 'Vimjas/vim-python-pep8-indent'
 Plug 'neomake/neomake'
+Plug 'artur-shaik/vim-javacomplete2'
 call plug#end()
 
 " deoplete
 let g:deoplete#enable_at_startup = 1
+let g:deoplete#omni_patterns = {}
+let g:deoplete#omni_patterns.java = '[^. *\t]\.\w*'
+let g:deoplete#auto_completion_start_length = 2
+let g:deoplete#sources = {}
+let g:deoplete#sources._ = []
+let g:deoplete#file#enable_buffer_path = 1
+
+set omnifunc=syntaxcomplete#Complete
+
+"javacomplete
+autocmd FileType java setlocal omnifunc=javacomplete#Complete
+
 
 autocmd StdinReadPre * let s:std_in=1
 
