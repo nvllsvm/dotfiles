@@ -25,10 +25,11 @@ xrdb "$dotfiles_dir"/xresources/general
 xrdb -merge "$dotfiles_dir"/xresources/mars
 
 xbindkeys -f "$dotfiles_dir"/xbindkeys/mars
-nextcloud &
+QSyncthingTray &
 
 rm -rf ~/.config/i3
 mkdir ~/.config/i3
 cat "$dotfiles_dir"/i3/general > ~/.config/i3/config
+cat "$dotfiles_dir"/i3/mars >> ~/.config/i3/config
 
 exec dbus-launch i3
