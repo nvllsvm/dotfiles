@@ -1,14 +1,14 @@
 ## Volume
 # Toggle
-"amixer set 'Front DAC' toggle"
+"pamixer --toggle-mute"
   c:121
 
 # Lower
-"amixer set 'Front DAC' unmute && amixer set Master 3%-"
+"pamixer --unmute && pamixer --decrease 3"
   c:122
 
 # Raise
-"amixer set 'Front DAC' unmute && amixer set Master 3%+"
+"pamixer --unmute && pamixer --increase 3"
   c:123
 
 
