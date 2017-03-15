@@ -154,4 +154,4 @@ exec --no-startup-id hsetroot -solid #000000
 
 for_window [title="Talos - Linux"] floating enable
 
-bindsym $mod+Shift+s exec maim -s ~/"$(date +%Y-%m-%d\ %H:%M:%S.%3N).png"
+bindsym $mod+Shift+s exec maim -s -n 1 ~/"$(date +%Y-%m-%d\ %H:%M:%S.%3N).png"
