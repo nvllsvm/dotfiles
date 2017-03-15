@@ -23,10 +23,12 @@ xrandr --newmode "1600x900" 97.50  1600 1648 1680 1760  900 903 908 926 +hsync -
 xrandr --addmode eDP-1 1600x900
 xrandr --dpi 192
 
-mpd
+export GDK_SCALE=2
 
 rm -rf ~/.config/i3
 mkdir ~/.config/i3
 cat "$dotfiles_dir"/i3/general > ~/.config/i3/config
+
+startcompositing
 
 exec dbus-launch i3
