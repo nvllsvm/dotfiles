@@ -32,6 +32,6 @@ mkdir ~/.config/i3
 cat "$dotfiles_dir"/i3/general > ~/.config/i3/config
 cat "$dotfiles_dir"/i3/mars >> ~/.config/i3/config
 
-startcompositing
+startcompositing &
 
 exec dbus-launch i3
