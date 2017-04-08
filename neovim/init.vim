@@ -62,6 +62,7 @@ Plug 'zchee/deoplete-jedi'
 Plug 'Vimjas/vim-python-pep8-indent'
 Plug 'neomake/neomake'
 Plug 'udalov/kotlin-vim'
+Plug 'rust-lang/rust.vim'
 call plug#end()
 
 " deoplete
