@@ -1,5 +1,5 @@
-if $(test $(command -v python2)); then
-    path=("$(python2 -m site --user-base)/bin"  "$path[@]")
+if $(test $(command -v python2.7)); then
+    path=("$(python2.7 -m site --user-base)/bin"  "$path[@]")
 
     if $(test $(command -v pip2)); then
         alias pip2-update='pip2 freeze --all --user | grep -v '^\-e' | cut -d = -f 1 | xargs pip2 install --user -U'
@@ -7,14 +7,14 @@ if $(test $(command -v python2)); then
     fi
 
     fn python2-site-build() {
-        site_dir=$(python2 -m site --user-site)
+        site_dir=$(python2.7 -m site --user-site)
         if [[ ! -d $site_dir ]]; then
             mkdir -p $site_dir
             touch "$site_dir/.pth"
 
-            cd $(python2 -m site --user-base)
+            cd $(python2.7 -m site --user-base)
             curl -O https://bootstrap.pypa.io/get-pip.py
-            python2 get-pip.py --user --force
+            python2.7 get-pip.py --user --force
             rm get-pip.py
         fi
     }
@@ -27,7 +27,7 @@ if $(test $(command -v python2)); then
         fi
 
         if [[ ! -d $env ]]; then
-            virtualenv -p python2 $env
+            virtualenv -p python2.7 $env
         fi
 
         source $env/bin/activate
