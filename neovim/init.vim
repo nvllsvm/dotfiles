@@ -63,6 +63,8 @@ Plug 'Vimjas/vim-python-pep8-indent'
 Plug 'neomake/neomake'
 Plug 'udalov/kotlin-vim'
 Plug 'rust-lang/rust.vim'
+Plug 'godlygeek/tabular'
+Plug 'plasticboy/vim-markdown'
 call plug#end()
 
 " deoplete

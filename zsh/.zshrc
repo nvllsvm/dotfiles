@@ -79,6 +79,7 @@ function virtenv_indicator {
         unset prompt_virtualenv
         unset ORIG_PYTHON2_BIN
         unset ORIG_PYTHON3_BIN
+        unset PIP_USER
     else
         prompt_virtualenv="($(basename $VIRTUAL_ENV))"
 
@@ -88,6 +89,8 @@ function virtenv_indicator {
         if [[ -n $PYTHON3_BIN ]] then
             export ORIG_PYTHON3_BIN=$PYTHON3_BIN
         fi
+
+        export PIP_USER=0
     fi
 }
 
