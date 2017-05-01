@@ -18,8 +18,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
          GRV,    1,    2,   3,   4,   5,   6,   7,   8,    9,    0, MINS,  EQL,   NO, BSPC, \
          TAB,    Q,    W,   E,   R,   T,   Y,   U,   I,    O,    P, LBRC, RBRC, BSLS,       \
          ESC,    A,    S,   D,   F,   G,   H,   J,   K,    L, SCLN, QUOT,   NO,  ENT,       \
-        LSFT,   NO,    Z,   X,   C,   V,   B,   N,   M, COMM,  DOT, SLSH,   NO, UP,   NO, \
-        LCTL, LGUI, LALT,                SPC,                  FN1, LEFT,  DOWN, RGHT),
+        LSFT,   NO,    Z,   X,   C,   V,   B,   N,   M, COMM,  DOT, SLSH,   NO, FN1,   NO, \
+        LCTL, LGUI, LALT,                SPC,                  LEFT,DOWN,   UP, RGHT),
 
     /* 1: Poker Fn
 ┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┐
@@ -39,8 +39,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         CAPS,   F1,   F2,   F3,   F4,   F5,   F6,   F7,   F8,   F9,  F10,  F11,  F12, TRNS, DEL, \
         TRNS, PGDN,   UP, PGUP, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,       \
         TRNS, LEFT, DOWN, RGHT, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,  INS,  DEL, TRNS,       \
-        TRNS, TRNS, HOME,  END, MUTE, VOLD, VOLU, MPRV, MPLY, MNXT, TRNS, TRNS, TRNS, PGUP, TRNS, \
-        TRNS, TRNS, TRNS,                   TRNS,                   TRNS, HOME, PGDN, END),
+        TRNS, TRNS, HOME,  END, MUTE, VOLD, VOLU, MPRV, MPLY, MNXT, TRNS, TRNS, TRNS, TRNS, TRNS, \
+        TRNS, TRNS, TRNS,                   TRNS,                   HOME, PGDN, PGUP, END),
 
     /* 2: Mouse
 ┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┐
@@ -67,6 +67,6 @@ const uint16_t PROGMEM fn_actions[] = {
     /* Poker Layout */
     [0] = ACTION_DEFAULT_LAYER_SET(0),  // set qwerty layout
     [1] = ACTION_LAYER_MOMENTARY(1),  // to Fn overlay
-    [2] = ACTION_LAYER_MOMENTARY(2),  // to Mouse overlay
+//    [2] = ACTION_LAYER_MOMENTARY(2),  // to Mouse overlay
 //    [3] = ACTION_MODS_KEY(MOD_RCTL|MOD_RSFT, KC_ESC), // Task(RControl,RShift+Esc)
 };
