@@ -1,4 +1,4 @@
-#include "s60-x.h"
+#include "s60_x.h"
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /* 0: qwerty
