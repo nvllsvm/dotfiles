@@ -15,11 +15,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 └─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┘
     */
     LEGACY_KEYMAP(
-         GRV,    1,    2,   3,   4,   5,   6,   7,   8,    9,    0, MINS,  EQL, BSPC, DEL, \
+         GRV,    1,    2,   3,   4,   5,   6,   7,   8,    9,    0, MINS,  EQL, BSPC,  DEL, \
          TAB,    Q,    W,   E,   R,   T,   Y,   U,   I,    O,    P, LBRC, RBRC, BSLS,       \
          ESC,    A,    S,   D,   F,   G,   H,   J,   K,    L, SCLN, QUOT,   NO,  ENT,       \
-        LSFT,   NO,    Z,   X,   C,   V,   B,   N,   M, COMM,  DOT, SLSH,   NO, FN1,  RSFT, \
-        LCTL, LGUI, LALT,                SPC,                  LEFT,DOWN,   UP, RGHT),
+        LSFT,   NO,    Z,   X,   C,   V,   B,   N,   M, COMM,  DOT, SLSH,   NO,   UP, RSFT, \
+        LCTL, LGUI, LALT,                SPC,                  FN1, LEFT, DOWN, RGHT),
 
     /* 1: Poker Fn
 ┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┐
@@ -36,11 +36,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     */
     LEGACY_KEYMAP(
-        CAPS,   F1,   F2,   F3,   F4,   F5,   F6,   F7,   F8,   F9,  F10,  F11,  F12, TRNS, INS, \
+        CAPS,   F1,   F2,   F3,   F4,   F5,   F6,   F7,   F8,   F9,  F10,  F11,  F12, TRNS,  INS, \
         TRNS, TRNS,   UP, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,       \
         TRNS, LEFT, DOWN, RGHT, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,       \
-        TRNS, TRNS, TRNS, TRNS, MUTE, VOLD, VOLU, MPRV, MPLY, MNXT, TRNS, TRNS, TRNS, TRNS, TRNS, \
-        TRNS, TRNS, TRNS,                   TRNS,                   HOME, PGDN, PGUP, END),
+        TRNS, TRNS, TRNS, TRNS, MUTE, VOLD, VOLU, MPRV, MPLY, MNXT, TRNS, TRNS, TRNS, PGUP, TRNS, \
+        TRNS, TRNS, TRNS,                   TRNS,                   TRNS, HOME, PGDN, END),
 
     /* 2: Mouse
 ┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┐
