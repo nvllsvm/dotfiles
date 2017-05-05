@@ -71,21 +71,16 @@ zle -N zle-keymap-select
 
 export VIRTUAL_ENV_DISABLE_PROMPT=1
 
-PYTHON2_BIN=$(command -v python2 || command -v python2.7)
 PYTHON3_BIN=$(command -v python3)
 
 function virtenv_indicator {
     if [[ -z $VIRTUAL_ENV ]] then
         unset prompt_virtualenv
-        unset ORIG_PYTHON2_BIN
         unset ORIG_PYTHON3_BIN
         unset PIP_USER
     else
         prompt_virtualenv="($(basename $VIRTUAL_ENV))"
 
-        if [[ -n $PYTHON2_BIN ]] then
-            export ORIG_PYTHON2_BIN=$PYTHON2_BIN
-        fi
         if [[ -n $PYTHON3_BIN ]] then
             export ORIG_PYTHON3_BIN=$PYTHON3_BIN
         fi
