@@ -8,6 +8,8 @@ set tabstop=4
 set shiftwidth=4
 set expandtab
 
+set mouse=a
+
 " line numbers
 set number
 set relativenumber
