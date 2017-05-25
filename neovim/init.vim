@@ -92,3 +92,5 @@ let g:neomake_python_enabled_makers = ['flake8']
 "let g:neomake_python_flake8_maker = { 'args': ['--ignore=E501'], }
 
 autocmd! BufWritePost * Neomake
+
+autocmd FileType markdown autocmd BufWritePost * call system("pandoc-markdown " . expand("<afile>"))
