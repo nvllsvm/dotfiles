@@ -21,7 +21,15 @@ bindkey "\e[6~" end-of-history # PageDown
 bindkey "^[[A" history-beginning-search-backward
 bindkey "^[[B" history-beginning-search-forward
 
-alias ranger='if [ -n "$RANGER_LEVEL" ] ; then echo "Nope - already in a ranger shell" ; else ranger; fi'
+ranger_bin=$(which ranger)
+ranger() {
+    if [ -n "$RANGER_LEVEL" ]; then
+        echo "Nope - already in a ranger shell"
+    else
+        $ranger_bin $@
+    fi
+}
+
 alias ls='ls --color=auto --group-directories-first'
 alias ll='ls -lh'
 alias la='ls -A'
