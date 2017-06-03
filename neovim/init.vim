@@ -1,5 +1,5 @@
-if !empty($ORIG_PYTHON3_BIN)
-    let g:python3_host_prog=$ORIG_PYTHON3_BIN
+if !empty($SYSTEM_PYTHON3_BIN)
+    let g:python3_host_prog=$SYSTEM_PYTHON3_BIN
 endif
 
 colorscheme wombat256mod

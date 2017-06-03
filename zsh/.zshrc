@@ -1,5 +1,6 @@
 zstyle ':completion:*' list-colors "${(@s.:.)LS_COLORS}"
 zstyle ':completion:*' menu select
+zstyle ':completion:*' rehash true
 autoload -U colors && colors
 autoload -U compinit && compinit
 autoload -U add-zsh-hook
@@ -21,12 +22,11 @@ bindkey "\e[6~" end-of-history # PageDown
 bindkey "^[[A" history-beginning-search-backward
 bindkey "^[[B" history-beginning-search-forward
 
-ranger_bin=$(which ranger)
 ranger() {
     if [ -n "$RANGER_LEVEL" ]; then
         echo "Nope - already in a ranger shell"
     else
-        $ranger_bin $@
+        command -p ranger $@
     fi
 }
 
@@ -84,13 +84,13 @@ PYTHON3_BIN=$(command -v python3)
 function virtenv_indicator {
     if [[ -z $VIRTUAL_ENV ]] then
         unset prompt_virtualenv
-        unset ORIG_PYTHON3_BIN
+        unset SYSTEM_PYTHON3_BIN
         unset PIP_USER
     else
         prompt_virtualenv="($(basename $VIRTUAL_ENV))"
 
         if [[ -n $PYTHON3_BIN ]] then
-            export ORIG_PYTHON3_BIN=$PYTHON3_BIN
+            export SYSTEM_PYTHON3_BIN=$PYTHON3_BIN
         fi
 
         export PIP_USER=0
