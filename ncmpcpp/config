@@ -275,7 +275,7 @@ alternative_header_second_line_format = {{$4$b%a$/b$9}{  $/b$0%y$9}{  $b$7%b$9$/
 ##
 #
 #song_columns_list_format = (20)[]{a} (6f)[green]{NE} (50)[white]{t|f:Title} (20)[cyan]{b} (7f)[magenta]{l}
-song_columns_list_format = (20)[blue]{a} (50)[white]{t|f:Title} (20)[cyan]{b} (7f)[black]{lr:}
+song_columns_list_format = (20)[blue]{a} (50)[white]{t|f:Title} (20)[cyan]{b} (7f)[white]{lr:}
 #song_columns_list_format = (50)[cyan]{t|f:Title} (7f)[black]{lr:}
 #
 ##### various settings #####
@@ -322,9 +322,8 @@ autocenter_mode = yes
 ## Note: You can specify third character which will
 ## be used to build 'empty' part of progressbar.
 ##
-progressbar_look = —-  
+progressbar_look = --
 #
-progressbar_boldness = yes
 #
 ## Available values: database, playlist.
 ##
@@ -477,9 +476,9 @@ ask_before_clearing_playlists = no
 #
 #empty_tag_color = cyan
 #
-header_window_color = black
+header_window_color = white
 #
-volume_color = black
+volume_color = white
 #
 #state_line_color = default
 #
@@ -493,7 +492,7 @@ volume_color = black
 #
 #main_window_highlight_color = yellow
 #
-#progressbar_color = black
+progressbar_color = black
 #
 progressbar_elapsed_color = cyan
 #
