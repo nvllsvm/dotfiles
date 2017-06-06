@@ -26,7 +26,7 @@ ranger() {
     if [ -n "$RANGER_LEVEL" ]; then
         echo "Nope - already in a ranger shell"
     else
-        command -p ranger $@
+        $(whence -p ranger) $@
     fi
 }
 
