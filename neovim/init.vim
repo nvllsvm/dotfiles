@@ -2,7 +2,6 @@ if !empty($SYSTEM_PYTHON3_BIN)
     let g:python3_host_prog=$SYSTEM_PYTHON3_BIN
 endif
 
-colorscheme wombat256mod
 set ruler
 set tabstop=4
 set shiftwidth=4
@@ -63,6 +62,7 @@ Plug 'udalov/kotlin-vim'
 Plug 'rust-lang/rust.vim'
 Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
+Plug 'chriskempson/base16-vim'
 call plug#end()
 
 " deoplete
@@ -94,3 +94,8 @@ let g:neomake_python_enabled_makers = ['flake8']
 autocmd! BufWritePost * Neomake
 
 autocmd FileType markdown autocmd BufWritePost * call system("pandoc-markdown " . expand("<afile>"))
+
+if filereadable(expand("~/.vimrc_background"))
+  let base16colorspace=256
+  source ~/.vimrc_background
+endif
