@@ -18,8 +18,8 @@ export __VDPAU_NVIDIA_SYNC_DISPLAY_DEVICE=DFP-6
 export SDL_VIDEO_FULLSCREEN_HEAD=0
 export SDL_AUDIODRIVER=alsa
 
-~/.bin/general/starttriple &
-#~/.bin/general/startcompositing &
+~/.bin/mars/starttriple &
+#~/.bin/desktop/startcompositing &
 
 xrdb "$dotfiles_dir"/xresources/general
 xrdb -merge "$dotfiles_dir"/xresources/mars
