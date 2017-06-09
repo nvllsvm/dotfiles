@@ -25,13 +25,16 @@ python-site-build() {
 
 venv() {
     local python_version=$1
-    local env=env$python_version
 
-    if [[ ! -d $env ]]; then
-        virtualenv -p python$python_version $env
+    if [[ -z $python_version ]]; then
+        python_version=3
     fi
 
-    source $env/bin/activate
+    if [[ ! -d env ]]; then
+        virtualenv -p python$python_version env
+    fi
+
+    source env/bin/activate
 }
 
 if $(test $(command -v python2.7)); then
