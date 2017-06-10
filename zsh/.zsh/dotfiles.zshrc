@@ -13,3 +13,4 @@ dotfiles-update() {
         echo Unable to pull.
     fi
 }
+update_commands=("$update_commands[@]" dotfiles-update)
