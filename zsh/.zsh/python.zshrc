@@ -54,3 +54,27 @@ if $(test $(command -v python3)); then
         update_commands=("$update_commands[@]" pip3-update)
     fi
 fi
+
+export VIRTUAL_ENV_DISABLE_PROMPT=1
+
+PYTHON3_BIN=$(command -v python3)
+
+function virtenv_indicator {
+    if [[ -z $VIRTUAL_ENV ]] then
+        unset prompt_virtualenv
+        unset SYSTEM_PYTHON3_BIN
+        unset PIP_USER
+    else
+        prompt_virtualenv="($(basename $VIRTUAL_ENV))"
+
+        if [[ -n $PYTHON3_BIN ]] then
+            export SYSTEM_PYTHON3_BIN=$PYTHON3_BIN
+        fi
+
+        export PIP_USER=0
+    fi
+}
+
+add-zsh-hook precmd virtenv_indicator
+
+PROMPT='$prompt_virtualenv'"$PROMPT"

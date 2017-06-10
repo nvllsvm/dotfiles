@@ -22,14 +22,6 @@ bindkey "\e[6~" end-of-history # PageDown
 bindkey "^[[A" history-beginning-search-backward
 bindkey "^[[B" history-beginning-search-forward
 
-ranger() {
-    if [ -n "$RANGER_LEVEL" ]; then
-        echo "Nope - already in a ranger shell"
-    else
-        $(whence -p ranger) $@
-    fi
-}
-
 alias ls='ls --color=auto --group-directories-first'
 alias ll='ls -lh'
 alias la='ls -A'
@@ -47,11 +39,7 @@ prompt_user='%F{green}%n%f'
 prompt_separator='%F{black}.%f'
 prompt_current_dir='%F{cyan}%~%f'
 
-prompt_ranger_active='(ranger)'
-
-if [ -n "$RANGER_LEVEL" ]; then prompt_ranger=$prompt_ranger_active; fi
-
-PROMPT='$prompt_virtualenv'"$prompt_ranger$prompt_user$prompt_separator$prompt_host  "
+PROMPT="$prompt_user$prompt_separator$prompt_host  "
 
 RPROMPT="$prompt_current_dir"
 
@@ -76,26 +64,6 @@ function zle-line-init zle-keymap-select {
 
 zle -N zle-line-init
 zle -N zle-keymap-select
-
-export VIRTUAL_ENV_DISABLE_PROMPT=1
-
-PYTHON3_BIN=$(command -v python3)
-
-function virtenv_indicator {
-    if [[ -z $VIRTUAL_ENV ]] then
-        unset prompt_virtualenv
-        unset SYSTEM_PYTHON3_BIN
-        unset PIP_USER
-    else
-        prompt_virtualenv="($(basename $VIRTUAL_ENV))"
-
-        if [[ -n $PYTHON3_BIN ]] then
-            export SYSTEM_PYTHON3_BIN=$PYTHON3_BIN
-        fi
-
-        export PIP_USER=0
-    fi
-}
 
 add-zsh-hook precmd virtenv_indicator
 add-zsh-hook precmd exit_status
