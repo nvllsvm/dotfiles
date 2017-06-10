@@ -1,0 +1,151 @@
+#!/bin/bash
+# Andrew Rabert
+# 2012-03-15
+# 
+# lossless-fix
+#
+# Filetypes supported: FLAC, APE, WV
+#
+# Extracts the above filetypes and converts the wave files to flac.
+
+IFS=$'\n'
+
+usage ()
+{
+	cat << EOF
+Usage: 	lossless-fix [options] [directory path]
+
+OPTIONS:
+	-h		Help
+	-a		Extract all lossless files
+	-e		Extract only APE, ALAC, and WV files
+	-c 		Convert all .wav files
+	-x 		Extract and convert all lossless to FLAC
+EOF
+}
+
+extract_ape ()
+{
+	for X in `find -iname '*'.ape`
+		do
+			ffmpeg -i "$X" "$X".wav		
+			rm "$X"
+		done
+}
+
+extract_tta ()
+{
+	for X in `find -iname '*'.tta`
+		do
+			ffmpeg -i "$X" "$X".wav		
+			rm "$X"
+		done
+}
+
+extract_tak ()
+{
+	for X in `find -iname '*'.tak`
+		do
+			ffmpeg -i "$X" "$X".wav		
+			rm "$X"
+		done
+}
+
+extract_alac ()
+{
+	for X in `find -iname '*'.m4a`
+		do
+			ffmpeg -i "$X" "$X".wav
+			rm "$X"
+		done
+}
+
+extract_wv ()
+{
+	for X in `find -iname '*'.wv`
+		do
+			wvunpack -d -y -cc "$X"
+		done
+}
+
+extract_flac ()
+{
+	for X in `find -iname '*'.flac`
+		do
+			flac --delete-input-file -d -f -F "$X"
+		done
+}
+
+wav2flac ()
+{
+	for X in `find -iname '*'.wav`
+		do
+			flac --best --delete-input-file -V -f "$X"
+		done
+}
+
+
+EXTRACT_FLAC=
+EXTRACT_OTHER=
+CONVERT=
+while getopts ":acehx" OPTION
+do
+	case $OPTION in
+		a)
+			EXTRACT_FLAC=true
+			EXTRACT_OTHER=true
+			;;
+		e)
+			EXTRACT_OTHER=true
+			;;
+		c)
+			CONVERT=true
+			;;
+		x)
+			EXTRACT_FLAC=true
+			EXTRACT_OTHER=true
+			CONVERT=true
+			;;
+		h)
+			usage
+			exit
+			;;
+		?)
+			usage
+			exit
+			;;
+	esac
+done
+
+
+DIRNAME=${@:OPTIND}
+
+if [ "$DIRNAME" = "" ]
+then
+	usage
+elif [ ! -d "$DIRNAME" ]
+then
+	echo "Invalid directory."
+else
+	cd "$DIRNAME"
+	if [[ $EXTRACT_FLAC == true ]]
+	then
+		extract_flac
+	fi
+	if [[ $EXTRACT_OTHER == true ]]
+	then
+		extract_ape
+		extract_alac
+		extract_wv
+		extract_tta
+		extract_tak
+	fi
+	if [[ $CONVERT == true ]]
+	then
+		wav2flac
+	fi
+	if [[ -z $CONVERT ]] && [[ -z $EXTRACT_ALL ]] && [[ -z $EXTRACT_APEWV ]]
+	then
+		usage
+	fi
+fi

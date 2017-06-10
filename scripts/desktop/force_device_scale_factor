@@ -1,0 +1,8 @@
+#!/bin/sh
+dpi=$(xdpyinfo | grep resolution | awk '{print $2}')
+
+if [[ $dpi == '192x192' ]]; then
+    GDK_SCALE=2 $1 --force-device-scale-factor=2 "${@:2}"
+else
+    $1 "${@:2}"
+fi

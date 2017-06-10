@@ -1,0 +1,6 @@
+#!/bin/sh
+
+if [[ $(xrandr | grep \* | cut -d' ' -f4) == "3200x1800" ]] 
+then xrandr --output HDMI-1 --off --output DP-1 --off --output eDP-1 --mode 1600x900 --pos 0x0 --rotate normal --output VIRTUAL1 --off
+else xrandr --output HDMI-1 --off --output DP-1 --off --output eDP-1 --mode 3200x1800 --pos 0x0 --rotate normal --output VIRTUAL1 --off
+fi

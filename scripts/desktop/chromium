@@ -1,0 +1,2 @@
+#!/bin/sh
+force_device_scale_factor /usr/bin/chromium $@

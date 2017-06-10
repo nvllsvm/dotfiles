@@ -1,0 +1,2 @@
+#!/bin/sh
+env GTK_THEME=Breeze gdk_scaled /usr/bin/firefox-developer $@

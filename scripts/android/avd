@@ -1,0 +1,7 @@
+#!/bin/sh
+if [[ -z $1 ]]; then
+    avdmanager list avd -c
+else
+    cd $ANDROID_HOME/emulator
+    emulator -avd $1
+fi

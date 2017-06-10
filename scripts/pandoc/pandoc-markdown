@@ -1,0 +1,10 @@
+#!/bin/sh
+
+if [ -z "$2" ]; then
+    OUTPUT_FILE=/tmp/pandoc-markdown.html
+else
+    OUTPUT_FILE=$2
+fi
+
+
+pandoc --from markdown_github --to html -c ~/.pandoc/css/github-markdown.css --self-contained --standalone --columns=10000 $1 > $OUTPUT_FILE

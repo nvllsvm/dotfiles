@@ -1,0 +1,287 @@
+#!/usr/bin/python
+import argparse
+import codecs
+import os
+import shutil
+import subprocess
+from chardet.universaldetector import UniversalDetector
+
+audioTypes = ('.flac','.mp3')
+
+imageTypes = ('.jpg','.png')
+imagePrefix = 'front'
+
+infoTypes = ('.nfo','.log','.cue')
+infoPrefix = 'ripping'
+
+switchType = {'.jpeg': '.jpg',
+              '.txt': '.nfo'}
+
+finalTypes = imageTypes + audioTypes + infoTypes
+
+caseTypes = imageTypes + audioTypes + infoTypes + tuple( switchType.keys())
+
+garbageTypes = ('.m3u','.m3u8','.md5','.accurip','.sfv')
+
+
+def get_encoding(current_file):
+    detector = UniversalDetector()
+    for line in open(current_file, 'rb'):
+        detector.feed(line)
+        if detector.done: 
+            break
+    detector.close()
+
+    return detector.result['encoding']
+
+
+def convert_file_to_utf8(path):
+    encoding = get_encoding(path)
+    old_file = codecs.open(path, 'r', encoding=encoding)
+
+    new = []
+
+    for line in old_file:
+        new.append(line)
+
+    new_file = open(path, 'w')
+    for line in new:
+        new_file.write(line)
+
+
+def getCueTrackCount(root, cueFile):
+    inputCue = os.path.join(root, cueFile)
+    f = open(inputCue)
+
+    try:
+        trackCount = sum([1 for line in f if line.strip().startswith('TRACK ')]) 
+    except UnicodeDecodeError:
+        convert_file_to_utf8(inputCue)
+        f = open(inputCue)
+        trackCount = sum([1 for line in f if line.strip().startswith('TRACK ')]) 
+
+    return trackCount
+
+
+def escapePath(path):
+    escaped = path
+    escaped = escaped.replace('"', '\\"')
+
+    return escaped
+
+
+def splitFlac(root, cueFile, flacFile):
+    inputCue = escapePath(os.path.join(root, cueFile))
+    inputFlac = escapePath(os.path.join(root, flacFile))
+    rootEscaped = escapePath(root)
+
+    call = """cd "{0}" && shntool split -f "{1}" -o 'flac flac --output-name=split%f -' -t '%n' "{2}" """.format(rootEscaped, inputCue, inputFlac)
+
+    subprocess.call(call,shell=True)
+
+    shutil.move(inputFlac, '{0}.bak'.format(inputFlac))
+
+
+def fixCase(root, files):
+    for f in files:
+        for properExt in caseTypes:
+            if f.lower().endswith(properExt):
+                extSubscript = -len(properExt) 
+                currentExt = f[extSubscript:]
+                lowerExt = currentExt.lower()
+                if lowerExt != currentExt:
+                    new = f[:extSubscript] + properExt
+                    
+                    moveFile(root, files, f, new)
+
+    return files
+
+
+def deleteGarbage(root, files):
+    for f in files:
+        for garbageType in garbageTypes:
+            if f.lower().endswith(garbageType):
+                deleteFile(root, files, f)
+
+
+def findEmptyDir(root, dirStructure):
+    emptyDirs = []
+    for r in dirStructure:
+        if r.startswith(root):
+            if dirStructure[r]['files'] > []:
+                emptyDirs = []
+                break
+            else:
+                emptyDirs.append(r)
+
+    return emptyDirs
+
+
+def deleteDirectory(d, dirStructure):
+    del dirStructure[d]
+    shutil.rmtree(d)
+
+
+def typeMap(root, files):
+    for f in files:
+        for oldType in switchType:
+            if f.endswith(oldType):
+                extSubscript = -len(oldType)
+                new = f[:extSubscript] + switchType[oldType]
+                    
+                moveFile(root, files, f, new)
+
+    return files
+
+
+def isAudioDirectory(root, files):
+    audioDir = False
+
+    fileCount = len(files)
+
+    if fileCount > 0:
+        audioCount = sum(1 for c in files if c.endswith(audioTypes))
+        validCount = sum(1 for c in files if c.endswith(finalTypes))
+
+        if audioCount == 0:
+            errorList.append('Non-audio directory: ' + root)
+        elif audioCount > 0 and validCount != fileCount:
+            audioDir = True
+            errorList.append('Extra files: ' + root)
+        else:
+            audioDir = True
+
+    return audioDir
+
+
+def moveFile(root, files, old, new):
+    if new in files:
+        errorList.append('Duplicate Error: ' + os.path.join(root, new))
+    else:
+        oldFile = os.path.join(root, old)
+        newFile = os.path.join(root, new)
+        files.remove(old)
+        files.append(new)
+        shutil.move(oldFile, newFile)
+
+
+def deleteFile(root, files, f):
+    files.remove(f)
+    deletedFile = os.path.join(root,f)
+    os.remove(deletedFile)
+
+
+def loadDirStructure(directory):
+    dirStructure = {}
+
+    for r,d,f in os.walk(directory):
+        root = r + '/'
+        dirStructure[root] = {}
+        dirStructure[root]['directories'] = d
+        dirStructure[root]['files'] = f
+
+    return dirStructure
+
+
+def checkMultipleImageTypes(root, files):
+    images = 0
+
+    for f in files:
+        for t in imageTypes:
+            if f.endswith(t):
+                images += 1
+                imageName = f
+                imageType = t
+
+    if images == 0:
+        errorList.append('No images: ' + root)
+    elif images > 1:
+        errorList.append('Multiple images:' + root)
+    else:
+        oldFile = os.path.join(root, imageName)
+        newFile = os.path.join(root, imagePrefix + imageType)
+        if oldFile != newFile:
+            shutil.move(oldFile, newFile)
+
+
+def checkMultipleInfoTypes(root, files):
+    for t in infoTypes:
+        infoCount = 0
+
+        for f in files:
+            if f.endswith(t):
+                infoCount += 1
+                infoName = f
+
+        if infoCount > 1:
+            errorList.append('Multiple ' + t + ': ' + root)
+        elif infoCount == 1:
+            oldFile = os.path.join(root, infoName)
+            newFile = os.path.join(root, infoPrefix + t)
+            if oldFile != newFile:
+                shutil.move(oldFile, newFile)
+
+
+def argumentParsing():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('music_dir', help='The directory containing the artist folders.')
+
+    args = parser.parse_args()
+
+    music_dir = os.path.abspath(args.music_dir)
+
+    return music_dir
+
+
+if __name__ == "__main__":
+    audioDir = argumentParsing()
+    
+    errorList = []
+
+    dirStructure = loadDirStructure(audioDir)
+
+    emptyDirs = []
+    for root in dirStructure:
+        rootEmptyDirs = findEmptyDir(root, dirStructure)
+
+        for d in rootEmptyDirs:
+            if d not in emptyDirs:
+                emptyDirs.append(d)
+
+    emptyDirs = sorted(emptyDirs, key=lambda x: x.count('/'), reverse=True)
+
+    for d in emptyDirs:
+        deleteDirectory(d, dirStructure)
+
+    for root in dirStructure:
+        files = dirStructure[root]['files']
+
+        deleteGarbage(root, files)
+        fixCase(root, files)
+        typeMap(root, files)
+
+        if isAudioDirectory(root, files):
+            checkMultipleImageTypes(root, files)
+            checkMultipleInfoTypes(root, files)
+
+    dirStructure = loadDirStructure(audioDir)
+    for root in dirStructure:
+        files = dirStructure[root]['files']
+
+        flacCount = 0
+        cueCount = 0
+        for f in files:
+            if f.endswith('.flac'):
+                flacCount += 1
+                flacFile = f
+            if f.endswith('.cue'):
+                cueCount += 1
+                cueFile = f
+
+        if flacCount == 1 & cueCount == 1:
+            if getCueTrackCount(root, cueFile) > 1:
+                splitFlac(root, cueFile, flacFile)
+
+    for error in sorted(errorList):
+        print(error)

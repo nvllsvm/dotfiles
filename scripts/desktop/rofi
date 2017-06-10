@@ -1,0 +1,2 @@
+#!/bin/sh
+gdk_scaled /usr/bin/rofi $@

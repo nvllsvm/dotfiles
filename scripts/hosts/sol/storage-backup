@@ -1,0 +1,14 @@
+#!/bin/sh
+
+if mount | awk '{print $3}' | grep /mnt/backup1$ > /dev/null ; then
+    sudo rsync -av --progress --delete ~ /mnt/storage1/Backup/sol/home
+    sudo rsync -av --progress --delete /mnt/storage1/ /mnt/backup1
+else
+    echo Error: /mnt/backup1 not mounted
+fi
+
+if mount | awk '{print $3}' | grep /mnt/backup2$ > /dev/null ; then
+    sudo rsync -av --progress --delete /mnt/storage2/ /mnt/backup2
+else
+    echo Error: /mnt/backup2 not mounted
+fi
