@@ -1,7 +1,7 @@
 *facename: DejaVu Sans Mono
-*fontsize: 8
-*font: xft:DejaVu Sans Mono:size=8
+*fontsize: 9
+*font: xft:DejaVu Sans Mono:size=9
 *boldFont:
-rofi*font: DejaVu Sans Mono 16
+rofi*font: DejaVu Sans Mono 18
 
 Xcursor.size: 32
