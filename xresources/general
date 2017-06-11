@@ -1,10 +1,13 @@
 Xcursor.size: 16
 
-urxvt.perl-ext-common: font-size,config-reload
+urxvt.perl-ext-common: font-size,config-reload,matcher
 urxvt.keysym.C-Up: font-size:increase
 urxvt.keysym.C-Down: font-size:decrease
 urxvt.keysym.C-equal: font-size:reset
 urxvt.keysym.C-slash: font-size:show
+
+URxvt.url-launcher: /usr/bin/xdg-open
+URxvt.matcher.button: 1
 
 urxvt*saveLines:32767
 urxvt*scrollBar: false
