@@ -8,6 +8,7 @@ urxvt.keysym.C-slash: font-size:show
 
 URxvt.url-launcher: /usr/bin/xdg-open
 URxvt.matcher.button: 1
+URxvt.matcher.rend.0: fg0
 
 urxvt*saveLines:32767
 urxvt*scrollBar: false
