@@ -402,9 +402,7 @@ table {
 html,
 body {
     margin: auto;
-    padding-right: 1em;
-    padding-left: 1em;
-    max-width: 55em;
+    max-width: 980px;
     color: #24292e;
 }
 *:not('#mkdbuttons') {
@@ -430,7 +428,7 @@ a {
 }
 body {
     background-color: #fff;
-    padding: 30px;
+    padding: 45px;
     margin: 15px;
     font-size: 1em;
     line-height: 1.5
