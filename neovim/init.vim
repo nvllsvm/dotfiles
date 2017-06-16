@@ -91,6 +91,18 @@ let g:neomake_python_enabled_makers = ['flake8']
 " E501 is line length of 80 characters
 "let g:neomake_python_flake8_maker = { 'args': ['--ignore=E501'], }
 
+let g:neomake_warning_sign = {'text': 'W'}
+let g:neomake_error_sign = {'text': 'E'}
+let g:neomake_info_sign = {'text': 'I'}
+let g:neomake_message_sign = {'text': 'M'}
+
+augroup my_neomake_highlights
+    au!
+    autocmd ColorScheme *
+      \ hi NeomakeError ctermbg=red |
+      \ hi NeomakeWarning ctermbg=yellow
+augroup END
+
 autocmd! BufWritePost * Neomake
 
 autocmd FileType markdown autocmd BufWritePost * call system("pandoc-markdown " . expand("<afile>"))
