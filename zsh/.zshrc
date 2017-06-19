@@ -28,6 +28,17 @@ alias la='ls -A'
 alias grep='grep --color=auto'
 alias today='date +"%Y-%m-%d"'
 
+srch () {
+    local search_dir
+    if [[ -z $2 ]]; then
+        search_dir=.
+    else
+        search_dir=$2
+    fi
+
+    grep -riI $1 $search_dir 2> /dev/null
+}
+
 setopt PROMPT_SUBST
 
 insert_mode_color='magenta'
