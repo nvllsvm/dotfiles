@@ -1,24 +1,35 @@
 #!/bin/sh
 
+pane_command() {
+    echo "echo $COMMAND $1 && $COMMAND $1 && echo Press enter to exit ... && read -s"
+}
+
 multi_run() {
     local command_arguments=( $COMMAND_ARGUMENTS )
 
     COMMAND=${command_arguments[0]}
-    unset command_arguments[0];
-
     first=${command_arguments[1]}
-    unset command_arguments[1];
+
+    unset command_arguments[0]
+    unset command_arguments[1]
+
+    NUM_ARGUMENTS="${#command_arguments[@]}"
 
     for i in "${command_arguments[@]}"; do
-        tmux split-window -h  "$COMMAND $i"
-        tmux select-layout tiled > /dev/null
+        tmux split-window -h "$(pane_command $i)"
     done
+
+    if [ $NUM_ARGUMENTS == 1 ]; then
+        tmux select-layout even-horizontal
+    elif [ $NUM_ARGUMENTS == 2 ]; then
+        tmux select-layout even-vertical
+    else
+        tmux select-layout tiled
+    fi
 
     tmux set-window-option synchronize-panes on
 
-    $COMMAND $first
-
-    tmux send-keys -t 1 C-l
+    eval $(pane_command $first)
 }
 
 COMMAND_ARGUMENTS=${COMMAND_ARGUMENTS:=$*}
