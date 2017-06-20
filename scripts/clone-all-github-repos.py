@@ -29,7 +29,6 @@ def register_with_myrepos(user, root, repos, use_ssh):
                 repo_url = f'https://github.com/{user}/{repo}.git'
             print(repo_url)
             subprocess.run(['git', '-C', root, 'clone', repo_url])
-        subprocess.run(['mr', 'register', repo_path])
 
 
 def main():
