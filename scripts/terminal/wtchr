@@ -1,0 +1,9 @@
+#!/bin/sh
+
+while true; do
+    clear
+    $@ &
+    trap "kill $! 2> /dev/null; exit" 2
+    wait
+    fswatch -l 0.1 --one-event ./ > /dev/null
+done
