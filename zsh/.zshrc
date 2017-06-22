@@ -29,14 +29,11 @@ alias grep='grep --color=auto'
 alias today='date +"%Y-%m-%d"'
 
 srch () {
-    local search_dir
     if [[ -z $2 ]]; then
-        search_dir=.
+        grep -riI $1 . 2> /dev/null
     else
-        search_dir=$2
+        grep -riI $1 ${@:2} 2> /dev/null
     fi
-
-    grep -riI $1 $search_dir 2> /dev/null
 }
 
 setopt PROMPT_SUBST
