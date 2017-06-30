@@ -1,5 +1,10 @@
 #!/bin/sh
 
+if [ -z $1 ]; then
+    echo ERROR: No command provided
+    exit 1
+fi
+
 while true; do
     clear
     eval "$@ &"
