@@ -13,8 +13,6 @@ full-update() {
 }
 
 exec-update() {
-    if [ ! -z $@ ]; then
         echo -e "\033[1;33mNow running $@ \033[0m..."
         eval "$@"
-    fi
 }
