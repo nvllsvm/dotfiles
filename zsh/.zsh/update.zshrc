@@ -6,12 +6,15 @@ full-update() {
             update_commands=("$update_commands[@]" "$2")
         fi
     else
-        for command in "${update_commands[@]}"
-        do
-          if [ ! -z $command ]; then
-              echo -e "\033[1;33mNow running $command \033[0m..."
-              eval $command
-          fi
+        for command in "${update_commands[@]}"; do
+            exec-update $command
         done
+    fi
+}
+
+exec-update() {
+    if [ ! -z $command ]; then
+        echo -e "\033[1;33mNow running $@ \033[0m..."
+        eval "$@"
     fi
 }
