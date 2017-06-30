@@ -6,4 +6,4 @@ fn npm-update () {
         npm -g install "$package"
     done
 }
-update_commands=("$update_commands[@]" npm-update)
+full-update add npm-update

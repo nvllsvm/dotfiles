@@ -42,7 +42,7 @@ if $(test $(command -v python2.7)); then
 
     if $(test $(command -v pip2)); then
         alias pip2-update='pip-update 2'
-        update_commands=("$update_commands[@]" pip2-update)
+        full-update add pip2-update
     fi
 fi
 
@@ -51,7 +51,7 @@ if $(test $(command -v python3)); then
 
     if $(test $(command -v pip3)); then
         alias pip3-update='pip-update 3'
-        update_commands=("$update_commands[@]" pip3-update)
+        full-update add pip3-update
     fi
 fi
 

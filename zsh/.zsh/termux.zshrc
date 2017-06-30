@@ -1,1 +1,2 @@
-update_commands=("$update_commands[@]" 'apt update' 'apt upgrade')
+full-update add 'apt update'
+full-update add 'apt upgrade'

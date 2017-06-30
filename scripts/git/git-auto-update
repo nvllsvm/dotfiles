@@ -1,0 +1,20 @@
+#!/bin/sh
+
+if [ -z $1 ]; then
+    echo ERROR: No git directory specified
+    exit 1
+fi
+
+cd $1
+git pull
+
+error_code=$?
+
+if [[ $error_code == 0 ]]; then
+    git add -A
+    git commit -m "$(basename $1)-update $(date +"%Y-%m-%d %H:%M:%S")"
+    git push
+    cd - > /dev/null
+else
+    echo Unable to pull.
+fi

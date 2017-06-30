@@ -6,4 +6,4 @@ base16-update() {
     git --git-dir ~/.config/base16-shell/.git pull
 }
 
-update_commands=("$update_commands[@]" base16-update)
+full-update add base16-update
