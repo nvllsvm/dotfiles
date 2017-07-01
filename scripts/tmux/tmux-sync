@@ -1,27 +1,28 @@
 #!/bin/sh
 
 pane_command() {
-    echo "echo $COMMAND $1 && $COMMAND $1 && echo Press enter to exit ... && read -s"
+    echo "echo $1 $2 && $1 $2 && echo Press enter to exit ... && read -s"
 }
 
-multi_run() {
-    local command_arguments=( $COMMAND_ARGUMENTS )
+if [ -z "$2" ]; then
+    echo "No arguments supplied for command."
+    exit 1
+elif [[ $TMUX ]]; then
+    clear
 
-    COMMAND=${command_arguments[0]}
-    first=${command_arguments[1]}
+    command=${@:1:1}
+    first_arg=${@:2:1}
 
-    unset command_arguments[0]
-    unset command_arguments[1]
+    declare -i num_args
+    num_args=$#-1
 
-    NUM_ARGUMENTS="${#command_arguments[@]}"
-
-    for i in "${command_arguments[@]}"; do
-        tmux split-window -h "$(pane_command $i)"
+    for i in "${@:3}"; do
+        tmux split-window -h "$(pane_command "$command" "$i")"
     done
 
-    if [ $NUM_ARGUMENTS == 1 ]; then
+    if [ $num_args == 2 ]; then
         tmux select-layout even-horizontal
-    elif [ $NUM_ARGUMENTS == 2 ]; then
+    elif [ $num_args == 3 ]; then
         tmux select-layout even-vertical
     else
         tmux select-layout tiled
@@ -29,17 +30,7 @@ multi_run() {
 
     tmux set-window-option synchronize-panes on
 
-    eval $(pane_command $first)
-}
-
-COMMAND_ARGUMENTS=${COMMAND_ARGUMENTS:=$*}
-
-if [ -z "$COMMAND_ARGUMENTS" ]; then
-    echo "No arguments supplied for command."
-    exit 1
-elif [[ $TMUX ]]; then
-    clear
-    multi_run
+    eval $(pane_command "$command" "$first_arg")
     tmux set-window-option synchronize-panes off
     clear
 else
