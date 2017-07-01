@@ -1,0 +1,3 @@
+#!/bin/sh
+
+docker-compose -p sol -f ~/Code/Private/sol-docker/docker-compose.yaml $@
