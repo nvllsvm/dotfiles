@@ -8,7 +8,7 @@ fi
 while true; do
     clear
     eval "$@ &"
-    trap "kill $! 2> /dev/null; exit" 2
+    trap "pkill -P $!; exit" 2
     wait
     fswatch -l 0.1 --one-event ./ > /dev/null
 done
