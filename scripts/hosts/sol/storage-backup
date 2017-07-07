@@ -1,5 +1,7 @@
 #!/bin/sh
 
+trap exit 2
+
 if mount | awk '{print $3}' | grep /mnt/backup1$ > /dev/null ; then
     sudo rsync -av --progress --delete ~ /mnt/storage1/Backup/sol/home
     sudo rsync -av --progress --delete /mnt/storage1/ /mnt/backup1
