@@ -30,8 +30,10 @@ alias today='date +"%Y-%m-%d"'
 
 srch () {
     if [[ -z $2 ]]; then
+        find . 2> /dev/null | grep -i $1
         grep -riI $1 . 2> /dev/null
     else
+        find ${@:2} 2> /dev/null | grep -i $1
         grep -riI $1 ${@:2} 2> /dev/null
     fi
 }
