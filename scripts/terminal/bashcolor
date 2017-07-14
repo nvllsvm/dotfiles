@@ -25,6 +25,6 @@ for FGs in '    m' '   1m' '  30m' '1;30m' '  31m' '1;31m' '  32m' \
 done
 echo
 
-for i in {0..255} ; do
-    printf "\x1b[38;5;${i}mcolour${i}\n"
-done
+#for i in {0..255} ; do
+#    printf "\x1b[38;5;${i}mcolour${i}\n"
+#done
