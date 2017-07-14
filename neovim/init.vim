@@ -63,6 +63,7 @@ Plug 'rust-lang/rust.vim'
 Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
 Plug 'chriskempson/base16-vim'
+Plug 'embear/vim-foldsearch'
 call plug#end()
 
 " deoplete
