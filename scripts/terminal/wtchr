@@ -1,5 +1,4 @@
 #!/bin/sh
-
 set -e
 
 if [ -z $1 ]; then
@@ -12,5 +11,5 @@ while true; do
     eval "$@ &"
     trap "pkill -P $!; exit" 2
     wait
-    fswatch -l 0.1 --one-event ./
+    fswatch -l 0.1 --one-event ./ > /dev/null
 done
