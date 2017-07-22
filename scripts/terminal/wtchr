@@ -11,5 +11,15 @@ while true; do
     eval "$@ &"
     trap "pkill -P $!; exit" 2
     wait
-    fswatch -l 0.1 --one-event ./ > /dev/null
+    fswatch -r -l 0.1 --one-event ./ \
+    --event=Created \
+    --event=Updated \
+    --event=Removed \
+    --event=Renamed \
+    --event=OwnerModified \
+    --event=AttributeModified \
+    --event=MovedFrom \
+    --event=MovedTo \
+    --event=Link \
+    > /dev/null
 done
