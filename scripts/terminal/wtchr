@@ -11,6 +11,7 @@ while true; do
     eval "$@ &"
     trap "pkill -P $!; exit" 2
     wait
+    sleep 0.5
     fswatch -r -l 0.1 --one-event ./ \
     --event=Created \
     --event=Updated \
