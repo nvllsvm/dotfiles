@@ -51,12 +51,12 @@ def color_to_ints(color):
     red = int(color[0:2], 16)
     if red > 0:
         colors['red'] = red
-    blue = int(color[2:4], 16)
-    if blue > 0:
-        colors['blue'] = blue
-    green = int(color[4:6], 16)
+    green = int(color[2:4], 16)
     if green > 0:
         colors['green'] = green
+    blue = int(color[4:6], 16)
+    if blue > 0:
+        colors['blue'] = blue
 
     return colors
 
