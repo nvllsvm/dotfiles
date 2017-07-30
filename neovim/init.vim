@@ -1,5 +1,5 @@
-if !empty($SYSTEM_PYTHON3_BIN)
-    let g:python3_host_prog=$SYSTEM_PYTHON3_BIN
+if !empty($VIRTUAL_ENV)
+    let g:python3_host_prog=system("which -a python3 | grep -v \"^$VIRTUAL_ENV\" | head -n 1 -c -1")
 endif
 
 set ruler
