@@ -19,6 +19,12 @@ set_from_resource $color12 color12 #000000
 set_from_resource $color13 color13 #000000
 set_from_resource $color14 color14 #000000
 set_from_resource $color15 color15 #000000
+set_from_resource $color16 color16 #000000
+set_from_resource $color17 color17 #000000
+set_from_resource $color18 color18 #000000
+set_from_resource $color19 color19 #000000
+set_from_resource $color20 color20 #000000
+set_from_resource $color21 color21 #000000
 
 set_from_resource $font facename Monospace
 set_from_resource $fontSize fontsize 11
@@ -130,28 +136,34 @@ bar {
     position          top
     workspace_buttons yes
     tray_output       primary
-    
+
     colors {
         background $background
         statusline $foreground
         separator  $foreground
 
-        focused_workspace  $foreground $color4
-        active_workspace   $foreground $color0
-        inactive_workspace $color8     $color0
-        urgent_workspace   $foreground $color1
+        # border background text
+        focused_workspace  $color19 $color19 $foreground
+        active_workspace   $color18 $color19 $foreground
+        inactive_workspace $background $background $color8
+        urgent_workspace   $color1  $color1  $foreground
     }
 }
 
-client.focused          $color4 $color12 $foreground $color15 $color4
+# class                 border   backgr. text    indicator child_border
+client.focused          $color19 $color19    $foreground $color8 $color19
+client.focused_inactive $color18 $color18    $color8     $color8 $color18
+client.unfocused        $color18 $color18    $color8     $color8 $background
+client.urgent           $color1  $background $foreground $color8 $color1
+client.placeholder      $color19 $background $foreground $color8 $color18
+
+client.background       $background
 
 hide_edge_borders vertical
 
 for_window [class="^.*"] border pixel 2
 
 bindsym $mod+b bar mode toggle
-
-exec --no-startup-id hsetroot -solid #000000
 
 for_window [title="Talos - Linux"] floating enable
 
