@@ -6,4 +6,13 @@ base16-update() {
     git --git-dir ~/.config/base16-shell/.git pull
 }
 
-full-update add base16-update
+
+_base16 () {
+    local script=$1
+    local theme=$2
+    [ -f $script ] && . $script
+    ln -fs $script ~/.base16_theme
+    export BASE16_THEME=${theme}
+    echo -e "if \0041exists('g:colors_name') || g:colors_name != 'base16-$theme'\n  colorscheme base16-$theme\nendif" >| ~/.vimrc_background
+    load-color-scheme
+}
