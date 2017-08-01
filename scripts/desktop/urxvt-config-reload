@@ -2,7 +2,7 @@
 /usr/bin/kill -s SIGHUP $(pgrep -u $USER -x urxvt)
 
 while read -r line; do
-    pts=$(ps --ppid $line | head -n 2 | tail -n 1 | awk '{print $2}')
+    pts=$(ps --ppid $line | grep zsh | awk '{print $2}')
     if [[ $pts == pts* ]]; then
         echo -n $(TERM=rxvt sh ~/.base16_theme) > /dev/$pts
     fi
