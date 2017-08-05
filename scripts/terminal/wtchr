@@ -22,5 +22,5 @@ while true; do
     --event=MovedFrom \
     --event=MovedTo \
     --event=Link \
-    > /dev/null
+    &> /dev/null
 done
