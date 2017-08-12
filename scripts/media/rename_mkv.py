@@ -17,7 +17,7 @@ def get_titles(path):
     number = 1
     with open(path) as f:
         for line in f:
-            titles[number] = line.strip()
+            titles[number] = line.strip().replace('/', '-')
             number += 1
 
     return titles
@@ -53,7 +53,7 @@ class Renamable(object):
         return int(matches.group(1))
 
 
-def process(path, regex, rename):
+def process(path, regex):
     pattern = re.compile(regex)
     for root, dirs, files in os.walk(path):
         if titles_name in files:
@@ -62,7 +62,13 @@ def process(path, regex, rename):
             for f in sorted(files):
                 renamable = Renamable(root, f, pattern)
                 if renamable.is_renamable:
-                    renamable.rename(titles, rename)
+                    renamable.rename(titles)
+            should_rename = input('Should rename? (y/n)  ')
+            if should_rename.lower() == 'y':
+                for f in sorted(files):
+                    renamable = Renamable(root, f, pattern)
+                    if renamable.is_renamable:
+                        renamable.rename(titles, True)
 
 
 def main():
@@ -70,13 +76,10 @@ def main():
             description='./rename_mkv.py -r \'.*S\d*E(\d*).*.mkv\' test')
     parser.add_argument('regex')
     parser.add_argument('directory')
-    parser.add_argument('-r', '--rename',
-                        action='store_const', const=True,
-                        help='rename files')
     args = parser.parse_args()
 
     pattern = '^{}$'.format(args.regex)
-    process(args.directory, pattern, args.rename)
+    process(args.directory, pattern)
 
 
 if __name__ == '__main__':
