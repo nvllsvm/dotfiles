@@ -1,151 +1,69 @@
-#!/bin/bash
-# Andrew Rabert
-# 2012-03-15
-# 
-# lossless-fix
-#
-# Filetypes supported: FLAC, APE, WV
-#
-# Extracts the above filetypes and converts the wave files to flac.
-
-IFS=$'\n'
-
-usage ()
-{
-	cat << EOF
-Usage: 	lossless-fix [options] [directory path]
-
-OPTIONS:
-	-h		Help
-	-a		Extract all lossless files
-	-e		Extract only APE, ALAC, and WV files
-	-c 		Convert all .wav files
-	-x 		Extract and convert all lossless to FLAC
-EOF
-}
-
-extract_ape ()
-{
-	for X in `find -iname '*'.ape`
-		do
-			ffmpeg -i "$X" "$X".wav		
-			rm "$X"
-		done
-}
-
-extract_tta ()
-{
-	for X in `find -iname '*'.tta`
-		do
-			ffmpeg -i "$X" "$X".wav		
-			rm "$X"
-		done
-}
-
-extract_tak ()
-{
-	for X in `find -iname '*'.tak`
-		do
-			ffmpeg -i "$X" "$X".wav		
-			rm "$X"
-		done
-}
-
-extract_alac ()
-{
-	for X in `find -iname '*'.m4a`
-		do
-			ffmpeg -i "$X" "$X".wav
-			rm "$X"
-		done
-}
-
-extract_wv ()
-{
-	for X in `find -iname '*'.wv`
-		do
-			wvunpack -d -y -cc "$X"
-		done
-}
-
-extract_flac ()
-{
-	for X in `find -iname '*'.flac`
-		do
-			flac --delete-input-file -d -f -F "$X"
-		done
-}
-
-wav2flac ()
-{
-	for X in `find -iname '*'.wav`
-		do
-			flac --best --delete-input-file -V -f "$X"
-		done
-}
+#!/usr/bin/env python3
+import argparse
+import multiprocessing
+import os
+import subprocess
 
 
-EXTRACT_FLAC=
-EXTRACT_OTHER=
-CONVERT=
-while getopts ":acehx" OPTION
-do
-	case $OPTION in
-		a)
-			EXTRACT_FLAC=true
-			EXTRACT_OTHER=true
-			;;
-		e)
-			EXTRACT_OTHER=true
-			;;
-		c)
-			CONVERT=true
-			;;
-		x)
-			EXTRACT_FLAC=true
-			EXTRACT_OTHER=true
-			CONVERT=true
-			;;
-		h)
-			usage
-			exit
-			;;
-		?)
-			usage
-			exit
-			;;
-	esac
-done
+POOL_SIZE = multiprocessing.cpu_count()
 
 
-DIRNAME=${@:OPTIND}
+def run_command(command):
+    subprocess.run(command,
+                   stdout=subprocess.PIPE,
+                   stderr=subprocess.PIPE,
+                   check=True)
 
-if [ "$DIRNAME" = "" ]
-then
-	usage
-elif [ ! -d "$DIRNAME" ]
-then
-	echo "Invalid directory."
-else
-	cd "$DIRNAME"
-	if [[ $EXTRACT_FLAC == true ]]
-	then
-		extract_flac
-	fi
-	if [[ $EXTRACT_OTHER == true ]]
-	then
-		extract_ape
-		extract_alac
-		extract_wv
-		extract_tta
-		extract_tak
-	fi
-	if [[ $CONVERT == true ]]
-	then
-		wav2flac
-	fi
-	if [[ -z $CONVERT ]] && [[ -z $EXTRACT_ALL ]] && [[ -z $EXTRACT_APEWV ]]
-	then
-		usage
-	fi
-fi
+
+def wav_to_flac(path):
+    print(f'wav-to-flac - {path}')
+    run_command(['flac', '--best', '--delete-input-file', '-V', '-f', path])
+
+
+def flac_to_wav(path):
+    print(f'flac-to-wav - {path}')
+    run_command(['flac', '--delete-input-file', '-d', '-f', '-F', path])
+
+
+def ffmpeg_to_wav(path):
+    print(f'ffmpeg-to-wav - {path}')
+    run_command(['ffmpeg', '-i', path, f'{path}.wav'])
+    os.remove(path)
+
+
+def find_endswith(ending, directory):
+    paths = []
+
+    for root, dirs, files in os.walk(directory):
+        for f in files:
+            if f.lower().endswith(ending):
+                paths.append(os.path.join(root, f))
+
+    return paths
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('directory')
+    parser.add_argument('-x', '--extract', action='store_const', const=True)
+    parser.add_argument('-e', '--encode', action='store_const', const=True)
+    args = parser.parse_args()
+
+    if not args.extract and not args.encode:
+        exit()
+
+    with multiprocessing.Pool(POOL_SIZE) as p:
+        if args.extract is True:
+            p.map(ffmpeg_to_wav, find_endswith(('.ape',
+                                                '.tta',
+                                                '.tak',
+                                                '.m4a',
+                                                '.wv'), args.directory))
+            p.map(flac_to_wav, find_endswith('.flac', args.directory))
+
+        if args.encode is True:
+            p.map(wav_to_flac, find_endswith('.wav', args.directory))
+
+
+if __name__ == '__main__':
+    main()
