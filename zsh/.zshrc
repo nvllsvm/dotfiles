@@ -108,6 +108,10 @@ sudo-command-line() {
     fi
 }
 
+timeshell() {
+    for i in $(seq 1 10); do /usr/bin/time zsh -i -c exit; done
+}
+
 zle -N sudo-command-line
 # Defined shortcut keys: [Esc] [Esc]
 bindkey '^r' sudo-command-line
