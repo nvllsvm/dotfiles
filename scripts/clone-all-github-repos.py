@@ -10,25 +10,20 @@ def get_repo_names(user):
     url = f'https://api.github.com/users/{user}/repos'
 
     response = requests.get(url)
+    response.raise_for_status()
 
-    repos = []
-
-    for repo in response.json():
-        repos.append(repo['name'])
-
-    return sorted(repos)
+    return sorted({repo['name'] for repo in response.json()})
 
 
-def register_with_myrepos(user, root, repos, use_ssh):
-    for repo in repos:
-        repo_path = os.path.join(root, repo)
-        if not os.path.isdir(repo_path):
-            if use_ssh:
-                repo_url = f'git@github.com:{user}/{repo}.git'
-            else:
-                repo_url = f'https://github.com/{user}/{repo}.git'
-            print(repo_url)
-            subprocess.run(['git', '-C', root, 'clone', repo_url])
+def register_with_myrepos(user, root, repo, use_ssh):
+    repo_path = os.path.join(root, repo)
+    if not os.path.isdir(repo_path):
+        if use_ssh:
+            repo_url = f'git@github.com:{user}/{repo}.git'
+        else:
+            repo_url = f'https://github.com/{user}/{repo}.git'
+        print(repo_url)
+        subprocess.run(['git', '-C', root, 'clone', repo_url])
 
 
 def main():
@@ -39,8 +34,10 @@ def main():
     parser.add_argument('path')
     args = parser.parse_args()
 
-    repos = get_repo_names(args.user)
-    register_with_myrepos(args.user, args.path, repos, args.use_ssh)
+    os.makedirs(os.path.join(args.path, args.user))
+
+    for repo in get_repo_names(args.user):
+        register_with_myrepos(args.user, args.path, repo, args.use_ssh)
 
 
 if __name__ == '__main__':
