@@ -29,7 +29,7 @@ rm -rf ~/.config/i3
 mkdir ~/.config/i3
 cat "$dotfiles_dir"/i3/general > ~/.config/i3/config
 
-libinput-gestures-setup start
+libinput-gestures-setup restart
 
 startcompositing
 

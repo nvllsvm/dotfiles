@@ -1,0 +1,2 @@
+#!/bin/sh
+wine ~/.wine/drive_c/GOG\ Games/Deus\ Ex\ GOTY/System/DeusEx.exe
