@@ -1,0 +1,25 @@
+#!/bin/bash
+TEMP_DIR=/tmp/python-wtchr
+mkdir -p $TEMP_DIR
+cd $TEMP_DIR
+
+build_venv() {
+    if [[ ! $(test -d env) ]] ; then
+        python3 -m venv env
+    fi
+    . env/bin/activate
+}
+
+while getopts 'v' flag; do
+    case "${flag}" in
+        v) build_venv ;;
+    esac
+done
+
+PYTHON_FILE=test.py
+touch $PYTHON_FILE
+tmux split-window -h "wtchr python $PYTHON_FILE"
+tmux select-pane -l
+nvim $PYTHON_FILE
+tmux select-pane -l
+tmux kill-pane
