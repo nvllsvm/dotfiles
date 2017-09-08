@@ -19,8 +19,8 @@ xrandr --output eDP-1 --primary
 
 apply-display-calibration
 
-xrandr --newmode "1600x900" 97.50  1600 1648 1680 1760  900 903 908 926 +hsync -vsync
-xrandr --addmode eDP-1 1600x900
+xrandr-custom-resolution eDP-1 1600 900
+xrandr-custom-resolution eDP-1 1280 720
 xrandr --dpi 192
 
 load-color-scheme

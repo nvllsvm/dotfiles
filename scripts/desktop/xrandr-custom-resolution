@@ -1,0 +1,6 @@
+#!/bin/bash
+cvt_output=$(cvt $2 $3 | tail -n 1 | awk '{$1=$2=""}1')
+mode_name="$2x$3"
+
+xrandr --newmode $mode_name $cvt_output 2> /dev/null
+xrandr --addmode $1 $mode_name
