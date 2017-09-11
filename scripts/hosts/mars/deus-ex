@@ -1,0 +1,3 @@
+#!/bin/sh
+cd ~/.wine/drive_c/GOG\ Games/Deus\ Ex\ GOTY/System/
+wine GMDX.exe 'INI=C:/GOG Games/Deus Ex GOTY/GMDXv9/System/gmdx.ini' 'USERINI=C:/GOG Games/Deus Ex GOTY/GMDXv9/System/gmdxuser.ini' 'LOG=C:/GOG Games/Deus Ex GOTY/GMDXv9/System/gmdx.log'
