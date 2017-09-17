@@ -1,14 +1,14 @@
 ## Volume
 # Toggle
-"pamixer --toggle-mute"
+"set-volume mute"
   c:121
 
 # Lower
-"pamixer --unmute && pamixer --decrease 3"
+"set-volume decrease"
   c:122
 
 # Raise
-"pamixer --unmute && pamixer --increase 3"
+"set-volume increase"
   c:123
 
 
@@ -28,11 +28,11 @@
 
 ## Backlight
 # Lower
-"/bin/zsh -c 'if [[ $(xbacklight -get) -gt 10 ]] then xbacklight -dec 10; else xbacklight -set 1; fi'"
+"set-backlight dec"
   c:232
 
 # Raise
-"/bin/zsh -c 'if [[ $(xbacklight -get) -lt 10 ]] then xbacklight -set 10; else xbacklight -inc 10; fi'"
+"set-backlight inc"
   c:233
 
 

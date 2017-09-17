@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if [[ $1 == 'dec' ]]; then
+    if [[ $(xbacklight -get) -gt 10 ]]; then
+        xbacklight -dec 10
+    else
+        xbacklight -set 1
+    fi
+elif [[ $1 == 'inc' ]]; then
+    if [[ $(xbacklight -get) -lt 10 ]]; then
+        xbacklight -set 10
+    else
+        xbacklight -inc 10
+    fi
+fi
+
+dunstify -t 1 "Backlight: $(xbacklight -get)"
