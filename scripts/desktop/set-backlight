@@ -12,6 +12,12 @@ elif [[ $1 == 'inc' ]]; then
     else
         xbacklight -inc 10
     fi
+else
+    cat << EOF
+inc:  Increase backlight by 10
+dec:  Decrease backlight by 10
+EOF
+    exit 1
 fi
 
 dunstify -t 1 "Backlight: $(xbacklight -get)"
