@@ -20,4 +20,4 @@ EOF
     exit 1
 fi
 
-dunstify -t 1 "Backlight: $(xbacklight -get)"
+dunstify Backlight -h int:value:$(xbacklight -get)

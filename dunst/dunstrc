@@ -123,11 +123,11 @@
     #   %p  progress value if set ([  0%] to [100%]) or nothing
     #   %n  progress value if set without any extra characters
     # Markup is allowed
-    format = "%s\n%b"
+    format = "%s\n%b%n"
 
     # Alignment of message text.
     # Possible values are "left", "center" and "right".
-    alignment = left
+    alignment = center
 
     # Show age of message if message is older than show_age_threshold
     # seconds.
@@ -145,7 +145,7 @@
     stack_duplicates = true
 
     # Hide the count of merged notifications with the same content
-    hide_duplicate_count = false
+    hide_duplicate_count = true
 
     # Display indicators for URLs (U) and actions (A).
     show_indicators = yes
@@ -282,7 +282,6 @@
 #[espeak]
 #    summary = "*"
 #    script = dunst_espeak.sh
-
 #[script-test]
 #    summary = "*script*"
 #    script = dunst_test.sh
@@ -317,5 +316,14 @@
 #    summary = *twitter.com*
 #    urgency = normal
 #
+
+[volume]
+    summary = Volume
+    timeout = 1
+
+[backlight]
+    summary = Backlight
+    timeout = 1
+
 
 # vim: ft=cfg

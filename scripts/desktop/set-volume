@@ -9,4 +9,4 @@ else
     notify_value=$(pamixer --get-volume)
 fi
 
-dunstify -t 2 "Volume: $notify_value"
+dunstify Volume -h int:value:$notify_value
