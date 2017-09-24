@@ -2,10 +2,14 @@
 
 if [[ $1 == 'mute' ]]; then
     pamixer --toggle-mute
-    notify_value=$(pamixer --get-mute)
 else
     pamixer --unmute
     pamixer --$1 3
+fi
+
+if [[ $(pamixer --get-mute) == "true" ]]; then
+    notify_value=0
+else
     notify_value=$(pamixer --get-volume)
 fi
 
