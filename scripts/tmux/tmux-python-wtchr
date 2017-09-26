@@ -3,9 +3,11 @@ TEMP_DIR=/tmp/python-wtchr
 mkdir -p $TEMP_DIR
 cd $TEMP_DIR
 
+PYTHON_BIN=python3
+
 build_venv() {
     if [[ ! $(test -d env) ]] ; then
-        python3 -m venv env
+        $PYTHON_BIN -m venv env
     fi
     . env/bin/activate
 }
@@ -18,7 +20,7 @@ done
 
 PYTHON_FILE=test.py
 touch $PYTHON_FILE
-tmux split-window -h "wtchr python $PYTHON_FILE"
+tmux split-window -h "wtchr $PYTHON_BIN $PYTHON_FILE"
 tmux select-pane -l
 nvim $PYTHON_FILE
 tmux select-pane -l
