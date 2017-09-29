@@ -27,6 +27,7 @@ set foldmethod=syntax
 set nowrap
 
 set cursorline
+nmap <C-c> :set cursorcolumn!<CR>
 
 function StripTrailingWhitespace()
   if !&binary && &filetype != 'diff'
