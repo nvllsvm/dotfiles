@@ -1,5 +1,6 @@
 if [[ $(uname) = "Darwin" ]]; then
     android_home=~/Library/Android
+    path=("/Applications/Android Studio 3.0 Preview.app/Contents/jre/jdk/Contents/Home/bin" "$path[@]")
 else
     android_home=~/.android
 fi
