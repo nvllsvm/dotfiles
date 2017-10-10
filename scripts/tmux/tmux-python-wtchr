@@ -1,13 +1,15 @@
 #!/bin/bash
+EDITOR=$EDITOR
+PYTHON_BIN=python3
+PYTHON_FILE=test.py
 TEMP_DIR=/tmp/python-wtchr
+
 mkdir -p $TEMP_DIR
 cd $TEMP_DIR
 
-PYTHON_BIN=python3
-
 build_venv() {
     if [[ ! $(test -d env) ]] ; then
-        $PYTHON_BIN -m venv env
+        virtualenv -p $PYTHON_BIN env
     fi
     . env/bin/activate
 }
@@ -18,10 +20,9 @@ while getopts 'v' flag; do
     esac
 done
 
-PYTHON_FILE=test.py
 touch $PYTHON_FILE
 tmux split-window -h "wtchr $PYTHON_BIN $PYTHON_FILE"
 tmux select-pane -l
-nvim $PYTHON_FILE
+$EDITOR $PYTHON_FILE
 tmux select-pane -l
 tmux kill-pane
