@@ -1,7 +1,0 @@
-*facename: Tamzen
-*fontsize: 9
-*font: xft:Tamzen:size=9:antialias=false
-*boldFont:
-rofi*font: Tamzen 9
-
-Xcursor.size: 16
