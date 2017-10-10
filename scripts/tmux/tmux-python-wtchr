@@ -4,6 +4,10 @@ PYTHON_BIN=python3
 PYTHON_FILE=test.py
 TEMP_DIR=/tmp/python-wtchr
 
+if [[ -n $VIRTUAL_ENV ]]; then
+    PYTHON_BIN=python
+fi
+
 mkdir -p $TEMP_DIR
 cd $TEMP_DIR
 
