@@ -75,7 +75,6 @@ function zle-line-init zle-keymap-select {
 zle -N zle-line-init
 zle -N zle-keymap-select
 
-add-zsh-hook precmd virtenv_indicator
 add-zsh-hook precmd exit_status
 
 exit_status () {
