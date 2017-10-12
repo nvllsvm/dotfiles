@@ -1,0 +1,12 @@
+rofi.width: 50
+rofi.fixed-num-lines: true
+rofi.location: 0
+rofi.fullscreen: 0
+rofi.lines: 10
+rofi.eh: 1
+rofi.separator-style: solid
+rofi.hide-scrollbar: true
+rofi.color-window: argb:ee000000, #e4e4e4, #555555
+rofi.color-normal: argb:00343434, #e4e4e4, argb:00343434, #555555, #eeeeee
+rofi.color-active: #fdf6e3, #268bd2, #eee8d5, #268bd2, #fdf6e3
+rofi.color-urgent: #fdf6e3, #dc322f, #eee8d5, #dc322f, #fdf6e3

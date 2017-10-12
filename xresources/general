@@ -1,0 +1,37 @@
+Xcursor.size: 16
+
+urxvt.perl-ext-common: font-size,config-reload,matcher
+urxvt.keysym.C-Up: font-size:increase
+urxvt.keysym.C-Down: font-size:decrease
+urxvt.keysym.C-equal: font-size:reset
+urxvt.keysym.C-slash: font-size:show
+
+URxvt.url-launcher: /usr/bin/xdg-open
+URxvt.matcher.button: 1
+URxvt.matcher.rend.0: fg0
+
+urxvt*saveLines:32767
+urxvt*scrollBar: false
+urxvt*pointerBlank: true
+
+*foreground: #eeeeee
+*background: #000000
+
+*underlineColor: #c5f779
+
+*color0 : #282a2e
+*color1 : #a54242
+*color2 : #8c9440
+*color3 : #de935f
+*color4 : #5f819d
+*color5 : #85678f
+*color6 : #5e8d87
+*color7 : #707880
+*color8 : #595b59
+*color9 : #d18fa6
+*color10 : #637b3a
+*color11 : #78592f
+*color12 : #135979
+*color13 : #604291
+*color14 : #76bbca
+*color15 : #b2b5ae

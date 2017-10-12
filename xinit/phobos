@@ -1,0 +1,34 @@
+dotfiles_dir=~/Code/GitHub/nvllsvm/dotfiles
+
+setxkbmap -option terminate:ctrl_alt_bksp
+xmodmap -e 'clear Lock' -e 'keycode 0x42 = Escape'
+
+xset -dpms; xset s off
+
+export GTK2_RC_FILES="$HOME/.gtkrc-2.0"
+export SDL_VIDEO_FULLSCREEN_HEAD=0
+export SDL_AUDIODRIVER=alsa
+export QT_AUTO_SCREEN_SCALE_FACTOR=0
+
+xrdb ~/Code/GitHub/nvllsvm/dotfiles/xresources/general
+xrdb -merge ~/Code/GitHub/nvllsvm/dotfiles/xresources/phobos
+
+xrandr --output eDP-1 --primary
+
+apply-display-calibration
+
+xrandr-custom-resolution eDP-1 1600 900
+xrandr-custom-resolution eDP-1 1280 720
+xrandr --dpi 192
+
+load-color-scheme
+
+rm -rf ~/.config/i3
+mkdir ~/.config/i3
+cat "$dotfiles_dir"/i3/general > ~/.config/i3/config
+
+libinput-gestures-setup restart
+
+startcompositing
+
+exec dbus-launch i3
