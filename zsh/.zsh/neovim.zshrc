@@ -1,3 +1,5 @@
+alias view="nvim -R"
+
 nvim-update() {
     if [[ ! -f ~/.config/nvim/autoload/plug.vim ]]; then
         curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs \
