@@ -16,3 +16,5 @@ _base16 () {
     echo -e "if \0041exists('g:colors_name') || g:colors_name != 'base16-$theme'\n  colorscheme base16-$theme\nendif" >| ~/.vimrc_background
     load-color-scheme 2> /dev/null || true
 }
+
+full-update add base16-update
