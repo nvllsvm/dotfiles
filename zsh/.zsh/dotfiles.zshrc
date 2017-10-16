@@ -1,3 +1,3 @@
-alias dotfiles-update='git-auto-update ~/Code/GitHub/nvllsvm/dotfiles'
+alias dotfiles-update="git-auto-update $DOTFILES_DIR"
 
 full-update add dotfiles-update

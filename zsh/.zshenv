@@ -1,1 +1,2 @@
-export EDITOR="nvim"
+export DOTFILES_DIR=~/Code/GitHub/nvllsvm/dotfiles
+export EDITOR=nvim

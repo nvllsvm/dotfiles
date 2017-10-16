@@ -55,8 +55,6 @@ RPROMPT="$prompt_current_dir"
 
 typeset -U path
 
-path=(~/.node_modules/bin "$path[@]")
-
 if [[ -d ~/.bin/ ]]; then
     for dir in ~/.bin/*; do
         path=($dir "$path[@]")
@@ -105,10 +103,6 @@ sudo-command-line() {
     else
         LBUFFER="sudo $LBUFFER"
     fi
-}
-
-timeshell() {
-    for i in $(seq 1 10); do /usr/bin/time zsh -i -c exit; done
 }
 
 zle -N sudo-command-line
