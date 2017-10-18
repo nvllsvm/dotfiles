@@ -1,0 +1,10 @@
+#!/bin/sh
+REPO_DIR=~/.config/base16-shell
+
+test -d $REPO_DIR || git clone https://github.com/chriskempson/base16-shell.git $REPO_DIR
+
+cd $REPO_DIR
+
+git clean -xdf
+git checkout .
+git pull
