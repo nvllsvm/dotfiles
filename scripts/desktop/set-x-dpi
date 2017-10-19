@@ -1,19 +1,17 @@
 #!/bin/zsh
 
-DPI=$1
+DPI=${${1}#0}
+
 XRESOURCES_TEMP_FILE=/tmp/dpi_xresources
 
 
-dpi_96 () {
-    xrandr --dpi 96
-
-    pkill -9 dunst
+dpi_lowdpi () {
     dunst -font "Tamzen 9" -frame_width 1 -geometry 120x5-0+18 &
 
     cat > $XRESOURCES_TEMP_FILE <<- EOF
 *facename: Tamzen
 *fontsize: 9
-*font: xft:Tamzen:size=9:antialias=false:dpi=96
+*font: xft:Tamzen:size=9:antialias=false:dpi=$DPI
 *boldFont:
 rofi*font: Tamzen 9
 
@@ -23,16 +21,13 @@ EOF
 
 
 
-dpi_192 () {
-    xrandr --dpi 192
-
-    pkill -9 dunst
+dpi_hidpi () {
     dunst -font "'DejaVu Sans Mono' 18" -frame_width 3 -geometry 300x5-0+40 &
 
     cat > $XRESOURCES_TEMP_FILE <<-EOF
 *facename: DejaVu Sans Mono
 *fontsize: 9
-*font: xft:DejaVu Sans Mono:size=9:dpi=192
+*font: xft:DejaVu Sans Mono:size=9:dpi=$DPI
 *boldFont:
 rofi*font: DejaVu Sans Mono 18
 
@@ -42,10 +37,13 @@ EOF
 
 
 
-if [[ $DPI == '96' ]]; then
-    dpi_96
-elif [[ $DPI == '192' ]]; then
-    dpi_192
+xrandr --dpi $DPI
+pkill -9 dunst
+
+if [[ $DPI -le 138 ]]; then
+    dpi_lowdpi
+else
+    dpi_hidpi
 fi
 
 xrdb ~/Code/GitHub/nvllsvm/dotfiles/xresources/general

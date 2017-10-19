@@ -14,7 +14,7 @@ elif [[ $1 == "internal-half" ]]; then
         --output HDMI-1 --off \
         --output DP-1 --off \
         --output eDP-1 --primary --mode 1600x900 --pos 0x0 --rotate normal
-    set-x-dpi 96
+    set-x-dpi 138
 elif [[ $1 == "external" ]]; then
     xrandr \
         --output HDMI-1 --off \
