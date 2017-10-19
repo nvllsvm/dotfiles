@@ -1,0 +1,32 @@
+#!/bin/sh
+
+xrandr-custom-resolution eDP-1 1600 900
+xrandr-custom-resolution eDP-1 1280 720
+
+if [[ $1 == "internal" ]]; then
+    xrandr \
+        --output HDMI-1 --off \
+        --output DP-1 --off \
+        --output eDP-1 --primary --mode 3200x1800 --pos 0x0 --rotate normal
+    set-x-dpi 192
+elif [[ $1 == "internal-half" ]]; then
+    xrandr \
+        --output HDMI-1 --off \
+        --output DP-1 --off \
+        --output eDP-1 --primary --mode 1600x900 --pos 0x0 --rotate normal
+    set-x-dpi 96
+elif [[ $1 == "external" ]]; then
+    xrandr \
+        --output HDMI-1 --off \
+        --output eDP-1 --off \
+        --output DP-1 --primary --mode 1920x1200 --pos 0x0 --rotate normal
+    set-x-dpi 96
+else
+    cat << EOF
+Options:
+- internal
+- internal-half
+- external
+EOF
+    exit 1
+fi
