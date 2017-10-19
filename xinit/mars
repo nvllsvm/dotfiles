@@ -26,8 +26,6 @@ xrdb -merge "$dotfiles_dir"/xresources/mars
 
 xbindkeys -f "$dotfiles_dir"/xbindkeys/mars
 
-load-color-scheme
-
 QSyncthingTray &
 
 rm -rf ~/.config/i3

@@ -1,0 +1,57 @@
+#!/bin/zsh
+
+DPI=$1
+XRESOURCES_TEMP_FILE=/tmp/dpi_xresources
+
+
+dpi_96 () {
+    xrandr --dpi 96
+
+    pkill -9 dunst
+    dunst -font "Tamzen 9" -frame_width 1 -geometry 120x5-0+18 &
+
+    cat > $XRESOURCES_TEMP_FILE <<- EOF
+*facename: Tamzen
+*fontsize: 9
+*font: xft:Tamzen:size=9:antialias=false:dpi=96
+*boldFont:
+rofi*font: Tamzen 9
+
+Xcursor.size: 16
+EOF
+}
+
+
+
+dpi_192 () {
+    xrandr --dpi 192
+
+    pkill -9 dunst
+    dunst -font "'DejaVu Sans Mono' 18" -frame_width 3 -geometry 300x5-0+40 &
+
+    cat > $XRESOURCES_TEMP_FILE <<-EOF
+*facename: DejaVu Sans Mono
+*fontsize: 9
+*font: xft:DejaVu Sans Mono:size=9:dpi=192
+*boldFont:
+rofi*font: DejaVu Sans Mono 18
+
+Xcursor.size: 32
+EOF
+}
+
+
+
+if [[ $DPI == '96' ]]; then
+    dpi_96
+elif [[ $DPI == '192' ]]; then
+    dpi_192
+fi
+
+xrdb ~/Code/GitHub/nvllsvm/dotfiles/xresources/general
+xrdb -merge $XRESOURCES_TEMP_FILE
+
+load-xresources-theme
+
+# Restart to use new xorg DPI
+i3 restart

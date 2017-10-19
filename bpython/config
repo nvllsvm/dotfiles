@@ -1,8 +1,0 @@
-[general]
-hist_duplicates = False
-hist_length = 1000
-
-[keyboard]
-transpose_chars =
-reimport = C-t
-external_editor = C-e
