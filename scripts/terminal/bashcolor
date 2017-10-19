@@ -1,9 +1,0 @@
-#!/bin/bash
-for i in {0..21} ; do
-    if [[ $i -lt 10 ]]; then
-        space="  "
-    else
-        space=" "
-    fi
-    printf "\x1b[38;5;${i}mcolour${i}${space}██████████\n"
-done
