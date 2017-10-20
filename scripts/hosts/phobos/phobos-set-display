@@ -9,18 +9,21 @@ if [[ $1 == "internal" ]]; then
         --output DP-1 --off \
         --output eDP-1 --primary --mode 3200x1800 --pos 0x0 --rotate normal
     set-x-dpi 192
+    apply-display-calibration
 elif [[ $1 == "internal-half" ]]; then
     xrandr \
         --output HDMI-1 --off \
         --output DP-1 --off \
         --output eDP-1 --primary --mode 1600x900 --pos 0x0 --rotate normal
     set-x-dpi 138
+    apply-display-calibration
 elif [[ $1 == "external" ]]; then
     xrandr \
         --output HDMI-1 --off \
         --output eDP-1 --off \
         --output DP-1 --primary --mode 1920x1200 --pos 0x0 --rotate normal
     set-x-dpi 96
+    apply-display-calibration
 else
     cat << EOF
 Options:

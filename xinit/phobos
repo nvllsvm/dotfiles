@@ -10,8 +10,6 @@ export QT_AUTO_SCREEN_SCALE_FACTOR=0
 
 phobos-set-display internal
 
-apply-display-calibration
-
 rm -rf ~/.config/i3
 mkdir ~/.config/i3
 cat "$DOTFILES_DIR"/i3/general > ~/.config/i3/config
