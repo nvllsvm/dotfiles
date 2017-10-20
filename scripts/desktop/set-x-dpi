@@ -1,55 +1,61 @@
 #!/bin/zsh
 
-DPI=${${1}#0}
+DPI=${1#0}
 
 XRESOURCES_TEMP_FILE=/tmp/dpi_xresources
 
-
-dpi_lowdpi () {
-    dunst -font "Tamzen 9" -frame_width 1 -geometry 120x5-0+18 &
-
-    cat > $XRESOURCES_TEMP_FILE <<- EOF
-*facename: Tamzen
-*fontsize: 9
-*font: xft:Tamzen:size=9:antialias=false:dpi=$DPI
-*boldFont:
-rofi*font: Tamzen 9
-
-Xcursor.size: 16
-EOF
-}
-
-
-
-dpi_hidpi () {
-    dunst -font "'DejaVu Sans Mono' 18" -frame_width 3 -geometry 300x5-0+40 &
-
-    cat > $XRESOURCES_TEMP_FILE <<-EOF
-*facename: DejaVu Sans Mono
-*fontsize: 9
-*font: xft:DejaVu Sans Mono:size=9:dpi=$DPI
-*boldFont:
-rofi*font: DejaVu Sans Mono 18
-
-Xcursor.size: 32
-EOF
-}
-
-
-
-xrandr --dpi $DPI
-pkill -9 dunst
-
 if [[ $DPI -le 138 ]]; then
-    dpi_lowdpi
+    CURSOR_SIZE=16
+
+    FONT_NAME=Tamzen
+    FONT_SIZE=9
+
+    ANTIALIAS=false
+
+    BORDER_WIDTH=1
+
+    DUNST_GEOMETRY=120x5-0+18
 else
-    dpi_hidpi
+    CURSOR_SIZE=32
+
+    FONT_NAME='DejaVu Sans Mono'
+    FONT_SIZE=9
+
+    ANTIALIAS=true
+
+    BORDER_WIDTH=3
+
+    DUNST_GEOMETRY=300x5-0+40
 fi
 
-xrdb ~/Code/GitHub/nvllsvm/dotfiles/xresources/general
+    cat > $XRESOURCES_TEMP_FILE <<- EOF
+*facename: ${FONT_NAME}
+*fontsize: ${FONT_SIZE}
+*font: xft:${FONT_NAME}:size=${FONT_SIZE}:antialias=${ANTIALIAS}:dpi=${DPI}
+*boldFont:
+
+rofi.font: ${FONT_NAME} ${FONT_SIZE}
+rofi.dpi: ${DPI}
+rofi.bw: ${BORDER_WIDTH}
+
+Xft.dpi: ${DPI}
+
+Xcursor.size: ${CURSOR_SIZE}
+EOF
+
+xrandr --dpi $DPI
+
+xrdb $DOTFILES_DIR/xresources/general
 xrdb -merge $XRESOURCES_TEMP_FILE
+
+pkill -9 dunst
+dunst \
+    -font "$FONT_NAME $FONT_SIZE" \
+    -frame_width $BORDER_WIDTH \
+    -geometry $DUNST_GEOMETRY &
 
 load-xresources-theme
 
-# Restart to use new xorg DPI
 i3 restart
+
+rm $XRESOURCES_TEMP_FILE
