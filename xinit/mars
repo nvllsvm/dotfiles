@@ -29,4 +29,4 @@ cat "$DOTFILES_DIR"/i3/mars >> ~/.config/i3/config
 
 startcompositing
 
-exec dbus-launch i3
+exec i3
