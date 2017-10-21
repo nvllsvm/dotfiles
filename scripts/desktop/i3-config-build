@@ -1,0 +1,12 @@
+#!/bin/sh
+
+CONFIG_DIR=~/.config/i3
+
+rm -r $CONFIG_DIR
+mkdir $CONFIG_DIR
+cat "$DOTFILES_DIR"/i3/general > $CONFIG_DIR/config
+
+HOST_CONFIG="$DOTFILES_DIR/i3/$HOSTNAME"
+if [ -f "$HOST_CONFIG" ]; then
+    cat $HOST_CONFIG >> $CONFIG_DIR/config
+fi
