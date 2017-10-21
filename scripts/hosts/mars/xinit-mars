@@ -3,3 +3,5 @@
 set-display-mars
 
 QSyncthingTray &
+
+xbindkeys -f $DOTFILES_DIR/xbindkeys/mars
