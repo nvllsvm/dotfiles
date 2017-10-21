@@ -2,7 +2,7 @@
 
 xmodmap-caps-to-esc
 
-phobos-set-display internal
+set-display-phobos
 
 libinput-gestures-setup restart
 

@@ -1,23 +1,29 @@
 #!/bin/sh
 
+MODE=$1
+
+if [[ -z $MODE ]]; then
+    MODE=internal
+fi
+
 xrandr-custom-resolution eDP-1 1600 900
 xrandr-custom-resolution eDP-1 1280 720
 
-if [[ $1 == "internal" ]]; then
+if [[ $MODE == "internal" ]]; then
     xrandr \
         --output HDMI-1 --off \
         --output DP-1 --off \
         --output eDP-1 --primary --mode 3200x1800 --pos 0x0 --rotate normal
     set-x-dpi 192
     apply-display-calibration
-elif [[ $1 == "internal-half" ]]; then
+elif [[ $MODE == "internal-half" ]]; then
     xrandr \
         --output HDMI-1 --off \
         --output DP-1 --off \
         --output eDP-1 --primary --mode 1600x900 --pos 0x0 --rotate normal
     set-x-dpi 138
     apply-display-calibration
-elif [[ $1 == "external" ]]; then
+elif [[ $MODE == "external" ]]; then
     xrandr \
         --output HDMI-1 --off \
         --output eDP-1 --off \
