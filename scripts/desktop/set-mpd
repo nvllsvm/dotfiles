@@ -1,0 +1,21 @@
+#!/bin/bash
+
+OUTPUT=$(mpc $1 --format '%artist% - %title%')
+
+if [[ $1 == 'toggle' ]]; then
+    STATE=$(echo "$OUTPUT" | head -n 2 | tail -n 1 | awk '{print $1}')
+    echo $OUTPUT
+    if [[ $STATE == '[playing]' ]]; then
+        ICON='▶️'
+    elif [[ $STATE == '[paused]' ]]; then
+        ICON='⏸'
+    fi
+elif [[ $1 == 'prev' ]]; then
+    ICON='⏮'
+elif [[ $1 == 'next' ]]; then
+    ICON='⏭'
+fi
+
+INFO=$(echo "$OUTPUT" | head -n 1)
+
+dunstify $ICON "$INFO"

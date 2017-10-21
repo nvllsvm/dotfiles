@@ -18,6 +18,7 @@ export SDL_AUDIODRIVER=alsa
 
 ~/.bin/mars/starttriple &
 
+set-x-dpi 96
 xbindkeys -f "$DOTFILES_DIR"/xbindkeys/mars
 
 QSyncthingTray &
