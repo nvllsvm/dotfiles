@@ -16,9 +16,8 @@ export __VDPAU_NVIDIA_SYNC_DISPLAY_DEVICE=DFP-6
 export SDL_VIDEO_FULLSCREEN_HEAD=0
 export SDL_AUDIODRIVER=alsa
 
-~/.bin/mars/starttriple &
+mars-set-display
 
-set-x-dpi 96
 xbindkeys -f "$DOTFILES_DIR"/xbindkeys/mars
 
 QSyncthingTray &

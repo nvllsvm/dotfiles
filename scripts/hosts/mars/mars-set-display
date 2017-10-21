@@ -1,0 +1,40 @@
+#!/bin/sh
+
+MODE=$1
+
+if [[ -z $MODE ]]; then
+    MODE=single
+fi
+
+if [[ $MODE == "single" ]]; then
+    xrandr \
+        --output DP-0 --off \
+        --output DP-1 --off \
+        --output DP-2 --off \
+        --output DP-3 --off \
+        --output DP-5 --off \
+        --output DVI-I-0 --off \
+        --output DVI-I-1 --off \
+        --output HDMI-0 --off \
+        --output DP-4 --primary --mode 1920x1200 --pos 0x0 --rotate normal
+    set-x-dpi 96
+elif [[ $MODE == "multi" ]]; then
+    xrandr \
+        --output DP-0 --off \
+        --output DP-1 --off \
+        --output DP-3 --off \
+        --output DP-5 --off \
+        --output DVI-I-0 --off \
+        --output DVI-I-1 --off \
+        --output HDMI-0 --off \
+        --output DP-2 --mode 1920x1200 --pos 1920x0 --rotate right \
+        --output DP-4 --primary --mode 1920x1200 --pos 0x0 --rotate normal
+    set-x-dpi 96
+else
+    cat << EOF
+Options:
+- single
+- multi
+EOF
+    exit 1
+fi
