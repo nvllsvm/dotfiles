@@ -1,6 +1,6 @@
 #!/bin/bash
 EDITOR=$EDITOR
-PYTHON_BIN=python3
+PYTHON_BIN=$1
 PYTHON_FILE=test.py
 TEMP_DIR=/tmp/python-wtchr
 
