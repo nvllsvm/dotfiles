@@ -14,15 +14,15 @@
 
 ## MPD
 # Toggle
-"mpc toggle"
+"set-mpd toggle"
   c:172
 
 # Preivous
-"mpc prev"
+"set-mpd prev"
   c:173
 
 # Next
-"mpc next"
+"set-mpd next"
   c:171
 
 

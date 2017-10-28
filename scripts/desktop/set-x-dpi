@@ -15,6 +15,7 @@ if [[ $DPI -le 138 ]]; then
     BORDER_WIDTH=1
 
     DUNST_GEOMETRY=0x5-0+18
+    DUNST_MAX_ICON_SIZE=64
 else
     CURSOR_SIZE=32
 
@@ -26,6 +27,7 @@ else
     BORDER_WIDTH=3
 
     DUNST_GEOMETRY=0x5-0+40
+    DUNST_MAX_ICON_SIZE=128
 fi
 
     cat > $XRESOURCES_TEMP_FILE <<- EOF
@@ -52,6 +54,7 @@ pkill -9 dunst
 dunst \
     -font "$FONT_NAME $FONT_SIZE" \
     -frame_width $BORDER_WIDTH \
+    -max_icon_size $DUNST_MAX_ICON_SIZE \
     -geometry $DUNST_GEOMETRY &
 
 load-xresources-theme
