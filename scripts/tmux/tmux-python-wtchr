@@ -1,8 +1,13 @@
 #!/bin/bash
 EDITOR=$EDITOR
-PYTHON_BIN=$1
 PYTHON_FILE=test.py
 TEMP_DIR=/tmp/python-wtchr
+
+if [[ -z $1 ]]; then
+    PYTHON_BIN=python3
+else
+    PYTHON_BIN=$1
+fi
 
 if [[ -n $VIRTUAL_ENV ]]; then
     PYTHON_BIN=python
