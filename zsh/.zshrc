@@ -78,10 +78,7 @@ add-zsh-hook precmd exit_status
 exit_status () {
     exit_status=$?
     if [[ $exit_status -gt 0 ]]; then
-        RED='\033[0;31m'
-        YELLOW_BG='\033[43m'
-        RESET_COLOR='\033[0m'
-        echo -e "${RED}${YELLOW_BG}$exit_status${RESET_COLOR}"
+        echo -e "${bg[yellow]}${fg[red]}${exit_status}${reset_color}"
     fi
 }
 
