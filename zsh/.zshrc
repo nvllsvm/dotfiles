@@ -7,8 +7,12 @@ autoload -U add-zsh-hook
 
 setopt completealiases
 
-HISTSIZE=1000
-SAVEHIST=1000
+# experiment time!
+#HISTSIZE=1000
+#SAVEHIST=1000
+HISTSIZE=0
+SAVEHIST=0
+
 HISTFILE=~/.zhistory
 
 setopt hist_no_store
