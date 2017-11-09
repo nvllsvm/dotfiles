@@ -7,8 +7,8 @@ autoload -U add-zsh-hook
 
 setopt completealiases
 
-HISTSIZE=0
-SAVEHIST=0
+HISTSIZE=1000
+SAVEHIST=1000
 
 HISTFILE=~/.zhistory
 
