@@ -7,9 +7,6 @@ autoload -U add-zsh-hook
 
 setopt completealiases
 
-# experiment time!
-#HISTSIZE=1000
-#SAVEHIST=1000
 HISTSIZE=0
 SAVEHIST=0
 
