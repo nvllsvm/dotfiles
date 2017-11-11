@@ -3,7 +3,11 @@
 MODE=$1
 
 if [[ -z $MODE ]]; then
-    MODE=internal
+    if [[ -z $(xrandr | grep '^DP-1 connected ' ) ]]; then
+        MODE=internal
+    else
+        MODE=external
+    fi
 fi
 
 xrandr-custom-resolution eDP-1 1600 900

@@ -1,2 +1,2 @@
 #!/bin/sh
-xcalib -d :0 $DOTFILES_DIR/xcalib/'phobos - 05P7H-LQ133Z1 #1 2016-01-27 22-20 D6500 2.2 S XYZLUT+MTX.icc'
+xcalib $DOTFILES_DIR/xcalib/'phobos - 05P7H-LQ133Z1 #1 2016-01-27 22-20 D6500 2.2 S XYZLUT+MTX.icc'
