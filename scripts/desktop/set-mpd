@@ -19,13 +19,13 @@ fi
 
 INFO=$(echo "$OUTPUT" | head -n 1)
 
-FILE_DIR="$LIBRARY_DIR/$(dirname "$(mpc -f %file% | head -n 1)")"
+#FILE_DIR="$LIBRARY_DIR/$(dirname "$(mpc -f %file% | head -n 1)")"
 
-if [ -f "$FILE_DIR/front.jpg" ]; then
-    IMAGE_PATH="$FILE_DIR/front.jpg"
-elif [ -f "$FILE_DIR/front.png" ]; then
-    IMAGE_PATH="$FILE_DIR/front.png"
-fi
+#if [ -f "$FILE_DIR/front.jpg" ]; then
+#    IMAGE_PATH="$FILE_DIR/front.jpg"
+#elif [ -f "$FILE_DIR/front.png" ]; then
+#    IMAGE_PATH="$FILE_DIR/front.png"
+#fi
 
 if [ ! -z "$IMAGE_PATH" ]; then
     ICON_ARG="--icon=$IMAGE_PATH"
@@ -33,4 +33,5 @@ else
     ICON_ARG=""
 fi
 
-dunstify --replace=10001 "$ICON_ARG" $SYMBOL "$INFO"
+#dunstify --replace=10001 "$ICON_ARG" $SYMBOL "$INFO"
+dunstify --replace=10001 $SYMBOL "$INFO"
