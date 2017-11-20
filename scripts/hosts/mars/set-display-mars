@@ -3,7 +3,11 @@
 MODE=$1
 
 if [[ -z $MODE ]]; then
-    MODE=single
+    if [[ $(xrandr | grep -e '^DP-2 ' -e '^DP-4 ' | grep ' connected' | wc -l) == '2' ]]; then
+        MODE=multi
+    else
+        MODE=single
+    fi
 fi
 
 if [[ $MODE == "single" ]]; then
