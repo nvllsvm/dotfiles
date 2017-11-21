@@ -71,9 +71,11 @@ function virtenv_indicator {
     if [[ -z $VIRTUAL_ENV ]] then
         unset prompt_virtualenv
         unset PIP_USER
+        unset PYTHONPATH
     else
         prompt_virtualenv="($(basename $VIRTUAL_ENV))"
         export PIP_USER=0
+        export PYTHONPATH=$VIRTUAL_ENV
     fi
 }
 
