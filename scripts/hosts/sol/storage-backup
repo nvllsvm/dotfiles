@@ -1,20 +1,45 @@
 #!/bin/sh
 
-trap exit 2
+set -e
 
-if mount | awk '{print $3}' | grep /mnt/backup1$ > /dev/null ; then
+STORAGE1=/mnt/storage1
+STORAGE2=/mnt/storage2
+
+BACKUP1=/mnt/backup1
+BACKUP2=/mnt/backup2
+
+HOME_BACKUP_DIR=$STORAGE1/Backup/sol/home
+
+backup_home() {
+    echo Backing up home ...
     sudo rsync -av --progress --delete \
         --exclude .embyserver/transcoding-temp \
         --exclude .embyserver/logs \
         --exclude .embyserver/cache \
-        ~ /mnt/storage1/Backup/sol/home
-    sudo rsync -av --progress --delete /mnt/storage1/ /mnt/backup1
-else
-    echo Error: /mnt/backup1 not mounted
-fi
+        ~ $HOME_BACKUP_DIR
+}
 
-if mount | awk '{print $3}' | grep /mnt/backup2$ > /dev/null ; then
-    sudo rsync -av --progress --delete /mnt/storage2/ /mnt/backup2
-else
-    echo Error: /mnt/backup2 not mounted
-fi
+backup_storage1() {
+    echo Backing up storage1 ...
+    sudo rsync -av --progress --delete $STORAGE1/ $BACKUP1
+}
+
+backup_storage2() {
+    echo Backing up storage2 ...
+    sudo rsync -av --progress --delete $STORAGE2/ $BACKUP2
+}
+
+check_mounted() {
+    if ! mount | awk '{print $3}' | grep $1$ > /dev/null ; then
+        echo Error: $1 not mounted
+    fi
+}
+
+check_mounted $STORAGE1
+check_mounted $STORAGE2
+check_mounted $BACKUP1
+check_mounted $BACKUP2
+
+backup_home
+backup_storage1
+backup_storage2
