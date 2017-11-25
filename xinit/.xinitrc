@@ -12,7 +12,7 @@ $(which xinit-$HOSTNAME 2> /dev/null)
 
 i3-build-config
 
-startcompositing
+compton &
 
 export QT_QPA_PLATFORMTHEME="qt5ct"
 
