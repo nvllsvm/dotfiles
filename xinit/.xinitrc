@@ -14,4 +14,6 @@ i3-build-config
 
 startcompositing
 
+export QT_QPA_PLATFORMTHEME="qt5ct"
+
 exec i3
