@@ -4,6 +4,8 @@ xmodmap-caps-to-esc
 
 set-display-phobos
 
+QSyncthingTray &
+
 libinput-gestures-setup restart
 
 TOUCHPAD_ID=$(xinput list --id-only 'DLL0665:01 06CB:76AD Touchpad')
