@@ -1,0 +1,61 @@
+{
+    "autoswitch": [], 
+    "autoswitch_osd": true, 
+    "controllers": {
+        "1": {
+            "icon": "sc-0.svg", 
+            "input_rotation_l": 20, 
+            "input_rotation_r": -20, 
+            "led_level": 80, 
+            "name": "1", 
+            "osd_alignment": 0
+        }
+    }, 
+    "enable_sniffing": false, 
+    "fix_xinput": true, 
+    "gesture_colors": {
+        "background": "160c00ff", 
+        "grid": "004000ff", 
+        "line": "ffffff1a"
+    }, 
+    "gui": {
+        "autokill_daemon": false, 
+        "enable_status_icon": true, 
+        "minimize_to_status_icon": true, 
+        "news": {
+            "enabled": true, 
+            "last_version": "0.3.12"
+        }
+    }, 
+    "ignore_serials": true, 
+    "osd_colors": {
+        "background": "160c00", 
+        "border": "00FF00", 
+        "menuitem_border": "004000", 
+        "menuitem_hilight": "000070", 
+        "menuitem_hilight_border": "00FF00", 
+        "menuitem_hilight_text": "FFFFFF", 
+        "menuseparator": "109010", 
+        "text": "00FF00"
+    }, 
+    "osk_colors": {
+        "button1": "162082", 
+        "button1_border": "262b5e", 
+        "button2": "162d44", 
+        "button2_border": "27323e", 
+        "hilight": "00688D", 
+        "pressed": "1A9485", 
+        "text": "ffffff"
+    }, 
+    "output": {
+        "axes": [[-32768, 32767], [-32768, 32767], [-32768, 32767], [-32768, 32767], [0, 255], [0, 255], [-1, 1], [-1, 1]], 
+        "buttons": 11, 
+        "name": "Microsoft X-Box 360 pad", 
+        "product": "0x028e", 
+        "rumble": true, 
+        "vendor": "0x045e", 
+        "version": "0x110"
+    }, 
+    "recent_max": 10, 
+    "recent_profiles": ["Stardew Valley", "XBox Controller", "XBox Controller with High Precision Camera", "Desktop"]
+}

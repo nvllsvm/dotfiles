@@ -8,4 +8,5 @@ neovim/autoload/plug.vim.old
 neovim/plugged
 ranger/bookmarks
 ranger/tagged
+sc-controller/daemon.*
 zsh/.zsh/local.zshrc
