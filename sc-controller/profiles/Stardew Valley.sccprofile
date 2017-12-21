@@ -68,7 +68,13 @@
         }, 
         "sensitivity": [1.2, 1.2, 1.0]
     }, 
-    "trigger_left": {}, 
-    "trigger_right": {}, 
+    "trigger_left": {
+        "action": "button(Keys.BTN_GAMEPAD)", 
+        "levels": [254, 255]
+    }, 
+    "trigger_right": {
+        "action": "button(Keys.BTN_NORTH)", 
+        "levels": [254, 255]
+    }, 
     "version": 1.2
 }
