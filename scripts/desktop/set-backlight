@@ -1,16 +1,19 @@
 #!/bin/bash
 
+STEP=10
+MINIMUM=1
+
 if [[ $1 == 'dec' ]]; then
-    if [[ $(xbacklight -get) -gt 10 ]]; then
-        xbacklight -dec 10
+    if [[ $(xbacklight -get) -gt $STEP ]]; then
+        xbacklight -dec $STEP
     else
-        xbacklight -set 1
+        xbacklight -set $MINIMUM
     fi
 elif [[ $1 == 'inc' ]]; then
-    if [[ $(xbacklight -get) -lt 10 ]]; then
-        xbacklight -set 10
+    if [[ $(xbacklight -get) -lt $STEP ]]; then
+        xbacklight -set $STEP
     else
-        xbacklight -inc 10
+        xbacklight -inc $STEP
     fi
 else
     cat << EOF
