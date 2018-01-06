@@ -1,5 +1,5 @@
 if !empty($VIRTUAL_ENV)
-    let g:python3_host_prog=system("which -a python3 | grep -v \"^$VIRTUAL_ENV\" | head -n 1 -c -1")
+    let g:python3_host_prog=system("which -a python3 | grep -v \"^$VIRTUAL_ENV\" | head -n 1 | tr -d '\n'")
 endif
 
 set ruler
