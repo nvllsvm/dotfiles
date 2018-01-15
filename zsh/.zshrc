@@ -26,7 +26,7 @@ bindkey "^[[B" history-beginning-search-forward
 alias ls='ls --color=auto --group-directories-first'
 alias ll='ls -lh'
 alias la='ls -A'
-alias grep='grep --color=always'
+alias grep='grep --color=auto'
 alias today='date +"%Y-%m-%d"'
 
 srch () {
