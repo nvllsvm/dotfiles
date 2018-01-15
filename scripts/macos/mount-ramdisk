@@ -1,0 +1,8 @@
+#!/bin/sh
+# Size at the end is * 2048 where 2048 = 1 MB, so 1572864 = 768 MB
+VOLUME='RamDiskCache'
+DISK=`/usr/bin/hdiutil attach -nobrowse -nomount ram://8388608`
+/usr/sbin/diskutil erasevolume HFS+ "${VOLUME}" ${DISK}
+
+exit
+CACHEDIR="/Volumes/${VOLUME}/${USER}"
