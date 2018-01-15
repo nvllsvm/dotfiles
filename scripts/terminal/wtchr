@@ -9,7 +9,7 @@ fi
 while true; do
     clear
     eval "$@ &"
-    trap "kill -- -$(ps -o pgid= $! | grep -o [0-9]*)" 2
+    trap "kill -- -$(ps -o pgid= $! | grep -o [0-9]*)" EXIT
     wait
     sleep 0.5
     fswatch -r -l 0.1 --one-event ./ \
