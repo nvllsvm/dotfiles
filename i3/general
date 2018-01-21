@@ -156,7 +156,7 @@ client.placeholder      $color19 $background $foreground $color8 $color18
 
 client.background       $background
 
-hide_edge_borders vertical
+hide_edge_borders both
 
 for_window [class="^.*"] border pixel 2
 
