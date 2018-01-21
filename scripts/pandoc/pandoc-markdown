@@ -7,4 +7,4 @@ else
 fi
 
 
-pandoc --from markdown_github --to html -c ~/.pandoc/css/github-markdown.css --self-contained --standalone --columns=10000 "$1" > $OUTPUT_FILE
+pandoc --from markdown_github --to html -c $DOTFILES_DIR/pandoc/css/github-markdown.css --self-contained --standalone --columns=10000 "$1" > $OUTPUT_FILE
