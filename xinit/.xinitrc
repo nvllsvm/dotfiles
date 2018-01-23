@@ -8,12 +8,12 @@ fi
 setxkbmap -option terminate:ctrl_alt_bksp
 xset -dpms; xset s off
 
-$(which xinit-$HOSTNAME 2> /dev/null)
-
-i3-build-config
+i3-config-build
 
 compton &
 
 export QT_QPA_PLATFORMTHEME="qt5ct"
+
+$(which xinit-$HOSTNAME) &
 
 exec i3
