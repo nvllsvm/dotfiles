@@ -21,7 +21,6 @@ class RepoDownloader(consumers.Consumer):
     def process(self, repo, user, user_path):
         self.logger.info('Downloading %s', repo)
         repo_path = pathlib.Path(user_path, repo)
-
         if repo_path.exists():
             self.logger.info('Pulling %s', repo)
             self.git_command(repo_path, 'pull')
@@ -29,7 +28,7 @@ class RepoDownloader(consumers.Consumer):
             self.logger.info('Cloning %s', repo)
             repo_path.mkdir()
             self.git_command(user_path, 'clone',
-                             'https://github.com/{user}/{repo}')
+                             f'https://github.com/{user}/{repo}')
 
         self.logger.info('Complete %s', repo)
 
@@ -54,15 +53,15 @@ def main():
     parser.add_argument('path')
     args = parser.parse_args()
 
-    path = pathlib.Path(args.path, args.user)
-    path.mkdir(parents=True, exist_ok=True)
+    user_path = pathlib.Path(args.path, args.user)
+    user_path.mkdir(parents=True, exist_ok=True)
 
-    existing_dirs = set([d.name for d in path.iterdir() if d.is_dir()])
+    existing_dirs = set([d.name for d in user_path.iterdir() if d.is_dir()])
     repos = set()
     with consumers.Queue(RepoDownloader) as q:
         for repo in get_repo_names(args.user):
             repos.add(repo)
-            q.put(repo, args.user, path)
+            q.put(repo, args.user, user_path)
 
     for d in existing_dirs.difference(repos):
         logging.warning('Orphan %s', d)
