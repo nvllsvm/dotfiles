@@ -35,6 +35,9 @@ def get_repo_names(user):
 
 
 class RepoDownloader(consumers.Consumer):
+    def initialize(self, errors):
+        self.errors = errors
+
     def process(self, repo, user, user_path):
         self.logger.info('Processing %s', repo)
         repo_path = pathlib.Path(user_path, repo)
@@ -57,6 +60,19 @@ class RepoDownloader(consumers.Consumer):
         except subprocess.CalledProcessError as e:
             self.logger.error('Error running command %s %s', path, args)
             self.logger.exception(e)
+            self.errors.put(path)
+
+
+class ErrorConsumer(consumers.Consumer):
+    def initialize(self):
+        self.errors = []
+
+    def process(self, error):
+        self.errors.append(error)
+
+    def shutdown(self):
+        for error in self.errors:
+            self.logger.error(error)
 
 
 def main():
@@ -73,9 +89,11 @@ def main():
     user_path = pathlib.Path(args.path, args.user)
     user_path.mkdir(parents=True, exist_ok=True)
 
+    errors = consumers.Queue(ErrorConsumer, quantity=1)
+
     existing_dirs = set([d.name for d in user_path.iterdir() if d.is_dir()])
     repos = set()
-    with consumers.Queue(RepoDownloader) as q:
+    with consumers.Queue(RepoDownloader(errors), queues=[errors]) as q:
         for repo in get_repo_names(args.user):
             repos.add(repo)
             q.put(repo, args.user, user_path)
