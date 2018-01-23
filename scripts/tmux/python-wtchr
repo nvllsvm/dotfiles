@@ -9,40 +9,18 @@ SESSION=python-wtchr
 trap "tmux kill-session -t $SESSION 2> /dev/null" SIGHUP
 trap "tmux kill-session -t $SESSION 2> /dev/null" EXIT
 
-
 if [[ -z $1 ]]; then
     PYTHON_BIN=python3
+elif [[ -n $VIRTUAL_ENV ]]; then
+    PYTHON_BIN=python
 else
     PYTHON_BIN=$1
-fi
-
-if [[ -n $VIRTUAL_ENV ]]; then
-    PYTHON_BIN=python
 fi
 
 mkdir -p $TEMP_DIR
 cd $TEMP_DIR
 
-build_venv() {
-    if [[ ! $(test -d env) ]] ; then
-        virtualenv -p $PYTHON_BIN env
-    fi
-    . env/bin/activate
-}
-
-while getopts 'v' flag; do
-    case "${flag}" in
-        v) build_venv ;;
-    esac
-done
-
-if [ ! -f $PYTHON_FILE ]; then
-    cat > $PYTHON_FILE<<EOF
-from pprint import pprint
-
-
-EOF
-fi
+touch $PYTHON_FILE
 
 if [[ $(tmux display-message -p '#S' 2> /dev/null) == $SESSION ]]; then
     tmux split-window -h "wtchr $PYTHON_BIN $PYTHON_FILE"
