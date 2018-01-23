@@ -1,25 +1,42 @@
 #!/usr/bin/env python3
 import argparse
 import logging
+import os
 import pathlib
 import subprocess
 
 import consumers
 import requests
+import requests.auth
+import requests.utils
+
+USERNAME = os.environ['GITHUB_USERNAME']
+TOKEN = os.environ['GITHUB_TOKEN']
 
 
 def get_repo_names(user):
     url = f'https://api.github.com/users/{user}/repos'
 
-    response = requests.get(url)
-    response.raise_for_status()
+    repos = []
 
-    return sorted({repo['name'] for repo in response.json()})
+    while url:
+        response = requests.get(url, auth=requests.auth.HTTPBasicAuth(USERNAME,
+                                                                      TOKEN))
+        response.raise_for_status()
+        repos.extend(repo['name'] for repo in response.json())
+
+        link = response.headers.get('Link')
+        url = None
+        for v in requests.utils.parse_header_links(link):
+            if v['rel'] == 'next':
+                url = v['url']
+
+    return sorted(repos)
 
 
 class RepoDownloader(consumers.Consumer):
     def process(self, repo, user, user_path):
-        self.logger.info('Downloading %s', repo)
+        self.logger.info('Processing %s', repo)
         repo_path = pathlib.Path(user_path, repo)
         if repo_path.exists():
             self.logger.info('Pulling %s', repo)
