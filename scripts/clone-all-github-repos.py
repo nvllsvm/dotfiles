@@ -90,13 +90,14 @@ def main():
     user_path.mkdir(parents=True, exist_ok=True)
 
     errors = consumers.Queue(ErrorConsumer, quantity=1)
+    downloader = consumers.Queue(RepoDownloader(errors))
 
     existing_dirs = set([d.name for d in user_path.iterdir() if d.is_dir()])
     repos = set()
-    with consumers.Queue(RepoDownloader(errors), queues=[errors]) as q:
+    with errors, downloader:
         for repo in get_repo_names(args.user):
             repos.add(repo)
-            q.put(repo, args.user, user_path)
+            downloader.put(repo, args.user, user_path)
 
     for d in existing_dirs.difference(repos):
         logging.warning('Orphan %s', d)
