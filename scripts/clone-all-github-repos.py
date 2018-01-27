@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import itertools
 import logging
 import os
 import pathlib
@@ -34,12 +35,12 @@ def get_repo_names(user):
     return sorted(repos)
 
 
-class RepoDownloader(consumers.Consumer):
+class RepoDownloader:
     def __init__(self):
+        self.logger = logging.getLogger()
         self.errors = []
-        self.logger = logging.getLogger(self.name)
 
-    def download(self, repo, user, user_path):
+    def process(self, repo, user, user_path):
         self.logger.info('Processing %s', repo)
         repo_path = pathlib.Path(user_path, repo)
         if repo_path.exists():
@@ -55,18 +56,18 @@ class RepoDownloader(consumers.Consumer):
 
     def git_command(self, path, *args):
         try:
-            subprocess.run(['faggit', '-C', path, *args],
+            subprocess.run(['git', '-C', path, *args],
                            stdout=subprocess.PIPE,
                            stderr=subprocess.PIPE, check=True)
-        except (subprocess.CalledProcessError, FileNotFoundError) as e:
+        except subprocess.CalledProcessError as e:
+            self.logger.error('Error running command %s %s', path, args)
+            self.logger.exception(e)
+            self.errors.append((path, args))
 
-            pass
-            self.errors.append(path)
-
-    def run(self):
-        for repo, user, user_path in self.items:
-            self.download(repo, user, user_path)
-
+    def __call__(self, items):
+        self.errors = []
+        for args in items:
+            self.process(*args)
         return self.errors
 
 
@@ -86,13 +87,16 @@ def main():
 
     existing_dirs = set([d.name for d in user_path.iterdir() if d.is_dir()])
     repos = set()
-    with RepoDownloader().pool() as pool:
+    with consumers.Pool(RepoDownloader) as pool:
         for repo in get_repo_names(args.user):
             repos.add(repo)
-            pool.process(repo, args.user, user_path)
+            pool.put(repo, args.user, user_path)
 
     for d in existing_dirs.difference(repos):
         logging.warning('Orphan %s', d)
+
+    for error in itertools.chain(*pool.results):
+        logging.error(error)
 
 
 if __name__ == '__main__':
