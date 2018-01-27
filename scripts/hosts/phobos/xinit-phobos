@@ -4,6 +4,7 @@ xmodmap-caps-to-esc
 
 set-display-phobos
 
+nm-applet &
 QSyncthingTray &
 
 libinput-gestures-setup restart
