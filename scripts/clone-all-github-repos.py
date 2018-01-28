@@ -46,6 +46,8 @@ class RepoDownloader:
         if repo_path.exists():
             self.logger.info('Pulling %s', repo)
             self.git_command(repo_path, 'pull')
+            self.logger.info('Pruning %s', repo)
+            self.git_command(repo_path, 'remote', 'prune', 'origin')
         else:
             self.logger.info('Cloning %s', repo)
             repo_path.mkdir()
