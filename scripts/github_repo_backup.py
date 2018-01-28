@@ -7,12 +7,14 @@ import pathlib
 import subprocess
 
 import consumers
+import pid.decorator
 import requests
 import requests.auth
 import requests.utils
 
 USERNAME = os.environ['GITHUB_USERNAME']
 TOKEN = os.environ['GITHUB_TOKEN']
+PID_DIR = os.environ.get('PID_DIR')
 
 
 class GitHubRepo:
@@ -104,6 +106,7 @@ def download_repos(repos):
     return errors
 
 
+@pid.decorator.pidfile(piddir=PID_DIR)
 def main():
     logging.basicConfig(
         level=logging.INFO,
