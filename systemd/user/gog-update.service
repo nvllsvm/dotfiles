@@ -1,0 +1,6 @@
+[Unit]
+Description=Run gog-update
+
+[Service]
+ExecStart=/usr/bin/env gog-update
+SyslogIdentifier=gog-update
