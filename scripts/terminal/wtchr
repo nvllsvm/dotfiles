@@ -1,29 +1,84 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
+INTERVAL=0.5
+KILL_CHILD_ON_CHANGE=
+
+POSITIONAL=()
+
 trap "exit 0" SIGINT
+trap "kill_all" EXIT
 
-if [ -z $1 ]; then
-    echo ERROR: No command provided
-    exit 1
-fi
 
-while true; do
-    clear
-    eval "$@ &"
-    child=$!
-    trap "kill -- $child -$child &> /dev/null || true" EXIT
-    wait
-    sleep 0.5
-    fswatch -r -l 0.1 --one-event ./ \
-    --event=Created \
-    --event=Updated \
-    --event=Removed \
-    --event=Renamed \
-    --event=OwnerModified \
-    --event=AttributeModified \
-    --event=MovedFrom \
-    --event=MovedTo \
-    --event=Link \
-    &> /dev/null
-done
+kill_all() {
+    jobs -rp | xargs -L 1 pkill -P || true
+    pkill -P $$ || true
+}
+
+
+parse_args() {
+    end_args=
+
+    while [[ $# -gt 0 ]]; do
+        key="$1"
+        if [[ -z $end_args ]]; then
+            case $key in
+                -n)
+                    INTERVAL="$2"
+                    shift
+                    shift
+                    ;;
+                -x)
+                    KILL_CHILD_ON_CHANGE=1
+                    shift
+                    ;;
+                *)
+                    end_args=1
+                    ;;
+            esac
+        fi
+
+        if [[ ! -z $end_args ]]; then
+            POSITIONAL+=("$1")
+            shift
+        fi
+    done
+
+    set -- "${POSITIONAL[@]}"
+
+    if [ -z $POSITIONAL ]; then
+        echo ERROR: No command provided
+        exit 1
+    fi
+}
+
+
+run() {
+    while true; do
+        if [[ ! -z $KILL_CHILD_ON_CHANGE ]]; then
+            kill_all
+        fi
+
+        clear
+        eval "${POSITIONAL[@]} &"
+
+        if [[ -z $KILL_CHILD_ON_CHANGE ]]; then
+            wait
+        fi
+        sleep "$INTERVAL"
+        fswatch -r -l 0.1 --one-event ./ \
+        --event=Created \
+        --event=Updated \
+        --event=Removed \
+        --event=Renamed \
+        --event=OwnerModified \
+        --event=AttributeModified \
+        --event=MovedFrom \
+        --event=MovedTo \
+        --event=Link \
+        &> /dev/null
+    done
+}
+
+parse_args $@
+run
