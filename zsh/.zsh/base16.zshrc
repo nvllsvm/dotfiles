@@ -14,4 +14,6 @@ _base16 () {
     load-xresources-theme 2> /dev/null || true
 }
 
+path=("$DOTFILES_DIR"/scripts/base16 "$path[@]")
+
 full-update add base16-update
