@@ -1,6 +1,6 @@
 #!/bin/sh
 GOG_DIR=/mnt/storage1/Games/PC/GOG.com
 ORPHANS_FILE=/tmp/gog-update-orphans
-lgogdownloader --directory $DIR --update-check
-lgogdownloader --directory $DIR --download --save-serials
-lgogdownloader --directory $DIR --check-orphans | tee $ORPHANS_FILE
+lgogdownloader --directory $GOG_DIR --update-check
+lgogdownloader --directory $GOG_DIR --download --save-serials
+lgogdownloader --directory $GOG_DIR --check-orphans | tee $ORPHANS_FILE
