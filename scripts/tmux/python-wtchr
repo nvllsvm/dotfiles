@@ -23,7 +23,7 @@ cd $TEMP_DIR
 touch $PYTHON_FILE
 
 if [[ $(tmux display-message -p '#S' 2> /dev/null) == $SESSION ]]; then
-    tmux split-window -h "wtchr $PYTHON_BIN $PYTHON_FILE"
+    tmux split-window -h "wtchr -x $PYTHON_BIN $PYTHON_FILE"
     tmux select-pane -l
     $EDITOR $PYTHON_FILE
 else

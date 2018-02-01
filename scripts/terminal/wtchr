@@ -3,6 +3,7 @@ set -e
 
 INTERVAL=0.5
 KILL_CHILD_ON_CHANGE=
+DIRECTORIES=./
 
 POSITIONAL=()
 
@@ -11,8 +12,8 @@ trap "kill_all" EXIT
 
 
 kill_all() {
-    jobs -rp | xargs -L 1 pkill -P || true
-    pkill -P $$ || true
+    jobs -rp | xargs -L 1 pkill -P &> /dev/null || true
+    pkill -P $$ &> /dev/null || true
 }
 
 
@@ -23,13 +24,18 @@ parse_args() {
         key="$1"
         if [[ -z $end_args ]]; then
             case $key in
-                -n)
+                -n|--interval)
                     INTERVAL="$2"
                     shift
                     shift
                     ;;
-                -x)
+                -x|--kill-on-change)
                     KILL_CHILD_ON_CHANGE=1
+                    shift
+                    ;;
+                -d|--directories)
+                    DIRECTORIES="$2"
+                    shift
                     shift
                     ;;
                 *)
@@ -64,6 +70,8 @@ run() {
 
         if [[ -z $KILL_CHILD_ON_CHANGE ]]; then
             wait
+        else
+            disown
         fi
         sleep "$INTERVAL"
         fswatch -r -l 0.1 --one-event ./ \
@@ -80,5 +88,5 @@ run() {
     done
 }
 
-parse_args $@
+parse_args "$@"
 run
