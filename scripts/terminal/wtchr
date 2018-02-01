@@ -3,7 +3,7 @@ set -e
 
 INTERVAL=0.5
 KILL_CHILD_ON_CHANGE=
-DIRECTORIES=./
+PATHS=./
 
 POSITIONAL=()
 
@@ -33,8 +33,8 @@ parse_args() {
                     KILL_CHILD_ON_CHANGE=1
                     shift
                     ;;
-                -d|--directories)
-                    DIRECTORIES="$2"
+                -p|--paths)
+                    PATHS="$2"
                     shift
                     shift
                     ;;
@@ -74,7 +74,7 @@ run() {
             disown
         fi
         sleep "$INTERVAL"
-        fswatch -r -l 0.1 --one-event ./ \
+        fswatch -r -l 0.1 --one-event $PATHS \
         --event=Created \
         --event=Updated \
         --event=Removed \
