@@ -4,6 +4,9 @@ set -e
 INTERVAL=0.5
 KILL_CHILD_ON_CHANGE=
 PATHS=./
+INCLUDE=
+EXCLUDE=
+ADDITIONAL_OPTS=()
 
 POSITIONAL=()
 
@@ -38,6 +41,16 @@ parse_args() {
                     shift
                     shift
                     ;;
+                -i|--include)
+                    INCLUDE="$2"
+                    shift
+                    shift
+                    ;;
+                -e|--exclude)
+                    EXCLUDE="$2"
+                    shift
+                    shift
+                    ;;
                 *)
                     end_args=1
                     ;;
@@ -50,7 +63,23 @@ parse_args() {
         fi
     done
 
+    if [ ! -z "$INCLUDE" ]; then
+        ADDITIONAL_OPTS+=("--include")
+        ADDITIONAL_OPTS+=("$INCLUDE")
+
+        if [ -z "$EXCLUDE" ]; then
+            EXCLUDE='.*'
+        fi
+    fi
+
+    if [ ! -z "$EXCLUDE" ]; then
+        ADDITIONAL_OPTS+=("--exclude")
+        ADDITIONAL_OPTS+=("$EXCLUDE")
+    fi
+
     set -- "${POSITIONAL[@]}"
+    set -- "${ADDITIONAL_OPTS[@]}"
+
 
     if [ -z $POSITIONAL ]; then
         echo ERROR: No command provided
@@ -75,6 +104,7 @@ run() {
         fi
         sleep "$INTERVAL"
         fswatch -r -l 0.1 --one-event $PATHS \
+        "${ADDITIONAL_OPTS[@]}" \
         --event=Created \
         --event=Updated \
         --event=Removed \
@@ -83,8 +113,7 @@ run() {
         --event=AttributeModified \
         --event=MovedFrom \
         --event=MovedTo \
-        --event=Link \
-        &> /dev/null
+        --event=Link &> /dev/null
     done
 }
 
