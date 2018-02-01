@@ -6,6 +6,7 @@ set-display-phobos
 
 nm-applet &
 QSyncthingTray &
+blueberry-tray &
 
 libinput-gestures-setup restart
 
