@@ -1,6 +1,6 @@
 Xcursor.size: 16
 
-urxvt.perl-ext-common: font-size,config-reload,matcher
+urxvt.perl-ext-common: font-size,config-reload,matcher,selection-to-clipboard
 urxvt.keysym.C-Up: font-size:increase
 urxvt.keysym.C-Down: font-size:decrease
 urxvt.keysym.C-equal: font-size:reset
