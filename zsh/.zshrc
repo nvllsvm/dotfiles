@@ -2,7 +2,7 @@ zstyle ':completion:*' list-colors "${(@s.:.)LS_COLORS}"
 zstyle ':completion:*' menu select
 zstyle ':completion:*' rehash true
 autoload -U colors && colors
-autoload -U compinit && compinit
+autoload -U compinit
 autoload -U add-zsh-hook
 
 setopt completealiases
@@ -104,5 +104,8 @@ zle -N sudo-command-line
 # Defined shortcut keys: [Esc] [Esc]
 bindkey '^r' sudo-command-line
 bindkey -M vicmd '^r' sudo-command-line
+
+fpath=($DOTFILES_DIR/zsh/functions $fpath)
+compinit
 
 [[ -r ~/.zshlocal ]] && . ~/.zshlocal
