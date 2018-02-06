@@ -111,4 +111,8 @@ autocmd FileType markdown autocmd BufWritePost * call system("pandoc-markdown '"
 autocmd FileType rst autocmd BufWritePost * call system("pandoc-rst '" . expand("<afile>") . "'")
 
 let base16colorspace=256
-colorscheme $BASE16_THEME
+if !empty($BASE16_THEME)
+    colorscheme $BASE16_THEME
+else
+    colorscheme base16-seti
+endif
