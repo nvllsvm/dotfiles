@@ -9,7 +9,6 @@ setopt completealiases
 
 HISTSIZE=1000
 SAVEHIST=1000
-
 HISTFILE=~/.zhistory
 
 setopt hist_no_store
@@ -27,7 +26,6 @@ alias ls='ls --color=auto --group-directories-first'
 alias ll='ls -lh'
 alias la='ls -A'
 alias grep='grep --color=auto'
-alias today='date +"%Y-%m-%d"'
 
 srch () {
     if [[ -z $2 ]]; then
@@ -51,7 +49,6 @@ prompt_separator='%F{black}.%f'
 prompt_current_dir='%F{cyan}%~%f'
 
 PROMPT="$prompt_user$prompt_separator$prompt_host  "
-
 RPROMPT="$prompt_current_dir"
 
 typeset -U path
@@ -108,4 +105,4 @@ zle -N sudo-command-line
 bindkey '^r' sudo-command-line
 bindkey -M vicmd '^r' sudo-command-line
 
-[[ -r ~/.zsh/local.zshrc ]] && . ~/.zsh/local.zshrc
+[[ -r ~/.zshlocal ]] && . ~/.zshlocal

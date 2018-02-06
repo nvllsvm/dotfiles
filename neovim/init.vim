@@ -110,7 +110,5 @@ autocmd! BufWritePost * Neomake
 autocmd FileType markdown autocmd BufWritePost * call system("pandoc-markdown '" . expand("<afile>") . "'")
 autocmd FileType rst autocmd BufWritePost * call system("pandoc-rst '" . expand("<afile>") . "'")
 
-if filereadable(expand("~/.vimrc_background"))
-  let base16colorspace=256
-  source ~/.vimrc_background
-endif
+let base16colorspace=256
+colorscheme $BASE16_THEME

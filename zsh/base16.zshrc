@@ -9,9 +9,10 @@ _base16 () {
     local theme=$2
     [ -f $script ] && . $script
     ln -fs $script ~/.base16_theme
-    export BASE16_THEME=${theme}
+    export BASE16_THEME=base16-${theme}
     echo -e "if \0041exists('g:colors_name') || g:colors_name != 'base16-$theme'\n  colorscheme base16-$theme\nendif" >| ~/.vimrc_background
     load-xresources-theme 2> /dev/null || true
+    rm ~/.vimrc_background
 }
 
 path=("$DOTFILES_DIR"/scripts/base16 "$path[@]")
