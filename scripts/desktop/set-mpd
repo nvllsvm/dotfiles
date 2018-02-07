@@ -17,7 +17,12 @@ elif [[ $1 == 'next' ]]; then
     SYMBOL='⏭'
 fi
 
-INFO=$(echo "$OUTPUT" | head -n 1)
+if [[ -n $(mpc playlist) ]]; then
+    INFO=$(echo "$OUTPUT" | head -n 1)
+else
+    SYMBOL="🚫"
+    INFO="Empty Playlist"
+fi
 
 #FILE_DIR="$LIBRARY_DIR/$(dirname "$(mpc -f %file% | head -n 1)")"
 
