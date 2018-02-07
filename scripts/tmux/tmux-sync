@@ -34,6 +34,6 @@ elif [[ $TMUX ]]; then
     tmux set-window-option synchronize-panes off
     clear
 else
-    tmux new-session -d -s "sync$$" $0 $@
+    tmux new-session -d -s "sync$$" "$0" "$@"
     tmux attach-session -t "sync$$"
 fi

@@ -27,7 +27,7 @@ if [[ $(tmux display-message -p '#S' 2> /dev/null) == $SESSION ]]; then
     tmux select-pane -l
     $EDITOR $PYTHON_FILE
 else
-    tmux new-session -d -s $SESSION $0 $@
+    tmux new-session -d -s $SESSION $0 "$@"
     tmux set-option -t $SESSION status off
     tmux attach-session -t $SESSION > /dev/null
 fi
