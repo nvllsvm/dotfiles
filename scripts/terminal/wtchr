@@ -94,6 +94,11 @@ run() {
             kill_all
         fi
 
+        if [[ -n $TMUX ]]; then
+            # exit copy-mode
+            tmux if -F -t $TMUX_PANE "#{pane_in_mode}" "send-keys -t $TMUX_PANE -X cancel"
+        fi
+
         clear
         eval "${POSITIONAL[@]} &"
 
