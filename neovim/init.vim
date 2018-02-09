@@ -9,6 +9,8 @@ set expandtab
 
 set mouse=a
 
+set clipboard=unnamedplus
+
 " line numbers
 set number
 set relativenumber
