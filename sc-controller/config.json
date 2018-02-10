@@ -9,7 +9,23 @@
             "led_level": 80, 
             "name": "1", 
             "osd_alignment": 0
+        }, 
+        "sc1": {
+            "icon": "sc-1.svg", 
+            "input_rotation_l": 20, 
+            "input_rotation_r": -20, 
+            "led_level": 80, 
+            "name": "sc1", 
+            "osd_alignment": 0
         }
+    }, 
+    "drivers": {
+        "ds4drv": true, 
+        "evdevdrv": true, 
+        "fake": false, 
+        "hiddrv": true, 
+        "sc_by_cable": true, 
+        "sc_dongle": true
     }, 
     "enable_sniffing": false, 
     "fix_xinput": true, 
@@ -21,6 +37,7 @@
     "gui": {
         "autokill_daemon": false, 
         "enable_status_icon": true, 
+        "minimize_on_start": false, 
         "minimize_to_status_icon": true, 
         "news": {
             "enabled": true, 
@@ -38,6 +55,7 @@
         "menuseparator": "109010", 
         "text": "00FF00"
     }, 
+    "osd_style": "Classic.gtkstyle.css", 
     "osk_colors": {
         "button1": "162082", 
         "button1_border": "262b5e", 
@@ -57,5 +75,6 @@
         "version": "0x110"
     }, 
     "recent_max": 10, 
-    "recent_profiles": ["Stardew Valley", "XBox Controller", "XBox Controller with High Precision Camera", "Desktop"]
+    "recent_profiles": ["Stardew Valley", "XBox Controller", "XBox Controller with High Precision Camera", "Desktop"], 
+    "windows_opacity": 0.95
 }
