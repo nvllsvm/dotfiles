@@ -2,6 +2,6 @@
 
 set-display-mars
 
-QSyncthingTray &
+syncthing-gtk &
 
 xbindkeys -f $DOTFILES_DIR/xbindkeys/mars

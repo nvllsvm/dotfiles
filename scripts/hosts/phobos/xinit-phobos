@@ -5,7 +5,7 @@ xmodmap-caps-to-esc
 set-display-phobos
 
 nm-applet &
-QSyncthingTray &
+syncthing-gtk &
 blueberry-tray &
 
 libinput-gestures-setup restart
