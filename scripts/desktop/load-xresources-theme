@@ -5,5 +5,6 @@ xrdb -merge $temp_file
 rm $temp_file
 
 urxvt-config-reload
+termite-config-reload
 i3 reload > /dev/null
 hsetroot -solid $(xrdb -query | grep '*background' | awk '{print $2}')

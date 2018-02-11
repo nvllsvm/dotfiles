@@ -16,4 +16,6 @@ export QT_QPA_PLATFORMTHEME="qt5ct"
 
 $(which xinit-$HOSTNAME) &
 
+/usr/lib/gnome-settings-daemon/gsd-xsettings &
+
 exec i3

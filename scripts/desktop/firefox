@@ -1,2 +1,2 @@
 #!/bin/sh
-env GDK_SCALE=1 GTK_THEME=Breeze /usr/bin/firefox "$@"
+env GTK_THEME=Adwaita /usr/bin/firefox "$@"

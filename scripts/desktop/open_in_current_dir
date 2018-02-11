@@ -1,2 +1,3 @@
 #!/bin/sh
-echo $(printf '%q' "$(xcwd)") | xargs urxvt -cd &
+#echo $(printf '%q' "$(xcwd)") | xargs urxvt -cd &
+echo $(printf '%q' "$(xcwd)") | xargs termite -d &
