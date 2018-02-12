@@ -1,6 +1,17 @@
 #!/bin/sh
 
 if [[ $(xrandr | grep \* | cut -d' ' -f4) == "3200x1800" ]] 
-then xrandr --output HDMI-1 --off --output DP-1 --off --output eDP-1 --mode 1600x900 --pos 0x0 --rotate normal --output VIRTUAL1 --off
-else xrandr --output HDMI-1 --off --output DP-1 --off --output eDP-1 --mode 3200x1800 --pos 0x0 --rotate normal --output VIRTUAL1 --off
+then
+    RESOLUTION=1280x720
+    DPI=96
+else 
+    RESOLUTION=3200x1800
+    DPI=192
 fi
+
+xrandr \
+    --output eDP-1 --mode $RESOLUTION --pos 0x0 --rotate normal \
+    --output HDMI-1 --off \
+    --output DP-1 --off \
+    --output VIRTUAL1 --off
+set-x-dpi $DPI
