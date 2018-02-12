@@ -40,8 +40,8 @@
         "minimize_on_start": false, 
         "minimize_to_status_icon": true, 
         "news": {
-            "enabled": true, 
-            "last_version": "0.3.12"
+            "enabled": false, 
+            "last_version": "0.4"
         }
     }, 
     "ignore_serials": true, 
