@@ -5,6 +5,7 @@ import logging
 import os
 import pathlib
 import subprocess
+import urllib3
 
 import consumers
 import pid.decorator
@@ -14,6 +15,12 @@ import requests.utils
 
 USERNAME = os.environ['GITHUB_USERNAME']
 TOKEN = os.environ['GITHUB_TOKEN']
+GITHUB_URL = os.environ.get('GITHUB_URL',
+                            'https://api.github.com/users/{}/repos')
+SSL_VERIFY = False if os.environ.get('GITHUB_SSL_VERIFY') == 'N' else True
+if not SSL_VERIFY:
+    urllib3.disable_warnings()
+
 PID_DIR = os.environ.get('PID_DIR')
 
 
@@ -69,22 +76,25 @@ class LocalRepo:
 
 
 def get_repo_names(user):
-    url = f'https://api.github.com/users/{user}/repos'
-
     repos = []
 
+    url = GITHUB_URL.format(user)
     while url:
-        response = requests.get(url, auth=requests.auth.HTTPBasicAuth(USERNAME,
-                                                                      TOKEN))
+        response = requests.get(
+            url,
+            auth=requests.auth.HTTPBasicAuth(USERNAME, TOKEN),
+            verify=SSL_VERIFY)
+
         response.raise_for_status()
         for item in response.json():
             repos.append(GitHubRepo(item))
 
-        link = response.headers.get('Link')
         url = None
-        for v in requests.utils.parse_header_links(link):
-            if v['rel'] == 'next':
-                url = v['url']
+        link = response.headers.get('Link')
+        if link is not None:
+            for v in requests.utils.parse_header_links(link):
+                if v['rel'] == 'next':
+                    url = v['url']
 
     return repos
 
