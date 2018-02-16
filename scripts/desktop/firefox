@@ -1,2 +1,2 @@
 #!/bin/sh
-env GTK_THEME=Adwaita /usr/bin/firefox "$@"
+GTK_THEME=Adwaita /usr/bin/firefox "$@"

@@ -58,8 +58,7 @@ gsettings set org.gnome.desktop.interface scaling-factor $SCALING_FACTOR
 gsettings set org.gnome.settings-daemon.plugins.xsettings overrides \
     "{'Gdk/WindowScalingFactor': <$SCALING_FACTOR>, 'Gtk/CursorThemeSize': <$CURSOR_SIZE>}"
 
-xrdb $DOTFILES_DIR/xresources/general
-xrdb -merge $XRESOURCES_TEMP_FILE
+xrdb $XRESOURCES_TEMP_FILE
 
 pkill -9 dunst
 dunst \

@@ -38,7 +38,10 @@ with open(os.path.expanduser('~/.base16_theme')) as f:
 attributes = {}
 for l in lines:
     attribute, remaining = l.split('=')
-    color = remaining.split()[0].replace('"', '').replace('$', '').replace('/', '')
+
+    color = remaining.split()[0]
+    for char in ('"', '$', '/'):
+        color = color.replace(char, '')
 
     if color.startswith('color'):
         color = attributes[color]

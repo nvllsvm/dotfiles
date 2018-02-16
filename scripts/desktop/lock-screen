@@ -1,4 +1,4 @@
 #!/bin/sh
 xset dpms 0 5
-i3lock -n -c 404A52
+i3lock -n -c 000000
 xset -dpms

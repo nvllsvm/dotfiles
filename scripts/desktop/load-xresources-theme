@@ -1,10 +1,9 @@
 #!/bin/sh
 temp_file=$(mktemp)
-base16_to_xresources $temp_file
+base16-set-xresources $temp_file
 xrdb -merge $temp_file
 rm $temp_file
 
-urxvt-config-reload
 termite-config-reload
 i3 reload > /dev/null
 hsetroot -solid $(xrdb -query | grep '*background' | awk '{print $2}')

@@ -34,7 +34,7 @@ font pango:$font $fontSize
 floating_modifier $mod
 
 # start a terminal
-bindsym $mod+Return exec open_in_current_dir
+bindsym $mod+Return exec i3-sensible-terminal -d $(xcwd)
 bindsym $mod+Shift+Return exec i3-sensible-terminal
 
 # kill focused window
