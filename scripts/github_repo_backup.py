@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import collections
 import itertools
 import logging
 import os
@@ -130,13 +131,19 @@ def main():
     parser.add_argument('users', nargs='+')
     args = parser.parse_args()
 
+    repos = collections.defaultdict(set)
     with consumers.Pool(download_repos) as pool:
         for user in args.users:
             for github_repo in get_repo_names(user):
-                local_path = pathlib.Path(args.directory,
-                                          github_repo.username,
-                                          github_repo.reponame)
+                user_path = pathlib.Path(args.directory, github_repo.username)
+                repos[user_path].add(github_repo.reponame)
+                local_path = pathlib.Path(user_path, github_repo.reponame)
                 pool.put(local_path, github_repo.url)
+
+    for user_path, repos in repos.items():
+        for orphan_repo in set(os.listdir(user_path)).difference(repos):
+            logging.warning('Orphan found %s', pathlib.Path(user_path,
+                                                            orphan_repo))
 
     for error in itertools.chain(*pool.results):
         logging.error(error)
