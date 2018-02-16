@@ -7,4 +7,16 @@ nvim-update() {
     fi
     nvim -c 'PlugUpgrade | PlugUpdate | PlugClean | silent UpdateRemotePlugins' -c 'qa'
 }
+
+
+nvim() {
+    local nvim=$(whence -p nvim)
+    if [ -f env/bin/python ]; then
+        VIRTUAL_ENV=./env $nvim "$@"
+    else
+        $nvim "$@"
+    fi
+}
+
+
 full-update add nvim-update

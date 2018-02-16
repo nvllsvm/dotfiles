@@ -51,19 +51,12 @@ let NERDTreeIgnore=['^__pycache__$[[dir]]', '\.pyc$']
 call plug#begin('~/.config/nvim/plugged')
 Plug 'tmhedberg/SimpylFold'
 Plug 'Shougo/deoplete.nvim'
-Plug 'tpope/vim-eunuch'
 Plug 'scrooloose/nerdtree'
-Plug 'jmcantrell/vim-virtualenv'
 Plug 'gregsexton/MatchTag'
-Plug 'majutsushi/tagbar'
-Plug 'pangloss/vim-javascript'
-Plug 'freitass/todo.txt-vim'
 Plug 'zchee/deoplete-jedi'
 Plug 'Vimjas/vim-python-pep8-indent'
 Plug 'neomake/neomake'
 Plug 'udalov/kotlin-vim'
-Plug 'rust-lang/rust.vim'
-Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
 Plug 'chriskempson/base16-vim'
 Plug 'embear/vim-foldsearch'
@@ -71,14 +64,12 @@ call plug#end()
 
 " deoplete
 let g:deoplete#enable_at_startup = 1
-let g:deoplete#omni_patterns = {}
-let g:deoplete#auto_completion_start_length = 2
-let g:deoplete#sources = {}
-let g:deoplete#sources._ = []
 let g:deoplete#file#enable_buffer_path = 1
 
 set omnifunc=syntaxcomplete#Complete
 
+" disable preview window
+set completeopt-=preview
 
 autocmd StdinReadPre * let s:std_in=1
 

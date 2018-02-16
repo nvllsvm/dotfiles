@@ -1,5 +1,5 @@
 #!/bin/bash
-EDITOR=$EDITOR
+EDITOR="$EDITOR -n"
 PYTHON_FILE=test.py
 TEMP_DIR=/tmp/python-wtchr
 SESSION=python-wtchr

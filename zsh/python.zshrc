@@ -47,27 +47,7 @@ venv() {
     fi
 }
 
-if $(test $(command -v python2.7)); then
-    path=("$(python2.7 -m site --user-base)/bin"  "$path[@]")
-
-    if $(test $(command -v pip2)); then
-        alias pip2-update='pip-update 2'
-        full-update add pip2-update
-    fi
-fi
-
-if $(test $(command -v python3)); then
-    path=("$(python3 -m site --user-base)/bin"  "$path[@]")
-
-    if $(test $(command -v pip3)); then
-        alias pip3-update='pip-update 3'
-        full-update add pip3-update
-    fi
-fi
-
-export VIRTUAL_ENV_DISABLE_PROMPT=1
-
-function virtenv_indicator {
+virtenv_indicator() {
     if [[ -z $VIRTUAL_ENV ]] then
         unset prompt_virtualenv
         unset PIP_USER
@@ -79,6 +59,20 @@ function virtenv_indicator {
     fi
 }
 
+for version in {'2.7','3'}; do
+    if $(test $(command -v python$version)); then
+        path=("$(python$version -m site --user-base)/bin"  "$path[@]")
+
+        if $(test $(command -v pip$version)); then
+            full-update add "pip-update $version"
+        fi
+    fi
+done
+
+export VIRTUAL_ENV_DISABLE_PROMPT=1
+
 add-zsh-hook precmd virtenv_indicator
+
+alias tox='PIP_USER=0 tox'
 
 PROMPT='$prompt_virtualenv'"$PROMPT"
