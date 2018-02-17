@@ -1,3 +1,0 @@
-#!/bin/sh
-export LD_PRELOAD="/usr/lib32/koku-xinput-wine.so /usr/lib32/koku-xinput-wine64.so"
-/usr/bin/wine "$@"
