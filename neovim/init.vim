@@ -110,3 +110,8 @@ if !empty(glob("~/.base16_theme"))
 else
     colorscheme base16-default-dark
 endif
+
+inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+function! s:my_cr_function() abort
+    return deoplete#close_popup() . "\<CR>"
+endfunction
