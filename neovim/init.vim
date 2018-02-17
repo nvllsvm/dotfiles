@@ -60,6 +60,7 @@ Plug 'udalov/kotlin-vim'
 Plug 'plasticboy/vim-markdown'
 Plug 'chriskempson/base16-vim'
 Plug 'embear/vim-foldsearch'
+Plug 'dbeniamine/todo.txt-vim'
 call plug#end()
 
 " deoplete
