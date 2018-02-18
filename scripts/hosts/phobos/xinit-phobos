@@ -13,8 +13,8 @@ libinput-gestures-setup restart
 TOUCHPAD_ID=$(xinput list --id-only 'DLL0665:01 06CB:76AD Touchpad')
 
 xinput --set-prop $TOUCHPAD_ID 'libinput Accel Speed' 1
-xinput --set-prop $TOUCHPAD_ID 'libinput Tapping Enabled' 1 
-xinput --set-prop $TOUCHPAD_ID 'libinput Natural Scrolling Enabled' 1 
-xinput --set-prop $TOUCHPAD_ID 'libinput Middle Emulation Enabled' 1 
+xinput --set-prop $TOUCHPAD_ID 'libinput Tapping Enabled' 1
+xinput --set-prop $TOUCHPAD_ID 'libinput Natural Scrolling Enabled' 1
+xinput --set-prop $TOUCHPAD_ID 'libinput Middle Emulation Enabled' 1
 
 xbindkeys -f $DOTFILES_DIR/xbindkeys/phobos
