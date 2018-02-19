@@ -1,5 +1,7 @@
 if !empty($VIRTUAL_ENV)
     let g:python3_host_prog=system("which -a python3 | grep -v \"^$VIRTUAL_ENV\" | head -n 1 | tr -d '\n'")
+else
+    let g:deoplete#sources#jedi#python_path=system("which python3 | tr -d '\n'")
 endif
 
 set ruler
