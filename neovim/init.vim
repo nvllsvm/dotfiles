@@ -4,6 +4,10 @@ else
     let g:deoplete#sources#jedi#python_path=system("which python3 | tr -d '\n'")
 endif
 
+if !empty($PYTHONPATH)
+    let g:deoplete#sources#jedi#extra_path=[$PYTHONPATH]
+endif
+
 set ruler
 set tabstop=4
 set shiftwidth=4
