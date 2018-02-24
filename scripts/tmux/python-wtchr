@@ -1,6 +1,7 @@
 #!/bin/bash
 EDITOR="$EDITOR -n"
 PYTHON_FILE=/tmp/python-wtchr/test.py
+WTCHR_DIR=$(dirname $PYTHON_FILE)
 SESSION=python-wtchr
 
 trap "tmux kill-session -t $SESSION 2> /dev/null" SIGHUP
@@ -15,7 +16,7 @@ else
 fi
 
 if [[ $(tmux display-message -p '#S' 2> /dev/null) == $SESSION ]]; then
-    tmux split-window -h "wtchr -x $PYTHON_BIN $PYTHON_FILE"
+    tmux split-window -h "wtchr -p $WTCHR_DIR -x $PYTHON_BIN $PYTHON_FILE"
     tmux select-pane -l
     $EDITOR $PYTHON_FILE &
 
@@ -24,7 +25,9 @@ if [[ $(tmux display-message -p '#S' 2> /dev/null) == $SESSION ]]; then
 
     wait
 else
-    mkdir -p $(dirname $TEMP_DIR)
+    mkdir -p $WTCHR_DIR
+    # prevent wtchr python from whining
+    touch $PYTHON_FILE
 
     unset TMUX
     tmux new-session -d -s $SESSION $0 "$@"
