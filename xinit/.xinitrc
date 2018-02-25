@@ -19,4 +19,6 @@ $(which xinit-$HOSTNAME) &
 
 /usr/lib/gnome-settings-daemon/gsd-xsettings &
 
+xbindkeys &
+
 exec i3

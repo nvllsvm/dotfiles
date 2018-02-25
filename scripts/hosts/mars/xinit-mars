@@ -1,8 +1,5 @@
 #!/bin/sh
-
 set-display-mars
 
 nm-applet &
 syncthing-gtk &
-
-xbindkeys -f $DOTFILES_DIR/xbindkeys/mars

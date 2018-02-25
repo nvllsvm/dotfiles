@@ -1,5 +1,4 @@
 #!/bin/sh
-
 xmodmap-caps-to-esc
 
 set-display-phobos
@@ -16,5 +15,3 @@ xinput --set-prop $TOUCHPAD_ID 'libinput Accel Speed' 1
 xinput --set-prop $TOUCHPAD_ID 'libinput Tapping Enabled' 1
 xinput --set-prop $TOUCHPAD_ID 'libinput Natural Scrolling Enabled' 1
 xinput --set-prop $TOUCHPAD_ID 'libinput Middle Emulation Enabled' 1
-
-xbindkeys -f $DOTFILES_DIR/xbindkeys/phobos
