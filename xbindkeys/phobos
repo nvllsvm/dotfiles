@@ -1,41 +1,36 @@
 ## Volume
 # Toggle
 "set-volume mute"
-  c:121
+  XF86AudioMute
 
 # Lower
 "set-volume decrease"
-  c:122
+  XF86AudioLowerVolume
 
 # Raise
 "set-volume increase"
-  c:123
+  XF86AudioRaiseVolume
 
 
 ## MPD
 # Toggle
 "set-mpd toggle"
-  c:172
+  XF86AudioPlay
 
 # Preivous
 "set-mpd prev"
-  c:173
+  XF86AudioPrev
 
 # Next
 "set-mpd next"
-  c:171
+  XF86AudioNext
 
 
 ## Backlight
 # Lower
 "set-backlight dec"
-  c:232
+  XF86MonBrightnessDown
 
 # Raise
 "set-backlight inc"
-  c:233
-
-
-## Swap resolutions
-"swap-res"
-  c:225
+  XF86MonBrightnessUp
