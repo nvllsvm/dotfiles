@@ -1,0 +1,5 @@
+[Unit]
+Description=Run linode-dynamic-dns
+
+[Service]
+ExecStart=/usr/bin/linode-dynamic-dns
