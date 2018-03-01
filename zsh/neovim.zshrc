@@ -12,7 +12,7 @@ nvim-update() {
 nvim() {
     local nvim=$(whence -p nvim)
     if [ -f env/bin/python ]; then
-        VIRTUAL_ENV=./env $nvim "$@"
+        VIRTUAL_ENV="$(readlink -f env)" $nvim "$@"
     else
         $nvim "$@"
     fi
