@@ -2,4 +2,4 @@
 Description=Run linode-dynamic-dns
 
 [Service]
-ExecStart=/usr/bin/linode-dynamic-dns
+ExecStart=/usr/bin/env dynamic-dns
