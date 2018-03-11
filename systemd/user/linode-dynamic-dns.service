@@ -3,3 +3,4 @@ Description=Run linode-dynamic-dns
 
 [Service]
 ExecStart=/usr/bin/env dynamic-dns
+SyslogIdentifier=linode-dynamic-dns
