@@ -1,0 +1,13 @@
+#!/bin/bash
+ID=$(xdpyinfo | grep focus | cut -f4 -d " ")
+NAME=$(xprop -id $ID | grep '^WM_NAME(STRING)' | cut -f3 -d ' ' | sed s/\"//g)
+
+if [[ "$NAME" == 'termite' ]]; then
+    WINDOW_PID=$(xprop -id $ID | grep -m 1 PID | cut -d " " -f 3)
+    TREE=$(pstree -lAp $WINDOW_PID | head -n 1)
+    PID=$(echo $TREE | sed 's/-+-/\n/g' | sed 's/---/\n/g' | grep '^zsh(' | tail -n 1 | sed 's/[\(,\)]/ /g' | awk '{print $2}')
+
+    termite -d "$(readlink -f /proc/$PID/cwd)" &
+else
+    termite &
+fi
