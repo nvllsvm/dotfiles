@@ -77,6 +77,13 @@ parse_args() {
         ADDITIONAL_OPTS+=("$EXCLUDE")
     fi
 
+    # FSEvents mixes file events into a single batch
+    # Ex. "Created", "Removed", and "IsFile" may show up in a single event
+    # Fucking bullshit
+    if [[ $(uname) == 'Darwin' ]]; then
+        ADDITIONAL_OPTS+=('--monitor' 'kqueue_monitor')
+    fi
+
     set -- "${POSITIONAL[@]}"
     set -- "${ADDITIONAL_OPTS[@]}"
 
