@@ -34,8 +34,7 @@ font pango:$font $fontSize
 floating_modifier $mod
 
 # start a terminal
-bindsym $mod+Return exec termite -d $(xcwd)
-bindsym $mod+Shift+Return exec termite
+bindsym $mod+Return exec termite
 
 # kill focused window
 bindsym $mod+Shift+q kill
