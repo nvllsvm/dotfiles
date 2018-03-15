@@ -1,0 +1,26 @@
+#!/bin/bash
+set -e
+
+for path in $(which -a scrcpy); do
+    if [[ $(file --mime "${path}" | grep charset=binary) ]]; then
+        SCRCPY_PATH="${path}"
+    fi
+done
+
+if [[ -z "${SCRCPY_PATH}" ]]; then
+    echo error: cannot determine scrpy path
+    exit 1
+fi
+
+ORIGINAL_MODE=$(adb shell settings get system screen_brightness_mode)
+ORIGINAL_VALUE=$(adb shell settings get system screen_brightness)
+NO_AUTO_MODE=0
+LOW_VALUE=0
+
+adb shell settings put system screen_brightness_mode ${NO_AUTO_MODE}
+adb shell settings put system screen_brightness ${LOW_VALUE}
+
+"${SCRCPY_PATH}" "$@"
+
+adb shell settings put system screen_brightness_mode ${ORIGINAL_MODE}
+adb shell settings put system screen_brightness ${ORIGINAL_VALUE}
