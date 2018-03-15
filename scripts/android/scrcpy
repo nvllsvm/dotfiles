@@ -17,10 +17,14 @@ ORIGINAL_VALUE=$(adb shell settings get system screen_brightness)
 NO_AUTO_MODE=0
 LOW_VALUE=0
 
+trap "restore_brightness" EXIT
+
 adb shell settings put system screen_brightness_mode ${NO_AUTO_MODE}
 adb shell settings put system screen_brightness ${LOW_VALUE}
 
 "${SCRCPY_PATH}" "$@"
 
-adb shell settings put system screen_brightness_mode ${ORIGINAL_MODE}
-adb shell settings put system screen_brightness ${ORIGINAL_VALUE}
+restore_brightness() {
+    adb shell settings put system screen_brightness_mode ${ORIGINAL_MODE}
+    adb shell settings put system screen_brightness ${ORIGINAL_VALUE}
+}
