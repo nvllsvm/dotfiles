@@ -8,7 +8,6 @@ if !empty($PYTHONPATH)
     let g:deoplete#sources#jedi#extra_path=[$PYTHONPATH]
 endif
 
-set spell
 set ruler
 set tabstop=4
 set shiftwidth=4
