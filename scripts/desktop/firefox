@@ -1,2 +1,4 @@
 #!/bin/sh
-GTK_THEME=Adwaita /usr/bin/firefox "$@"
+export GTK_THEME=Adwaita
+export MOZ_USE_XINPUT2=1
+/usr/bin/firefox "$@"
