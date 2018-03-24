@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+for ARG in "$@"; do
+    echo "$ARG"
+    nvim --headless -n -c 'retab|call StripTrailingWhitespace()|x' "$ARG" 2> /dev/null
+done

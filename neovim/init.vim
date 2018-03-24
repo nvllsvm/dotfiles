@@ -47,6 +47,8 @@ function StripTrailingWhitespace()
   endif
 endfunction
 
+command Whitespace :retab | call StripTrailingWhitespace()
+
 nmap <F8> :TagbarToggle<CR>
 nmap <C-n> :NERDTreeToggle<CR>
 map <F12> :silent! exec "!ctags -R 2> /dev/null"<CR>:echo<CR>
