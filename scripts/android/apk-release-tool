@@ -1,0 +1,17 @@
+#!/bin/bash
+set -e
+UNSIGNED_APK="$1"
+RELEASE_KEY="$2"
+
+if [[ -z "${UNSIGNED_APK}" || -z "${RELEASE_KEY}" ]]; then
+    echo usage: $(basename "$0") apk key
+    echo error: required arguments missing
+    exit 1
+fi
+
+ALIGNED_APK=$(echo "${UNSIGNED_APK}" | sed 's/-unsigned\.apk$/-aligned.apk/')
+RELEASE_APK=$(echo "${UNSIGNED_APK}" | sed 's/-unsigned\.apk$/.apk/')
+
+zipalign -f -v -p 4 "${UNSIGNED_APK}" "${ALIGNED_APK}"
+apksigner sign --ks "${RELEASE_KEY}" --out "${RELEASE_APK}" "${ALIGNED_APK}"
+apksigner verify "${RELEASE_APK}"
