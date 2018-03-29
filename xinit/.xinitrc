@@ -14,7 +14,7 @@ xset -dpms; xset s off
 i3-config-build
 
 compton &
-/usr/lib/gnome-settings-daemon/gsd-xsettings &
+/usr/lib/gsd-xsettings &
 xbindkeys &
 xss-lock -- lock-screen &
 
