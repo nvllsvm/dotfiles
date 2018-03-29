@@ -7,14 +7,14 @@ fi
 
 export QT_QPA_PLATFORMTHEME=qt5ct
 export QT_AUTO_SCREEN_SCALE_FACTOR=1
+export GTK_THEME=Adwaita:dark
 
 setxkbmap -option terminate:ctrl_alt_bksp
 xset -dpms; xset s off
-
 i3-config-build
 
 compton &
-gnome-session &
+/usr/lib/gnome-settings-daemon/gsd-xsettings &
 xbindkeys &
 xss-lock -- lock-screen &
 
