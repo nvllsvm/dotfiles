@@ -10,10 +10,11 @@ export QT_AUTO_SCREEN_SCALE_FACTOR=1
 
 setxkbmap -option terminate:ctrl_alt_bksp
 xset -dpms; xset s off
+
 i3-config-build
 
 compton &
-/usr/lib/gnome-settings-daemon/gsd-xsettings &
+gnome-session &
 xbindkeys &
 xss-lock -- lock-screen &
 
