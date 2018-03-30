@@ -43,7 +43,9 @@ def rename_files(root, dry_run=True):
                 new_f.parent.mkdir(parents=True, exist_ok=True)
                 f.rename(new_f)
             renamed_paths.append(new_f)
-            print(f, '->', new_f)
+            print(f)
+            print(new_f)
+            print()
 
     if not dry_run:
         subprocess.run(('find', root, '-type', 'd', '-empty', '-delete'))
