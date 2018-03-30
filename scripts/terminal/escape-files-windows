@@ -45,7 +45,8 @@ def rename_files(root, dry_run=True):
             renamed_paths.append(new_f)
             print(f, '->', new_f)
 
-    subprocess.run(('find', root, '-type', 'd', '-empty', '-delete'))
+    if not dry_run:
+        subprocess.run(('find', root, '-type', 'd', '-empty', '-delete'))
 
 
 def main():
