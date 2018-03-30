@@ -162,8 +162,7 @@ for_window [class="^.*"] border pixel 2
 
 bindsym $mod+b bar mode toggle
 
-for_window [title="Talos - Linux"] floating enable
-
+bindsym $mod+Shift+s exec maim -s -n 1 | xclip -selection clipboard -t image/png
 bindsym $mod+Shift+s exec maim -s -n 1 ~/"$(date +%Y-%m-%d\ %H:%M:%S.%3N).png"
 bindsym $mod+g exec lock-screen
 
