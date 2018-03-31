@@ -46,7 +46,7 @@ function StripTrailingWhitespace()
 endfunction
 
 command Whitespace :retab | call StripTrailingWhitespace()
-command Render :autocmd BufWritePost * call system("pandoc-render '" . expand("<afile>") . "'")
+command Render :autocmd BufWritePost * call system("pandoc-render '" . expand("<afile>") . "' &")
 
 nmap <F8> :TagbarToggle<CR>
 nmap <C-n> :NERDTreeToggle<CR>
