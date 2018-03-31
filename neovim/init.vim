@@ -46,6 +46,7 @@ function StripTrailingWhitespace()
 endfunction
 
 command Whitespace :retab | call StripTrailingWhitespace()
+command Render :autocmd BufWritePost * call system("pandoc-render '" . expand("<afile>") . "'")
 
 nmap <F8> :TagbarToggle<CR>
 nmap <C-n> :NERDTreeToggle<CR>
@@ -106,9 +107,6 @@ augroup my_neomake_highlights
 augroup END
 
 autocmd! BufWritePost * Neomake
-
-autocmd FileType markdown autocmd BufWritePost * call system("pandoc-markdown '" . expand("<afile>") . "'")
-autocmd FileType rst autocmd BufWritePost * call system("pandoc-rst '" . expand("<afile>") . "'")
 
 let base16colorspace=256
 if !empty(glob("~/.base16_theme"))
