@@ -107,8 +107,8 @@ augroup END
 
 autocmd! BufWritePost * Neomake
 
-"autocmd FileType markdown autocmd BufWritePost * call system("pandoc-markdown '" . expand("<afile>") . "'")
-"autocmd FileType rst autocmd BufWritePost * call system("pandoc-rst '" . expand("<afile>") . "'")
+autocmd FileType markdown autocmd BufWritePost * call system("pandoc-markdown '" . expand("<afile>") . "'")
+autocmd FileType rst autocmd BufWritePost * call system("pandoc-rst '" . expand("<afile>") . "'")
 
 let base16colorspace=256
 if !empty(glob("~/.base16_theme"))
