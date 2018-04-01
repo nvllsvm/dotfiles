@@ -1,0 +1,6 @@
+#!/bin/sh
+export ASPELL_CONF="per-conf /home/draje//.config/aspell/aspell.conf"
+
+BIN=$(which -a aspell | head -n 2 | tail -n 1)
+
+"${BIN}" "$@"
