@@ -1,5 +1,5 @@
 #!/bin/sh
-export ASPELL_CONF="per-conf /home/draje//.config/aspell/aspell.conf"
+export ASPELL_CONF="per-conf ${HOME}/.config/aspell/aspell.conf; home-dir ${HOME}/.config/aspell"
 
 BIN=$(which -a aspell | head -n 2 | tail -n 1)
 
