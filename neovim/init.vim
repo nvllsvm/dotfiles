@@ -56,17 +56,14 @@ let NERDTreeQuitOnOpen=1
 let NERDTreeIgnore=['^__pycache__$[[dir]]', '\.pyc$']
 
 call plug#begin('~/.config/nvim/plugged')
-Plug 'tmhedberg/SimpylFold'
 Plug 'Shougo/deoplete.nvim'
 Plug 'scrooloose/nerdtree'
 Plug 'gregsexton/MatchTag'
 Plug 'zchee/deoplete-jedi'
 Plug 'Vimjas/vim-python-pep8-indent'
 Plug 'neomake/neomake'
-Plug 'udalov/kotlin-vim'
 Plug 'plasticboy/vim-markdown'
 Plug 'chriskempson/base16-vim'
-Plug 'embear/vim-foldsearch'
 Plug 'dbeniamine/todo.txt-vim'
 call plug#end()
 
