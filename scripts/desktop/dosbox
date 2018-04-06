@@ -1,0 +1,18 @@
+#!/bin/sh
+DOSBOX_BIN=$(which -a dosbox | head -n 2 | tail -n 1)
+TEMP_CONFIG=$(mktemp)
+
+trap "rm ${TEMP_CONFIG}" EXIT
+
+cat > "${TEMP_CONFIG}" <<EOF
+[sdl]
+fullscreen=false
+windowresolution=$(xrandr-primary-resolution)
+output=openglnb
+
+[render]
+aspect=true
+scalar=normal3x
+EOF
+
+"${DOSBOX_BIN}" "$@" -conf "${TEMP_CONFIG}"

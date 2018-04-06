@@ -1,11 +1,16 @@
 #!/bin/bash
-
 if [ -z $1 ]; then
-    echo ERROR: No git directory specified
-    exit 1
+    if git status 2> /dev/null; then
+        GIT_DIR='.'
+    else
+        echo ERROR: No git directory specified
+        exit 1
+    fi
+else
+    GIT_DIR="$1"
 fi
 
-cd $1
+cd "${GIT_DIR}"
 git pull
 
 error_code=$?
