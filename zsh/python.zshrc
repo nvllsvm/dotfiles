@@ -74,5 +74,6 @@ export VIRTUAL_ENV_DISABLE_PROMPT=1
 add-zsh-hook precmd virtenv_indicator
 
 alias tox='PIP_USER=0 tox'
+alias pipenv='PIP_USER=0 pipenv'
 
 PROMPT='$prompt_virtualenv'"$PROMPT"
