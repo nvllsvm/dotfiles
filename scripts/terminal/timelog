@@ -1,0 +1,7 @@
+#!/bin/sh
+if [ -z $1 ]; then
+    DATE=$(date +%Y-%m-%d)
+else
+    DATE=$1
+fi
+nvim ~/Syncthing/Notes/Journal/${DATE}
