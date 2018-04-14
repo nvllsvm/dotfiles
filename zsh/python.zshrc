@@ -1,3 +1,5 @@
+path=("${DOTFILES_DIR}"/scripts/python  "$path[@]")
+
 venv() {
     local python_version=$1
     local folder=env
@@ -37,12 +39,10 @@ virtenv_indicator() {
 if $(test $(command -v python3)); then
     path=("$(python3 -m site --user-base)/bin"  "$path[@]")
 
-    if $(test $(command -v pip-user)); then
+    if $(test $(command -v pip)); then
         full-update add "pip-update pip-user"
     fi
 fi
-
-path=("${DOTFILES_DIR}"/scripts/python  "$path[@]")
 
 export VIRTUAL_ENV_DISABLE_PROMPT=1
 
