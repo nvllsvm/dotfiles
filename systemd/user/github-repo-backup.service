@@ -1,6 +1,0 @@
-[Unit]
-Description=Run github-repo-backup
-
-[Service]
-ExecStart=/usr/bin/env github-repo-backup
-SyslogIdentifier=github-repo-backup

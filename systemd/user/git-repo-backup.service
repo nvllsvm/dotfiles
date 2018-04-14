@@ -1,0 +1,6 @@
+[Unit]
+Description=Run git-repo-backup
+
+[Service]
+ExecStart=/usr/bin/env backup-git-repos
+SyslogIdentifier=git-repo-backup

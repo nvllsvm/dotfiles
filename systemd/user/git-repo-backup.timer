@@ -1,5 +1,5 @@
 [Unit]
-Description=Run github-repo-backup every 30 minutes
+Description=Run git-repo-backup every 30 minutes
 
 [Timer]
 OnBootSec=30min
