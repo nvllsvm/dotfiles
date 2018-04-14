@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+
+pip_bin=$1
+packages=$(${pip_bin} list --outdated --format=freeze)
+
+if [[ ! -z $packages ]]; then
+    echo $packages | grep -v '^\-e' | cut -d = -f 1 | xargs ${pip_bin} install --upgrade
+else
+    echo All Python $python_version packages up-to-date.
+fi
