@@ -1,5 +1,7 @@
 #!/bin/bash
-set -e
+set -ex
+
+export PIP_REQUIRE_VIRTUALENV=0
 
 python_version=$1
 site_dir=$(python$python_version -m site --user-site)
