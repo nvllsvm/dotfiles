@@ -75,6 +75,6 @@
         "version": "0x110"
     }, 
     "recent_max": 10, 
-    "recent_profiles": ["FPS", "XBox Controller with High Precision Camera", "XBox Controller", "Desktop", "Stardew Valley"], 
+    "recent_profiles": ["XBox Controller", "FPS", "XBox Controller with High Precision Camera", "Desktop", "Stardew Valley"], 
     "windows_opacity": 0.95
 }
