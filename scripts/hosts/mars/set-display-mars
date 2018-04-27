@@ -31,7 +31,7 @@ elif [[ $MODE == "multi" ]]; then
         --output DVI-I-0 --off \
         --output DVI-I-1 --off \
         --output HDMI-0 --off \
-        --output DP-2 --mode 1920x1200 --pos 1920x0 --rotate right \
+        --output DP-2 --mode 1920x1200 --pos 1920x0 \
         --output DP-4 --primary --mode 1920x1200 --pos 0x0 --rotate normal
     set-x-dpi 96
 else
