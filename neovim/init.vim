@@ -65,6 +65,7 @@ Plug 'neomake/neomake'
 Plug 'plasticboy/vim-markdown'
 Plug 'chriskempson/base16-vim'
 Plug 'dbeniamine/todo.txt-vim'
+Plug 'udalov/kotlin-vim'
 call plug#end()
 
 " deoplete
