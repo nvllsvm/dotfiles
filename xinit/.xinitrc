@@ -7,7 +7,8 @@ fi
 
 export QT_QPA_PLATFORMTHEME=qt5ct
 export QT_AUTO_SCREEN_SCALE_FACTOR=1
-export GTK_THEME=Adwaita:dark
+export GTK_THEME=Adwaita
+export MOZ_USE_XINPUT2=1
 
 setxkbmap -option terminate:ctrl_alt_bksp
 xset -dpms; xset s off
