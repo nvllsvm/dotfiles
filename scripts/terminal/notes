@@ -1,0 +1,8 @@
+#!/bin/sh
+NOTES_DIR=~/Syncthing/Notes
+cd "${NOTES_DIR}"
+if [[ $# -eq 0 ]]; then
+    nvim "${NOTES_DIR}"
+else
+    nvim "$@"
+fi
