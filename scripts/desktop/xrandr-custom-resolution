@@ -1,5 +1,11 @@
 #!/bin/bash
-cvt_output=$(cvt $2 $3 | tail -n 1 | awk '{$1=$2=""}1')
+if [ -z "$4" ]; then
+    REFRESH=60
+else
+    REFRESH=$4
+fi
+
+cvt_output=$(cvt $2 $3 $REFRESH | tail -n 1 | awk '{$1=$2=""}1')
 mode_name="$2x$3"
 
 xrandr --newmode $mode_name $cvt_output 2> /dev/null
