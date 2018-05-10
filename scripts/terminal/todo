@@ -1,2 +1,8 @@
 #!/bin/sh
-nvim ~/Syncthing/Notes/todo.txt
+TODO_FILE=~/Syncthing/Notes/todo.txt
+
+if [ -z "$1" ]; then
+    nvim "${TODO_FILE}"
+else
+    echo $(date +%Y-%m-%d) $@ >> "${TODO_FILE}"
+fi
