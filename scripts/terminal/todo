@@ -1,5 +1,13 @@
-#!/bin/sh
+#!/bin/bash
 TODO_FILE=~/Syncthing/Notes/todo.txt
+
+if [[ $# -eq 1 && $1 == '-l' ]]; then
+   TOKENIZED=$(sed 's/ /\n/g' "${TODO_FILE}" | sort -u)
+   echo "${TOKENIZED}" | grep '^@'
+   echo
+   echo "${TOKENIZED}" | grep '^+'
+   exit
+fi
 
 if [ -z "$1" ]; then
     nvim "${TODO_FILE}"
