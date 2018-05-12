@@ -1,6 +1,13 @@
-#!/bin/sh
+#!/bin/bash
 GOG_DIR=/mnt/storage1/Games/PC/GOG.com
 ORPHANS_FILE=/tmp/gog-update-orphans
+
 lgogdownloader --directory $GOG_DIR --update-check
 lgogdownloader --directory $GOG_DIR --download --save-serials
-lgogdownloader --directory $GOG_DIR --check-orphans | tee $ORPHANS_FILE
+
+ORPHANS=$(lgogdownloader --directory $GOG_DIR --check-orphans)
+if [[ $(echo "${ORPHANS}" | tail -n 1) == 'No orphaned files' ]]; then
+    rm -rf "${ORPHANS_FILE}"
+else
+    echo "${ORPHANS}" > "${ORPHANS_FILE}"
+fi
