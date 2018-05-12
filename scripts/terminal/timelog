@@ -1,7 +1,8 @@
 #!/bin/sh
+. $DOTFILES_DIR/zsh/env/syncthing.env
 if [ -z $1 ]; then
     DATE=$(date +%Y-%m-%d)
 else
     DATE=$1
 fi
-nvim ~/Syncthing/Notes/Journal/${DATE}
+nvim "${SYNCTHING_DIR}"/Notes/Journal/${DATE}

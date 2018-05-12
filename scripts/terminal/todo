@@ -1,5 +1,6 @@
 #!/bin/bash
-TODO_FILE=~/Syncthing/Notes/todo.txt
+. "${DOTFILES_DIR}"/zsh/env/syncthing.env
+TODO_FILE="${SYNCTHING_DIR}"/Notes/todo.txt
 
 if [[ $# -eq 1 && $1 == '-l' ]]; then
    TOKENIZED=$(sed 's/ /\n/g' "${TODO_FILE}" | sort -u)
