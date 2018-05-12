@@ -133,7 +133,10 @@ class LocalRepo:
             self.clone()
 
     def pull(self):
-        self.git_command(self.path, 'pull')
+        self.git_command(self.path, 'fetch', '--all')
+        result = self.git_command(self.path, 'branch', '--all')
+        if result.stdout:
+            self.git_command(self.path, 'pull')
 
     def prune(self):
         self.git_command(self.path, 'remote', 'prune', 'origin')
@@ -146,12 +149,15 @@ class LocalRepo:
 
     def git_command(self, path, *args):
         try:
-            subprocess.run(['git', '-C', path, *args],
-                           stdout=subprocess.PIPE,
-                           stderr=subprocess.PIPE, check=True)
+            result = subprocess.run(
+                ['git', '-C', path, *args],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=True)
         except subprocess.CalledProcessError as e:
             self.logger.exception(e)
             raise RepoError
+        return result
 
 
 def download_repos(repos):
