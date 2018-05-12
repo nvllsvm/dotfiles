@@ -3,7 +3,7 @@
 REMOTE_MOUNT=/mnt/sol
 
 if mount | awk '{print $3}' | grep "$REMOTE_MOUNT$" > /dev/null ; then
-    rsync -av --progress --delete --exclude Library --exclude MP3_192 $REMOTE_MOUNT/storage1/Audio ~
+    rsync -av --progress --delete --exclude Library $REMOTE_MOUNT/storage1/Audio ~
     rsync -av --progress --delete $REMOTE_MOUNT/storage1/Books ~
 else
     echo Not mounted - $REMOTE_DIR

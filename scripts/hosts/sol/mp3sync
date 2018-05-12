@@ -1,7 +1,2 @@
 #!/bin/sh
-
-if mount | awk '{print $3}' | grep /mnt/mp3$ > /dev/null ; then
-    rsync -av --progress --delete /mnt/mp3/ /mnt/storage1/Audio/MP3
-else
-    echo Error: /mnt/mp3 not mounted
-fi
+audiosync /mnt/storage1/Audio/Library /mnt/storage1/Audio/MP3
