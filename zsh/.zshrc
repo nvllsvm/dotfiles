@@ -108,4 +108,10 @@ bindkey -M vicmd '^r' sudo-command-line
 fpath=($DOTFILES_DIR/zsh/functions $fpath)
 compinit
 
+autoload -Uz bracketed-paste-magic
+zle -N bracketed-paste bracketed-paste-magic
+
+autoload -Uz url-quote-magic
+zle -N self-insert url-quote-magic
+
 [[ -r ~/.zshlocal ]] && . ~/.zshlocal
