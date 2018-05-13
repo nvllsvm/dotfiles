@@ -1,2 +1,2 @@
 #!/bin/sh
-audiosync /mnt/storage1/Audio/Library /mnt/storage1/Audio/MP3
+harmonize /mnt/storage1/Audio/Library /mnt/storage1/Audio/MP3
