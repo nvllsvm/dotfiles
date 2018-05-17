@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-INTERVAL=0
-KILL_CHILD_ON_CHANGE=
+INTERVAL=0.5
+WAIT_UNTIL_DONE=
 PATHS=./
 INCLUDE=
 EXCLUDE=
@@ -32,8 +32,8 @@ parse_args() {
                     shift
                     shift
                     ;;
-                -x|--kill-on-change)
-                    KILL_CHILD_ON_CHANGE=1
+                -w|--wait)
+                    WAIT_UNTIL_DONE=1
                     shift
                     ;;
                 -p|--paths)
@@ -98,7 +98,7 @@ parse_args() {
 
 run() {
     while true; do
-        if [[ ! -z $KILL_CHILD_ON_CHANGE ]]; then
+        if [[ -z $WAIT_UNTIL_DONE ]]; then
             kill_all
         fi
 
@@ -110,10 +110,10 @@ run() {
         clear
         eval "${POSITIONAL[@]} &"
 
-        if [[ -z $KILL_CHILD_ON_CHANGE ]]; then
-            wait
-        else
+        if [[ -z $WAIT_UNTIL_DONE ]]; then
             disown
+        else
+            wait
         fi
         sleep "$INTERVAL"
         fswatch -r -l 0.1 --one-event $PATHS \
