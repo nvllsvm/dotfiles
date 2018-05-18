@@ -16,7 +16,7 @@ else
 fi
 
 if [[ $(tmux display-message -p '#S' 2> /dev/null) == $SESSION ]]; then
-    tmux split-window -h "wtchr -p $WTCHR_DIR -x $PYTHON_BIN $PYTHON_FILE"
+    tmux split-window -h "wtchr -p $WTCHR_DIR $PYTHON_BIN $PYTHON_FILE"
     tmux select-pane -l
     $EDITOR $PYTHON_FILE &
 
