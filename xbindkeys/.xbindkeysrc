@@ -14,15 +14,15 @@
 
 ## MPD
 # Toggle
-"set-mpd toggle"
+"mpc toggle"
   XF86AudioPlay
 
 # Preivous
-"set-mpd prev"
+"mpc prev"
   XF86AudioPrev
 
 # Next
-"set-mpd next"
+"mpc next"
   XF86AudioNext
 
 

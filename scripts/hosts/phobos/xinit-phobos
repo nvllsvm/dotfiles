@@ -3,6 +3,7 @@ xmodmap-caps-to-esc
 
 set-display-phobos
 
+mpd-notification &
 nm-applet &
 syncthing-gtk &
 blueberry-tray &
