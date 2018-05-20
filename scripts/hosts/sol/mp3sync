@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+IMAGE=nvllsvm/harmonize
+docker pull $IMAGE > /dev/null
+docker run \
+    -e PUID=1000 \
+    -e PGID=100 \
+    -e NUM_PROCESSES=8 \
+    -v /mnt/storage1/Audio/Library:/source \
+    -v /mnt/storage1/Audio/MP3:/target \
+    $IMAGE
