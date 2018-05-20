@@ -325,5 +325,9 @@
     summary = Backlight
     timeout = 1
 
+[mpd-notification]
+    summary = MPD Notification
+    format = "%b"
+
 
 # vim: ft=cfg
