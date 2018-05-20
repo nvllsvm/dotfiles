@@ -1,2 +1,2 @@
 #!/bin/sh
-COMPOSE_PROJECT_NAME=sol COMPOSE_FILE=~/Code/Private/sol-docker/docker-compose.yaml docker-compose "$@"
+COMPOSE_PROJECT_NAME=sol-docker COMPOSE_FILE=~/Code/Private/sol-docker/docker-compose.yaml docker-compose "$@"
