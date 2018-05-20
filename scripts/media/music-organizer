@@ -9,7 +9,7 @@ from chardet.universaldetector import UniversalDetector
 audioTypes = ('.flac','.mp3')
 
 imageTypes = ('.jpg','.png')
-imagePrefix = 'front'
+imagePrefix = 'cover'
 
 infoTypes = ('.nfo','.log','.cue')
 infoPrefix = 'ripping'
