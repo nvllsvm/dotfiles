@@ -72,8 +72,8 @@ def process(path, regex):
 
 
 def main():
-    parser = argparse.ArgumentParser(
-            description='./rename_mkv.py -r \'.*S\d*E(\d*).*.mkv\' test')
+    parser = argparse.ArgumentParser()
+    parser.description = f"{parser.prog} -r '.*S\d*E(\d*).*.mkv' test"
     parser.add_argument('regex')
     parser.add_argument('directory')
     args = parser.parse_args()
