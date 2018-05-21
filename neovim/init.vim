@@ -119,3 +119,6 @@ function! s:my_cr_function() abort
 endfunction
 
 autocmd FileType yaml setlocal shiftwidth=2 tabstop=2
+
+" workaround for https://github.com/neovim/neovim/issues/7861
+autocmd VimResized * redraw!
