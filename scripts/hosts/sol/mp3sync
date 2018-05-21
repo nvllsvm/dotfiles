@@ -9,3 +9,5 @@ docker run \
     -v /mnt/storage1/Audio/Library:/source \
     -v /mnt/storage1/Audio/MP3:/target \
     $IMAGE
+
+airsonic-scan
