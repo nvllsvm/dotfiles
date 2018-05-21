@@ -1,4 +1,6 @@
 #!/bin/bash
+set -e
+
 . "${DOTFILES_DIR}"/zsh/env/syncthing.env
 TODO_FILE="${SYNCTHING_DIR}"/Notes/todo.txt
 
@@ -15,3 +17,5 @@ if [ -z "$1" ]; then
 else
     echo $(date +%Y-%m-%d) $@ >> "${TODO_FILE}"
 fi
+
+sort "${TODO_FILE}" -o "${TODO_FILE}"
