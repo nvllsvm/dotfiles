@@ -43,3 +43,4 @@ EOF
     exit 1
 fi
 
+apply-display-calibration
