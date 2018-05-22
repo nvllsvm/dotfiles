@@ -1,0 +1,65 @@
+#!/usr/bin/env python3
+import argparse
+import time
+
+import zmq
+
+
+PORT = 5556
+
+
+def start_subscriber(topic):
+    context = zmq.Context()
+    socket = context.socket(zmq.SUB)
+    socket.connect(f'tcp://localhost:{PORT}')
+    topicfilter = topic.encode()
+    socket.setsockopt(zmq.SUBSCRIBE, topicfilter)
+    wait()
+    return socket
+
+
+def start_publisher():
+    context = zmq.Context()
+    socket = context.socket(zmq.XPUB)
+    socket.bind(f'tcp://*:{PORT}')
+    wait()
+    return socket
+
+
+def wait():
+    time.sleep(.25)
+
+
+def publish(socket, data):
+    data = data.encode()
+    print('publish', data)
+    socket.send(data)
+
+
+def receive(socket):
+    data = socket.recv()
+    print('receive', data)
+    return data
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-p', '--publish', action='store_true')
+    group.add_argument('-s', '--subscribe', action='store_true')
+    parser.add_argument('topic')
+    args = parser.parse_args()
+
+    topic = args.topic
+
+    if args.publish:
+        server = start_publisher()
+        publish(server, args.topic)
+    elif args.subscribe:
+        topic = args.topic
+        socket = start_subscriber(topic)
+        receive(socket)
+
+
+if __name__ == '__main__':
+    main()
