@@ -16,6 +16,7 @@ backup_home() {
         --exclude .embyserver/transcoding-temp \
         --exclude .embyserver/logs \
         --exclude .embyserver/cache \
+        --exclude .cache \
         ~ $HOME_BACKUP_DIR
 }
 
