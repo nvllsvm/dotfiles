@@ -3,8 +3,8 @@
 BACKUP_ROOT="$DOTFILES_DIR"/desktop
 
 sync_file() {
-    echo Syncing "$target"
     if [ -f "$target" ]; then
+        echo Syncing "$target"
         sudo cp "$source" "$target"
     fi
 }
