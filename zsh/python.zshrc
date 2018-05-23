@@ -1,39 +1,31 @@
 path=("${DOTFILES_DIR}"/scripts/python  "$path[@]")
 
 venv() {
-    local python_version=$1
-    local folder=env
+    local env_folder=$1
+    local python_bin=$2
 
-    if [[ -z $python_version ]]; then
-        python_version=3
+    if [[ -z $env_folder ]]; then
+        env_folder=env
     fi
 
-    if [[ ! -d $folder ]]; then
-        virtualenv -p python$python_version $folder
+    if [[ -z $python_bin ]]; then
+        python_bin=python3
+    fi
+
+    if [[ ! -d $env_folder ]]; then
+        virtualenv -p $python_bin $env_folder
         if [[ $? -ne 0 ]]; then
-            rm -r $folder
+            rm -r $env_folder
             return 1
         fi
     fi
 
-    if [[ -e $folder/bin/activate ]]; then
-        source $folder/bin/activate
-    else
-        echo Invalid virtualenv
-        return 1
-    fi
-}
+    cat >.envrc<<EOF
+. $env_folder/bin/activate
+EOF
 
-virtenv_indicator() {
-    if [[ -z $VIRTUAL_ENV ]] then
-        unset prompt_virtualenv
-        unset PIP_USER
-        unset PYTHONPATH
-    else
-        prompt_virtualenv="($(basename $VIRTUAL_ENV))"
-        export PIP_USER=0
-        export PYTHONPATH=$VIRTUAL_ENV
-    fi
+    direnv allow
+    direnv reload
 }
 
 if $(test $(command -v python3)); then
@@ -45,7 +37,3 @@ if $(test $(command -v python3)); then
 fi
 
 export VIRTUAL_ENV_DISABLE_PROMPT=1
-
-add-zsh-hook precmd virtenv_indicator
-
-PROMPT='$prompt_virtualenv'"$PROMPT"

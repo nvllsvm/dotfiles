@@ -105,7 +105,7 @@ augroup my_neomake_highlights
 augroup END
 
 autocmd! BufWritePost * Neomake
-autocmd BufWritePost * call system("zmq pub file-updated " . expand('%:p') . " &")
+autocmd BufWritePost * call system("lmk --path " . expand('%:p') . " &")
 
 let base16colorspace=256
 if !empty(glob("~/.base16_theme"))
