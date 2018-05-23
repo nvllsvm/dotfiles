@@ -2,6 +2,7 @@
 set -e
 
 TOPIC='file-updated'
+LINK_PWD=$(readlink -f "$PWD")
 
 kill_all() {
     jobs -rp | xargs -L 1 pkill -P &> /dev/null || true
@@ -32,7 +33,7 @@ while true; do
     disown
     while true; do
         FILE=$(zmq sub -t "$TOPIC" | cut -f2- -d ' ')
-        if [[ "$FILE" == "$PWD"/* ]]; then
+        if [[ "$FILE" == "$PWD"/* || "$FILE" == "$LINK_PWD"/* ]]; then
             break
         fi
     done
