@@ -1,2 +1,10 @@
-#!/bin/sh
-COMPOSE_PROJECT_NAME=sol-docker COMPOSE_FILE=~/Code/Private/sol-docker/docker-compose.yaml docker-compose "$@"
+#!/bin/bash
+export COMPOSE_PROJECT_NAME=sol-docker 
+export COMPOSE_FILE=~/Code/Private/sol-docker/docker-compose.yaml
+
+if [[ "$1" == "restart" ]]; then
+    docker-compose down -t 1
+    docker-compose up -d
+else
+    docker-compose "$@"
+fi
