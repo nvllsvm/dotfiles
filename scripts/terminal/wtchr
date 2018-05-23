@@ -108,7 +108,7 @@ run() {
         fi
 
         clear
-        eval "${POSITIONAL[@]} &"
+        "${POSITIONAL[@]}" &
 
         if [[ -z $WAIT_UNTIL_DONE ]]; then
             disown

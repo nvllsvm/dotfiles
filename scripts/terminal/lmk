@@ -10,11 +10,12 @@ kill_all() {
 
 
 if [ -z $1 ]; then
-    echo ERROR: No command provided
-    exit 1
+    echo Publishing event for current directory
+    zmq pub "$TOPIC" "$PWD"/
+    exit
 fi
 
-trap "exit 0" SIGINT
+trap "exit 1" SIGINT
 trap "kill_all" EXIT
 
 while true; do
@@ -26,11 +27,11 @@ while true; do
     fi
 
     clear
-    eval "$@" &
+    "$@" &
 
     disown
     while true; do
-        FILE=$(zmq -s "$TOPIC" | cut -f3- -d ' ')
+        FILE=$(zmq sub -t "$TOPIC" | cut -f2- -d ' ')
         if [[ "$FILE" == "$PWD"/* ]]; then
             break
         fi
