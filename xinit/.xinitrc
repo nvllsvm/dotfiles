@@ -19,6 +19,12 @@ compton &
 xbindkeys &
 xss-lock -- lock-screen &
 
-$(which xinit-$HOSTNAME) &
+apply-display-calibration
+
+xinit-$HOSTNAME &
+
+mpd-notification &
+nm-applet &
+syncthing-gtk &
 
 exec i3
