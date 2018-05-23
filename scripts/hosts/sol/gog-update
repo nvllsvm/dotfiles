@@ -2,6 +2,7 @@
 set -e
 
 GOG_DIR=/mnt/storage1/Games/PC/GOG.com
+CONTAINER_GOG_DIR=/downloads
 ORPHANS_FILE=/tmp/gog-update-orphans
 DOCKER_IMAGE=nvllsvm/lgogdownloader
 
@@ -9,7 +10,7 @@ lgogdownloader() {
     docker run \
         -e PUID=1000 \
         -e PGID=100 \
-        -v $GOG_DIR:/downloads \
+        -v $GOG_DIR:/$CONTAINER_GOG_DIR \
         -v ~/.cache/lgogdownloader:/cache \
         -v ~/Code/Private/dotfiles-private/lgogdownloader:/config \
         $DOCKER_IMAGE "$@"
@@ -20,8 +21,12 @@ docker pull $DOCKER_IMAGE > /dev/null
 lgogdownloader --update-check
 lgogdownloader --download --save-serials
 
-ORPHANS=$(lgogdownloader --check-orphans)
-if [[ $(echo "${ORPHANS}" | tail -n 1) == 'No orphaned files' ]]; then
+grep_gog() {
+    grep "^$CONTAINER_GOG_DIR" || true
+}
+
+ORPHANS=$(lgogdownloader --check-orphans | grep_gog)
+if [[ -z "${ORPHANS}" ]]; then
     rm -rf "${ORPHANS_FILE}"
 else
     echo "${ORPHANS}" > "${ORPHANS_FILE}"
