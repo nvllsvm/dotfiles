@@ -1,6 +1,2 @@
 #!/bin/sh
 set-display-mars
-
-mpd-notification &
-nm-applet &
-syncthing-gtk &

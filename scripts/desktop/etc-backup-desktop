@@ -1,0 +1,15 @@
+#!/bin/sh
+
+BACKUP_ROOT="$DOTFILES_DIR"/desktop
+
+sync_file() {
+    echo Syncing "$target"
+    if [ -f "$target" ]; then
+        sudo cp "$source" "$target"
+    fi
+}
+
+for source in $(find "$BACKUP_ROOT" -type f); do
+    target=${source#$BACKUP_ROOT}
+    sync_file "$source" "$target"
+done
