@@ -20,9 +20,7 @@ venv() {
         fi
     fi
 
-    cat >.envrc<<EOF
-. $env_folder/bin/activate
-EOF
+    echo . $env_folder/bin/activate > .envrc
 
     direnv allow
     direnv reload
