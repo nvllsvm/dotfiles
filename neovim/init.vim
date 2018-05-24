@@ -123,3 +123,5 @@ autocmd FileType yaml setlocal shiftwidth=2 tabstop=2
 
 " workaround for https://github.com/neovim/neovim/issues/7861
 autocmd VimResized * redraw!
+
+command JSON :%!python3 -m json.tool
