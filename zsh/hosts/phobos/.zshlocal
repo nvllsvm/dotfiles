@@ -1,0 +1,11 @@
+. $DOTFILES_DIR/zsh/update.zshrc
+. $DOTFILES_DIR/zsh/direnv.zshrc
+. $DOTFILES_DIR/zsh/dotfiles.zshrc
+. ~/Code/Private/dotfiles-private/zsh/dotfiles-private.zshrc
+. $DOTFILES_DIR/zsh/base16.zshrc
+. $DOTFILES_DIR/zsh/arch_linux.zshrc
+. $DOTFILES_DIR/zsh/python.zshrc
+. $DOTFILES_DIR/zsh/neovim.zshrc
+. $DOTFILES_DIR/zsh/ranger.zshrc
+
+full-update add etc-backup-desktop
