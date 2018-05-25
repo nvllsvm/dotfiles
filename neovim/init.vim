@@ -46,7 +46,6 @@ function StripTrailingWhitespace()
 endfunction
 
 command Whitespace :retab | call StripTrailingWhitespace()
-command Render :autocmd BufWritePost * call system("pandoc-render '" . expand("<afile>") . "' &")
 
 nmap <F8> :TagbarToggle<CR>
 nmap <C-n> :NERDTreeToggle<CR>
@@ -66,6 +65,8 @@ Plug 'plasticboy/vim-markdown'
 Plug 'chriskempson/base16-vim'
 Plug 'dbeniamine/todo.txt-vim'
 Plug 'udalov/kotlin-vim'
+Plug 'godlygeek/tabular'
+Plug 'plasticboy/vim-markdown'
 call plug#end()
 
 " deoplete
