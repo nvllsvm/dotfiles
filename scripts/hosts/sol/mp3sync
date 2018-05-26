@@ -10,4 +10,11 @@ docker run \
     -v /mnt/storage1/Audio/MP3:/target \
     $IMAGE
 
-airsonic-scan
+printf 'Updating Airsonic library .'
+airsonic-cli startScan > /dev/null
+
+while [[ $(airsonic-cli getScanStatus | jq '.scanning') == 'true' ]]; do
+    printf .
+    sleep 1
+done
+echo ' Done'
