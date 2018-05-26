@@ -1,7 +1,11 @@
 #!/bin/bash
 set -e
 
-PYTHON3_BIN=$(which -a python3 | grep -v "^$VIRTUAL_ENV" | head -n 1 | tr -d '\n')
+if [ ! -z "$VIRTUAL_ENV" ]; then
+    PYTHON3_BIN=$(which -a python3 | grep -v "^$VIRTUAL_ENV" | head -n 1 | tr -d '\n')
+else
+    PYTHON3_BIN=$(which python3)
+fi
 ZMQ_BIN=$(which zmq)
 
 TOPIC='lmk-fs-event'
