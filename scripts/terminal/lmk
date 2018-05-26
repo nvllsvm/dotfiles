@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+PYTHON3_BIN=$(which -a python3 | grep -v "^$VIRTUAL_ENV" | head -n 1 | tr -d '\n')
+ZMQ_BIN=$(which zmq)
+
 TOPIC='lmk-fs-event'
 LINK_PWD=$(readlink -f "$PWD")
 
@@ -11,11 +14,11 @@ kill_all() {
 
 
 publish_message() {
-    zmq pub "$TOPIC" "$1"
+    "$PYTHON3_BIN" "$ZMQ_BIN" pub "$TOPIC" "$1"
 }
 
 get_message() {
-    zmq sub -t "$TOPIC" | cut -f2- -d ' '
+    "$PYTHON3_BIN" "$ZMQ_BIN" sub -t "$TOPIC" | cut -f2- -d ' '
 }
 
 
