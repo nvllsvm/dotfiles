@@ -66,7 +66,7 @@ Plug 'chriskempson/base16-vim'
 Plug 'dbeniamine/todo.txt-vim'
 Plug 'udalov/kotlin-vim'
 Plug 'godlygeek/tabular'
-Plug 'plasticboy/vim-markdown'
+Plug 'gabrielelana/vim-markdown'
 call plug#end()
 
 " deoplete
