@@ -4,12 +4,6 @@ file="$1"
 filename=$(basename "$file")
 extension="${filename##*.}"
 
-if [ -z "$2" ]; then
-    OUTPUT_FILE=/tmp/pandoc.html
-else
-    OUTPUT_FILE=$2
-fi
-
 if [ "${extension}" == "md" ]; then
     pandoc_format=gfm
 elif [ "${extension}" == "rst" ]; then
@@ -25,4 +19,4 @@ pandoc \
     -c "${DOTFILES_DIR}"/pandoc/css/github-markdown.css \
     --self-contained \
     --standalone \
-    --columns=10000 "$1" > $OUTPUT_FILE
+    --columns=10000 "$1"
