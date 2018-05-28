@@ -1,9 +1,11 @@
 #!/bin/sh
+set -ex
+
 ALL_CONTAINERS=$(docker ps -aq)
 
 if [ -n "$ALL_CONTAINERS" ]; then
-    docker stop -t 0 "$ALL_CONTAINERS"
-    docker rm -f "$ALL_CONTAINERS"
+    docker stop -t 0 $ALL_CONTAINERS
+    docker rm -f $ALL_CONTAINERS
 fi
 
 docker volume prune -f
