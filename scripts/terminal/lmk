@@ -47,7 +47,7 @@ while true; do
     fi
 
     clear
-    "$@" &
+    eval "$@" &
 
     disown
     while true; do
