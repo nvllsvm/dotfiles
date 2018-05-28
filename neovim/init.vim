@@ -67,6 +67,8 @@ Plug 'dbeniamine/todo.txt-vim'
 Plug 'udalov/kotlin-vim'
 Plug 'godlygeek/tabular'
 Plug 'gabrielelana/vim-markdown'
+Plug 'iamcco/mathjax-support-for-mkdp'
+Plug 'iamcco/markdown-preview.vim'
 call plug#end()
 
 " deoplete
