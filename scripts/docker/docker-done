@@ -1,12 +1,22 @@
 #!/bin/sh
-set -ex
+set -e
 
-ALL_CONTAINERS=$(docker ps -aq)
+YELLOW='\033[1;33m'
+RESET_COLOR='\033[0m'
 
-if [ -n "$ALL_CONTAINERS" ]; then
-    docker stop -t 0 $ALL_CONTAINERS
-    docker rm -f $ALL_CONTAINERS
+log() {
+    printf "${YELLOW}$1${RESET_COLOR}\n"
+}
+
+all_containers=$(docker ps -aq)
+
+log "Stopping and removing containers ..."
+if [ -n "$all_containers" ]; then
+    docker stop -t 0 $all_containers > /dev/null
+    docker rm -f $all_containers > /dev/null
 fi
 
-docker volume prune -f
-docker network prune -f
+log "Pruning volumes ..."
+docker volume prune -f > /dev/null
+log "Pruning networks ..."
+docker network prune -f > /dev/null
