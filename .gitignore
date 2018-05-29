@@ -10,3 +10,5 @@ ranger/bookmarks
 ranger/tagged
 sc-controller/daemon.*
 zsh/.zsh/local.zshrc
+*.pyc
+__pycache__
