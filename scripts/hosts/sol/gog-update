@@ -8,6 +8,7 @@ DOCKER_IMAGE=nvllsvm/lgogdownloader
 
 lgogdownloader() {
     docker run \
+        --rm \
         -e PUID=1000 \
         -e PGID=100 \
         -v $GOG_DIR:/$CONTAINER_GOG_DIR \

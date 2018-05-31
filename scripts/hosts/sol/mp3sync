@@ -3,6 +3,7 @@ set -e
 IMAGE=nvllsvm/harmonize
 docker pull $IMAGE > /dev/null
 docker run \
+    --rm \
     -e PUID=1000 \
     -e PGID=100 \
     -e NUM_PROCESSES=8 \
