@@ -13,7 +13,7 @@ if [[ $# -eq 1 && $1 == '-l' ]]; then
 fi
 
 if [ -z "$1" ]; then
-    nvim "${TODO_FILE}"
+    "${EDITOR}" "${TODO_FILE}"
 else
     echo $(date +%Y-%m-%d) $@ >> "${TODO_FILE}"
 fi

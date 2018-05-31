@@ -5,4 +5,4 @@ if [ -z $1 ]; then
 else
     DATE=$1
 fi
-nvim "${SYNCTHING_DIR}"/Notes/Journal/${DATE}
+"${EDITOR}" "${SYNCTHING_DIR}"/Notes/Journal/${DATE}
