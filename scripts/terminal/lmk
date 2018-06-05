@@ -39,15 +39,14 @@ trap "exit 1" SIGINT
 trap "kill_all" EXIT
 
 while true; do
-    kill_all
-
     # exit tmux copy-mode
     if [[ -n $TMUX ]]; then
         tmux if -F -t $TMUX_PANE "#{pane_in_mode}" "send-keys -t $TMUX_PANE -X cancel"
     fi
 
+    kill_all
     clear
-    eval "$@" &
+    "$@" &
 
     disown
     while true; do

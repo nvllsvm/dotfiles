@@ -128,3 +128,8 @@ autocmd FileType yaml setlocal shiftwidth=2 tabstop=2
 autocmd VimResized * redraw!
 
 command JSON :%!python3 -m json.tool
+
+" enable line numbers
+let NERDTreeShowLineNumbers=1
+" make sure relative line numbers are used
+autocmd FileType nerdtree setlocal relativenumber
