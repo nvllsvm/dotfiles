@@ -1,3 +1,0 @@
-#!/bin/sh
-let factor=$(get-x-dpi)/96
-/usr/bin/electron --force-device-scale-factor=$factor "$@"

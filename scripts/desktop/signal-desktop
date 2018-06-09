@@ -1,2 +1,0 @@
-#!/bin/sh
-/usr/bin/signal-desktop --start-in-tray
