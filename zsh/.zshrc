@@ -23,8 +23,8 @@ bindkey "^[[A" history-beginning-search-backward
 bindkey "^[[B" history-beginning-search-forward
 
 alias ls='ls --color=auto --group-directories-first'
-alias ll='ls -lh'
 alias la='ls -A'
+alias ll='la -lh'
 alias grep='grep --color=auto'
 
 srch () {
