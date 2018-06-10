@@ -22,7 +22,9 @@ backup_home() {
 
 backup_storage1() {
     echo Backing up storage1 ...
-    sudo rsync -av --progress --delete $STORAGE1/ $BACKUP1
+    sudo rsync -av --progress --delete \
+        --exclude Downloads/Torrent/incomplete \
+        $STORAGE1/ $BACKUP1
 }
 
 backup_storage2() {
