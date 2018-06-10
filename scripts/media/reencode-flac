@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+import argparse
+import multiprocessing
+import os
+import pathlib
+import subprocess
+
+import harmonize
+import mutagen
+
+
+POOL_SIZE = multiprocessing.cpu_count()
+
+
+def pipe_to_flac(pipe, target):
+    subprocess.run(
+        ['flac', '-s', '--best', '-V', '-f', '-o', target, '-'],
+        input=pipe,
+        stdout=subprocess.DEVNULL,
+        check=True
+    )
+
+
+def copy_tags(source, target):
+    metadata_source = mutagen.File(source)
+    metadata_target = mutagen.File(target)
+    metadata_target.update(metadata_source)
+    metadata_target.save()
+
+
+def reencode_flac(source):
+    print(f'Reencoding {source}')
+    pipe = harmonize.decode_flac_to_stdout(source)
+    with harmonize.TempPath(dir=source.parent, suffix='.flac') as temp_path:
+        pipe_to_flac(pipe, temp_path)
+        copy_tags(source, temp_path)
+        source.unlink()
+        temp_path.rename(source)
+
+
+def find_endswith(ending, directory):
+    paths = []
+    for root, dirs, files in os.walk(directory):
+        for f in files:
+            if f.lower().endswith(ending):
+                paths.append(pathlib.Path(root, f))
+    return paths
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('directory')
+    args = parser.parse_args()
+
+    with multiprocessing.Pool(POOL_SIZE) as p:
+        p.map(
+            reencode_flac,
+            find_endswith('.flac', pathlib.Path(args.directory).absolute())
+        )
+
+
+if __name__ == '__main__':
+    main()

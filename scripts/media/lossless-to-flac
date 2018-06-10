@@ -20,11 +20,6 @@ def wav_to_flac(path):
     run_command(['flac', '--best', '--delete-input-file', '-V', '-f', path])
 
 
-def flac_to_wav(path):
-    print(f'flac-to-wav - {path}')
-    run_command(['flac', '--delete-input-file', '-d', '-f', '-F', path])
-
-
 def ffmpeg_to_wav(path):
     print(f'ffmpeg-to-wav - {path}')
     run_command(['ffmpeg', '-i', path, f'{path}.wav'])
@@ -46,7 +41,6 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('directory')
     parser.add_argument('-x', '--extract', action='store_const', const=True)
-    parser.add_argument('-e', '--encode', action='store_const', const=True)
     args = parser.parse_args()
 
     if not args.extract and not args.encode:
@@ -59,10 +53,7 @@ def main():
                                                 '.tak',
                                                 '.m4a',
                                                 '.wv'), args.directory))
-            p.map(flac_to_wav, find_endswith('.flac', args.directory))
-
-        if args.encode is True:
-            p.map(wav_to_flac, find_endswith('.wav', args.directory))
+        p.map(wav_to_flac, find_endswith('.wav', args.directory))
 
 
 if __name__ == '__main__':
