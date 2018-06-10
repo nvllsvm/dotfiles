@@ -1,0 +1,15 @@
+#!/bin/bash
+set -e
+for filename in "$@"; do
+    target="${filename%.*}"
+
+    if [ -d "${target}" ]; then
+        echo Error: directory exists \"${target}\"
+        exit 1
+    fi
+done
+
+for filename in "$@"; do
+    target="${filename%.*}"
+    7z x -o"${target}" "${filename}"
+done
