@@ -133,3 +133,5 @@ command JSON :%!python3 -m json.tool
 let NERDTreeShowLineNumbers=1
 " make sure relative line numbers are used
 autocmd FileType nerdtree setlocal relativenumber
+
+au BufNewFile,BufRead *.avsc set filetype=json
