@@ -1,10 +1,8 @@
 #!/bin/bash
 read -s -n 1 -p 'Fuck it? (y/N) ' FUCKIT
 echo
-if [[ $FUCKIT != 'y' ]]; then
-    exit 1
+if [[ $FUCKIT == 'y' ]]; then
+    git add -A
+    git commit --amend --no-edit
+    git push --force
 fi
-
-git add -A
-git commit --amend --no-edit
-git push --force

@@ -1,0 +1,30 @@
+#!/bin/sh
+PORT=8000
+
+HTML_DIR=$(pwd)
+if [ -n "$1" ]; then
+    HTML_DIR="$(realpath "$1")"
+fi
+
+NGINX_CONFIG=$(mktemp -p /tmp)
+cat > "${NGINX_CONFIG}" <<EOF
+server {
+    listen 80;
+    server_name localhost;
+
+    sendfile off;
+    add_header Cache-Control no-cache;
+
+    location / {
+        root /content;
+        index index.html;
+    }
+}
+EOF
+
+echo http://localhost:$PORT
+docker-shell \
+    -p ${PORT}:80 \
+    -v "${NGINX_CONFIG}":/etc/nginx/conf.d/default.conf \
+    -v "${HTML_DIR}":/content \
+    nginx:alpine

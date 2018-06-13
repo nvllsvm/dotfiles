@@ -135,3 +135,5 @@ let NERDTreeShowLineNumbers=1
 autocmd FileType nerdtree setlocal relativenumber
 
 au BufNewFile,BufRead *.avsc set filetype=json
+
+au FileType python set foldmethod=indent
