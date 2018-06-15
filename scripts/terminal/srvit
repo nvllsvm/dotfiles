@@ -1,4 +1,5 @@
 #!/bin/sh
+IMAGE=nginx:alpine
 PORT=8000
 
 HTML_DIR=$(pwd)
@@ -22,9 +23,10 @@ server {
 }
 EOF
 
+docker pull "${IMAGE}"
 echo http://localhost:$PORT
 docker-shell \
     -p ${PORT}:80 \
     -v "${NGINX_CONFIG}":/etc/nginx/conf.d/default.conf \
     -v "${HTML_DIR}":/content \
-    nginx:alpine
+    "${IMAGE}"

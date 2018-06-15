@@ -7,5 +7,6 @@
 . $DOTFILES_DIR/zsh/python.zshrc
 . $DOTFILES_DIR/zsh/neovim.zshrc
 . $DOTFILES_DIR/zsh/ranger.zshrc
+. $DOTFILES_DIR/zsh/android.zshrc
 
 full-update add etc-backup-desktop
