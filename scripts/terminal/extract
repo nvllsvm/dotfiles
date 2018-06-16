@@ -11,5 +11,5 @@ done
 
 for filename in "$@"; do
     target="${filename%.*}"
-    7z x -o"${target}" "${filename}"
+    7z x -spe -o"${target}" "${filename}"
 done
