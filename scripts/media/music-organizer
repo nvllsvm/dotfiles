@@ -9,6 +9,7 @@ import mutagen.flac
 import mutagen.mp3
 
 AUDIO_EXT = ('.flac', '.mp3')
+FLAC_EXT = '.flac'
 
 IMAGE_EXT = ('.jpg', '.png')
 IMAGE_PREFIX = 'cover'
@@ -63,21 +64,21 @@ def split_flac(flac_path, cue_path):
 
 def check_cue_files(root_path):
     paths = [p for p in root_path.iterdir() if p.is_file()]
-    audio_files = [p for p in paths if p.suffix in AUDIO_EXT]
-    if not audio_files:
+    flac_files = [p for p in paths if p.suffix == FLAC_EXT]
+    if not flac_files:
         return
 
     cue_files = [p for p in paths if p.suffix in CUE_EXT]
 
     if len(cue_files) > 1:
         print(f'Multiple .cue files: {root_path}')
-    elif len(cue_files) == len(audio_files) == 1:
+    elif len(cue_files) == len(flac_files) == 1:
         cue_file = cue_files[0]
         num_tracks = cue_track_count(cue_file)
         if num_tracks == 0:
             print(f'Bad cue file: {cue_file}')
         elif num_tracks != 1:
-            split_flac(audio_files[0], cue_file)
+            split_flac(flac_files[0], cue_file)
 
 
 def organize_images(root_path):
