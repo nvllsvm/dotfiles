@@ -122,6 +122,7 @@ def rename_extensions(path):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('directory')
+    parser.add_argument('-t', '--check-tags', action='store_const', const=True)
     args = parser.parse_args()
 
     music_dir = pathlib.Path(args.directory)
@@ -133,8 +134,9 @@ def main():
         organize_images(root_path)
         check_cue_files(root_path)
 
-        for path in {p for p in root_path.iterdir() if p.is_file()}:
-            check_tags(path)
+        if args.check_tags:
+            for path in {p for p in root_path.iterdir() if p.is_file()}:
+                check_tags(path)
 
 
 if __name__ == '__main__':
