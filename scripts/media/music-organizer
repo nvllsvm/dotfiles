@@ -117,6 +117,7 @@ def rename_extensions(path):
         new_f = pathlib.Path(f.parent, f.stem + suffix)
         if f != new_f:
             print(f'Renaming "{f}" to "{new_f}"')
+            f.rename(new_f)
 
 
 def main():
