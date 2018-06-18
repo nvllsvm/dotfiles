@@ -53,8 +53,8 @@ def cue_track_count(path):
 def split_flac(flac_path, cue_path):
     print(f'Splitting {flac_path}')
     subprocess.run(
-        ['shntool', 'split', '-f', cue_path, '-o',
-         'flac flac --output-name=split%f -', '-t', '%n', flac_path],
+        ['shntool', 'split', '-f', cue_path.name, '-o',
+         'flac flac --output-name=split%f -', '-t', '%n', flac_path.name],
         cwd=cue_path.parent,
         stderr=subprocess.DEVNULL,
         check=True
