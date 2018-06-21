@@ -1,0 +1,6 @@
+#!/bin/bash
+if type xclip >& /dev/null ; then
+    xclip -selection c
+elif type pbcopy >& /dev/null ; then
+    pbcopy
+fi
