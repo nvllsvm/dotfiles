@@ -1,6 +1,8 @@
 #!/bin/bash
 if type xclip >& /dev/null ; then
     xclip -selection c -o
+elif type termux-clipboard-get >& /dev/null ; then
+    termux-clipboard-get
 elif type pbcopy >& /dev/null ; then
     pbpaste
 fi
