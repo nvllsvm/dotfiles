@@ -1,0 +1,10 @@
+. $DOTFILES_DIR/zsh/update.zshrc
+. $DOTFILES_DIR/zsh/ranger.zshrc
+. $DOTFILES_DIR/zsh/python.zshrc
+. $DOTFILES_DIR/zsh/neovim.zshrc
+. $DOTFILES_DIR/zsh/base16.zshrc
+
+PROMPT='%F{$vi_mode_color}$%f '
+
+full-update add "git -C $DOTFILES_DIR pull"
+full-update add 'pkg upgrade'
