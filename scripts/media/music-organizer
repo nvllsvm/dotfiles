@@ -99,25 +99,62 @@ def organize_images(root_path):
         print(f'No images: {root_path}')
 
 
-def check_tags(path):
-    mutagen_class = MUTAGEN_CLASS.get(path.suffix)
-    if mutagen_class:
-        metadata = mutagen_class(path)
-        for tag in EXPECTED_TAGS:
-            try:
-                metadata[tag]
-            except KeyError:
-                print(f'File {path} missing "{tag}"')
+def check_metadata(path, metadata):
+    for tag in EXPECTED_TAGS:
+        try:
+            metadata[tag]
+        except KeyError:
+            print(f'File {path} missing "{tag}"')
+
+
+def fix_tracknumber(path, metadata):
+    tracknumber = metadata['tracknumber'][0]
+
+    if '/' in tracknumber:
+        tracknumber, all_tracks = tracknumber.split('/')
+
+        try:
+            int(tracknumber)
+        except ValueError:
+            print(f'Unhandled tracknumber: "{tracknumber}"')
+
+        metadata['tracknumber'] = tracknumber
+        print(f'Fixing track number: "{path}"')
+        metadata.save()
 
 
 def rename_extensions(path):
     for f in {p for p in path.iterdir() if p.is_file()}:
         suffix = f.suffix.lower()
         suffix = RENAME_MAP.get(suffix, suffix)
-        new_f = pathlib.Path(f.parent, f.stem + suffix)
-        if f != new_f:
-            print(f'Renaming "{f}" to "{new_f}"')
-            f.rename(new_f)
+        safe_rename(f, f.stem + suffix)
+
+
+def rename_from_tags(path, metadata):
+    title = metadata['title'][0]
+    try:
+        tracknumber = int(metadata['tracknumber'][0])
+    except ValueError:
+        print(f'Cannot rename "{path}"')
+        return
+    # Only modify when under 10 to retain tracks >= 100
+    if tracknumber < 10:
+        tracknumber = f'{tracknumber:02d}'
+
+    for char in ('/', '.'):
+        title = title.replace(char, ' ')
+    title = ' '.join(title.split())
+    safe_rename(path, f'{tracknumber} - {title}{path.suffix}')
+
+
+def safe_rename(source, name):
+    target = source.with_name(name)
+    if source != target:
+        if target.exists():
+            print(f'Error renaming "{source}" to "{target}": already exists')
+        else:
+            print(f'Renaming "{source}" to "{target}"')
+            source.rename(target)
 
 
 def main():
@@ -136,8 +173,19 @@ def main():
         check_cue_files(root_path)
 
         if args.check_tags:
+            albums = set()
+
             for path in {p for p in root_path.iterdir() if p.is_file()}:
-                check_tags(path)
+                mutagen_class = MUTAGEN_CLASS.get(path.suffix)
+                if mutagen_class:
+                    metadata = mutagen_class(path)
+                    check_metadata(path, metadata)
+                    fix_tracknumber(path, metadata)
+                    rename_from_tags(path, metadata)
+                    albums.add(metadata['album'][0])
+
+            if len(albums) > 1:
+                print(f'Multiple album tags in "{root_path}"')
 
 
 if __name__ == '__main__':
