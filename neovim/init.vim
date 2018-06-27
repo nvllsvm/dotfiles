@@ -45,7 +45,7 @@ function StripTrailingWhitespace()
   endif
 endfunction
 
-command Whitespace :retab | call StripTrailingWhitespace()
+command FixEmpty :retab | call StripTrailingWhitespace() | :%s/\r//ge
 
 nmap <F8> :TagbarToggle<CR>
 nmap <C-n> :NERDTreeToggle<CR>

@@ -1,3 +1,6 @@
 {
-    "default_options": ["--style=vim"]
+    "default_options": [
+        "--default-scheme=https",
+        "--style=vim"
+    ]
 }
