@@ -1,33 +1,48 @@
 #!/bin/bash
 EDITOR="$EDITOR -n"
-LMK_DIR=/tmp/python-lmk
-PYTHON_FILE=$LMK_DIR/test.py
 SESSION=python-lmk
 
 trap "tmux kill-session -t $SESSION 2> /dev/null" SIGHUP
 trap "tmux kill-session -t $SESSION 2> /dev/null" EXIT
 
-if [[ -n $VIRTUAL_ENV ]]; then
-    PYTHON_BIN=python
-elif [[ -z $1 ]]; then
-    PYTHON_BIN=python3
-else
-    PYTHON_BIN=$1
-fi
-
 if [[ $(tmux display-message -p '#S' 2> /dev/null) == $SESSION ]]; then
-    cd $LMK_DIR
-    pwd
-    tmux split-window -h "lmk $PYTHON_BIN $PYTHON_FILE"
-    tmux select-pane -l
-    $EDITOR $PYTHON_FILE
-else
-    mkdir -p $LMK_DIR
-    # prevent lmk python from whining
-    touch $PYTHON_FILE
+    if [[ $1 == '-p' ]]; then
+        PYTHON_BIN=$2
+        shift
+        shift
+    elif [[ -n $VIRTUAL_ENV ]]; then
+        PYTHON_BIN=python
+    else
+        PYTHON_BIN=python3
+    fi
 
+    if [[ -z $1 ]]; then
+        LMK_FILE=$(mktemp --suffix='.py')
+        trap "rm -f "$LMK_FILE"" EXIT
+        mkdir -p "$(dirname "$LMK_FILE")"
+        touch "$LMK_FILE"
+    else
+        LMK_FILE="$1"
+    fi
+
+    cd $(dirname "$LMK_FILE")
+    if [[ -n $VIRTUAL_ENV ]]; then
+        tmux split-window -h "VIRTUAL_ENV="$VIRTUAL_ENV" lmk $PYTHON_BIN $LMK_FILE"
+    else
+        tmux split-window -h "lmk $PYTHON_BIN $LMK_FILE"
+    fi
+
+    tmux select-pane -l
+    $EDITOR $LMK_FILE
+    tmux kill-session
+else
     unset TMUX
-    tmux new-session -d -s $SESSION $0 "$@"
+
+    if [[ -n $VIRTUAL_ENV ]]; then
+        tmux new-session -d -s $SESSION "VIRTUAL_ENV="$VIRTUAL_ENV" $0 "$@""
+    else
+        tmux new-session -d -s $SESSION $0 "$@"
+    fi
     tmux set-option -t $SESSION status off
     tmux attach-session -t $SESSION > /dev/null
 fi
