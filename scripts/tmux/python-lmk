@@ -34,7 +34,7 @@ if [[ $(tmux display-message -p '#S' 2> /dev/null) == $SESSION ]]; then
 
     tmux select-pane -l
     $EDITOR $LMK_FILE
-    tmux kill-session
+    tmux kill-session -t $SESSION
 else
     unset TMUX
 
