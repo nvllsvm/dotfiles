@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 . $DOTFILES_DIR/zsh/env/syncthing.env
 NOTES_DIR="${SYNCTHING_DIR}"/Notes
 cd "${NOTES_DIR}"
