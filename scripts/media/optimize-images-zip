@@ -1,8 +1,11 @@
 #!/bin/bash
-TEMP_DIR=$(mktemp -d)
-trap "rm -rf "${TEMP_DIR}"" EXIT
-7z x "$1" "-o"${TEMP_DIR}""
-image_optim -r "${TEMP_DIR}"
-mv "$1" "$1".bak
-7z a -mm=Deflate -mfb=258 -mpass=15 "$1".zip "${TEMP_DIR}"/.
-mv "$1".zip "$1"
+for f in "$@"; do
+    TEMP_DIR=$(mktemp -d)
+    trap "rm -rf "${TEMP_DIR}"" EXIT
+    7z x "$f" "-o"${TEMP_DIR}""
+    image_optim -r "${TEMP_DIR}"
+    mv "$f" "$f".bak
+    7z a -mm=Deflate -mfb=258 -mpass=15 "$f".zip "${TEMP_DIR}"/.
+    mv "$f".zip "$f"
+    rm -rf $TEMP_DIR
+done

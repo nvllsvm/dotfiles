@@ -24,6 +24,7 @@
         "evdevdrv": true, 
         "fake": false, 
         "hiddrv": true, 
+        "sc_by_bt": true, 
         "sc_by_cable": true, 
         "sc_dongle": true
     }, 
@@ -75,6 +76,6 @@
         "version": "0x110"
     }, 
     "recent_max": 10, 
-    "recent_profiles": ["XBox Controller", "FPS", "XBox Controller with High Precision Camera", "Desktop", "Stardew Valley"], 
+    "recent_profiles": ["Keyboard", "XBox Controller", "FPS", "XBox Controller with High Precision Camera", "Desktop", "Stardew Valley"], 
     "windows_opacity": 0.95
 }
