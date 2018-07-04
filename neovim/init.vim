@@ -137,3 +137,5 @@ autocmd FileType nerdtree setlocal relativenumber
 au BufNewFile,BufRead *.avsc set filetype=json
 
 au FileType python set foldmethod=indent
+
+let g:markdown_enable_spell_checking = 0
