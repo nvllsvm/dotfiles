@@ -1,9 +1,8 @@
 alias ssh='TERM=xterm-256color ssh'
 alias pacman-update-mirrors='sudo reflector --verbose --sort rate -a 1 -n 30 --save /etc/pacman.d/mirrorlist'
-alias trizen-install='trizen -S --noedit --noconfirm'
 
 archlinux-update() {
-    trizen -Syu --devel --noconfirm --noedit --needed 
+    yay -Syu --noconfirm
     asp update 
     pkgfile update
 
