@@ -34,6 +34,13 @@ else
     SCALING_FACTOR=2
 fi
 
+if [[ $2 == 'large' ]]; then
+    FONT_NAME='DejaVu Sans Mono'
+    FONT_SIZE=14
+
+    ANTIALIAS=true
+fi
+
     cat > $XRESOURCES_TEMP_FILE <<- EOF
 *facename: ${FONT_NAME}
 *fontsize: ${FONT_SIZE}

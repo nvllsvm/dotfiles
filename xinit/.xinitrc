@@ -19,7 +19,7 @@ compton &
 xbindkeys &
 xss-lock -- lock-screen &
 
-apply-display-calibration
+setup-outputs
 
 xinit-$HOSTNAME &
 

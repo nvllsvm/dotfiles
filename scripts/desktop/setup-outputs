@@ -1,0 +1,16 @@
+#!/bin/sh
+
+case "$HOSTNAME" in
+    "deimos")
+        xrandr \
+            --output DP-1 --off \
+            --output HDMI-1 --off \
+            --output HDMI-2 --off \
+            --output eDP-1 --primary --mode 720x1280 --pos 0x0 --rotate right
+        set-x-dpi 96 large
+        ;;
+    *)
+        ;;
+esac
+
+apply-display-calibration
