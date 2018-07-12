@@ -33,6 +33,7 @@ if [[ $(tmux display-message -p '#S' 2> /dev/null) == $SESSION ]]; then
     fi
 
     tmux select-pane -l
+    tmux resize-pane -x 90
     $EDITOR $LMK_FILE
     tmux kill-session -t $SESSION
 else
