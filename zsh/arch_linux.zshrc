@@ -4,7 +4,7 @@ alias pacman-update-mirrors='sudo reflector --verbose --sort rate -a 1 -n 30 --s
 archlinux-update() {
     yay -Syu --noconfirm
     asp update 
-    pkgfile update
+    sudo pkgfile --update
 
     sudo pacman -Sc --noconfirm 
     if pacman -Qdtq > /dev/null; then 
