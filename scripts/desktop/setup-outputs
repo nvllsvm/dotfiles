@@ -88,12 +88,28 @@ mars() {
 
 
 deimos() {
-    xrandr \
-        --output DP-1 --off \
-        --output HDMI-1 --off \
-        --output HDMI-2 --off \
-        --output eDP-1 --primary --mode 720x1280 --pos 0x0 --rotate right
-    set-x-dpi 96 large
+    if [[ -z $MODE ]]; then
+        if [[ -z $(xrandr | grep '^HDMI-1 connected ' ) ]]; then
+            MODE=internal
+        else
+            MODE=external
+        fi
+    fi
+    if [[ $MODE == "internal" ]]; then
+        xrandr \
+            --output DP-1 --off \
+            --output HDMI-1 --off \
+            --output HDMI-2 --off \
+            --output eDP-1 --primary --mode 720x1280 --pos 0x0 --rotate right
+        set-x-dpi 96 large
+    elif [[ $MODE == "external" ]]; then
+        xrandr \
+            --output DP-1 --off \
+            --output HDMI-1 --primary --mode 1920x1200 --pos 0x0 \
+            --output HDMI-2 --off \
+            --output eDP-1 --off
+        set-x-dpi 96
+    fi
 }
 
 
