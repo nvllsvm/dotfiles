@@ -1,19 +1,25 @@
 #!/bin/bash
 set -e
 
-dispwin -h |& grep Output | awk '{print $1}' | xargs -n 1 dispwin -c -d
+CLEAR_ONLY=$1
 
-if [[ $1 == 'clear' ]]; then
-    exit
-fi
+clear_existing_calibration() {
+    dispwin -h |& grep Output | awk '{print $1}' | xargs -n 1 dispwin -c -d
+
+    if [[ $CLEAR_ONLY == 'clear' ]]; then
+        exit
+    fi
+}
 
 case "$HOSTNAME" in
     "mars")
+        clear_existing_calibration
         dispwin -h |& grep Output | \
         awk '{print $1}' | \
         xargs -I % -n 1 dispwin -c -d% $DOTFILES_DIR/icc/dell_u2412m_custom.icc
         ;;
     "phobos")
+        clear_existing_calibration
         dispwin -d1 $DOTFILES_DIR/icc/xps13_phobos.icc
         ;;
     *)

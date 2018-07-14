@@ -1,8 +1,6 @@
 #!/bin/sh
 xmodmap-caps-to-esc
 
-set-display-phobos
-
 blueberry-tray &
 
 libinput-gestures-setup restart
