@@ -18,6 +18,12 @@ case "$HOSTNAME" in
         awk '{print $1}' | \
         xargs -I % -n 1 dispwin -c -d% $DOTFILES_DIR/icc/dell_u2412m_custom.icc
         ;;
+    "deimos")
+        clear_existing_calibration
+        dispwin -h |& grep Output | \
+        awk '{print $1}' | \
+        xargs -I % -n 1 dispwin -c -d% $DOTFILES_DIR/icc/dell_u2412m_custom.icc
+        ;;
     "phobos")
         clear_existing_calibration
         dispwin -d1 $DOTFILES_DIR/icc/xps13_phobos.icc
