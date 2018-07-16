@@ -89,7 +89,7 @@ mars() {
 
 deimos() {
     if [[ -z $MODE ]]; then
-        if [[ -z $(xrandr | grep '^HDMI-1 connected ' ) ]]; then
+        if [[ -z $(xrandr | grep '^DP-1 connected ' ) ]]; then
             MODE=internal
         else
             MODE=external
@@ -105,8 +105,8 @@ deimos() {
         xbacklight -set 10
     elif [[ $MODE == "external" ]]; then
         xrandr \
-            --output DP-1 --off \
-            --output HDMI-1 --primary --mode 1920x1200 --pos 0x0 \
+            --output DP-1 --primary --mode 1920x1200 --pos 0x0 \
+            --output HDMI-1 --off \
             --output HDMI-2 --off \
             --output eDP-1 --off
         set-x-dpi 96
