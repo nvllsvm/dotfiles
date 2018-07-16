@@ -19,4 +19,14 @@ man() {
     fi
 }
 
+# roughly match util-linux
+uuidgen() {
+    if [ "$#" -eq 0 ]; then
+        /usr/bin/uuidgen | tr "[:upper:]" "[:lower:]"
+    else
+        /usr/bin/uuidgen "$@"
+    fi
+}
+
+
 full-update add brew-update
