@@ -24,6 +24,8 @@ backup_storage1() {
     echo Backing up storage1 ...
     sudo rsync -av --progress --delete \
         --exclude Downloads/Torrent/incomplete \
+        --exclude Downloads/Torrent/completed \
+        --exclude sort \
         $STORAGE1/ $BACKUP1
 }
 
