@@ -48,3 +48,5 @@ check_mounted $BACKUP2
 backup_home
 backup_storage1
 backup_storage2
+
+wasabi-sync
