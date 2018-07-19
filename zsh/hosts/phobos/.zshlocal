@@ -8,5 +8,6 @@
 . $DOTFILES_DIR/zsh/neovim.zshrc
 . $DOTFILES_DIR/zsh/ranger.zshrc
 . $DOTFILES_DIR/zsh/android.zshrc
+. $DOTFILES_DIR/zsh/syncthing.zshrc
 
 full-update add etc-backup-desktop

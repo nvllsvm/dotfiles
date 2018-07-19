@@ -3,6 +3,7 @@
 . $DOTFILES_DIR/zsh/python.zshrc
 . $DOTFILES_DIR/zsh/neovim.zshrc
 . $DOTFILES_DIR/zsh/base16.zshrc
+. $DOTFILES_DIR/zsh/syncthing.zshrc
 
 PROMPT='%F{$vi_mode_color}$%f '
 
