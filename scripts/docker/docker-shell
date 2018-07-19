@@ -1,4 +1,4 @@
 #!/bin/sh
-container_name="docker_shell-$(uuidgen | tr '[:upper:]' '[:lower:]' | tr -d '-')"
+container_name="docker_shell-$(uuidgen)"
 trap "docker kill "${container_name}"" SIGHUP
 docker run --rm -it --name "${container_name}" "$@"
