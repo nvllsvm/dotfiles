@@ -97,18 +97,18 @@ deimos() {
     fi
     if [[ $MODE == "internal" ]]; then
         xrandr \
-            --output DP-1 --off \
-            --output HDMI-1 --off \
-            --output HDMI-2 --off \
-            --output eDP-1 --primary --mode 720x1280 --pos 0x0 --rotate right
+            --output DP1 --off \
+            --output HDMI1 --off \
+            --output HDMI2 --off \
+            --output eDP1 --primary --mode 720x1280 --pos 0x0 --rotate right
         set-x-dpi 96 large
         xbacklight -set 10
     elif [[ $MODE == "external" ]]; then
         xrandr \
-            --output DP-1 --primary --mode 1920x1200 --pos 0x0 \
-            --output HDMI-1 --off \
-            --output HDMI-2 --off \
-            --output eDP-1 --off
+            --output DP1 --primary --mode 1920x1200 --pos 0x0 \
+            --output HDMI1 --off \
+            --output HDMI2 --off \
+            --output eDP1 --off
         set-x-dpi 96
         xbacklight -set 0
     fi
