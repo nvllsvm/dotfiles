@@ -102,7 +102,6 @@ deimos() {
             --output HDMI2 --off \
             --output eDP1 --primary --mode 720x1280 --pos 0x0 --rotate right
         set-x-dpi 96 large
-        xbacklight -set 10
     elif [[ $MODE == "external" ]]; then
         xrandr \
             --output DP1 --primary --mode 1920x1200 --pos 0x0 \
@@ -110,7 +109,6 @@ deimos() {
             --output HDMI2 --off \
             --output eDP1 --off
         set-x-dpi 96
-        xbacklight -set 0
     fi
 }
 
