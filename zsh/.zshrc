@@ -37,6 +37,14 @@ srch () {
     fi
 }
 
+fnd () {
+    find . -iname "*$1*" | grep "$1"
+}
+
+grp () {
+    grep -riI "$1" .
+}
+
 setopt PROMPT_SUBST
 
 insert_mode_color='magenta'

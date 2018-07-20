@@ -47,9 +47,8 @@ endfunction
 
 command FixEmpty :retab | call StripTrailingWhitespace() | :%s/\r//ge
 
-nmap <F8> :TagbarToggle<CR>
 nmap <C-n> :NERDTreeToggle<CR>
-map <F12> :silent! exec "!ctags -R 2> /dev/null"<CR>:echo<CR>
+nmap <C-t> :TableFormat<CR>
 
 let NERDTreeQuitOnOpen=1
 let NERDTreeIgnore=['^__pycache__$[[dir]]', '\.pyc$']
@@ -66,9 +65,6 @@ Plug 'chriskempson/base16-vim'
 Plug 'dbeniamine/todo.txt-vim'
 Plug 'udalov/kotlin-vim'
 Plug 'godlygeek/tabular'
-Plug 'gabrielelana/vim-markdown'
-Plug 'iamcco/mathjax-support-for-mkdp'
-Plug 'iamcco/markdown-preview.vim'
 call plug#end()
 
 " deoplete
