@@ -25,6 +25,7 @@ xinit-$HOSTNAME &
 
 mpd-notification &
 nm-applet &
+blueberry-tray &
 syncthing-gtk &
 
 exec i3

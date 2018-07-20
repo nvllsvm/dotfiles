@@ -1,8 +1,6 @@
 #!/bin/sh
 xmodmap-caps-to-esc
 
-blueberry-tray &
-
 libinput-gestures-setup restart
 
 TOUCHPAD_ID=$(xinput list --id-only 'DLL0665:01 06CB:76AD Touchpad')
