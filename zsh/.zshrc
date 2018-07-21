@@ -38,7 +38,7 @@ srch () {
 }
 
 fnd () {
-    find . -iname "*$1*" | grep "$1"
+    find . -iname "*$1*" | grep -i "$1"
 }
 
 grp () {
