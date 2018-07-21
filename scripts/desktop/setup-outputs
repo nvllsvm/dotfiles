@@ -89,7 +89,7 @@ mars() {
 
 deimos() {
     if [[ -z $MODE ]]; then
-        if [[ -z $(xrandr | grep '^DP-1 connected ' ) ]]; then
+        if [[ -z $(xrandr | grep '^DP1 connected ' ) ]]; then
             MODE=internal
         else
             MODE=external
