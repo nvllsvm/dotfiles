@@ -13,10 +13,19 @@ else
     exit 1
 fi
 
-pandoc \
-    --from "${pandoc_format}" \
-    --to html \
-    -c "${DOTFILES_DIR}"/pandoc/css/github-markdown.css \
-    --self-contained \
-    --standalone \
-    --columns=10000 "$1"
+render() {
+    pandoc \
+        --from "${pandoc_format}" \
+        --to html \
+        -c "${DOTFILES_DIR}"/pandoc/css/github-markdown.css \
+        --self-contained \
+        --standalone \
+        --columns=10000 "$file"
+}
+
+
+if [ -n "$2" ]; then
+    render > "$2"
+else
+    render
+fi
