@@ -1,0 +1,30 @@
+#!/bin/bash
+set -e
+
+NORDVPN_PROTOCOL=tcp
+NORDVPN_DIR=~/.config/nordvpn/ovpn_$NORDVPN_PROTOCOL
+EXTRA_SCRIPT=$(which update-resolv-conf)
+
+if [[ $1 == 'update' ]]; then
+    rm -rf ~/.config/nordvpn
+    curl https://downloads.nordcdn.com/configs/archives/servers/ovpn.zip > /tmp/ovpn.zip
+    7z x /tmp/ovpn.zip "-o$HOME/.config/nordvpn"
+    rm /tmp/ovpn.zip
+    grep -r -L SHA512 ~/.config/nordvpn | xargs rm
+    exit
+elif [[ $1 == 'random' ]]; then
+    config_file="$NORDVPN_DIR/$(ls $NORDVPN_DIR | grep ^us | shuf | head -n 1)"
+elif [[ -n $1  ]]; then
+    echo Unknown argument: \"$1\"
+    exit 1
+else
+    recommended_ip=$(curl -s 'https://nordvpn.com/wp-admin/admin-ajax.php?action=servers_recommendations' | jq '.[0].station' | sed 's/"//g')
+    config_file="$(grep -lr " $recommended_ip " $NORDVPN_DIR)"
+fi
+
+sudo openvpn \
+    --config $config_file \
+    --script-security 2 \
+    --auth-user-pass $DOTFILES_PRIVATE_DIR/nordvpn/auth \
+    --up $EXTRA_SCRIPT \
+    --down $EXTRA_SCRIPT
