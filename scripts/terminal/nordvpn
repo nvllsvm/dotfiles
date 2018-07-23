@@ -18,7 +18,7 @@ elif [[ -n $1  ]]; then
     echo Unknown argument: \"$1\"
     exit 1
 else
-    recommended_ip=$(curl -s 'https://nordvpn.com/wp-admin/admin-ajax.php?action=servers_recommendations' | jq '.[0].station' | sed 's/"//g')
+    recommended_ip=$(curl -s 'https://nordvpn.com/wp-admin/admin-ajax.php?action=servers_recommendations' | jq -r '.[0].station')
     config_file="$(grep -lr " $recommended_ip " $NORDVPN_DIR)"
 fi
 
