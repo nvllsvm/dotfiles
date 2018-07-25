@@ -3,7 +3,6 @@ path=("${DOTFILES_DIR}"/scripts/python  "$path[@]")
 if [[ -d ~/.pyenv ]]; then
     export PYENV_ROOT=~/.pyenv
     path=("$PYENV_ROOT/bin" "$path[@]")
-    eval "$(pyenv init -)"
     full-update add "pyenv-setup"
 fi
 
