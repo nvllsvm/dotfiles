@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+
+PYENV_DIR=~/.pyenv
+
+if [[ -d "${PYENV_DIR}" ]]; then
+    git -C "${PYENV_DIR}" pull
+else
+    git clone https://github.com/pyenv/pyenv.git "${PYENV_DIR}"
+fi
