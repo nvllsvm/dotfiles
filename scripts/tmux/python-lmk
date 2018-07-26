@@ -1,11 +1,11 @@
 #!/bin/bash
 EDITOR="$EDITOR -n"
-SESSION=python-lmk
+SESSION=$(uuidgen)
 
 trap "tmux kill-session -t $SESSION 2> /dev/null" SIGHUP
 trap "tmux kill-session -t $SESSION 2> /dev/null" EXIT
 
-if [[ $(tmux display-message -p '#S' 2> /dev/null) == $SESSION ]]; then
+if [[ $(tmux display-message -p '#S' 2> /dev/null) == $TMUX_SESSION ]]; then
     if [[ $1 == '-p' ]]; then
         PYTHON_BIN=$2
         shift
@@ -39,7 +39,7 @@ else
     unset TMUX
 
     if [[ -n $VIRTUAL_ENV ]]; then
-        tmux new-session -d -s $SESSION "VIRTUAL_ENV="$VIRTUAL_ENV" $0 "$@""
+        tmux new-session -d -s $SESSION "TMUX_SESSION="$SESSION" VIRTUAL_ENV="$VIRTUAL_ENV" $0 "$@""
     else
         tmux new-session -d -s $SESSION $0 "$@"
     fi
