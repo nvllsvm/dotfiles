@@ -41,7 +41,7 @@ else
     if [[ -n $VIRTUAL_ENV ]]; then
         tmux new-session -d -s $SESSION "TMUX_SESSION="$SESSION" VIRTUAL_ENV="$VIRTUAL_ENV" $0 "$@""
     else
-        tmux new-session -d -s $SESSION $0 "$@"
+        tmux new-session -d -s $SESSION "TMUX_SESSION="$SESSION" $0 "$@""
     fi
     tmux set-option -t $SESSION status off
     tmux attach-session -t $SESSION > /dev/null
