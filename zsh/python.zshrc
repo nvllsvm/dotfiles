@@ -11,6 +11,9 @@ if $(test $(command -v python3)); then
 
     if $(test $(command -v pip)); then
         full-update add "pip-update pip-user"
+
+        # and yet again, flake8's dependencies are out-of-fucking-sync, bah
+        full-update add "pip-user install flake8"
     fi
 fi
 
