@@ -1,0 +1,24 @@
+#!/bin/sh
+env_folder=$1
+python_bin=$2
+
+if [[ -z $env_folder ]]; then
+    env_folder=env
+fi
+
+if [[ -z $python_bin ]]; then
+    python_bin=python3
+fi
+
+if [[ ! -d $env_folder ]]; then
+    virtualenv -p $python_bin $env_folder
+    if [[ $? -ne 0 ]]; then
+        rm -r $env_folder
+        return 1
+    fi
+fi
+
+echo . $env_folder/bin/activate > .envrc
+
+direnv allow
+direnv reload
