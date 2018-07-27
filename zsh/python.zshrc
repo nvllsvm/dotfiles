@@ -6,6 +6,7 @@ if [[ -d ~/.pyenv ]]; then
     full-update add "pyenv-setup"
 fi
 
+
 if $(test $(command -v python3)); then
     path=("$(python3 -m site --user-base)/bin"  "$path[@]")
 
