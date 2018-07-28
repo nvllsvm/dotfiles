@@ -1,6 +1,6 @@
 #!/bin/bash
 export COMPOSE_PROJECT_NAME=sol-docker 
-export COMPOSE_FILE=~/Code/Private/sol-docker/docker-compose.yaml
+export COMPOSE_FILE=~/Code/Private/sol-docker/docker-compose.yml
 
 if [[ "$1" == "restart" ]]; then
     if [[ -n "$2" ]]; then
