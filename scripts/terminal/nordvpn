@@ -7,9 +7,9 @@ EXTRA_SCRIPT=$(which update-resolv-conf)
 
 if [[ $1 == 'update' ]]; then
     rm -rf ~/.config/nordvpn
-    curl https://downloads.nordcdn.com/configs/archives/servers/ovpn.zip > /tmp/ovpn.zip
-    7z x /tmp/ovpn.zip "-o$HOME/.config/nordvpn"
-    rm /tmp/ovpn.zip
+    curl https://downloads.nordcdn.com/configs/archives/servers/ovpn.zip > ~/ovpn.zip
+    7z x ~/ovpn.zip "-o$HOME/.config/nordvpn"
+    rm ~/ovpn.zip
     grep -r -L SHA512 ~/.config/nordvpn | xargs rm
     exit
 elif [[ $1 == 'random' ]]; then
