@@ -29,3 +29,5 @@ blueberry-tray &
 syncthing-gtk &
 
 exec i3
+
+pkill -9 -f mpd-notification
