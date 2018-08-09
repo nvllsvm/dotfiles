@@ -1,4 +1,13 @@
-#!/bin/sh
+#!/usr/bin/env bash
 container_name="docker_shell-$(uuidgen)"
 trap "docker kill "${container_name}"" SIGHUP
-docker run --rm -it --name "${container_name}" "$@"
+
+args=()
+if [[ $1 == '-s' ]]; then
+    shift;
+    args=(--entrypoint /bin/sh "${args[@]}")
+fi
+
+args=("${args[@]}" "$@")
+
+docker run --rm -it --name "${container_name}" "${args[@]}"
