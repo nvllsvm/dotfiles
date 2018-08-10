@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+
+if [[ -d "${PYENV_ROOT}" ]]; then
+    git -C "${PYENV_ROOT}" pull
+    pyenv rehash
+else
+    git clone https://github.com/pyenv/pyenv.git "${PYENV_ROOT}"
+fi

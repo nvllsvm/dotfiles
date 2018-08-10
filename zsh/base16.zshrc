@@ -1,6 +1,6 @@
 BASE16_SHELL=$HOME/.config/base16-shell/
 
-if [[ -z $SSH_TTY ]] || [[ $BASE16_ENABLE ]]; then
+if [[ -z $SSH_TTY ]] && [[ -z $TMUX ]]; then
     [ -n "$PS1" ] && [ -s $BASE16_SHELL/profile_helper.sh ] && eval "$(bash $BASE16_SHELL/profile_helper.sh)"
     unset BASE16_THEME
 fi

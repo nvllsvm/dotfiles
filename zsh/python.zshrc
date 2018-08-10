@@ -1,21 +1,17 @@
+export PYENV_ROOT=~/.pyenv
+export PYTHONUSERBASE=~/.pythonuser
+export VIRTUAL_ENV_DISABLE_PROMPT=1
+
 path=("${DOTFILES_DIR}"/scripts/python  "$path[@]")
 
-if [[ -d ~/.pyenv ]]; then
-    export PYENV_ROOT=~/.pyenv
-    path=("$PYENV_ROOT/bin" "$path[@]")
-    full-update add "pyenv-setup"
+if [[ -d "$PYENV_ROOT" ]]; then
+    path=("$PYENV_ROOT/shims" "$PYENV_ROOT/bin" "$path[@]")
+    full-update add "pyenv-update"
 fi
 
+path=("$PYTHONUSERBASE"/bin "$path[@]")
 
-if $(test $(command -v python3)); then
-    path=("$(python3 -m site --user-base)/bin"  "$path[@]")
+full-update add "pip-update pip-user"
 
-    if $(test $(command -v pip)); then
-        full-update add "pip-update pip-user"
-
-        # and yet again, flake8's dependencies are out-of-fucking-sync, bah
-        full-update add "pip-user install flake8"
-    fi
-fi
-
-export VIRTUAL_ENV_DISABLE_PROMPT=1
+# and yet again, flake8's dependencies are out-of-fucking-sync, bah
+full-update add "pip-user install flake8"

@@ -1,4 +1,4 @@
-if [[ $(uname) = "Darwin" ]]; then
+if [[ $OSTYPE = "darwin*" ]]; then
     android_home=~/Library/Android
     path=("/Applications/Android Studio 3.0 Preview.app/Contents/jre/jdk/Contents/Home/bin" "$path[@]")
 else
