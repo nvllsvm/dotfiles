@@ -1,24 +1,35 @@
-#!/bin/sh
-env_folder=$1
-python_bin=$2
+#!/usr/bin/env bash
+set -e
 
-if [[ -z $env_folder ]]; then
-    env_folder=env
+env_root=~/.venv
+parent=$(realpath $(pwd))
+env_folder=$env_root/$(printf $parent | sha256sum | awk '{print $1}')
+
+rm -rf $env_folder .envrc
+
+if [[ $1 == '-d' ]]; then
+    exit
+elif [[ -n $1 ]]; then
+    eval "$(pyenv init -)"
+    pyenv shell $1
 fi
 
-if [[ -z $python_bin ]]; then
-    python_bin=python3
-fi
+mkdir -p $env_root
 
-if [[ ! -d $env_folder ]]; then
-    virtualenv -p $python_bin $env_folder
-    if [[ $? -ne 0 ]]; then
-        rm -r $env_folder
-        return 1
-    fi
+virtualenv -q -p python $env_folder
+if [[ $? -ne 0 ]]; then
+    rm -r $env_folder
+    exit 1
 fi
 
 echo . $env_folder/bin/activate > .envrc
+ln -s $parent $env_folder/.parent
+cat > $env_folder/pip.conf<<EOF
+[global]
+user = false
+EOF
+
+. $env_folder/bin/activate
 
 direnv allow
 direnv reload

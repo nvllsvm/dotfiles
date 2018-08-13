@@ -1,9 +1,9 @@
 #!/bin/bash
 set -e
 
-packages=$(pip-user list --outdated --format=freeze)
+packages=$(pip list --outdated --format=freeze)
 
-pip-user install -U pip setuptools
+pip install -U pip setuptools
 if [[ ! -z $packages ]]; then
-    echo "${packages}" | grep -v '^\-e' | cut -d = -f 1 | xargs pip-user install --upgrade
+    echo "${packages}" | grep -v '^\-e' | cut -d = -f 1 | xargs pip install --upgrade
 fi
