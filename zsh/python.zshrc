@@ -11,7 +11,7 @@ fi
 
 path=("$PYTHONUSERBASE"/bin "$path[@]")
 
-full-update add "pip-update pip-user"
+full-update add "pip-update"
 
 # and yet again, flake8's dependencies are out-of-fucking-sync, bah
-full-update add "pip-user install flake8"
+full-update add "pip install flake8"
