@@ -45,7 +45,7 @@ function StripTrailingWhitespace()
   endif
 endfunction
 
-command FixEmpty :retab | call StripTrailingWhitespace() | :%s/\r//ge
+command FixEmpty :set expandtab | :retab | call StripTrailingWhitespace() | :%s/\r//ge
 
 nmap <C-n> :NERDTreeToggle<CR>
 nmap <C-t> :TableFormat<CR>
