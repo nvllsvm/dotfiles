@@ -3,7 +3,7 @@ set -e
 
 packages=$(pip list --outdated --format=freeze)
 
-pip install -U pip setuptools
+pip install -U pip setuptools wheel
 if [[ ! -z $packages ]]; then
     echo "${packages}" | grep -v '^\-e' | cut -d = -f 1 | xargs pip install --upgrade
 fi
