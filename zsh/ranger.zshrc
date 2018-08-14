@@ -11,3 +11,5 @@ prompt_ranger_active='(ranger)'
 if [ -n "$RANGER_LEVEL" ]; then prompt_ranger=$prompt_ranger_active; fi
 
 PROMPT="$prompt_ranger$PROMPT"
+
+full-update add ranger-update

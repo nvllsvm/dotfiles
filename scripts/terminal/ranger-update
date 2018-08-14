@@ -1,0 +1,14 @@
+#!/bin/sh
+set -e
+
+REPO_DIR=~/.rangerfm
+
+test -d $REPO_DIR || git clone https://github.com/ranger/ranger $REPO_DIR
+
+cd $REPO_DIR
+
+git clean -xdf
+git checkout .
+git pull
+
+pip install -e $REPO_DIR
