@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-env_root=~/.venv
+env_root=~/.cache/venv
 parent=$(realpath $(pwd))
 env_folder=$env_root/$(printf $parent | sha256sum | awk '{print $1}')
 
