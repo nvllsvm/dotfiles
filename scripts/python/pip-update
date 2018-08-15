@@ -1,5 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
+
+if ! [ -x "$(command -v pip)" ]; then
+    curl -O https://bootstrap.pypa.io/get-pip.py
+    python get-pip.py --user
+    rm get-pip.py
+fi
 
 packages=$(pip list --outdated --format=freeze)
 
