@@ -11,4 +11,4 @@ git clean -xdf
 git checkout .
 git pull
 
-pip install -e $REPO_DIR
+pip install $REPO_DIR
