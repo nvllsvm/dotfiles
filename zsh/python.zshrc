@@ -1,5 +1,5 @@
-export PYENV_ROOT=~/.pyenv
-export PYTHONUSERBASE=~/.pythonuser
+export PYENV_ROOT=~/.local/git/pyenv
+export PYTHONUSERBASE=~/.local/pythonuser
 export VIRTUAL_ENV_DISABLE_PROMPT=1
 
 path=("${DOTFILES_DIR}"/scripts/python  "$path[@]")
