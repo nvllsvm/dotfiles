@@ -1,9 +1,4 @@
 #!/bin/sh
-port=$(docker-compose port "$1" $2 | cut -d: -f2)
-
-if [[ $port == '' ]]; then
-    echo Error: No port found
-    exit 1
-else
-    echo $port
-fi
+set -e
+port=$(docker-compose port "$@")
+printf $port | cut -d: -f2
