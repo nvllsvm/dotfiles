@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+import argparse
+import functools
+import json
+import os
+import sys
+
+
+def __write(obj, bytes_mode, value):
+    if not bytes_mode:
+        if isinstance(value, str):
+            value = value.encode()
+        elif not isinstance(value, bytes):
+            value = str(value).encode()
+    try:
+        obj.buffer.write(value)
+    except TypeError as e:
+        sys.stderr.write(f'error: unable to write output. {str(e)}\n')
+        sys.exit(1)
+    obj.flush()
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('command')
+    parser.add_argument(
+        '-b',
+        action='store_const',
+        const=True,
+        default=False,
+        dest='bytes_mode',
+        help='Read/write in bytes'
+    )
+    args = parser.parse_args()
+    exec_command(args.command, args.bytes_mode)
+
+
+def exec_command(command, bytes_mode):
+    if not sys.stdin.isatty():
+        stdin = sys.stdin.buffer.read()
+        if not bytes_mode:
+            stdin = stdin.decode()
+
+    # convenience variables
+    stdout = functools.partial(__write, sys.stdout, bytes_mode)
+    stderr = functools.partial(__write, sys.stderr, bytes_mode)
+    env = dict(os.environ)
+    exit = sys.exit
+
+    exec(command)
+
+
+if __name__ == '__main__':
+    main()
