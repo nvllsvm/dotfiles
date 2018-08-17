@@ -2,7 +2,6 @@
 import argparse
 import functools
 import json
-import os
 import sys
 
 
@@ -32,7 +31,7 @@ def main():
         const='bytes',
         default=False,
         dest='mode',
-        help='Read/write in bytes'
+        help='Read/write as bytes'
     )
     group.add_argument(
         '-j',
@@ -40,18 +39,21 @@ def main():
         const='json',
         default=False,
         dest='mode',
-        help='Read/write in bytes'
+        help='Read/write as JSON'
+    )
+    group.add_argument(
+        '-d', dest='delimiter', default=False,
+        help='Set to process input in chunks'
     )
     args = parser.parse_args()
-    exec_command(args.command, args.mode)
 
-
-def exec_command(command, mode):
-    if not sys.stdin.isatty():
+    if sys.stdin.isatty():
+        inp = None
+    else:
         inp = sys.stdin.buffer.read()
-        if mode != 'bytes':
+        if args.mode != 'bytes':
             inp = inp.decode()
-            if mode == 'json':
+            if args.mode == 'json':
                 try:
                     inp = json.loads(inp)
                 except json.JSONDecodeError:
@@ -62,12 +64,16 @@ def exec_command(command, mode):
                     sys.exit(1)
 
     # convenience variables
-    out = functools.partial(__write, sys.stdout, mode)
-    err = functools.partial(__write, sys.stderr, mode)
-    env = dict(os.environ)
-    exit = sys.exit
+    out = functools.partial(__write, sys.stdout, args.mode)
+    err = functools.partial(__write, sys.stderr, args.mode)
 
-    exec(command)
+    if args.delimiter:
+        delimiter = args.delimiter.encode().decode('unicode_escape')
+        lines = inp.strip().split(delimiter)
+        for inp in lines:
+            exec(args.command)
+    else:
+        exec(args.command)
 
 
 if __name__ == '__main__':
