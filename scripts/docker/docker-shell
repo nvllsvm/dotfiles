@@ -10,10 +10,4 @@ fi
 
 args=("${args[@]}" "$@")
 
-# Ugh - docker run needs a --pull flag
-# https://github.com/moby/moby/issues/13331
-if [[ $1 != '-*' ]]; then
-    docker pull $1 > /dev/null
-fi
-
 docker run --rm -it --name "${container_name}" "${args[@]}"
