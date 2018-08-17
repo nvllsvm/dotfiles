@@ -6,16 +6,18 @@ import os
 import sys
 
 
-def __write(obj, bytes_mode, value):
-    if not bytes_mode:
-        if isinstance(value, str):
-            value = value.encode()
-        elif not isinstance(value, bytes):
-            value = str(value).encode()
+def __write(obj, mode, value):
     try:
+        if mode != 'bytes':
+            if mode == 'json':
+                value = json.dumps(value)
+            if isinstance(value, str):
+                value = value.encode()
+            elif not isinstance(value, bytes):
+                value = str(value).encode()
         obj.buffer.write(value)
     except TypeError as e:
-        sys.stderr.write(f'error: unable to write output. {str(e)}\n')
+        print(f'error: unable to write output. {str(e)}', file=sys.stderr)
         sys.exit(1)
     obj.flush()
 
@@ -23,27 +25,45 @@ def __write(obj, bytes_mode, value):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('command')
-    parser.add_argument(
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(
         '-b',
         action='store_const',
-        const=True,
+        const='bytes',
         default=False,
-        dest='bytes_mode',
+        dest='mode',
+        help='Read/write in bytes'
+    )
+    group.add_argument(
+        '-j',
+        action='store_const',
+        const='json',
+        default=False,
+        dest='mode',
         help='Read/write in bytes'
     )
     args = parser.parse_args()
-    exec_command(args.command, args.bytes_mode)
+    exec_command(args.command, args.mode)
 
 
-def exec_command(command, bytes_mode):
+def exec_command(command, mode):
     if not sys.stdin.isatty():
-        stdin = sys.stdin.buffer.read()
-        if not bytes_mode:
-            stdin = stdin.decode()
+        inp = sys.stdin.buffer.read()
+        if mode != 'bytes':
+            inp = inp.decode()
+            if mode == 'json':
+                try:
+                    inp = json.loads(inp)
+                except json.JSONDecodeError:
+                    print(
+                        'error: stdin is not valid json',
+                        file=sys.stderr
+                    )
+                    sys.exit(1)
 
     # convenience variables
-    stdout = functools.partial(__write, sys.stdout, bytes_mode)
-    stderr = functools.partial(__write, sys.stderr, bytes_mode)
+    out = functools.partial(__write, sys.stdout, mode)
+    err = functools.partial(__write, sys.stderr, mode)
     env = dict(os.environ)
     exit = sys.exit
 
