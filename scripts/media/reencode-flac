@@ -5,20 +5,11 @@ import os
 import pathlib
 import subprocess
 
-import harmonize
+import harmonize.app as harmonize
 import mutagen
 
 
 POOL_SIZE = multiprocessing.cpu_count()
-
-
-def pipe_to_flac(pipe, target):
-    subprocess.run(
-        ['flac', '-s', '--best', '-V', '-f', '-o', target, '-'],
-        input=pipe,
-        stdout=subprocess.DEVNULL,
-        check=True
-    )
 
 
 def copy_tags(source, target):
@@ -30,12 +21,19 @@ def copy_tags(source, target):
 
 def reencode_flac(source):
     print(f'Reencoding {source}')
-    pipe = harmonize.decode_flac_to_stdout(source)
-    with harmonize.TempPath(dir=source.parent, suffix='.flac') as temp_path:
-        pipe_to_flac(pipe, temp_path)
-        copy_tags(source, temp_path)
-        source.unlink()
-        temp_path.rename(source)
+    with harmonize.decode_flac_to_stdout(source) as decode:
+        with harmonize.TempPath(dir=source.parent, suffix='.flac') as temp_path:
+            encode = subprocess.Popen(
+                ['flac', '-s', '--best', '-V', '-f', '-o', temp_path, '-'],
+                stdin=decode.stdout,
+                stdout=subprocess.DEVNULL
+            )
+            encode.wait()
+            if encode.returncode:
+                raise subprocess.CalledProcessError(encode.returncode, encode.args)
+            copy_tags(source, temp_path)
+            source.unlink()
+            temp_path.rename(source)
 
 
 def find_endswith(ending, directory):
