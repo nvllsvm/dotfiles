@@ -1,7 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 set -e
-
-for file in $(find "$1" -type f -iname '*.avi'); do
-    mkvmerge -o "${file}".mkv "${file}"
-    rm "${file}"
-done
+mkvmerge -o "$1".mkv "$1"
+rm "$1"
