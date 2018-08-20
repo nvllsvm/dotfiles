@@ -1,15 +1,14 @@
 export PYENV_ROOT=~/.local/git/pyenv
-export PYTHONUSERBASE=~/.local/pythonuser
 
-if command -v pyenv > /dev/null; then
+if [[ -d "$PYENV_ROOT" ]]; then
+    export PYTHONUSERBASE=~/.local/pythonuser
+
+    path=("$PYENV_ROOT/shims" "$PYENV_ROOT/bin" "$path[@]")
+    full-update add "pyenv-update"
+
     export VIRTUAL_ENV_DISABLE_PROMPT=1
 
     path=("${DOTFILES_DIR}"/scripts/python  "$path[@]")
-
-    if [[ -d "$PYENV_ROOT" ]]; then
-        path=("$PYENV_ROOT/shims" "$PYENV_ROOT/bin" "$path[@]")
-        full-update add "pyenv-update"
-    fi
 
     path=("$PYTHONUSERBASE"/bin "$path[@]")
 
@@ -17,4 +16,6 @@ if command -v pyenv > /dev/null; then
 
     # and yet again, flake8's dependencies are out-of-fucking-sync, bah
     full-update add flake8-update
+else
+    unset PYENV_ROOT
 fi

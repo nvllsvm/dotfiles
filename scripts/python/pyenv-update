@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -e
+PYENV_ROOT=~/.local/git/pyenv
 
 if [[ -d "${PYENV_ROOT}" ]]; then
     git -C "${PYENV_ROOT}" pull
