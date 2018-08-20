@@ -1,0 +1,14 @@
+#!/bin/sh
+set -e
+
+REPO_DIR=~/.local/git/flake8
+
+test -d $REPO_DIR || git clone https://gitlab.com/pycqa/flake8 $REPO_DIR
+
+cd $REPO_DIR
+
+git clean -xdf
+git checkout .
+git pull
+
+pip install $REPO_DIR
