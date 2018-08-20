@@ -1,11 +1,1 @@
-. $DOTFILES_DIR/zsh/update.zshrc
-. $DOTFILES_DIR/zsh/direnv.zshrc
-. $DOTFILES_DIR/zsh/dotfiles.zshrc
-. $DOTFILES_DIR/zsh/macos.zshrc
-. $DOTFILES_DIR/zsh/ranger.zshrc
-. $DOTFILES_DIR/zsh/python.zshrc
-. $DOTFILES_DIR/zsh/neovim.zshrc
-. $DOTFILES_DIR/zsh/android.zshrc
-. $DOTFILES_DIR/zsh/base16.zshrc
-. $DOTFILES_DIR/zsh/syncthing.zshrc
 . ~/Code/AWeber/andrewr/dotfiles-aweber/zsh/aweber.zshrc
