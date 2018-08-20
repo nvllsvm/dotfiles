@@ -9,3 +9,4 @@ host_scripts="${DOTFILES_DIR}/scripts/hosts/$HOST"
 if [ -d "$host_scripts" ]; then
     path=("$host_scripts" "$path[@]")
 fi
+unset host_scripts
