@@ -62,9 +62,7 @@ RPROMPT="$prompt_current_dir"
 typeset -U path
 
 if [[ -d ~/.bin/ ]]; then
-    for dir in ~/.bin/*; do
-        path=($dir "$path[@]")
-    done
+    path=($dir "$path[@]")
 fi
 
 bindkey -v
