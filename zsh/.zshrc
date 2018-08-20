@@ -60,10 +60,7 @@ PROMPT="$prompt_user$prompt_separator$prompt_host  "
 RPROMPT="$prompt_current_dir"
 
 typeset -U path
-
-if [[ -d ~/.bin/ ]]; then
-    path=($dir "$path[@]")
-fi
+path=(~/.bin "$path[@]")
 
 bindkey -v
 
