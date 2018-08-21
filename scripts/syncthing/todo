@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 
-. "${DOTFILES_DIR}"/zsh/env/syncthing.env
 TODO_FILE="${SYNCTHING_DIR}"/Notes/todo.txt
 
 if [[ $# -eq 1 && $1 == '-l' ]]; then

@@ -1,1 +1,2 @@
 . ~/Code/AWeber/andrewr/dotfiles-aweber/zsh/aweber.zshrc
+export SYNCTHING_DIR=~/Syncthing
