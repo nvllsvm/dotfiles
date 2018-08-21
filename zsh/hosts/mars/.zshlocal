@@ -1,12 +1,3 @@
-. $DOTFILES_DIR/zsh/update.zshrc
-. $DOTFILES_DIR/zsh/direnv.zshrc
-. $DOTFILES_DIR/zsh/dotfiles.zshrc
 . ~/Code/Private/dotfiles-private/zsh/dotfiles-private.zshrc
-. $DOTFILES_DIR/zsh/arch_linux.zshrc
-. $DOTFILES_DIR/zsh/base16.zshrc
-. $DOTFILES_DIR/zsh/neovim.zshrc
-. $DOTFILES_DIR/zsh/python.zshrc
-. $DOTFILES_DIR/zsh/ranger.zshrc
-. $DOTFILES_DIR/zsh/android.zshrc
-. $DOTFILES_DIR/zsh/syncthing.zshrc
+export SYNCTHING_DIR=~/Syncthing
 full-update add etc-backup-desktop
