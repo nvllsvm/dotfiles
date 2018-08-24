@@ -15,11 +15,22 @@ elif [[ -n $1 ]]; then
 fi
 
 mkdir -p $env_root
-
-virtualenv -q -p python $env_folder
-if [[ $? -ne 0 ]]; then
-    rm -r $env_folder
-    exit 1
+if [[ $(python -c 'import sys; print(sys.version_info >= (3,3))') == 'False' ]]; then
+    set +e
+    virtualenv -q -p python $env_folder
+    if [[ $? -ne 0 ]]; then
+        rm -r $env_folder
+        exit 1
+    fi
+    set -e
+else
+    set +e
+    python -m venv $env_folder
+    if [[ $? -ne 0 ]]; then
+        rm -r $env_folder
+        exit 1
+    fi
+    set -e
 fi
 
 echo . $env_folder/bin/activate > .envrc
