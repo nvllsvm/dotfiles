@@ -1,14 +1,2 @@
-#!/bin/sh
-set -e
-
-REPO_DIR=~/.local/git/ranger
-
-test -d $REPO_DIR || git clone https://github.com/ranger/ranger $REPO_DIR
-
-cd $REPO_DIR
-
-git clean -xdf
-git checkout .
-git pull
-
-pip install $REPO_DIR
+#!/usr/bin/env sh
+pip install $(git install https://github.com/ranger/ranger)

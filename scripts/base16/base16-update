@@ -1,12 +1,2 @@
-#!/bin/sh
-set -e
-
-REPO_DIR=~/.local/git/base16-shell
-
-test -d $REPO_DIR || git clone https://github.com/chriskempson/base16-shell.git $REPO_DIR
-
-cd $REPO_DIR
-
-git clean -xdf
-git checkout .
-git pull
+#!/usr/bin/env sh
+git install https://github.com/chriskempson/base16-shell
