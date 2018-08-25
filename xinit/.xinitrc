@@ -12,14 +12,14 @@ export MOZ_USE_XINPUT2=1
 
 setxkbmap -option terminate:ctrl_alt_bksp
 xset -dpms; xset s off
+setup-outputs
+
 i3-config-build
 
 compton &
 /usr/lib/gsd-xsettings &
 xbindkeys &
 xss-lock -- lock-screen &
-
-setup-outputs
 
 xinit-$HOSTNAME &
 
