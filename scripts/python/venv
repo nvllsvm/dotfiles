@@ -33,6 +33,8 @@ else
     set -e
 fi
 
+pip-update
+
 echo . $env_folder/bin/activate > .envrc
 ln -s $parent $env_folder/.parent
 cat > $env_folder/pip.conf<<EOF
