@@ -33,8 +33,6 @@ else
     set -e
 fi
 
-pip-update
-
 echo . $env_folder/bin/activate > .envrc
 ln -s $parent $env_folder/.parent
 cat > $env_folder/pip.conf<<EOF
@@ -43,6 +41,8 @@ user = false
 EOF
 
 . $env_folder/bin/activate
+
+pip-update
 
 direnv allow
 direnv reload
