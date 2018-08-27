@@ -61,6 +61,12 @@ RPROMPT="$prompt_current_dir"
 
 typeset -U path
 path=(~/.bin "$path[@]")
+setopt +o nomatch
+for dir in ~/.bin/*/; do
+path=($dir "$path[@]")
+    path=($dir "$path[@]")
+done
+setopt -o nomatch
 
 bindkey -v
 

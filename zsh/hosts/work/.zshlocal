@@ -1,2 +1,3 @@
 . ~/Code/AWeber/andrewr/dotfiles-aweber/zsh/aweber.zshrc
 export SYNCTHING_DIR=~/Syncthing
+full-update add 'git-install github:nvllsvm/shtty'
