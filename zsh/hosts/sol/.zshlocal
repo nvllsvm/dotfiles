@@ -1,3 +1,4 @@
 . ~/Code/Private/dotfiles-private/zsh/dotfiles-private.zshrc
 export SYNCTHING_DIR=~/Syncthing
 full-update add 'git-auto-update ~/Code/Private/sol-docker'
+full-update add 'git install gitlab:nvllsvm/shtty'
