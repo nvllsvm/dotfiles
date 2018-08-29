@@ -33,12 +33,18 @@ else
     set -e
 fi
 
-echo . $env_folder/bin/activate > .envrc
+echo . $env_folder/bin/activate > $env_folder/.envrc
 ln -s $parent $env_folder/.parent
 cat > $env_folder/pip.conf<<EOF
 [global]
 user = false
 EOF
+
+cd $env_folder
+direnv allow
+cd -
+
+cp $env_folder/.envrc .
 
 . $env_folder/bin/activate
 
