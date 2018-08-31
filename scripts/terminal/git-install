@@ -30,7 +30,7 @@ _update() {
 
     cd "$REPO_DIR"
 
-    if [ -z NO_CLEAN ]; then
+    if [ -z $NO_CLEAN ]; then
         git clean -xdf
     fi
     git checkout .

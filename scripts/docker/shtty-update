@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+set -e
+mkdir -p ~/.bin
+rm -rf ~/.bin/shtty
+ln -s $(git install gitlab:nvllsvm/shtty)/bin ~/.bin/shtty
