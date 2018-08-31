@@ -10,13 +10,16 @@ log() {
 
 all_containers=$(docker ps -aq)
 
-log "Stopping and removing containers ..."
+log "Killing containers ..."
 if [ -n "$all_containers" ]; then
-    docker stop -t 0 $all_containers > /dev/null
-    docker rm -f $all_containers > /dev/null
+    docker kill $all_containers
+fi
+log "Removing containers ..."
+if [ -n "$all_containers" ]; then
+    docker rm -f $all_containers
 fi
 
 log "Pruning volumes ..."
-docker volume prune -f > /dev/null
+docker volume prune -f
 log "Pruning networks ..."
-docker network prune -f > /dev/null
+docker network prune -f
