@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 NOTES_DIR="${SYNCTHING_DIR}"/Notes
 cd "${NOTES_DIR}"
 if [[ $# -eq 0 ]]; then
