@@ -1,3 +1,2 @@
 . ~/Code/Private/dotfiles-private/zsh/dotfiles-private.zshrc
-export SYNCTHING_DIR=~/Syncthing
 full-update add etc-backup-desktop
