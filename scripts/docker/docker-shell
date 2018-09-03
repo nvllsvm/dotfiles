@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 container_name="docker_shell-$(uuidgen)"
-trap "docker kill "${container_name}"" SIGHUP
+trap "docker kill "${container_name}" >& /dev/null || true" SIGHUP EXIT
 
 args=()
 if [[ $1 == '-s' ]]; then
