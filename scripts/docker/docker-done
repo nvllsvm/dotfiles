@@ -1,6 +1,4 @@
 #!/bin/sh
-set -e
-
 YELLOW='\033[1;33m'
 RESET_COLOR='\033[0m'
 
