@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-container_name="docker_shell-$(uuidgen)"
+container_name="docker_shell-$(uuidgen | tr -d -)"
 trap "docker kill "${container_name}" >& /dev/null || true" SIGHUP EXIT
 
 args=()
