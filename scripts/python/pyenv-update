@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-$(git install https://github.com/pyenv/pyenv)/bin/pyenv rehash
+$(git install -k https://github.com/pyenv/pyenv)/bin/pyenv rehash
