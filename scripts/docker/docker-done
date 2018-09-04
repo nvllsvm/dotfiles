@@ -1,18 +1,13 @@
-#!/bin/sh
+#!/usr/bin/env sh
 YELLOW='\033[1;33m'
 RESET_COLOR='\033[0m'
 
 log() {
-    printf "${YELLOW}$1${RESET_COLOR}\n"
+    printf "${YELLOW}$@${RESET_COLOR}\n"
 }
 
+log "Removing all containers ..."
 all_containers=$(docker ps -aq)
-
-log "Killing containers ..."
-if [ -n "$all_containers" ]; then
-    docker kill $all_containers
-fi
-log "Removing containers ..."
 if [ -n "$all_containers" ]; then
     docker rm -f $all_containers
 fi

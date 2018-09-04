@@ -2,7 +2,7 @@
 \set HISTCONTROL ignoreboth
 
 -- Keep a different history file for each database name you log on to.
-\set HISTFILE /tmp/psql_history/:DBNAME
+\set HISTFILE ~/.cache/psql_history/:DBNAME
 
 -- Keep a history of the last 2000 commands.
 \set HISTSIZE 2000
