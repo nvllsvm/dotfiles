@@ -1,7 +1,7 @@
 if command -v direnv > /dev/null; then
     eval "$(direnv hook zsh)"
 
-    alias direnv='DIRENV_LOG_FORMAT= direnv'
+    export DIRENV_LOG_FORMAT=
 
     direnv_indicator() {
         if [[ -z $DIRENV_DIR ]] then
