@@ -1,5 +1,5 @@
 #!/bin/sh
-if [ "$(tmux list-sessions)" ]; then
+if [ "$(tmux list-sessions >& /dev/null)" ]; then
     exec tmux a -d
 else
     exec tmux
