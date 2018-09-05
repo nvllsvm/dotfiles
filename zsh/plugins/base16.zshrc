@@ -1,14 +1,21 @@
 BASE16_SHELL=$HOME/.local/git/base16-shell/
 
 if [[ -z $SSH_TTY ]] && [[ -z $TMUX ]]; then
-    [ -n "$PS1" ] && [ -s $BASE16_SHELL/profile_helper.sh ] && eval "$($BASE16_SHELL/profile_helper.sh)"
-    unset BASE16_THEME
+    if [ -f ~/.base16_theme ]; then
+      . ~/.base16_theme
+    fi
 fi
 
+for script in $BASE16_SHELL/scripts/base16*.sh; do
+  script_name=${script##*/}
+  script_name=${script_name%.sh}
+  theme=${script_name#*-}
+  alias "base16_${theme}"="_base16 $script"
+done;
+
 _base16 () {
-    local script=$1
-    [ -f $script ] && . $script
-    ln -fs $script ~/.base16_theme
+    ln -fs $1 ~/.base16_theme
+    . ~/.base16_theme
     load-xresources-theme 2> /dev/null || true
 }
 
