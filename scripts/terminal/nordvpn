@@ -22,7 +22,7 @@ else
     config_file="$(grep -lr " $recommended_ip " $NORDVPN_DIR)"
 fi
 
-sudo openvpn \
+exec sudo openvpn \
     --config $config_file \
     --script-security 2 \
     --auth-user-pass $DOTFILES_PRIVATE_DIR/nordvpn/auth \

@@ -23,11 +23,10 @@ xss-lock -- lock-screen &
 
 xinit-$HOSTNAME &
 
+pkill -9 -f mpd-notification
 mpd-notification &
 nm-applet &
 blueberry-tray &
 syncthing-gtk &
 
 exec i3
-
-pkill -9 -f mpd-notification

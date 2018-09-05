@@ -11,7 +11,7 @@ if [[ "$NAME" == 'termite' ]]; then
 fi
 
 if [ -d "${CWD}" ]; then
-    termite -d "${CWD}" &
+    exec termite -d "${CWD}"
 else
-    termite &
+    exec termite
 fi

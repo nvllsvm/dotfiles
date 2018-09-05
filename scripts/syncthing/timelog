@@ -5,4 +5,4 @@ if [ -z $1 ]; then
 else
     DATE=$1
 fi
-"${EDITOR}" "${SYNCTHING_DIR}"/Notes/Journal/${DATE}
+exec "${EDITOR}" "${SYNCTHING_DIR}"/Notes/Journal/${DATE}

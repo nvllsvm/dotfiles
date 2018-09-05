@@ -10,4 +10,4 @@ fi
 
 cd $ANDROID_HOME/emulator
 export ANDROID_EMULATOR_USE_SYSTEM_LIBS=1
-emulator -avd $NAME
+exec emulator -avd $NAME

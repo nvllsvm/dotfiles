@@ -1,8 +1,8 @@
 #!/bin/bash
 if type xclip >& /dev/null ; then
-    xclip -selection c
+    exec xclip -selection c
 elif type termux-clipboard-set >& /dev/null ; then
-    termux-clipboard-set
+    exec termux-clipboard-set
 elif type pbcopy >& /dev/null ; then
-    pbcopy
+    exec pbcopy
 fi
