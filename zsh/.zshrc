@@ -115,7 +115,7 @@ bindkey '^r' sudo-command-line
 bindkey -M vicmd '^r' sudo-command-line
 
 fpath=($DOTFILES_DIR/zsh/functions $fpath)
-compinit
+compinit -C
 
 autoload -Uz bracketed-paste-magic
 zle -N bracketed-paste bracketed-paste-magic
@@ -146,3 +146,5 @@ exec-update() {
 for plugin in $DOTFILES_DIR/zsh/plugins/*; do
     . $plugin
 done
+
+full-update add compdump
