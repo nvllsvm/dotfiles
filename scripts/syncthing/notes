@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 NOTES_DIR="${SYNCTHING_DIR}"/Notes
 cd "${NOTES_DIR}"
 ARGS="${@:-${NOTES_DIR}}"
