@@ -68,8 +68,6 @@ Plug 'udalov/kotlin-vim'
 Plug 'godlygeek/tabular'
 Plug 'iamcco/mathjax-support-for-mkdp'
 Plug 'iamcco/markdown-preview.vim'
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
 call plug#end()
 
 let g:jedi#completions_enabled = 0
@@ -143,14 +141,13 @@ au FileType python set foldmethod=indent
 
 let g:markdown_enable_spell_checking = 0
 
-let g:airline#extensions#tabline#enabled = 2
-let g:airline#extensions#tabline#fnamemod = ':t'
-let g:airline#extensions#tabline#left_sep = ' '
-let g:airline#extensions#tabline#left_alt_sep = '|'
-let g:airline#extensions#tabline#right_sep = ' '
-let g:airline#extensions#tabline#right_alt_sep = '|'
-let g:airline_left_sep = ' '
-let g:airline_left_alt_sep = '|'
-let g:airline_right_sep = ' '
-let g:airline_right_alt_sep = '|'
-let g:airline_theme= 'base16'
+" Status Line {
+        set laststatus=2                             " always show statusbar
+        set statusline=
+        set statusline+=%-4.3n\                     " buffer number
+        set statusline+=%f\                          " filename
+        set statusline+=%h%m%r%w                     " status flags
+        set statusline+=%=                           " right align remainder
+        set statusline+=%-14(%l,%c%V%)               " line, character
+        set statusline+=%<%P                         " file position
+"}
