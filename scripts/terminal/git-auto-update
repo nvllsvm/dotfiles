@@ -19,12 +19,12 @@ if [[ $error_code != 0 ]]; then
     exit $error_code
 fi
 
-branch=$(git rev-parse --abbrev-ref HEAD)
 if [ $(git status --porcelain | wc -l) -gt 0 ]; then
     git add -A
     git commit -m "git-auto-update $(date +"%Y-%m-%d %H:%M:%S")"
 fi
 
-if [ $(git log origin/master..master | wc -l) -gt 0 ]; then
+branch=$(git rev-parse --abbrev-ref HEAD)
+if [ $(git log origin/$branch..$branch | wc -l) -gt 0 ]; then
     git push
 fi
