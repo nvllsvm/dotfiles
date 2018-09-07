@@ -14,4 +14,5 @@ if command -v pacman > /dev/null; then
     }
 
     full-update add 'archlinux-update'
+    full-update add 'etc-backup-desktop'
 fi

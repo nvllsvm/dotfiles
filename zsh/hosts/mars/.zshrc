@@ -1,2 +1,1 @@
 . ~/Code/Private/dotfiles-private/zsh/dotfiles-private.zshrc
-full-update add etc-backup-desktop

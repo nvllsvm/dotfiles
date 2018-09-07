@@ -145,7 +145,9 @@ exec-update() {
     fi
 }
 
-[[ -r ~/.zshlocal ]] && . ~/.zshlocal
+zshrc_host="$DOTFILES_DIR/zsh/hosts/$HOST/.zshrc"
+[[ -r "$zshrc_host" ]] && . "$zshrc_host"
+unset zshrc_host
 
 for plugin in $DOTFILES_DIR/zsh/plugins/*; do
     . $plugin
