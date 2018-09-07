@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 if [ -z $1 ]; then
     if git status 2> /dev/null; then
         GIT_DIR='.'
@@ -19,7 +19,12 @@ if [[ $error_code != 0 ]]; then
     exit $error_code
 fi
 
-git add -A
-git commit -m "git-auto-update $(date +"%Y-%m-%d %H:%M:%S")"
-git push
-cd - > /dev/null
+branch=$(git rev-parse --abbrev-ref HEAD)
+if [ $(git status --porcelain | wc -l) -gt 0 ]; then
+    git add -A
+    git commit -m "git-auto-update $(date +"%Y-%m-%d %H:%M:%S")"
+fi
+
+if [ $(git log origin/master..master | wc -l) -gt 0 ]; then
+    git push
+fi
