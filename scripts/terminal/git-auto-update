@@ -15,11 +15,11 @@ git pull
 
 error_code=$?
 
-if [[ $error_code == 0 ]]; then
-    git add -A
-    git commit -m "git-auto-update $(date +"%Y-%m-%d %H:%M:%S")"
-    git push
-    cd - > /dev/null
-else
-    echo Unable to pull.
+if [[ $error_code != 0 ]]; then
+    exit $error_code
 fi
+
+git add -A
+git commit -m "git-auto-update $(date +"%Y-%m-%d %H:%M:%S")"
+git push
+cd - > /dev/null
