@@ -145,12 +145,12 @@ exec-update() {
     fi
 }
 
-zshrc_host="$DOTFILES_DIR/zsh/hosts/$HOST/.zshrc"
-[[ -r "$zshrc_host" ]] && . "$zshrc_host"
-unset zshrc_host
-
 for plugin in $DOTFILES_DIR/zsh/plugins/*; do
     . $plugin
 done
+
+zshrc_host="$DOTFILES_DIR/zsh/hosts/$HOST/.zshrc"
+[[ -r "$zshrc_host" ]] && . "$zshrc_host"
+unset zshrc_host
 
 full-update add compdump
