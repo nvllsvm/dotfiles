@@ -1,4 +1,4 @@
 #!/bin/sh
-export ASPELL_CONF="per-conf ${HOME}/.config/aspell/aspell.conf; home-dir ${HOME}/.config/aspell"
+export ASPELL_CONF="per-conf ${DOTFILES_DIR}/aspell/aspell.conf; home-dir ${DOTFILES_DIR}/aspell"
 BIN=$(which -a aspell | head -n 2 | tail -n 1)
 exec "${BIN}" "$@"

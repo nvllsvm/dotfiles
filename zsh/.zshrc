@@ -66,6 +66,10 @@ for dir in ~/.bin/*/; do
 path=($dir "$path[@]")
     path=($dir "$path[@]")
 done
+for dir in ~/.local/bin/*/; do
+path=($dir "$path[@]")
+    path=($dir "$path[@]")
+done
 setopt -o nomatch
 
 bindkey -v
