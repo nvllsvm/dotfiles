@@ -1,10 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 
 TODO_FILE="${SYNCTHING_DIR}"/Notes/todo.txt
 
 if [ -n "$(find "${SYNCTHING_DIR}/Notes" -maxdepth 1 -name 'todo.*.txt')" ] ; then
-    echo error: sync conflict detected
+    echo error: sync conflict detected >&2
     exit 1
 fi
 

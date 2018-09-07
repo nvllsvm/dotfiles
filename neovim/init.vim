@@ -57,6 +57,7 @@ call plug#begin('~/.config/nvim/plugged')
 Plug 'Shougo/deoplete.nvim'
 Plug 'scrooloose/nerdtree'
 Plug 'gregsexton/MatchTag'
+Plug 'davidhalter/jedi-vim'
 Plug 'zchee/deoplete-jedi'
 Plug 'Vimjas/vim-python-pep8-indent'
 Plug 'neomake/neomake'
@@ -67,7 +68,11 @@ Plug 'udalov/kotlin-vim'
 Plug 'godlygeek/tabular'
 Plug 'iamcco/mathjax-support-for-mkdp'
 Plug 'iamcco/markdown-preview.vim'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
 call plug#end()
+
+let g:jedi#completions_enabled = 0
 
 " deoplete
 let g:deoplete#enable_at_startup = 1
@@ -137,3 +142,15 @@ au BufNewFile,BufRead *.avsc set filetype=json
 au FileType python set foldmethod=indent
 
 let g:markdown_enable_spell_checking = 0
+
+let g:airline#extensions#tabline#enabled = 2
+let g:airline#extensions#tabline#fnamemod = ':t'
+let g:airline#extensions#tabline#left_sep = ' '
+let g:airline#extensions#tabline#left_alt_sep = '|'
+let g:airline#extensions#tabline#right_sep = ' '
+let g:airline#extensions#tabline#right_alt_sep = '|'
+let g:airline_left_sep = ' '
+let g:airline_left_alt_sep = '|'
+let g:airline_right_sep = ' '
+let g:airline_right_alt_sep = '|'
+let g:airline_theme= 'base16'

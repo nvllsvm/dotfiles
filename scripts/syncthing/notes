@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 NOTES_DIR="${SYNCTHING_DIR}"/Notes
-cd "${NOTES_DIR}"
-ARGS="${@:-${NOTES_DIR}}"
-exec "${EDITOR}" "${ARGS[@]}"
+if [ -t 1 ]; then
+    cd "${NOTES_DIR}"
+    ARGS="${@:-${NOTES_DIR}}"
+    exec "${EDITOR}" "${ARGS[@]}"
+else
+    echo $NOTES_DIR
+fi
