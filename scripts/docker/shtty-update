@@ -2,4 +2,4 @@
 set -e
 mkdir -p ~/.local/bin
 rm -rf ~/.local/bin/shtty
-ln -s $(git install gitlab:nvllsvm/shtty)/bin ~/.local/bin/shtty
+ln -s $(git install gitlab:nvllsvm/shtty)/shtty ~/.local/bin
