@@ -66,6 +66,7 @@ for dir in ~/.bin/*/; do
 path=($dir "$path[@]")
     path=($dir "$path[@]")
 done
+path=(~/.local/bin "$path[@]")
 for dir in ~/.local/bin/*/; do
 path=($dir "$path[@]")
     path=($dir "$path[@]")
