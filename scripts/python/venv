@@ -48,7 +48,7 @@ cp $env_folder/.envrc .
 
 . $env_folder/bin/activate
 
-pip-update
+pip install --upgrade pip setuptools wheel
 
 direnv allow
 direnv reload
