@@ -1,2 +1,0 @@
-#!/usr/bin/env sh
-pip install $(git install https://github.com/ranger/ranger)

@@ -12,6 +12,4 @@ if command -v ranger > /dev/null; then
     if [ -n "$RANGER_LEVEL" ]; then prompt_ranger=$prompt_ranger_active; fi
 
     PROMPT="$prompt_ranger$PROMPT"
-
-    full-update add ranger-update
 fi
