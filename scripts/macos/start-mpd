@@ -1,0 +1,4 @@
+#!/bin/sh
+mpd ~/.config/mpd/mpd.conf >& /dev/null &
+mpdkeys >& /dev/null &
+disown
