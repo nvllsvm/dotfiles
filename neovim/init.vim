@@ -57,7 +57,7 @@ call plug#begin('~/.config/nvim/plugged')
 Plug 'Shougo/deoplete.nvim'
 Plug 'scrooloose/nerdtree'
 Plug 'gregsexton/MatchTag'
-Plug 'davidhalter/jedi-vim'
+"Plug 'davidhalter/jedi-vim' " this causes brokenness in my terminal
 Plug 'zchee/deoplete-jedi'
 Plug 'Vimjas/vim-python-pep8-indent'
 Plug 'neomake/neomake'
