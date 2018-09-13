@@ -57,7 +57,7 @@ call plug#begin('~/.config/nvim/plugged')
 Plug 'Shougo/deoplete.nvim'
 Plug 'scrooloose/nerdtree'
 Plug 'gregsexton/MatchTag'
-"Plug 'davidhalter/jedi-vim' " this causes brokenness in my terminal
+Plug 'davidhalter/jedi-vim' " this causes brokenness in my terminal
 Plug 'zchee/deoplete-jedi'
 Plug 'Vimjas/vim-python-pep8-indent'
 Plug 'neomake/neomake'
@@ -125,9 +125,6 @@ endfunction
 
 autocmd FileType yaml setlocal shiftwidth=2 tabstop=2
 
-" workaround for https://github.com/neovim/neovim/issues/7861
-autocmd VimResized * redraw!
-
 command JSON :%!python3 -m json.tool
 
 " enable line numbers
@@ -151,3 +148,6 @@ let g:markdown_enable_spell_checking = 0
         set statusline+=%-14(%l,%c%V%)               " line, character
         set statusline+=%<%P                         " file position
 "}
+
+" workaround for https://github.com/neovim/neovim/issues/7861
+autocmd VimResized * redraw!

@@ -32,7 +32,11 @@ if [[ $(tmux display-message -p '#S' 2> /dev/null) == $TMUX_SESSION ]]; then
     fi
 
     tmux select-pane -l
-    $EDITOR $LMK_FILE
+
+    # hack to fix neovim rendering issue with jedi.vim
+    $EDITOR $LMK_FILE &
+    wait
+
     tmux kill-session -t $TMUX_SESSION
 else
     unset TMUX
