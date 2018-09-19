@@ -1,0 +1,20 @@
+#!/usr/bin/env python
+import argparse
+import pkgutil
+import sys
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('module')
+    args = parser.parse_args()
+    loader = pkgutil.get_loader(args.module)
+    if loader is None:
+        print('error: module not found', file=sys.stderr)
+        sys.exit(1)
+    else:
+        print(loader.path)
+
+
+if __name__ == '__main__':
+    main()
