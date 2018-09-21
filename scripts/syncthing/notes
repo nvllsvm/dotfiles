@@ -5,5 +5,5 @@ if [ -t 1 ]; then
     ARGS="${@:-${NOTES_DIR}}"
     exec "${EDITOR}" "${ARGS[@]}"
 else
-    echo $NOTES_DIR
+    echo "${NOTES_DIR}"
 fi
