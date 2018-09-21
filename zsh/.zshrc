@@ -155,5 +155,3 @@ zshrc_host="$DOTFILES_DIR/zsh/hosts/$HOST/.zshrc"
 unset zshrc_host
 
 full-update add compdump
-
-zmodload -u zsh/stat
