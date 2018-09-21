@@ -1,3 +1,6 @@
+*.pyc
+/private
+__pycache__
 mpd/library
 mpd/mpd.db
 mpd/mpd.log
@@ -10,6 +13,3 @@ ranger/bookmarks
 ranger/tagged
 sc-controller/daemon.*
 zsh/.zsh/local.zshrc
-*.pyc
-__pycache__
-!/private
