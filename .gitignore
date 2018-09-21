@@ -12,3 +12,4 @@ sc-controller/daemon.*
 zsh/.zsh/local.zshrc
 *.pyc
 __pycache__
+!/private
