@@ -5,6 +5,9 @@ autoload -U colors && colors
 autoload -U compinit
 autoload -U add-zsh-hook
 
+zmodload zsh/stat
+export DOTFILES_DIR=${$(zstat +link ~/.zshrc)%%zsh/.zshrc}
+
 setopt completealiases
 
 HISTSIZE=1000
@@ -155,3 +158,5 @@ zshrc_host="$DOTFILES_DIR/zsh/hosts/$HOST/.zshrc"
 unset zshrc_host
 
 full-update add compdump
+
+zmodload -u zsh/stat
