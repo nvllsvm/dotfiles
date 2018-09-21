@@ -1,4 +1,4 @@
-export DOTFILES_DIR=~/Code/GitHub/nvllsvm/dotfiles
+export DOTFILES_DIR=~/.dotfiles/public
 export EDITOR=nvim
 
 zshenv_host="$DOTFILES_DIR/zsh/hosts/$HOST/.zshenv"
