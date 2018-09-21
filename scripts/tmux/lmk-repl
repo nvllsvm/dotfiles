@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+EDITOR="$EDITOR -n"
+SESSION=$(uuidgen)
+
+trap "tmux kill-session -t $SESSION 2> /dev/null" EXIT SIGHUP
+
+if [[ $(tmux display-message -p '#S' 2> /dev/null) == $TMUX_SESSION ]]; then
+    if [[ $1 == '-f' ]]; then
+        LMK_FILE="$1"
+    else
+        LMK_FILE=$(mktemp)
+        trap "rm -f "$LMK_FILE"" EXIT
+        mkdir -p "$(dirname "$LMK_FILE")"
+        touch "$LMK_FILE"
+    fi
+
+    cd $(dirname "$LMK_FILE")
+    tmux split-window -h "lmk "$@" $LMK_FILE"
+    tmux select-pane -l
+
+    # hack to fix neovim rendering issue with jedi.vim
+    $EDITOR $LMK_FILE &
+    wait
+
+    tmux kill-session -t $TMUX_SESSION
+else
+    unset TMUX
+
+    tmux new-session -d -s $SESSION "TMUX_SESSION="$SESSION" $0 "$@""
+    tmux set-option -t $SESSION status off
+    tmux attach-session -t $SESSION > /dev/null
+fi
