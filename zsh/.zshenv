@@ -1,4 +1,5 @@
-export DOTFILES_DIR=~/.dotfiles/public
+zmodload zsh/stat
+export DOTFILES_DIR=${$(zstat +link ~/.zshrc)%%zsh/.zshrc}
 export EDITOR=nvim
 
 zshenv_host="$DOTFILES_DIR/zsh/hosts/$HOST/.zshenv"
