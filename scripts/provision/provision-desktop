@@ -21,6 +21,7 @@ link_dotfile compton/compton.conf ~/.config
 link_dotfile dunst ~/.config
 link_dotfile fontconfig ~/.config
 link_dotfile i3blocks ~/.config
+link_dotfile mimeapps/mimeapps.list ~/.config
 link_dotfile mpd ~/.config
 link_dotfile mpd-notification/mpd-notification.conf ~/.config
 link_dotfile mpv ~/.config
