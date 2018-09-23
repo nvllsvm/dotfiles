@@ -24,7 +24,7 @@ link_dotfile tmux/.tmux.conf ~
 link_dotfile zsh/.zshenv ~
 link_dotfile zsh/.zshrc ~
 link_dotfile ranger ~/.config
-link_dotfile httpie ~
+link_dotfile httpie ~/.httpie
 
 zsh_command pyenv-update
 zsh_command pip-update
