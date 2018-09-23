@@ -1,15 +1,15 @@
 #!/bin/sh
 set -e
 
-link_dotfile() {
+link_file() {
     source_path="$PWD/$1"
     target_path="$2"
     echo -e "\033[1;33mLinking $1 \033[0m"
     if ! [ -e "$source_path" ]; then
         echo error: path $source_path does not exist. >&2
-    exit 1
+        exit 1
     fi
-    mkdir -p "$(dirname $target_path)"
+    rm -rf "$target_path"
     ln -sf "$source_path" "$target_path"
 }
 
@@ -18,16 +18,18 @@ zsh_command() {
     zsh -c "$1"
 }
 
-link_dotfile git/.gitignore ~
-link_dotfile httpie ~/.httpie
-link_dotfile nvim ~/.config
-link_dotfile pip ~/.config
-link_dotfile psql/.psqlrc ~
-link_dotfile ranger ~/.config
-link_dotfile sqlite/.sqliterc ~
-link_dotfile tmux/.tmux.conf ~
-link_dotfile zsh/.zshenv ~
-link_dotfile zsh/.zshrc ~
+mkdir -p ~/.config
+
+link_file git/.gitignore ~/.gitignore
+link_file httpie ~/.httpie
+link_file nvim ~/.config/nvim
+link_file pip ~/.config/pip
+link_file psql/.psqlrc ~/.psqlrc
+link_file ranger ~/.config/ranger
+link_file sqlite/.sqliterc ~/.sqliterc
+link_file tmux/.tmux.conf ~/.tmux.conf
+link_file zsh/.zshenv ~/.zshenv
+link_file zsh/.zshrc ~/.zshrc
 
 zsh_command pyenv-update
 zsh_command pip-update

@@ -1,14 +1,14 @@
 #!/bin/sh
 
-link_dotfile() {
+link_file() {
     source_path="$PWD/$1"
     target_path="$2"
     echo -e "\033[1;33mLinking $1 \033[0m"
     if ! [ -e "$source_path" ]; then
         echo error: path $source_path does not exist. >&2
-    exit 1
+        exit 1
     fi
-    mkdir -p "$(dirname $target_path)"
+    rm -rf "$target_path"
     ln -sf "$source_path" "$target_path"
 }
 
@@ -17,20 +17,20 @@ zsh_command() {
     zsh -c "$1"
 }
 
-link_dotfile compton/compton.conf ~/.config
-link_dotfile dunst ~/.config
-link_dotfile fontconfig ~/.config
-link_dotfile i3blocks ~/.config
-link_dotfile mimeapps/mimeapps.list ~/.config
-link_dotfile mpd ~/.config
-link_dotfile mpd-notification/mpd-notification.conf ~/.config
-link_dotfile mpv ~/.config
-link_dotfile ncmpcpp ~/.config
-link_dotfile qt5ct ~/.config
-link_dotfile rofi ~/.config
-link_dotfile xbindkeys/.xbindkeysrc ~
-link_dotfile xinit/.xinitrc ~
-link_dotfile zsh/.zprofile ~
+link_file compton/compton.conf ~/.config/compton.conf
+link_file dunst ~/.config/dunst
+link_file fontconfig ~/.config/fontconfig
+link_file i3blocks ~/.config/i3blocks
+link_file mimeapps/mimeapps.list ~/.config/mimeapps.list
+link_file mpd ~/.config/mpd
+link_file mpd-notification/mpd-notification.conf ~/.config/mpd-notification.conf
+link_file mpv ~/.config/mpv
+link_file ncmpcpp ~/.config/ncmpcpp
+link_file qt5ct ~/.config/qt5ct
+link_file rofi ~/.config/rofi
+link_file xbindkeys/.xbindkeysrc ~/..xbindkeysrc
+link_file xinit/.xinitrc ~/.xinitrc
+link_file zsh/.zprofile ~/.zprofile
 
 zsh_command 'pip install base16-shell-preview'
 
