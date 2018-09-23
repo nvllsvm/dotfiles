@@ -1,2 +1,9 @@
 #!/bin/sh
 xmodmap-caps-to-esc
+
+TOUCHPAD_ID=$(xinput list --id-only 'Microsoft Surface Type Cover Touchpad')
+
+xinput --set-prop $TOUCHPAD_ID 'libinput Accel Speed' 1
+xinput --set-prop $TOUCHPAD_ID 'libinput Tapping Enabled' 1
+xinput --set-prop $TOUCHPAD_ID 'libinput Natural Scrolling Enabled' 1
+xinput --set-prop $TOUCHPAD_ID 'libinput Middle Emulation Enabled' 1

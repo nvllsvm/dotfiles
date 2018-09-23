@@ -112,6 +112,9 @@ deimos() {
     fi
 }
 
+apollo() {
+    set-x-dpi 192
+}
 
 case "$HOSTNAME" in
     "deimos")
@@ -122,6 +125,9 @@ case "$HOSTNAME" in
         ;;
     "phobos")
         phobos
+        ;;
+    "apollo")
+        apollo
         ;;
     *)
         printf "WARN: Host \'$HOSTNAME\' undefined"
