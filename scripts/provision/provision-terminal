@@ -1,0 +1,32 @@
+#!/bin/sh
+set -e
+
+link_dotfile() {
+    source_path="$PWD/$1"
+    target_path="$2"
+    echo -e "\033[1;33mLinking $1 \033[0m"
+    if ! [ -e "$source_path" ]; then
+        echo error: path $source_path does not exist. >&2
+    exit 1
+    fi
+    mkdir -p "$(dirname $target_path)"
+    ln -sf "$source_path" "$target_path"
+}
+
+zsh_command() {
+    echo -e "\033[1;33mNow running $1 \033[0m..."
+    zsh -c "$1"
+}
+
+link_dotfile nvim ~/.config
+link_dotfile pip ~/.config
+link_dotfile tmux/.tmux.conf ~
+link_dotfile zsh/.zshenv ~
+link_dotfile zsh/.zshrc ~
+link_dotfile ranger ~/.config
+link_dotfile httpie ~
+
+zsh_command pyenv-update
+zsh_command pip-update
+zsh_command nvim-update
+zsh_command 'pip install ranger-fm httpie pyzmq virtualenv speedtest-cli'

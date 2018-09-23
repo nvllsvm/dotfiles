@@ -1,0 +1,36 @@
+#!/bin/sh
+
+link_dotfile() {
+    source_path="$PWD/$1"
+    target_path="$2"
+    echo -e "\033[1;33mLinking $1 \033[0m"
+    if ! [ -e "$source_path" ]; then
+        echo error: path $source_path does not exist. >&2
+    exit 1
+    fi
+    mkdir -p "$(dirname $target_path)"
+    ln -sf "$source_path" "$target_path"
+}
+
+zsh_command() {
+    echo -e "\033[1;33mNow running $1 \033[0m..."
+    zsh -c "$1"
+}
+
+link_dotfile compton/compton.conf ~/.config
+link_dotfile dunst ~/.config
+link_dotfile fontconfig ~/.config
+link_dotfile i3blocks ~/.config
+link_dotfile mpd ~/.config
+link_dotfile mpd-notification/mpd-notification.conf ~/.config
+link_dotfile mpv ~/.config
+link_dotfile ncmpcpp ~/.config
+link_dotfile qt5ct ~/.config
+link_dotfile rofi ~/.config
+link_dotfile xbindkeys/.xbindkeysrc ~
+link_dotfile xinit/.xinitrc ~
+link_dotfile zsh/.zprofile ~
+
+zsh_command 'pip install base16-shell-preview'
+
+systemctl --user enable syncthing
