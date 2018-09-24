@@ -1,1 +1,1 @@
-. ~/Code/AWeber/andrewr/dotfiles-aweber/zsh/aweber.zshrc
+. ~/.dotfiles/aweber/zsh/.zshrc

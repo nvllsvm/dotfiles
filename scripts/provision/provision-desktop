@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 link_file() {
     source_path="$PWD/$1"
@@ -17,21 +17,28 @@ zsh_command() {
     zsh -c "$1"
 }
 
-link_file compton/compton.conf ~/.config/compton.conf
-link_file dunst ~/.config/dunst
-link_file fontconfig ~/.config/fontconfig
-link_file i3blocks ~/.config/i3blocks
-link_file mimeapps/mimeapps.list ~/.config/mimeapps.list
+osname=$(uname)
+if [[ $osname == Linux* ]]; then
+    link_file compton/compton.conf ~/.config/compton.conf
+    link_file dunst ~/.config/dunst
+    link_file fontconfig ~/.config/fontconfig
+    link_file i3blocks ~/.config/i3blocks
+    link_file mimeapps/mimeapps.list ~/.config/mimeapps.list
+    link_file mpd-notification/mpd-notification.conf ~/.config/mpd-notification.conf
+    link_file mpv ~/.config/mpv
+    link_file qt5ct ~/.config/qt5ct
+    link_file rofi ~/.config/rofi
+    link_file xbindkeys/.xbindkeysrc ~/..xbindkeysrc
+    link_file xinit/.xinitrc ~/.xinitrc
+    link_file zsh/.zprofile ~/.zprofile
+
+    systemctl --user enable syncthing
+elif [[ $osname == Darwin ]]; then
+    zsh_command 'pip install osxmpdkeys'
+    link_file karabiner ~/.config/karabiner
+fi
+
 link_file mpd ~/.config/mpd
-link_file mpd-notification/mpd-notification.conf ~/.config/mpd-notification.conf
-link_file mpv ~/.config/mpv
 link_file ncmpcpp ~/.config/ncmpcpp
-link_file qt5ct ~/.config/qt5ct
-link_file rofi ~/.config/rofi
-link_file xbindkeys/.xbindkeysrc ~/..xbindkeysrc
-link_file xinit/.xinitrc ~/.xinitrc
-link_file zsh/.zprofile ~/.zprofile
 
 zsh_command 'pip install base16-shell-preview'
-
-systemctl --user enable syncthing

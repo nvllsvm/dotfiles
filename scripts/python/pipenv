@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+set -e
+export PIP_USER=0
+exec "$(which -a pipenv | grep -v "$0" | head -n 1)" "$@"

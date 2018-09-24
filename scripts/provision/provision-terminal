@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 set -e
 
 link_file() {
@@ -23,8 +23,6 @@ mkdir -p ~/.config
 link_file git/.gitignore ~/.gitignore
 link_file httpie ~/.httpie
 link_file nvim ~/.config/nvim
-link_file pacman ~/.config/pacman
-link_file pip ~/.config/pip
 link_file psql/.psqlrc ~/.psqlrc
 link_file ranger ~/.config/ranger
 link_file sqlite/.sqliterc ~/.sqliterc
@@ -32,7 +30,18 @@ link_file tmux/.tmux.conf ~/.tmux.conf
 link_file zsh/.zshenv ~/.zshenv
 link_file zsh/.zshrc ~/.zshrc
 
+osname=$(uname)
+if [[ $osname == Darwin* ]]; then
+    link_file pip ~/Library/Application\ Support/pip
+fi
+
+if [[ $osname == Linux* ]]; then
+    link_file pacman ~/.config/pacman
+    link_file pip ~/.config/pip
+fi
+
 zsh_command pyenv-update
 zsh_command pip-update
 zsh_command nvim-update
-zsh_command 'pip install ranger-fm httpie pyzmq virtualenv speedtest-cli'
+zsh_command 'pip install pipenv ranger-fm httpie pyzmq virtualenv speedtest-cli'
+zsh_command flake8-update
