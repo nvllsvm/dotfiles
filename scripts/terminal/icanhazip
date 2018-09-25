@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+IPV4=$(http --timeout 5 --body https://ipv4.icanhazip.com 2> /dev/null | tr -d '[:space:]')
+IPV6=$(http --timeout 5 --body https://ipv6.icanhazip.com 2> /dev/null | tr -d '[:space:]')
+
+echo IPv4: $IPV4
+echo IPv6: $IPV6
