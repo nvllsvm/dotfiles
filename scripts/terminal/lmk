@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 
 if [ ! -z "$VIRTUAL_ENV" ]; then
@@ -26,6 +26,11 @@ get_message() {
 }
 
 
+if [[ $1 == '-a' ]]; then
+    LMK_ANY=1
+    shift
+fi
+
 if [ -z $1 ]; then
     publish_message "$PWD"
     exit
@@ -51,7 +56,9 @@ while true; do
     disown
     while true; do
         EVENT_PATH=$(get_message)
-        if [[ "$EVENT_PATH"/ == "$PWD"/* || "$EVENT_PATH"/ == "$LINK_PWD"/* ]]; then
+        if [ -n LMK_ANY ]; then
+            break
+        elif [[ "$EVENT_PATH"/ == "$PWD"/* || "$EVENT_PATH"/ == "$LINK_PWD"/* ]]; then
             break
         fi
     done
