@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-set -ex
+set -e
 if [ -z $1 ]; then
     if git status 2> /dev/null; then
         GIT_DIR='.'
