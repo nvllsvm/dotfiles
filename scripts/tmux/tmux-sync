@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 pane_command() {
     echo "echo $1 $2 && $1 $2 && echo Press enter to exit ... && read -s"

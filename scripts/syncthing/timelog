@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 . $DOTFILES_DIR/zsh/env/syncthing.env
 if [ -z $1 ]; then
     DATE=$(date +%Y-%m-%d)

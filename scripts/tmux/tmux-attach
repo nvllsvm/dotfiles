@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 if [ "$(tmux list-sessions 2> /dev/null)" ]; then
     exec tmux a -d
 else
