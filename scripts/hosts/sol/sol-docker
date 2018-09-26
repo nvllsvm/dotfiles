@@ -1,16 +1,16 @@
-#!/bin/bash
+#!/usr/bin/env sh
 export COMPOSE_PROJECT_NAME=sol-docker 
-export COMPOSE_FILE=~/Code/Private/sol-docker/docker-compose.yml
+export COMPOSE_FILE="$HOME/Code/Private/sol-docker/docker-compose.yml"
 
-if [[ "$1" == "restart" ]]; then
-    if [[ -n "$2" ]]; then
+if [ "$1" = "restart" ]; then
+    if [ -n "$2" ]; then
         docker-compose stop -t 0 "$2"
         docker-compose rm -fs "$2"
     else
         sol-docker down
     fi
     docker-compose up -d
-elif [[ "$1" == "down" ]]; then
+elif [ "$1" = "down" ]; then
     docker-compose down -t 1 --remove-orphans -v
 else
     docker-compose "$@"
