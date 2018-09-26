@@ -12,8 +12,11 @@ def main():
     if loader is None:
         print('error: module not found', file=sys.stderr)
         sys.exit(1)
-    else:
-        print(loader.path)
+    path = getattr(loader, 'path', None)
+    if path is None:
+        print('error: built-in module', file=sys.stderr)
+        sys.exit(1)
+    print(path)
 
 
 if __name__ == '__main__':
