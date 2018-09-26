@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
+set -e
 if [ -z $1 ]; then
     if git status 2> /dev/null; then
         GIT_DIR='.'
@@ -11,12 +12,9 @@ else
 fi
 
 cd "${GIT_DIR}"
-git pull
-
-error_code=$?
-
-if [[ $error_code != 0 ]]; then
-    exit $error_code
+git fetch
+if [[ $(git rev-parse HEAD) != $(git rev-parse @{u}) ]]; then
+    git merge
 fi
 
 if [ $(git status --porcelain | wc -l) -gt 0 ]; then
