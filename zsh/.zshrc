@@ -17,8 +17,6 @@ setopt hist_ignore_space
 setopt inc_append_history
 setopt share_history
 
-bindkey "\e[5~" beginning-of-history # PageUp
-bindkey "\e[6~" end-of-history # PageDown
 bindkey "^[[A" history-beginning-search-backward
 bindkey "^[[B" history-beginning-search-forward
 
