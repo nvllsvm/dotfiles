@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+if command -v trash > /dev/null; then
+    echo dash found
+    mkdir -p ~/.bin
+    ln -sf $(which dash) ~/.bin/sh
+else
+    echo error: dash found >&2
+    rm -f ~/.bin/sh
+    exit 1
+fi
