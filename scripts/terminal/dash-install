@@ -4,8 +4,8 @@ REPO_DIR="$(git install -k https://git.kernel.org/pub/scm/utils/dash/dash.git)"
 cd "$REPO_DIR"
 git checkout "$(git describe --abbrev=0 --tags)"
 ./autogen.sh
-./configure
+./configure --prefix="$HOME/.local"
 make -j8
+make install
 mkdir -p "$HOME/.bin"
-ln -sf "$PWD/src/dash" "$HOME/.bin/dash"
-ln -sf "$PWD/src/dash" "$HOME/.bin/sh"
+ln -sf "$HOME/.local/bin/dash" "$HOME/.local/bin/sh"
