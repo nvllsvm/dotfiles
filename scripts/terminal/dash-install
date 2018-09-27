@@ -7,6 +7,5 @@ git checkout "$(git describe --abbrev=0 --tags)"
 ./configure
 make -j8
 mkdir -p "$HOME/.bin"
-# copy instead of symlink to avoid issue if link becomes invalid
-cp "$PWD/src/dash" "$HOME/.bin/dash"
-cp "$PWD/src/dash" "$HOME/.bin/sh"
+ln -sf "$PWD/src/dash" "$HOME/.bin/dash"
+ln -sf "$PWD/src/dash" "$HOME/.bin/sh"
