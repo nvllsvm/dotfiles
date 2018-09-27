@@ -1,13 +1,4 @@
 #!/usr/bin/env bash
-container_name="docker_shell-$(uuidgen | tr -d -)"
+container_name="docker_shell-$(cat /dev/urandom | tr -cd 'a-f0-9' | head -c 32)"
 trap "docker kill "${container_name}" >& /dev/null || true" SIGHUP EXIT
-
-args=()
-if [[ $1 == '-s' ]]; then
-    shift;
-    args=(--entrypoint /bin/sh "${args[@]}")
-fi
-
-args=("${args[@]}" "$@")
-
-docker run --rm -it --name "${container_name}" "${args[@]}"
+docker run --rm -it --name "${container_name}" "$@"
