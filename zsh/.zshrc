@@ -146,6 +146,8 @@ exec-update() {
     fi
 }
 
+full-update add 'if command -v dash; then; mkdir -p ~/.bin; ln -sf $(which dash) ~/.bin/sh; fi'
+
 for plugin in $DOTFILES_DIR/zsh/plugins/*; do
     . $plugin
 done
