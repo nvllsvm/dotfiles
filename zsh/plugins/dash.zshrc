@@ -1,1 +1,1 @@
-full-update add link-dash
+full-update add dash-install

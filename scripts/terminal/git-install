@@ -31,8 +31,10 @@ _update() {
     cd "$REPO_DIR"
 
     if [ -z $NO_CLEAN ]; then
+        echo cleaning!
         git clean -xdf
     fi
+    git checkout master
     git checkout .
     git pull
 }
