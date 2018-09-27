@@ -2,10 +2,10 @@
 LINK_TARGET=~/.bin/sh
 if command -v dash > /dev/null; then
     echo linking dash to $LINK_TARGET
-    mkdir -p ~/.bin
-    ln -sf $(which dash) "$LINK_TARGET"
+    mkdir -p "$(dirname "$LINK_TARGET")"
+    ln -sf "$(which dash)" "$LINK_TARGET"
 else
     echo error: dash not found >&2
-    rm -f ~/.bin/sh
+    rm -f "$LINK_TARGET"
     exit 1
 fi
