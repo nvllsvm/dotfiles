@@ -1,0 +1,28 @@
+#!/usr/bin/env sh
+set -e
+
+if [ -z "$KVDIR" ]; then
+    KVDIR="$HOME/.local/share/kv"
+fi
+
+KEY="$1"
+VALUE="$2"
+
+KEY_PATH="$KVDIR/$KEY"
+
+if [ $# -eq 2 ]; then
+    if [ -z "$VALUE" ]; then
+        rm -rf "$KEY_PATH"
+    else
+        mkdir -p "$(dirname "$KEY_PATH")"
+        printf "$VALUE" > "$KEY_PATH"
+    fi
+elif [ $# -eq 1 ]; then
+    if ! [ -e "$KEY_PATH" ]; then
+        exit 1
+    fi
+    cat "$KEY_PATH"
+elif [ $# -eq 0 ]; then
+    cd "$KVDIR"
+    find . -type f -printf '%P\n'
+fi

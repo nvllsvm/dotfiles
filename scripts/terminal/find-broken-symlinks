@@ -1,2 +1,0 @@
-#!/usr/bin/env sh
-find -L . -type l -ls

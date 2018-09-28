@@ -1,2 +1,4 @@
 #!/usr/bin/env sh
+set -x
 rm -rf ~/.cache
+rm -rf ~/.local/share/virtualenvs
