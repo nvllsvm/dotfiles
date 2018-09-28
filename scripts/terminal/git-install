@@ -34,8 +34,8 @@ _update() {
         echo cleaning!
         git clean -xdf
     fi
-    git checkout -q master
     git checkout -q .
+    git checkout -q master
     git pull
 }
 

@@ -1,17 +1,16 @@
 #!/usr/bin/env sh
 set -e
 PREFIX="$HOME/.local"
-REPO_DIR="$(git install https://git.kernel.org/pub/scm/utils/dash/dash.git)"
+REPO_DIR="$(git install https://github.com/stedolan/jq.git)"
 cd "$REPO_DIR"
-git checkout -q "$(git describe --abbrev=0 --tags)"
+git checkout -q "$(git tag --sort=committerdate | grep -v rc | tail -n 1)"
 
 current_version=$(git rev-parse --short HEAD)
-key="git-install/dash"
+key="git-install/jq"
 if [ "$(kv $key || true)" != "$current_version" ]; then
-    ./autogen.sh
+    autoreconf -i
     ./configure --prefix="$PREFIX"
     make -j8
     make install
-    ln -sf "$PREFIX/bin/dash" "$PREFIX/bin/sh"
     kv $key $current_version
 fi
