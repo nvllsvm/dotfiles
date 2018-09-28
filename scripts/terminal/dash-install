@@ -3,7 +3,7 @@ set -e
 PREFIX="$HOME/.local"
 REPO_DIR="$(git install -k https://git.kernel.org/pub/scm/utils/dash/dash.git)"
 cd "$REPO_DIR"
-git checkout "$(git describe --abbrev=0 --tags)"
+git checkout -q "$(git describe --abbrev=0 --tags)"
 
 current_version=$(git rev-parse --short HEAD)
 key="git-install/dash"
