@@ -58,18 +58,6 @@ PROMPT="$prompt_user$prompt_separator$prompt_host  "
 RPROMPT="$prompt_current_dir"
 
 typeset -U path
-path=(~/.bin "$path[@]")
-setopt +o nomatch
-for dir in ~/.bin/*/; do
-path=($dir "$path[@]")
-    path=($dir "$path[@]")
-done
-path=(~/.local/bin "$path[@]")
-for dir in ~/.local/bin/*/; do
-path=($dir "$path[@]")
-    path=($dir "$path[@]")
-done
-setopt -o nomatch
 
 bindkey -v
 
@@ -101,6 +89,10 @@ up() {
             echo -n ../
         fi
     done
+}
+
+envfile() {
+    set -a; . "$@"; set +a
 }
 
 sudo-command-line() {
@@ -153,3 +145,5 @@ zshrc_host="$DOTFILES_DIR/zsh/hosts/$HOST/.zshrc"
 unset zshrc_host
 
 full-update add compdump
+
+path=(~/.bin ~/.local/bin "$path[@]")
