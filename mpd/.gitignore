@@ -1,1 +1,4 @@
-/playlists
+library
+mpd.db
+mpd.log
+mpd.state

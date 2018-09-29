@@ -1,12 +1,2 @@
 *.pyc
-/private
 __pycache__
-mpd/library
-mpd/mpd.db
-mpd/mpd.log
-mpd/mpd.state
-ncmpcpp/error.log
-ranger/bookmarks
-ranger/tagged
-sc-controller/daemon.*
-zsh/.zsh/local.zshrc
