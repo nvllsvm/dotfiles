@@ -6,9 +6,6 @@ mpd/mpd.db
 mpd/mpd.log
 mpd/mpd.state
 ncmpcpp/error.log
-neovim/autoload/plug.vim
-neovim/autoload/plug.vim.old
-neovim/plugged
 ranger/bookmarks
 ranger/tagged
 sc-controller/daemon.*

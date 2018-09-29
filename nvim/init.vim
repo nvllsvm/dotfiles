@@ -68,6 +68,7 @@ Plug 'godlygeek/tabular'
 Plug 'iamcco/mathjax-support-for-mkdp'
 Plug 'iamcco/markdown-preview.vim'
 Plug 'davidhalter/jedi-vim' " this causes brokenness in my terminal
+Plug 'zah/nim.vim'
 call plug#end()
 
 let g:jedi#completions_enabled = 0
