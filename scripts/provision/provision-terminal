@@ -42,6 +42,6 @@ fi
 
 zsh_command pyenv-update
 zsh_command pip-update
-zsh_command nvim-update
-zsh_command 'pip install pipenv ranger-fm httpie pyzmq virtualenv speedtest-cli'
+zsh_command 'pip install pipenv ranger-fm httpie pyzmq virtualenv speedtest-cli youtube_dl'
 zsh_command flake8-update
+zsh_command nvim-update
