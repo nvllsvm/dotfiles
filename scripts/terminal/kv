@@ -1,27 +1,41 @@
 #!/usr/bin/env sh
+# key/value utility
+#
+# Environment:
+# KVDIR: root of the key/value store. Defaults to $HOME/.local/share/kv
+#
+# Dependencies:
+# - GNU Findutils
+# - GNU Coreutils
 set -e
 
-if [ -z "$KVDIR" ]; then
-    KVDIR="$HOME/.local/share/kv"
-fi
-
+KVDIR="$(realpath "${KVDIR:-"$HOME/.local/share/kv"}")"
 KEY="$1"
 VALUE="$2"
 
-KEY_PATH="$KVDIR/$KEY"
-
-if [ $# -eq 2 ]; then
-    if [ -z "$VALUE" ]; then
-        rm -rf "$KEY_PATH"
-    else
-        mkdir -p "$(dirname "$KEY_PATH")"
-        printf "$VALUE" > "$KEY_PATH"
-    fi
-elif [ $# -eq 1 ]; then
-    if [ -e "$KEY_PATH" ]; then
-        cat "$KEY_PATH"
-    fi
-elif [ $# -eq 0 ]; then
+if [ $# -eq 0 ]; then
     cd "$KVDIR"
     find . -type f -printf '%P\n'
+else
+    USER_KEY_PATH="$KVDIR/$KEY"
+    KEY_PATH="$(realpath "$USER_KEY_PATH")"
+
+    if [ "$USER_KEY_PATH" != "$KEY_PATH" ]; then
+        echo error: invalid key >&2
+        exit 1
+    fi
+
+    if [ $# -eq 1 ]; then
+        if [ -e "$KEY_PATH" ]; then
+            cat "$KEY_PATH"
+        fi
+    elif [ $# -eq 2 ]; then
+        if [ -z "$VALUE" ]; then
+            rm -rf "$KEY_PATH"
+        else
+            mkdir -p "$(dirname "$KEY_PATH")"
+            printf "$VALUE" > "$KEY_PATH"
+            find "$KVDIR" -type d -empty -delete
+        fi
+    fi
 fi
