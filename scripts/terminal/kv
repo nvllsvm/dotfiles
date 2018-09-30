@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# key/value utility
+# A filesystem-based key/value utility
 #
 # Environment:
 # KVDIR: root of the key/value store. Defaults to $HOME/.local/share/kv
