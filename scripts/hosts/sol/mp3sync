@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 set -e
 IMAGE=nvllsvm/harmonize
 docker pull $IMAGE > /dev/null
@@ -14,7 +14,7 @@ docker run \
 printf 'Updating Airsonic library .'
 airsonic-cli startScan > /dev/null
 
-while [[ $(airsonic-cli getScanStatus | jq '.scanning') == 'true' ]]; do
+while [ $(airsonic-cli getScanStatus | jq '.scanning') = 'true' ]; do
     printf .
     sleep 1
 done
