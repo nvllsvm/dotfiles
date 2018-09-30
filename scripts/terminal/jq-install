@@ -9,7 +9,7 @@ current_version=$(git rev-parse --short HEAD)
 key="git-install/jq"
 if [ "$(kv $key || true)" != "$current_version" ]; then
     autoreconf -i
-    ./configure --prefix="$PREFIX"
+    ./configure --prefix="$PREFIX" --disable-maintainer-mode
     make -j8
     make install
     kv $key $current_version
