@@ -7,7 +7,7 @@ git checkout -q "$(git describe --abbrev=0 --tags)"
 
 current_version=$(git rev-parse --short HEAD)
 key="git-install/dash"
-if [ "$(kv $key || true)" != "$current_version" ]; then
+if [ "$(kv $key)" != "$current_version" ]; then
     ./autogen.sh
     ./configure --prefix="$PREFIX"
     make -j8

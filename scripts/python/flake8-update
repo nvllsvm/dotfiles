@@ -2,7 +2,7 @@
 cd "$(git install https://gitlab.com/pycqa/flake8.git)"
 current_version=$(git rev-parse --short HEAD)
 key="git-install/flake8"
-if [ "$(kv $key || true)" != "$current_version" ]; then
+if [ "$(kv $key)" != "$current_version" ]; then
     pip install .
     kv $key $current_version
 fi

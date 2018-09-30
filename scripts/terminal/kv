@@ -18,10 +18,9 @@ if [ $# -eq 2 ]; then
         printf "$VALUE" > "$KEY_PATH"
     fi
 elif [ $# -eq 1 ]; then
-    if ! [ -e "$KEY_PATH" ]; then
-        exit 1
+    if [ -e "$KEY_PATH" ]; then
+        cat "$KEY_PATH"
     fi
-    cat "$KEY_PATH"
 elif [ $# -eq 0 ]; then
     cd "$KVDIR"
     find . -type f -printf '%P\n'

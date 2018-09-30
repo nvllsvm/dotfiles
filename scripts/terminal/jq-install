@@ -7,7 +7,7 @@ git checkout -q "$(git tag --sort=committerdate | grep -v rc | tail -n 1)"
 
 current_version=$(git rev-parse --short HEAD)
 key="git-install/jq"
-if [ "$(kv $key || true)" != "$current_version" ]; then
+if [ "$(kv $key)" != "$current_version" ]; then
     autoreconf -i
     ./configure --prefix="$PREFIX" --disable-maintainer-mode
     make -j8
