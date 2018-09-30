@@ -21,7 +21,7 @@ compton &
 xbindkeys &
 xss-lock -- lock-screen &
 
-xinit-$HOSTNAME &
+xinit-$(hostname) &
 
 pkill -9 -f mpd-notification
 mpd-notification &
