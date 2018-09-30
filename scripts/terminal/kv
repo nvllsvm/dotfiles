@@ -1,6 +1,27 @@
 #!/usr/bin/env sh
 # A filesystem-based key/value utility
 #
+# Usage:
+#
+# # list keys
+# $ kv
+# a
+#
+# # set key
+# $ kv b value
+# $ kv
+# a
+# b
+#
+# # get key value
+# $ kv b
+# value
+#
+# # delete key with zero-length parameter
+# $ kv b ''
+# $ kv
+# a
+#
 # Environment:
 # KVDIR: root of the key/value store. Defaults to $HOME/.local/share/kv
 #
