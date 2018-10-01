@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+cd "$(git install -k https://github.com/creationix/nvm)"
+. ./nvm.sh
+nvm install node --latest-npm
