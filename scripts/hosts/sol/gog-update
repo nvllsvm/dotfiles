@@ -8,9 +8,9 @@ docker pull $DOCKER_IMAGE > /dev/null
 docker run \
     --rm \
     -e PUID=$(id -u) \
-    -e PGID=$(id -u) \
+    -e PGID=$(id -g) \
     -e HOME \
     -v $GOG_DIR:/downloads \
     -v ~/.cache/lgogdownloader:/cache \
-    -v ~/Code/Private/dotfiles-private/lgogdownloader:/config \
+    -v ~/.dotfiles/private/lgogdownloader:/config \
     $DOCKER_IMAGE
