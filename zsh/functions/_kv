@@ -1,0 +1,2 @@
+#compdef kv
+_files -W "${KVDIR:-"$HOME/.local/share/kv"}"
