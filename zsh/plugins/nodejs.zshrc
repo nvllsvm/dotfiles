@@ -1,6 +1,6 @@
 export NVM_DIR=~/.local/git/nvm
 
-if [[ -d "$NVM_DIR" ]]; then
+if [ -d "$NVM_DIR" ]; then
     # holy fuck nvm.sh nearly triples shell startup time
     # lazy load that piece of shit
     _nvm_load=(
