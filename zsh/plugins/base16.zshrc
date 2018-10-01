@@ -17,7 +17,9 @@ if [ -d "$BASE16_SHELL" ]; then
     _base16 () {
         ln -fs $1 ~/.base16_theme
         . ~/.base16_theme
-        load-xresources-theme 2> /dev/null || true
+        if [[ "$OSTYPE" != "darwin"* ]]; then
+            load-xresources-theme
+        fi
     }
 
     path=("$DOTFILES_DIR"/scripts/base16 "$path[@]")
