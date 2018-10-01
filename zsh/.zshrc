@@ -145,5 +145,6 @@ zshrc_host="$DOTFILES_DIR/zsh/hosts/$HOST/.zshrc"
 unset zshrc_host
 
 full-update add 'rm ~/.zcompdump && zsh -ic "echo -n"'
+full-update add 'exec zsh'
 
 path=(~/.bin ~/.local/bin "$path[@]")
