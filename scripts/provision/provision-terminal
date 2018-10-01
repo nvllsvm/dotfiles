@@ -14,8 +14,8 @@ link_file() {
 }
 
 zsh_command() {
-    echo -e "\033[1;33mNow running $1 \033[0m..."
-    zsh -c "$1"
+    echo -e "\033[1;33mNow running $@ \033[0m..."
+    zsh -c "$@"
 }
 
 mkdir -p ~/.config
@@ -33,6 +33,22 @@ link_file zsh/.zshrc ~/.zshrc
 osname=$(uname)
 if [[ $osname == Darwin* ]]; then
     link_file pip ~/Library/Application\ Support/pip
+    zsh_command '$DOTFILES_DIR/scripts/macos/brew-update'
+    brew install \
+        automake \
+        coreutils \
+        direnv \
+        findutils \
+        git \
+        grep \
+        libtool \
+        mpd \
+        ncmpcpp \
+        neovim \
+        openssh \
+        p7zip \
+        tmux \
+        zsh
 fi
 
 if [[ $osname == Linux* ]]; then
@@ -40,7 +56,12 @@ if [[ $osname == Linux* ]]; then
     link_file pip ~/.config/pip
 fi
 
-zsh_command pyenv-update
+zsh_command '$DOTFILES_DIR/scripts/python/pyenv-update'
+if [[ $osname == Darwin* ]]; then
+#    zsh_command -i 'pyenv install 3.7.0'
+    zsh_command 'pyenv global 3.7.0'
+fi
+
 zsh_command pip-update
 zsh_command 'pip install pipenv ranger-fm httpie pyzmq virtualenv speedtest-cli youtube_dl'
 zsh_command flake8-update

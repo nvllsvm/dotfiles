@@ -1,9 +1,9 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 NOTES_DIR="${SYNCTHING_DIR}"/Notes
+NOTES_FILE="$NOTES_DIR/$1"
 if [ -t 1 ]; then
-    cd "${NOTES_DIR}"
-    ARGS="${@:-${NOTES_DIR}}"
-    exec "${EDITOR}" "${ARGS[@]}"
+    mkdir -p "$(dirname "${NOTES_FILE}")"
+    exec "${EDITOR}" "${NOTES_FILE}"
 else
     echo "${NOTES_DIR}"
 fi

@@ -30,17 +30,21 @@
 # - GNU Coreutils
 set -e
 
-KVDIR="$(realpath "${KVDIR:-"$HOME/.local/share/kv"}")"
+KVDIR="$(realpath -m "${KVDIR:-"$HOME/.local/share/kv"}")"
 KEY="$1"
 VALUE="$2"
 
 if [ $# -eq 0 ]; then
-    cd "$KVDIR"
-    find . -type f -printf '%P\n'
+    if [ -d "$KVDIR" ]; then
+        cd "$KVDIR"
+        find . -type f -printf '%P\n'
+    fi
 else
+    mkdir -p "$KVDIR"
+
     # restrict key to be under the $KVDIR (prevent ../ usage)
     USER_KEY_PATH="$KVDIR/$KEY"
-    KEY_PATH="$(realpath "$USER_KEY_PATH")"
+    KEY_PATH="$(realpath -m "$USER_KEY_PATH")"
     if [ "$USER_KEY_PATH" != "$KEY_PATH" ]; then
         echo error: invalid key >&2
         exit 1

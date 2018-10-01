@@ -13,8 +13,8 @@ link_file() {
 }
 
 zsh_command() {
-    echo -e "\033[1;33mNow running $1 \033[0m..."
-    zsh -c "$1"
+    echo -e "\033[1;33mNow running $@ \033[0m..."
+    zsh -c "$@"
 }
 
 osname=$(uname)
@@ -43,3 +43,7 @@ link_file mpd ~/.config/mpd
 link_file ncmpcpp ~/.config/ncmpcpp
 
 zsh_command 'pip install base16-shell-preview'
+
+if ! [ -e $HOME/.base16_theme ]; then
+    zsh_command -i base16_default-dark
+fi
