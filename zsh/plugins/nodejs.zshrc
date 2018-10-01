@@ -14,8 +14,8 @@ if [[ -d "$NVM_DIR" ]]; then
         for cmd in "$_nvm_load[@]"; do
             unalias $cmd
         done
-        unset -f nvm-load
         unset _nvm_load
+        unset -f nvm-load
         . "$NVM_DIR/nvm.sh"
     }
 
