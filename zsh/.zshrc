@@ -144,6 +144,6 @@ zshrc_host="$DOTFILES_DIR/zsh/hosts/$HOST/.zshrc"
 [[ -r "$zshrc_host" ]] && . "$zshrc_host"
 unset zshrc_host
 
-full-update add compdump
+full-update add "fpath="$fpath" compdump"
 
 path=(~/.bin ~/.local/bin "$path[@]")
