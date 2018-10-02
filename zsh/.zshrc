@@ -49,13 +49,20 @@ insert_mode_color='magenta'
 default_mode_color='green'
 vi_mode_color=$default_mode_color
 
-prompt_host='%F{$vi_mode_color}%m%f'
 prompt_user='%F{green}%n%f'
 prompt_separator='%F{black}.%f'
 prompt_current_dir='%F{cyan}%~%f'
+if ! [ -z $SSH_TTY ] && [ -z $TMUX ]; then
+    prompt_host='%F{$vi_mode_color}%m%f '
+else
+    prompt_host=''
+fi
 
-PROMPT="$prompt_user$prompt_separator$prompt_host  "
+PROMPT='$prompt_host%F{$vi_mode_color}\$%f '
 RPROMPT="$prompt_current_dir"
+
+# hide when start typing
+setopt TRANSIENT_RPROMPT
 
 typeset -U path
 
