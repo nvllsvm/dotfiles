@@ -5,9 +5,12 @@ if ! [ -x "$(command -v pip)" ]; then
     curl https://bootstrap.pypa.io/get-pip.py | python
 fi
 
-packages="$(pip list --outdated --format=freeze)"
+if [ "$(pip list | grep -e '^pip ' -e '^setuptools ' -e '^wheel ' | wc -l)" != '3' ]; then
+    pip install -U --force-reinstall pip setuptools wheel
+fi
 
-pip install -U pip setuptools wheel
-if ! [ -z "${packages}" ]; then
-    echo "${packages}" | grep -v '^\-e' | cut -d = -f 1 | xargs pip install --upgrade
+ood_packages="$(pip list --outdated --format=freeze)"
+
+if ! [ -z "${ood_packages}" ]; then
+    echo "${ood_packages}" | grep -v '^\-e' | cut -d = -f 1 | xargs pip install --upgrade
 fi
