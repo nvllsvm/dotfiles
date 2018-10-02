@@ -4,8 +4,10 @@ BACKUP_ROOT="$DOTFILES_DIR"/desktop
 
 sync_file() {
     if [ -f "$target" ]; then
-        echo Syncing "$target"
-        sudo cp "$source" "$target"
+        if ! sudo diff "$source" "$target" > /dev/null ; then
+            echo Syncing "$target"
+            sudo cp "$source" "$target"
+        fi
     fi
 }
 
