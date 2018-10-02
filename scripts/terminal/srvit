@@ -2,6 +2,11 @@
 IMAGE=nginx:alpine
 PORT=8000
 
+if [ $1 = '--pull' ]; then
+    docker pull "${IMAGE}"
+    exit
+fi
+
 if ! [ -t 0 ]; then
     TEMP_DIR=$(mktemp -d /tmp/srvit.XXXXXXXXX)
     HTML_DIR=$TEMP_DIR
@@ -29,7 +34,6 @@ server {
 }
 EOF
 
-docker pull "${IMAGE}" > /dev/null
 echo http://localhost:$PORT
 
 container_name="docker_shell-$(uuidgen | tr -d -)"

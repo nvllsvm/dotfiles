@@ -11,3 +11,5 @@ if [ -d "$host_scripts" ]; then
     path=("$host_scripts" "$path[@]")
 fi
 unset host_scripts
+
+full-update add 'srvit --pull'
