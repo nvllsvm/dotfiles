@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+yay -Syu --noconfirm
+asp update
+sudo pkgfile --update
+
+sudo pacman -Sc --noconfirm 
+if pacman -Qdtq > /dev/null; then 
+    sudo pacman -Rns --noconfirm $(pacman -Qdtq)
+fi
