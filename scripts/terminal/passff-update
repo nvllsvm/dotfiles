@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
+set -e
 temp_file="$(mktemp)"
 trap "rm "$temp_file"" EXIT
 curl https://raw.githubusercontent.com/passff/passff-host/master/src/install_host_app.sh --output "$temp_file"
