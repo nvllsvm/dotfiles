@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
-cd "$(git install https://gitlab.com/pycqa/flake8.git)"
+cd "$(git install https://github.com/pushrax/osxmpdkeys.git)"
 current_version=$(git rev-parse HEAD)
-key="git-install/flake8"
+key="git-install/osxmpdkeys"
 if [ "$(kv $key)" != "$current_version" ]; then
     pip install .
     kv $key $current_version

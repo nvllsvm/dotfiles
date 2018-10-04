@@ -35,7 +35,6 @@ if [[ $osname == Linux* ]]; then
 
     systemctl --user enable syncthing
 elif [[ $osname == Darwin ]]; then
-    zsh_command 'pip install osxmpdkeys'
     link_file karabiner ~/.config/karabiner
 fi
 

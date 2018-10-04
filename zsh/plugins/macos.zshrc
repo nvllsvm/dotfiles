@@ -31,4 +31,5 @@ if [[ $OSTYPE == darwin* ]]; then
 
 
     full-update add brew-update
+    full-update add osxmpdkeys-update
 fi

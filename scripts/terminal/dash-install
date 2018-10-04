@@ -5,7 +5,7 @@ REPO_DIR="$(git install https://git.kernel.org/pub/scm/utils/dash/dash.git)"
 cd "$REPO_DIR"
 git checkout -q "$(git describe --abbrev=0 --tags)"
 
-current_version=$(git rev-parse --short HEAD)
+current_version=$(git rev-parse HEAD)
 key="git-install/dash"
 if [ "$(kv $key)" != "$current_version" ]; then
     ./autogen.sh
