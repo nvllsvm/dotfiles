@@ -41,6 +41,7 @@ if [[ $osname == Darwin* ]]; then
         findutils \
         git \
         grep \
+        htop \
         libtool \
         mpd \
         ncmpcpp \
