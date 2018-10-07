@@ -1,9 +1,24 @@
 #!/usr/bin/env sh
+MAGENTA='\033[1;35m'
+RESET='\033[0m'
+
+log() {
+    printf "${MAGENTA}$1 ...${RESET}\n"
+}
+
+log 'Updating packages'
 yay -Syu --noconfirm
+
+log 'Updating build cache'
 asp update
+
+log 'Updating file cache'
 sudo pkgfile --update
 
+log 'Pruning package cache'
 sudo pacman -Sc --noconfirm 
+
+log 'Removing orphans'
 if pacman -Qdtq > /dev/null; then 
     sudo pacman -Rns --noconfirm $(pacman -Qdtq)
 fi
