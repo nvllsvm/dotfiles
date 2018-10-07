@@ -9,14 +9,11 @@ log() {
 log 'Updating packages'
 yay -Syu --noconfirm
 
-log 'Updating build cache'
-asp update
-
 log 'Updating file cache'
-sudo pkgfile --update
+sudo pkgfile --update > /dev/null
 
 log 'Pruning package cache'
-sudo pacman -Sc --noconfirm 
+sudo pacman -Sc --noconfirm > /dev/null
 
 log 'Removing orphans'
 if pacman -Qdtq > /dev/null; then 
