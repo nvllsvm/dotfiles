@@ -116,7 +116,7 @@ zle -N sudo-command-line
 bindkey '^r' sudo-command-line
 bindkey -M vicmd '^r' sudo-command-line
 
-fpath=($DOTFILES_DIR/zsh/functions $fpath)
+fpath=($DOTFILES/zsh/functions $fpath)
 compinit -C
 
 autoload -Uz bracketed-paste-magic
@@ -143,11 +143,11 @@ exec-update() {
     fi
 }
 
-for plugin in $DOTFILES_DIR/zsh/plugins/*; do
+for plugin in $DOTFILES/zsh/plugins/*; do
     . $plugin
 done
 
-zshrc_host="$DOTFILES_DIR/zsh/hosts/$HOST/.zshrc"
+zshrc_host="$DOTFILES/zsh/hosts/$HOST/.zshrc"
 [[ -r "$zshrc_host" ]] && . "$zshrc_host"
 unset zshrc_host
 

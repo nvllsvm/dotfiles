@@ -1,3 +1,3 @@
 if command -v tmux > /dev/null; then
-    path=("$DOTFILES_DIR"/scripts/tmux "$path[@]")
+    path=("$DOTFILES"/scripts/tmux "$path[@]")
 fi

@@ -5,7 +5,7 @@ if [[ -d "$PYENV_ROOT" ]]; then
     export VIRTUAL_ENV_DISABLE_PROMPT=1
 
     path=(
-        "${DOTFILES_DIR}/scripts/python"
+        "${DOTFILES}/scripts/python"
         "${PYTHONUSERBASE}/bin"
         "${PYENV_ROOT}/bin"
         "${PYENV_ROOT}/shims"

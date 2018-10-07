@@ -23,7 +23,7 @@ if [ -d "$NVM_DIR" ]; then
         alias $cmd="nvm-load && $cmd"
     done
 
-    path=("${DOTFILES_DIR}/scripts/nodejs" "$path[@]")
+    path=("${DOTFILES}/scripts/nodejs" "$path[@]")
     full-update add nvm-update
 else
     unset NVM_DIR

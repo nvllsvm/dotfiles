@@ -22,7 +22,7 @@ if [ -d "$BASE16_SHELL" ]; then
         fi
     }
 
-    path=("$DOTFILES_DIR"/scripts/base16 "$path[@]")
+    path=("$DOTFILES"/scripts/base16 "$path[@]")
 
     full-update add base16-update
 else

@@ -2,7 +2,7 @@
 MODIFIED_CONFIG=~/.config/termite/config
 
 mkdir -p ~/.config/termite
-cp $DOTFILES_DIR/termite/config $MODIFIED_CONFIG
+cp $DOTFILES/termite/config $MODIFIED_CONFIG
 
 # set background prevents another color from flashing when spawning a new term
 background_color=$(xrdb -query | grep background | awk '{print $2}')

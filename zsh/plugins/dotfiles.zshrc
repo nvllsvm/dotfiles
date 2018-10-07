@@ -1,5 +1,5 @@
 dotfiles-update() {
-    git-auto-update $DOTFILES_DIR
+    git-auto-update $DOTFILES
 }
 
 full-update add dotfiles-update

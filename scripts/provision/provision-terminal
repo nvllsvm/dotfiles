@@ -33,7 +33,7 @@ link_file zsh/.zshrc ~/.zshrc
 osname=$(uname)
 if [[ $osname == Darwin* ]]; then
     link_file pip ~/Library/Application\ Support/pip
-    zsh_command '$DOTFILES_DIR/scripts/macos/brew-update'
+    zsh_command '$DOTFILES/scripts/macos/brew-update'
     brew install \
         automake \
         coreutils \
@@ -57,7 +57,7 @@ if [[ $osname == Linux* ]]; then
     link_file pip ~/.config/pip
 fi
 
-zsh_command '$DOTFILES_DIR/scripts/python/pyenv-update'
+zsh_command '$DOTFILES/scripts/python/pyenv-update'
 if [[ $osname == Darwin* ]]; then
 #    zsh_command -i 'pyenv install 3.7.0'
     zsh_command 'pyenv global 3.7.0'

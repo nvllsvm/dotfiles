@@ -23,7 +23,7 @@ render() {
     pandoc \
         --from "${pandoc_format}" \
         --to html \
-        -c "${DOTFILES_DIR}"/pandoc/css/github-markdown.css \
+        -c "${DOTFILES}"/pandoc/css/github-markdown.css \
         --self-contained \
         --standalone \
         --columns=10000 "$file"

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-BACKUP_ROOT="$DOTFILES_DIR"/desktop
+BACKUP_ROOT="$DOTFILES"/desktop
 
 sync_file() {
     if [ -f "$target" ]; then
