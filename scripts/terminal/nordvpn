@@ -25,6 +25,6 @@ fi
 exec sudo openvpn \
     --config $config_file \
     --script-security 2 \
-    --auth-user-pass $DOTFILES_PRIVATE_DIR/nordvpn/auth \
+    --auth-user-pass $DOTFILES_PRIVATE/nordvpn/auth \
     --up $EXTRA_SCRIPT \
     --down $EXTRA_SCRIPT
