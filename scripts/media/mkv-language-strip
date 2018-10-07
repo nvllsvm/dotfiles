@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import os
+import pathlib
 import shutil
 import subprocess
 import sys
@@ -89,16 +90,22 @@ class MKVFile(object):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('input_directory')
-    parser.add_argument('output_directory')
+    parser.add_argument('input_directory', type=pathlib.Path)
+    parser.add_argument('output_directory', type=pathlib.Path)
     args = parser.parse_args()
 
-    input_directory = os.path.abspath(args.input_directory)
-    output_directory = args.output_directory
+    input_directory = args.input_directory.resolve()
+    if not input_directory.is_dir():
+        print('error: input directory does not exist', file=sys.stderr)
+        sys.exit(1)
 
-    if os.path.exists(output_directory):
-        print('Error: output directory exists: {}'.format(output_directory))
-        sys.exit()
+    output_directory = args.output_directory.resolve()
+
+    try:
+        output_directory.mkdir(parents=True)
+    except FileExistsError:
+        print('error: output directory already exists', file=sys.stderr)
+        sys.exit(1)
 
     valid_languages = set(['eng', 'und', None])
 
