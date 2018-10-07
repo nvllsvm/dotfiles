@@ -4,16 +4,12 @@ set -e
 MAGENTA='\033[1;35m'
 RESET='\033[0m'
 
-log() {
-    printf "${YELLOW}$@${RESET_COLOR}\n"
+update_repo() {
+    printf "${MAGENTA}Updating $1 ($2)...${RESET}\n"
+    git auto-update "$2"
 }
 
-for d in $(env | grep ^DOTFILES | sort); do
-    name="$(echo "$d" | cut -d = -f 1)"
-    loc="$(echo "$d" | cut -d = -f 2)"
-    printf "${MAGENTA}Updating $name ...${RESET}\n"
-    git auto-update "$loc"
-done
+update_repo "DOTFILES" "$DOTFILES"
 
 # non-user files
 BACKUP_ROOT="$DOTFILES"/desktop
@@ -25,4 +21,10 @@ for source in $(find "$BACKUP_ROOT" -type f); do
             sudo cp "$source" "$target"
         fi
     fi
+done
+
+for d in $(env | grep ^DOTFILES_ | sort); do
+    name="$(echo "$d" | cut -d = -f 1)"
+    loc="$(echo "$d" | cut -d = -f 2)"
+    update_repo "$name" "$loc"
 done
