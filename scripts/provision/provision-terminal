@@ -53,8 +53,13 @@ if [[ $osname == Darwin* ]]; then
 fi
 
 if [[ $osname == Linux* ]]; then
-    link_file pacman ~/.config/pacman
     link_file pip ~/.config/pip
+
+    if command -v pacman; then
+        link_file pacman ~/.config/pacman
+        sudo pacman -S --noconfirm dash
+        ln -sf "$(which dash)" "$HOME/.local/bin/sh"
+    fi
 fi
 
 zsh_command '$DOTFILES/scripts/python/pyenv-update'
