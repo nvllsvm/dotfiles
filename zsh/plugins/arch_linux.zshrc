@@ -3,5 +3,4 @@ if command -v pacman > /dev/null; then
     path=("$DOTFILES/scripts/arch_linux" "$path[@]")
 
     full-update add 'arch-linux-update'
-    full-update add 'etc-backup-desktop'
 fi
