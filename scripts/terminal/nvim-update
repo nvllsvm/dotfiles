@@ -6,5 +6,4 @@ fi
 if ! pip list | grep '^neovim ' > /dev/null || pip list -o | grep '^neovim ' > /dev/null; then
     pip install -U neovim
 fi
-exit
 nvim -c 'PlugUpgrade | PlugUpdate | PlugClean | silent UpdateRemotePlugins' -c 'qa'
