@@ -28,7 +28,7 @@ if [[ $osname == Linux* ]]; then
     link_file mpv ~/.config/mpv
     link_file qt5ct ~/.config/qt5ct
     link_file rofi ~/.config/rofi
-    link_file xbindkeys/.xbindkeysrc ~/..xbindkeysrc
+    link_file xbindkeys/.xbindkeysrc ~/.xbindkeysrc
     link_file xinit/.xinitrc ~/.xinitrc
     link_file zsh/.zprofile ~/.zprofile
     link_file environment.d ~/.config/environment.d

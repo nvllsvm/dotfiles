@@ -1,1 +1,1 @@
-. ~/Code/Private/dotfiles-private/zsh/.zshrc
+. ~/.dotfiles/private/zsh/.zshrc
