@@ -1,19 +1,28 @@
 #!/usr/bin/env sh
 set -e
-git auto-update $DOTFILES
 
+MAGENTA='\033[1;35m'
+RESET='\033[0m'
+
+log() {
+    printf "${YELLOW}$@${RESET_COLOR}\n"
+}
+
+for d in $(env | grep ^DOTFILES | sort); do
+    name="$(echo "$d" | cut -d = -f 1)"
+    loc="$(echo "$d" | cut -d = -f 2)"
+    printf "${MAGENTA}Updating $name ...${RESET}\n"
+    git auto-update "$loc"
+done
+
+# non-user files
 BACKUP_ROOT="$DOTFILES"/desktop
-
-sync_file() {
+for source in $(find "$BACKUP_ROOT" -type f); do
+    target=${source#$BACKUP_ROOT}
     if [ -f "$target" ]; then
         if ! sudo diff "$source" "$target" > /dev/null ; then
             echo Syncing "$target"
             sudo cp "$source" "$target"
         fi
     fi
-}
-
-for source in $(find "$BACKUP_ROOT" -type f); do
-    target=${source#$BACKUP_ROOT}
-    sync_file "$source" "$target"
 done
