@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
-if command -v xclip > /dev/null ; then
+if command -v xclip; then
     exec xclip -selection c -o
-elif command -v termux-clipboard-get > /dev/null ; then
+elif command -v termux-clipboard-get; then
     exec termux-clipboard-get
-elif command -v pbcopy > /dev/null ; then
+elif command -v pbcopy; then
     exec pbpaste
 fi
