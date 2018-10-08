@@ -2,7 +2,7 @@
 IMAGE=nginx:alpine
 PORT=8000
 
-if [ $1 = '--pull' ]; then
+if [ "$1" = '--pull' ]; then
     docker pull "${IMAGE}"
     exit
 fi
@@ -37,7 +37,7 @@ EOF
 echo http://localhost:$PORT
 
 container_name="docker_shell-$(uuidgen | tr -d -)"
-trap "rm -rf $TEMP_DIR; docker kill "${container_name}" >& /dev/null || true" SIGHUP EXIT
+trap "rm -rf $TEMP_DIR; docker kill "${container_name}" >& /dev/null || true" HUP EXIT
 
 docker run \
     --rm \
