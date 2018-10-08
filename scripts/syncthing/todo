@@ -21,5 +21,3 @@ if [ -z "$1" ]; then
 else
     echo $(date +%Y-%m-%d) $@ >> "${TODO_FILE}"
 fi
-
-sort "${TODO_FILE}" -o "${TODO_FILE}"

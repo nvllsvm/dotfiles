@@ -1,3 +1,0 @@
-#!/usr/bin/env sh
-cd "$(git install https://github.com/passff/passff-host)"
-sh src/install_host_app.sh --local firefox
