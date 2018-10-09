@@ -1,4 +1,2 @@
-#!/bin/sh
-set -e
-port=$(docker-compose port "$@")
-printf $port | cut -d: -f2
+#!/usr/bin/env sh
+printf docker-compose port "$@" | cut -d: -f2
