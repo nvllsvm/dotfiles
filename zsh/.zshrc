@@ -21,27 +21,6 @@ bindkey "^[[A" history-beginning-search-backward
 bindkey "^[[B" history-beginning-search-forward
 
 alias ls='ls --color=auto --group-directories-first'
-alias la='ls -A'
-alias ll='la -lh'
-alias grep='grep --color=auto'
-
-srch () {
-    if [[ -z $2 ]]; then
-        find . 2> /dev/null | grep -i $1
-        grep -riI $1 . 2> /dev/null
-    else
-        find ${@:2} 2> /dev/null | grep -i $1
-        grep -riI $1 ${@:2} 2> /dev/null
-    fi
-}
-
-fnd () {
-    find . -iname "*$1*" | grep -i "$1"
-}
-
-grp () {
-    grep -riI "$1" .
-}
 
 setopt PROMPT_SUBST
 
