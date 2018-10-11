@@ -5,8 +5,10 @@ MAGENTA='\033[1;35m'
 RESET='\033[0m'
 
 update_repo() {
-    printf "${MAGENTA}Updating $1 ($2)...${RESET}\n"
-    git auto-update "$2"
+    if [ -d "$2/.git" ]; then
+        printf "${MAGENTA}Updating $1 ($2)...${RESET}\n"
+        git auto-update "$2"
+    fi
 }
 
 update_repo "DOTFILES" "$DOTFILES"
