@@ -14,7 +14,7 @@ docker run \
 printf 'Updating Airsonic library .'
 airsonic-cli startScan > /dev/null
 
-while [ $(airsonic-cli getScanStatus | jq '.scanning') = 'true' ]; do
+while [ "$(airsonic-cli getScanStatus | jq '.scanning')" = 'true' ]; do
     printf .
     sleep 1
 done
