@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-container_name="$(cat /dev/urandom | tr -cd 'a-f0-9' | head -c 32)"
+container_name="$(cat /dev/urandom | LC_ALL=C tr -cd 'a-f0-9' | head -c 32)"
 trap "docker kill "${container_name}" > /dev/null 2>&1" HUP EXIT
 if [ -t 0 -a -t 1 -a -t 2 ]; then
     docker run --rm -i --name "${container_name}" -t "$@"
