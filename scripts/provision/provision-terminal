@@ -42,12 +42,15 @@ if [[ $osname == Darwin* ]]; then
         git \
         grep \
         htop \
+        kubectl \
+        kubernetes-helm \
         libtool \
         mpd \
         ncmpcpp \
         neovim \
         openssh \
         p7zip \
+        stern \
         tmux \
         zsh
 fi
