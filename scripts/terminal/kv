@@ -53,8 +53,6 @@ else
     if [ $# -eq 1 ]; then
         if [ -e "$KEY_PATH" ]; then
             cat "$KEY_PATH"
-        else
-            exit 1
         fi
     elif [ $# -eq 2 ]; then
         if [ -z "$VALUE" ]; then
