@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+set -e
+PREFIX="$HOME/.local"
+REPO_DIR="$(git install github:nvllsvm/mpd-notification)"
+cd "$REPO_DIR"
+
+current_version=$(git rev-parse HEAD)
+key="git-install/mpd-notification-nvllsvm"
+if [ "$(kv $key)" != "$current_version" ]; then
+    make
+    ln -sf "$PWD/mpd-notification" "$PREFIX/bin/mpd-notification"
+    kv $key $current_version
+fi
