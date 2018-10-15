@@ -9,9 +9,9 @@ if [ "$1" = "restart" ]; then
     else
         sol-docker down
     fi
-    docker-compose up -d
+    exec docker-compose up -d
 elif [ "$1" = "down" ]; then
-    docker-compose down -t 1 --remove-orphans -v
+    exec docker-compose down -t 1 --remove-orphans -v
 else
-    docker-compose "$@"
+    exec docker-compose "$@"
 fi
