@@ -1,14 +1,14 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 set -e
 
 TODO_FILE="${SYNCTHING_DIR}"/Notes/todo.txt
 
-if [ -n "$(find "${SYNCTHING_DIR}/Notes" -maxdepth 1 -name 'todo.*.txt')" ] ; then
+if [ "$(ls "${SYNCTHING_DIR}/Notes" | grep '^todo.*.txt' | wc -l)" -gt 1 ] ; then
     echo error: sync conflict detected >&2
     exit 1
 fi
 
-if [[ $# -eq 1 && $1 == '-l' ]]; then
+if [ "$1" = '-l' ]; then
    TOKENIZED=$(sed 's/ /\n/g' "${TODO_FILE}" | sort -u)
    echo "${TOKENIZED}" | grep '^@'
    echo
