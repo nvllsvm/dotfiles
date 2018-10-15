@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+set -e
+alias bw="$(which -a bw | head -n 2 | tail -n 1)"
+trap "bw lock > /dev/null" EXIT
+export BW_SESSION="$(bw unlock --raw)"
+bw sync > /dev/null
+bw "$@"
