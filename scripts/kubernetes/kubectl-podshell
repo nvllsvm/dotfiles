@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+if [ "$1" != '-n' ] || [ $# != 3 ]; then
+    echo usage: $(basename "$0") -n NAMESPACE POD >&2
+    exit 1
+fi
+NAMESPACE="$2"
+POD="$3"
+kubectl exec -it "${POD}" -n "${NAMESPACE}" -- sh
+sleep 50

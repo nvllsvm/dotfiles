@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
 pane_command() {
-    echo "echo $1 $2 && $1 $2 && echo Press enter to exit ... && read -s"
+    echo "echo $2 && $1 $2 && echo Press enter to exit ... && read -s"
 }
 
 if [ -z "$2" ]; then
     echo "No arguments supplied for command."
     exit 1
-elif [[ $TMUX ]]; then
+elif [ -n "$TMUX" ]; then
     clear
 
     command=${@:1:1}
@@ -20,9 +20,9 @@ elif [[ $TMUX ]]; then
         tmux split-window -h "$(pane_command "$command" "$i")"
     done
 
-    if [ $num_args == 2 ]; then
+    if [ $num_args = 2 ]; then
         tmux select-layout even-horizontal
-    elif [ $num_args == 3 ]; then
+    elif [ $num_args = 3 ]; then
         tmux select-layout even-vertical
     else
         tmux select-layout tiled
