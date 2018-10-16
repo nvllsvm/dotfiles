@@ -50,6 +50,7 @@ if [[ $osname == Darwin* ]]; then
         neovim \
         openssh \
         p7zip \
+        ripgrep \
         stern \
         tmux \
         zsh
