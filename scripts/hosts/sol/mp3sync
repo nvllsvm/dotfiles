@@ -1,15 +1,22 @@
 #!/usr/bin/env sh
 set -e
-IMAGE=nvllsvm/harmonize
-docker pull $IMAGE > /dev/null
-docker run \
-    --rm \
-    -e PUID=1000 \
-    -e PGID=100 \
-    -e NUM_PROCESSES=8 \
-    -v /mnt/storage1/Audio/Library:/source \
-    -v /mnt/storage1/Audio/MP3:/target \
-    $IMAGE
+IMAGE=nvllsvm/harmonize:dev
+
+SOURCE=/mnt/storage1/Audio/Library
+TARGET=/mnt/storage1/Audio/MP3
+
+docker pull "$IMAGE" > /dev/null
+
+harmonize() {
+    docker run \
+        --rm \
+        --user $(id -u):$(id -g) \
+        -v "$SOURCE:$SOURCE" \
+        -v "$TARGET:$TARGET" \
+        "$IMAGE" "$@"
+}
+
+harmonize -n 8 "$SOURCE" "$TARGET"
 
 printf 'Updating Airsonic library .'
 airsonic-cli startScan > /dev/null
