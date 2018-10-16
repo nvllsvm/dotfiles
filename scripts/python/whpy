@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import argparse
+import os
 import pkgutil
 import sys
 
@@ -7,6 +8,13 @@ import sys
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('module')
+    parser.add_argument(
+        '-d',
+        dest='directory',
+        action='store_const',
+        const=True,
+        help='output the directory instead of file'
+    )
     args = parser.parse_args()
 
     loader = pkgutil.get_loader(args.module)
@@ -24,7 +32,10 @@ def main():
         sys.stderr.write('error: built-in module\n')
         sys.exit(1)
 
-    print(path)
+    if args.directory is not None:
+        print(os.path.dirname(path))
+    else:
+        print(path)
 
 
 if __name__ == '__main__':
