@@ -36,6 +36,8 @@ if [[ $osname == Linux* ]]; then
     systemctl --user enable syncthing
 elif [[ $osname == Darwin ]]; then
     link_file karabiner ~/.config/karabiner
+
+    find "$PWD/macos/LaunchAgents" -type f -exec ln -sf {} ~/Library/LaunchAgents \;
 fi
 
 link_file mpd ~/.config/mpd

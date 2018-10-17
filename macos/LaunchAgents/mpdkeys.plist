@@ -3,13 +3,13 @@
 <plist version="1.0">
   <dict>
     <key>Label</key>
-    <string>mpd</string>
+    <string>mpdkeys</string>
     <key>Program</key>
-    <string>/Users/andrewr/.dotfiles/public/scripts/macos/start-mpd</string>
+    <string>/Users/andrewr/.dotfiles/public/scripts/macos/start-mpdkeys</string>
     <key>StandardOutLog</key>
-    <string>/tmp/mpd.out.log</string>
+    <string>/tmp/mpdkeys.out.log</string>
     <key>StandardErrorLog</key>
-    <string>/tmp/mpd.err.log</string>
+    <string>/tmp/mpdkeys.err.log</string>
     <key>RunAtLoad</key>
     <true/>
     <key>KeepAlive</key>

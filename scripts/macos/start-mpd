@@ -1,4 +1,2 @@
 #!/usr/bin/env sh
-/usr/local/bin/zsh -ic 'exec mpdkeys' &
-/usr/local/bin/mpd --no-daemon ~/.config/mpd/mpd.conf &
-wait
+exec /usr/local/bin/mpd --no-daemon ~/.config/mpd/mpd.conf
