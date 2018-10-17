@@ -23,7 +23,7 @@ log Remote
 git remote -v
 
 log All Branch
-git branch
+git branch -vv
 
 log Changes
-git status --short --show-stash --branch
+git status --short --show-stash
