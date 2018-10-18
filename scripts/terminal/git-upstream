@@ -5,4 +5,4 @@ if [ -n "$1" ]; then
     git remote add upstream "$1"
 fi
 git fetch upstream
-git rebase upstream/"$(git remote show upstream  | grep '^  HEAD branch: ' | cut -c16- )"
+git branch -u upstream/master master

@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-printf docker-compose port "$@" | cut -d: -f2
+docker-compose port "$@" | cut -d: -f2
