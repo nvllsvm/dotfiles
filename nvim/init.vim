@@ -125,7 +125,7 @@ endfunction
 
 autocmd FileType yaml setlocal shiftwidth=2 tabstop=2
 
-command JSON :%!python3 -m json.tool
+command JSON :%!jq -S '.'
 
 " enable line numbers
 let NERDTreeShowLineNumbers=1
