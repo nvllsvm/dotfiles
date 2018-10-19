@@ -9,6 +9,7 @@ if [[ $OSTYPE == darwin* ]]; then
 
     path=(/usr/local/sbin "$path[@]")
     path=(/usr/local/opt/sqlite/bin "$path[@]")
+    path=(/usr/local/opt/curl/bin "$path[@]")
     path=("$DOTFILES/scripts/macos" "$path[@]")
 
     man() {

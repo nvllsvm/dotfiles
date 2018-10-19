@@ -37,6 +37,7 @@ if [[ $osname == Darwin* ]]; then
     brew install \
         automake \
         coreutils \
+        curl \
         direnv \
         findutils \
         git \
