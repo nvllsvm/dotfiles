@@ -6,3 +6,4 @@ if [ -n "$1" ]; then
 fi
 git fetch upstream
 git branch -u upstream/master master
+git merge
