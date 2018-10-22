@@ -127,9 +127,10 @@ autocmd FileType yaml setlocal shiftwidth=2 tabstop=2
 
 command JSON :%!jq -S '.'
 
-" enable line numbers
+au FileType json set tabstop=2
+au FileType json set shiftwidth=2
+
 let NERDTreeShowLineNumbers=1
-" make sure relative line numbers are used
 autocmd FileType nerdtree setlocal relativenumber
 
 au BufNewFile,BufRead *.avsc set filetype=json
