@@ -13,9 +13,9 @@ HOME_BACKUP_DIR=$STORAGE1/Backup/sol/home
 backup_home() {
     echo Backing up home ...
     sudo rsync -av --progress --delete \
-        --exclude Code/Private/sol-docker/volumes/emby/transcoding-temp \
-        --exclude Code/Private/sol-docker/volumes/emby/logs \
-        --exclude Code/Private/sol-docker/volumes/emby/cache \
+        --exclude Code/private/sol-docker/volumes/emby/transcoding-temp \
+        --exclude Code/private/sol-docker/volumes/emby/logs \
+        --exclude Code/private/sol-docker/volumes/emby/cache \
         --exclude .cache \
         ~draje $HOME_BACKUP_DIR
 }
