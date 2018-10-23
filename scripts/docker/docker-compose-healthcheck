@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 containers_healthy() {
     FORMAT='{{ if .State.Health }}{{ if ne .State.Health.Status "healthy"}}1{{end}}{{end}}'
-    return $(docker inspect -f "$FORMAT" $(docker-compose ps -q) | sort -n | tail -n 1)
+    return $(docker inspect -f "$FORMAT" $(docker-compose ps -q "$@") | sort -n | tail -n 1)
 }
 
 
@@ -16,7 +16,7 @@ wait_for_containers_healthy() {
 }
 
 if [ "$1" = '-w' ]; then
-    wait_for_containers_healthy
+    wait_for_containers_healthy "$@"
 else
-    containers_healthy
+    containers_healthy "$@"
 fi
