@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 containers_healthy() {
     FORMAT='{{ if .State.Health }}{{ if ne .State.Health.Status "healthy"}}1{{end}}{{end}}'
-    return $(docker inspect --format "$FORMAT" $(docker-compose ps -q) | sort -n | tail -n 1)
+    return $(docker inspect -f "$FORMAT" $(docker-compose ps -q) | sort -n | tail -n 1)
 }
 
 
