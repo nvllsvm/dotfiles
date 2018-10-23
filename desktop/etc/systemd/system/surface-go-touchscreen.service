@@ -1,6 +1,7 @@
 [Unit]
 Description=set power setting for surface go touchscreen
 After=tlp.service
+After=suspend.target
 
 [Service]
 Type=oneshot
@@ -9,3 +10,4 @@ ExecStart=/bin/sh -c 'echo on > /sys/devices/pci0000\:00/0000\:00\:15.1/i2c_desi
 
 [Install]
 WantedBy=multi-user.target
+WantedBy=sleep.target
