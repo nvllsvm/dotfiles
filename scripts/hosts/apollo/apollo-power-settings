@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+sudo sh -c 'echo on > /sys/devices/pci0000\:00/0000\:00\:15.1/i2c_designware.1/power/control'
+sudo undervolt --core -90 --cache -90 --gpu -90
