@@ -1,0 +1,11 @@
+[Unit]
+Description=undervolt surface go
+After=tlp.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/undervolt --core -100 --cache -100 --gpu -100
+
+[Install]
+WantedBy=multi-user.target
