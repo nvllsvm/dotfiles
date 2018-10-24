@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import os
 import sys
 
 import pika
@@ -7,13 +8,30 @@ import pika
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-p', '--port', type=int, default=5672)
-    parser.add_argument('-H', '--host', default='localhost')
-    parser.add_argument('-v', '--vhost', default='/')
-    parser.add_argument('-a', '--ack', action='store_const', const=True,
-                        default=False)
-    parser.add_argument('-u', '--username')
-    parser.add_argument('-P', '--password')
+    parser.add_argument(
+        '-p', '--port',
+        type=int,
+        default=os.environ.get('RABBITMQ_PORT', 5672)
+    )
+    parser.add_argument(
+        '-H', '--host',
+        default=os.environ.get('RABBITMQ_HOST', 'localhost')
+    )
+    parser.add_argument(
+        '-v', '--vhost',
+        default=os.environ.get('RABBITMQ_VHOST', '/')
+    )
+    parser.add_argument(
+        '-u', '--username',
+        default=os.environ.get('RABBITMQ_USERNAME')
+    )
+    parser.add_argument(
+        '-P', '--password',
+        default=os.environ.get('RABBITMQ_PASSWORD')
+    )
+    parser.add_argument(
+        '-a', '--ack', action='store_const', const=True, default=False
+    )
     parser.add_argument('-t', '--tag')
     parser.add_argument('queue')
     args = parser.parse_args()
