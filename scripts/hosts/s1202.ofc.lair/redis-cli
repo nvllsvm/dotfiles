@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+IMAGE='redis:alpine'
+if [ "$1" = '--pull' ]; then
+    docker pull "$IMAGE"
+    exit
+fi
+exec shtty "$IMAGE" redis-cli "$@"

@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+aws --pull > /dev/null &
+influx --pull > /dev/null &
+psql --pull > /dev/null &
+redis-cli --pull > /dev/null &
+srvit --pull > /dev/null &
+
+for image in "alpine" "alpine:edge"; do
+    docker pull "$image" > /dev/null &
+done
+
+wait
