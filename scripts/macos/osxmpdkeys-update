@@ -1,4 +1,12 @@
 #!/usr/bin/env sh
+cd "$(git install https://github.com/nvllsvm/osxmmkeys.git)"
+current_version=$(git rev-parse HEAD)
+key="git-install/osxmmkeys"
+if [ "$(kv $key)" != "$current_version" ]; then
+    pip install .
+    kv $key $current_version
+fi
+
 cd "$(git install https://github.com/pushrax/osxmpdkeys.git)"
 current_version=$(git rev-parse HEAD)
 key="git-install/osxmpdkeys"
