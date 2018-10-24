@@ -2,7 +2,7 @@
 set -e
 
 if ! [ -x "$(command -v pip)" ]; then
-    curl https://bootstrap.pypa.io/get-pip.py | python
+    python -m ensurepip --user --default-pip
 fi
 
 if [ "$(pip list | grep -e '^pip ' -e '^setuptools ' -e '^wheel ' | wc -l)" != '3' ]; then
