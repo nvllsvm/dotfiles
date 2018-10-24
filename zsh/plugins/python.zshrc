@@ -14,9 +14,6 @@ if [[ -d "$PYENV_ROOT" ]]; then
 
     full-update add pyenv-update
     full-update add pip-update
-
-    # and yet again, flake8's dependencies are out-of-fucking-sync, bah
-    full-update add flake8-update
 else
     unset PYENV_ROOT
 fi
