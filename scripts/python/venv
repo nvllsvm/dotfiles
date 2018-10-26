@@ -6,6 +6,7 @@ parent=$(realpath $(pwd))
 env_folder=$env_root/$(printf $parent | sha256sum | awk '{print $1}')
 
 rm -rf $env_folder .envrc
+unset VIRTUAL_ENV
 pipenv --rm >& /dev/null || true
 
 if [[ $1 == '-d' ]]; then

@@ -2,7 +2,6 @@ export PYENV_ROOT=~/.local/git/pyenv
 
 if [[ -d "$PYENV_ROOT" ]]; then
     export PYTHONUSERBASE=~/.local/pythonuser
-    export VIRTUAL_ENV_DISABLE_PROMPT=1
 
     path=(
         "${DOTFILES}/scripts/python"
