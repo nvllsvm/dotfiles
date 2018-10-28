@@ -13,16 +13,16 @@ fi
 
 cd "${GIT_DIR}"
 git fetch
-if [ $(git rev-parse HEAD) != $(git rev-parse @{u}) ]; then
+if [ "$(git rev-parse HEAD)" != "$(git rev-parse @{u})" ]; then
     git merge
 fi
 
-if [ $(git status --porcelain | wc -l) -gt 0 ]; then
+if [ "$(git status --porcelain | wc -l)" -gt 0 ]; then
     git add -A
     git commit -m "git-auto-update $(date +"%Y-%m-%d %H:%M:%S")"
 fi
 
 branch=$(git rev-parse --abbrev-ref HEAD)
-if [ $(git log origin/$branch..$branch | wc -l) -gt 0 ]; then
+if [ "$(git log origin/$branch..$branch | wc -l)" -gt 0 ]; then
     git push
 fi
