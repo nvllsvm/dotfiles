@@ -13,10 +13,9 @@ zwatch() {
         echo "$help" >&2
         return 1
     fi
-    while True; do
+    while true; do
         clear
-        echo "$(date) - sleep $sleeptime"
-        echo -n "$@" | cut -c1-$COLUMNS
+        echo "$(date +'%Y-%m-%d %H:%M:%S') sleep ${sleeptime}s: $@" | cut -c1-$COLUMNS
         echo
         eval "$@"
         sleep "$sleeptime"
