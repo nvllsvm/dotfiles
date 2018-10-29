@@ -54,6 +54,7 @@ if [[ $osname == Darwin* ]]; then
         ripgrep \
         stern \
         tmux \
+        watch \
         zsh
 fi
 
