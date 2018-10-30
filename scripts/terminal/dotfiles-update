@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-set -ex
+set -e
 
 if [ "$1" = '-v' ]; then
     VERBOSE=1
@@ -16,17 +16,17 @@ update_repo() {
     fi
 
     # non-user files
-    for backup_root in "$2/non-user/common" "$2/non-user/$(hostname)"; do
-        if [ -d "$BACKUP_ROOT" ]; then
-            for source in $(find "$BACKUP_ROOT" -type f); do
-                target=${source#$BACKUP_ROOT}
+    for tag in common "$(hostname)"; do
+        backup_root="$2/non-user/$tag"
+        if [ -d "$backup_root" ]; then
+            for source in $(find "$backup_root" -type f); do
+                target=${source#$backup_root}
                 if [ -f "$target" ]; then
-                    if [ -n "$VERBOSE" ]; then
-                        echo Found "$target"
-                    fi
                     if ! diff "$source" "$target" > /dev/null ; then
                         echo Syncing "$target"
                         sudo cp "$source" "$target"
+                    elif [ -n "$VERBOSE" ]; then
+                        echo Found "$tag" "$target"
                     fi
                 fi
             done
