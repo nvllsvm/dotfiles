@@ -2,7 +2,7 @@
 set -e
 
 if [ "$1" = '-v' ]; then
-    set -x
+    VERBOSE=1
 fi
 
 MAGENTA='\033[1;35m'
@@ -20,7 +20,9 @@ update_repo() {
         for source in $(find "$BACKUP_ROOT" -type f); do
             target=${source#$BACKUP_ROOT}
             if [ -f "$target" ]; then
-                echo Found "$target"
+                if [ -n "$VERBOSE" ]; then
+                    echo Found "$target"
+                fi
                 if ! diff "$source" "$target" > /dev/null ; then
                     echo Syncing "$target"
                     sudo cp "$source" "$target"
