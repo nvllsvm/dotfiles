@@ -9,22 +9,25 @@ update_repo() {
         printf "${MAGENTA}Updating $1 ($2)...${RESET}\n"
         git auto-update "$2"
     fi
+
+    # non-user files
+    BACKUP_ROOT="$2"/desktop
+    if [ -d "$BACKUP_ROOT" ]; then
+        for source in $(find "$BACKUP_ROOT" -type f); do
+            target=${source#$BACKUP_ROOT}
+            if [ -f "$target" ]; then
+                echo Found "$target"
+                if ! diff "$source" "$target" > /dev/null ; then
+                    echo Syncing "$target"
+                    sudo cp "$source" "$target"
+                fi
+            fi
+        done
+    fi
 }
 
 update_repo "DOTFILES" "$DOTFILES"
 
-# non-user files
-BACKUP_ROOT="$DOTFILES"/desktop
-for source in $(find "$BACKUP_ROOT" -type f); do
-    target=${source#$BACKUP_ROOT}
-    if [ -f "$target" ]; then
-        echo Found "$target"
-        if ! diff "$source" "$target" > /dev/null ; then
-            echo Syncing "$target"
-            sudo cp "$source" "$target"
-        fi
-    fi
-done
 
 for d in $(env | grep ^DOTFILES_ | sort); do
     name="$(echo "$d" | cut -d = -f 1)"
