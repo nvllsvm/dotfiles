@@ -18,7 +18,8 @@ BACKUP_ROOT="$DOTFILES"/desktop
 for source in $(find "$BACKUP_ROOT" -type f); do
     target=${source#$BACKUP_ROOT}
     if [ -f "$target" ]; then
-        if ! sudo diff "$source" "$target" > /dev/null ; then
+        echo Found "$target"
+        if ! diff "$source" "$target" > /dev/null ; then
             echo Syncing "$target"
             sudo cp "$source" "$target"
         fi
