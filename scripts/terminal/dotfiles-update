@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-set -e
+set -ex
 
 if [ "$1" = '-v' ]; then
     VERBOSE=1
@@ -16,8 +16,6 @@ update_repo() {
     fi
 
     # non-user files
-    BACKUP_ROOT="$2"/non-user
-
     for backup_root in "$2/non-user/common" "$2/non-user/$(hostname)"; do
         if [ -d "$BACKUP_ROOT" ]; then
             for source in $(find "$BACKUP_ROOT" -type f); do
