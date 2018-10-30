@@ -1,6 +1,10 @@
 #!/usr/bin/env sh
 set -e
 
+if [ "$1" = '-v' ]; then
+    set -x
+fi
+
 MAGENTA='\033[1;35m'
 RESET='\033[0m'
 
