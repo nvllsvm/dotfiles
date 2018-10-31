@@ -1,10 +1,4 @@
 #!/usr/bin/env sh
 set -e
 export PIP_USER=0
-
-# virtualenv bitches about using imp
-if [ "$1" = 'install' ]; then
-    export PYTHONWARNINGS='ignore::DeprecationWarning'
-fi
-
 exec "$(which -a pipenv | grep -v "$0" | head -n 1)" "${@}"
