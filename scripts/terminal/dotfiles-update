@@ -16,22 +16,24 @@ update_repo() {
     fi
 
     # non-user files
-    for tag in common "$(hostname)"; do
-        backup_root="$2/non-user/$tag"
-        if [ -d "$backup_root" ]; then
-            for source in $(find "$backup_root" -type f); do
-                target=${source#$backup_root}
-                if sudo test -f "$target" || [ "$tag" != 'common' ]; then
-                    if ! sudo diff "$source" "$target" > /dev/null 2>&1 ; then
-                        echo Syncing "$target"
-                        sudo cp "$source" "$target"
-                    elif [ -n "$VERBOSE" ]; then
-                        echo Found "$tag" "$target"
+    if command -v sudo > /dev/null; then
+        for tag in common "$(hostname)"; do
+            backup_root="$2/non-user/$tag"
+            if [ -d "$backup_root" ]; then
+                for source in $(find "$backup_root" -type f); do
+                    target=${source#$backup_root}
+                    if sudo test -f "$target" || [ "$tag" != 'common' ]; then
+                        if ! sudo diff "$source" "$target" > /dev/null 2>&1 ; then
+                            echo Syncing "$target"
+                            sudo cp "$source" "$target"
+                        elif [ -n "$VERBOSE" ]; then
+                            echo Found "$tag" "$target"
+                        fi
                     fi
-                fi
-            done
-        fi
-    done
+                done
+            fi
+        done
+    fi
 }
 
 update_repo "DOTFILES" "$DOTFILES"
