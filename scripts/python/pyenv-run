@@ -1,14 +1,12 @@
-#!/bin/sh
+#!/usr/bin/env sh
 set -e
-eval "$(pyenv init - --no-rehash)"
 
-VERSION=$1
+if [ $1 = 'local' ]; then
+    PYENV_VERSION=$(pyenv global)
+else
+    PYENV_VERSION=$1
+fi
 shift
 
-if [[ $VERSION == 'local' ]]; then
-    VERSION=$(pyenv local)
-elif [[ $VERSION == 'global' ]]; then
-    VERSION=$(pyenv global)
-fi
-pyenv shell $VERSION
-"$@"
+export PYENV_VERSION
+exec "$@"
