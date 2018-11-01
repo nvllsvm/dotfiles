@@ -22,6 +22,7 @@ else
     config_file="$(grep -lr " $recommended_ip " $NORDVPN_DIR)"
 fi
 
+echo using $config_file
 exec sudo openvpn \
     --config $config_file \
     --script-security 2 \
