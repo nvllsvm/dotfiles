@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# named pipenvs that live the fuck outside your working directory
+set -e
+PIPTFO_ROOT=$HOME/.local/share/piptfo
+BIN_DIR=$HOME/.local/bin
+
+# fix a deficiency in pipenv
+# https://github.com/pypa/pipenv/issues/1798
+export PIP_USER=0
+
+mkdir -p "${PIPTFO_ROOT}"
+cd "${PIPTFO_ROOT}"
+
+if [ "$1" = '--update' ]; then
+    for d in ./*; do
+        if [ -d "$d" ]; then
+            cd "$d"
+            echo Updating "$(basename "$d")"
+            pipenv update
+        fi
+    done
+    exit
+fi
+
+if [ $# -eq 0 ]; then
+    echo error >&2
+    exit 1
+else
+    NAME="$1"
+    NAME_ROOT="${PIPTFO_ROOT}/${NAME}"
+
+    if [ $# -eq 1 ]; then
+        echo "${NAME_ROOT}"
+        exit
+    fi
+    shift
+fi
+
+export PIPENV_VENV_IN_PROJECT=1
+
+mkdir -p "${NAME}"
+cd "${NAME}"
+if [ "$1" = 'install' ]; then
+    shift
+    PACKAGE="$1"
+    pipenv install "${PACKAGE}"
+    for bin in $(piptfo "${NAME}" bin "${PACKAGE}") ; do
+        ln -sf $(pwd)/.venv/bin/$bin $BIN_DIR/$bin
+    done
+elif [ "$1" = 'bin' ]; then
+    shift
+    pipenv run python -c '
+import pkg_resources
+import sys
+dist = pkg_resources.get_distribution(sys.argv[1])
+for bin in dist.get_entry_map().get("console_scripts").keys():
+    print(bin)
+' "$1"
+
+else
+    pipenv "$@"
+fi
