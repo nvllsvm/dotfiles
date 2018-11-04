@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # named pipenvs that live the fuck outside your working directory
 set -e
 PIPTFO_ROOT=$HOME/.local/share/piptfo
