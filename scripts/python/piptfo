@@ -1,62 +1,88 @@
-#!/usr/bin/env sh
-# named pipenvs that live the fuck outside your working directory
-set -e
-PIPTFO_ROOT=$HOME/.local/share/piptfo
-BIN_DIR=$HOME/.local/bin
-
-# fix a deficiency in pipenv
-# https://github.com/pypa/pipenv/issues/1798
-export PIP_USER=0
-
-mkdir -p "${PIPTFO_ROOT}"
-cd "${PIPTFO_ROOT}"
-
-if [ "$1" = '--update' ]; then
-    for d in ./*; do
-        if [ -d "$d" ]; then
-            cd "$d"
-            echo Updating "$(basename "$d")"
-            pipenv update
-        fi
-    done
-    exit
-fi
-
-if [ $# -eq 0 ]; then
-    echo error >&2
-    exit 1
-else
-    NAME="$1"
-    NAME_ROOT="${PIPTFO_ROOT}/${NAME}"
-
-    if [ $# -eq 1 ]; then
-        echo "${NAME_ROOT}"
-        exit
-    fi
-    shift
-fi
-
-export PIPENV_VENV_IN_PROJECT=1
-
-mkdir -p "${NAME}"
-cd "${NAME}"
-if [ "$1" = 'install' ]; then
-    shift
-    PACKAGE="$1"
-    pipenv install "${PACKAGE}"
-    for bin in $(piptfo "${NAME}" bin "${PACKAGE}") ; do
-        ln -sf $(pwd)/.venv/bin/$bin $BIN_DIR/$bin
-    done
-elif [ "$1" = 'bin' ]; then
-    shift
-    pipenv run python -c '
-import pkg_resources
+#!/usr/bin/env python3
+import json
+import os
+import pathlib
+import subprocess
 import sys
-dist = pkg_resources.get_distribution(sys.argv[1])
-for bin in dist.get_entry_map().get("console_scripts").keys():
-    print(bin)
-' "$1"
 
-else
-    pipenv "$@"
-fi
+import pkg_resources
+
+CONFIG_ROOT = pathlib.Path('~/.config/piptfo').expanduser().resolve()
+LOCAL_ROOT = pathlib.Path('~/.local/share/piptfo').expanduser().resolve()
+LOCAL_BIN_ROOT = pathlib.Path('~/.local/bin').expanduser().resolve()
+
+
+def package_scripts(package):
+    bin_root = pathlib.Path(os.environ['VIRTUAL_ENV'], 'bin').resolve()
+
+    dist = pkg_resources.get_distribution(package)
+
+    scripts = []
+    for line in dist.get_metadata_lines('RECORD'):
+        path = pathlib.Path(dist.location, line.split(',')[0]).resolve()
+        if path.parent == bin_root:
+            scripts.append(path)
+    return scripts
+
+
+def pipenv(args, **kwargs):
+    os.environ['WORKON_HOME'] = str(LOCAL_ROOT)
+
+    # fix a deficiency in pipenv
+    # https://github.com/pypa/pipenv/issues/1798
+    os.environ['PIP_USER'] = '0'
+
+    return subprocess.run(
+        ['pipenv', *args],
+        check=True,
+        **kwargs
+    )
+
+
+def piptfo_scripts(namespace):
+    result = pipenv(
+        ['run', 'piptfo', namespace, 'scripts'],
+        stdout=subprocess.PIPE
+    )
+    return [
+        pathlib.Path(line.strip())
+        for line in result.stdout.decode().split('\n')
+        if line
+    ]
+
+
+def pipenv_explicitly_installed():
+    result = pipenv(['graph', '--json-tree'], stdout=subprocess.PIPE)
+    return [package['package_name'] for package in json.loads(result.stdout)]
+
+
+def main():
+    namespace = sys.argv[1]
+
+    namespace_root = CONFIG_ROOT.joinpath(namespace)
+    namespace_root.mkdir(parents=True, exist_ok=True)
+
+    namespace_pipfile = namespace_root.joinpath('Pipfile')
+    namespace_pipfile.touch()
+
+    os.environ['PIPENV_PIPFILE'] = str(namespace_pipfile)
+
+    if sys.argv[2] == 'scripts':
+        for package in pipenv_explicitly_installed():
+            for script in package_scripts(package):
+                print(script)
+    else:
+        pipenv(sys.argv[2:])
+        if sys.argv[2] == 'install':
+            for script in piptfo_scripts(namespace):
+                target = LOCAL_BIN_ROOT.joinpath(script.name)
+                print(f'Linking {target} -> {script}')
+                try:
+                    target.unlink()
+                except FileNotFoundError:
+                    pass
+                target.symlink_to(script)
+
+
+if __name__ == '__main__':
+    main()

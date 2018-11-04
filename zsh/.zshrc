@@ -133,4 +133,7 @@ unset zshrc_host
 full-update add 'rm -f ~/.zcompdump && zsh -ic "echo -n"'
 full-update add 'exec zsh'
 
-path=(~/.bin ~/.local/bin "$path[@]")
+for dir in ~/.bin ~/.local/bin; do
+    full-update add "find $dir -xtype l -delete"
+    path=(dir "$path[@]")
+done
