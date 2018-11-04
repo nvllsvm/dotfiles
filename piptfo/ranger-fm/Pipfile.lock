@@ -1,0 +1,28 @@
+{
+    "_meta": {
+        "hash": {
+            "sha256": "a2c5987d8493e0d876790140dc936483d87df957540fc611b78c6a3ebdcb30b3"
+        },
+        "pipfile-spec": 6,
+        "requires": {
+            "python_version": "3.7"
+        },
+        "sources": [
+            {
+                "name": "pypi",
+                "url": "https://pypi.org/simple",
+                "verify_ssl": true
+            }
+        ]
+    },
+    "default": {
+        "ranger-fm": {
+            "hashes": [
+                "sha256:0ec62031185ad1f40b9faebd5a2d517c8597019c2eee919e3f1c60ce466d8625"
+            ],
+            "index": "pypi",
+            "version": "==1.9.2"
+        }
+    },
+    "develop": {}
+}

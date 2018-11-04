@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Wise man once said "Coding with sickness result in many WTFs when better"
+
 import json
 import os
 import pathlib
@@ -7,9 +9,13 @@ import sys
 
 import pkg_resources
 
-CONFIG_ROOT = pathlib.Path('~/.config/piptfo').expanduser().resolve()
-LOCAL_ROOT = pathlib.Path('~/.local/share/piptfo').expanduser().resolve()
-LOCAL_BIN_ROOT = pathlib.Path('~/.local/bin').expanduser().resolve()
+os.environ.setdefault('PIPTFO_CONFIG', '~/.config/piptfo')
+os.environ.setdefault('PIPTFO_LOCAL', '~/.local/share/piptfo')
+os.environ.setdefault('PIPTFO_BIN', '~/.local/bin')
+
+PIPTFO_CONFIG = pathlib.Path(os.environ['PIPTFO_CONFIG']).expanduser().resolve()
+PIPTFO_LOCAL = pathlib.Path(os.environ['PIPTFO_LOCAL']).expanduser().resolve()
+PIPTFO_BIN = pathlib.Path(os.environ['PIPTFO_BIN']).expanduser().resolve()
 
 
 def package_scripts(package):
@@ -26,7 +32,7 @@ def package_scripts(package):
 
 
 def pipenv(args, **kwargs):
-    os.environ['WORKON_HOME'] = str(LOCAL_ROOT)
+    os.environ['WORKON_HOME'] = str(PIPTFO_LOCAL)
 
     # fix a deficiency in pipenv
     # https://github.com/pypa/pipenv/issues/1798
@@ -56,10 +62,31 @@ def pipenv_explicitly_installed():
     return [package['package_name'] for package in json.loads(result.stdout)]
 
 
-def main():
-    namespace = sys.argv[1]
+def piptfo_all(args):
+    for d in PIPTFO_CONFIG.iterdir():
+        if d.is_dir():
+            print(d)
+            pipenv(
+                ['run', 'piptfo', d.name, *args],
+            )
 
-    namespace_root = CONFIG_ROOT.joinpath(namespace)
+
+def main():
+    if sys.argv[1] == '-d':
+        global PIPTFO_CONFIG
+        PIPTFO_CONFIG = pathlib.Path(sys.argv[2]).expanduser().resolve()
+        os.environ['PIPTFO_CONFIG'] = str(PIPTFO_CONFIG)
+        sys.argv.pop(1)
+        sys.argv.pop(2)
+    if sys.argv[1] == '--all':
+        piptfo_all(sys.argv[2:])
+        sys.exit()
+    else:
+        namespace = sys.argv[1]
+        method = sys.argv[2]
+        args = sys.argv[2:]
+
+    namespace_root = PIPTFO_CONFIG.joinpath(namespace)
     namespace_root.mkdir(parents=True, exist_ok=True)
 
     namespace_pipfile = namespace_root.joinpath('Pipfile')
@@ -67,15 +94,15 @@ def main():
 
     os.environ['PIPENV_PIPFILE'] = str(namespace_pipfile)
 
-    if sys.argv[2] == 'scripts':
+    if method == 'scripts':
         for package in pipenv_explicitly_installed():
             for script in package_scripts(package):
                 print(script)
     else:
-        pipenv(sys.argv[2:])
-        if sys.argv[2] == 'install':
+        pipenv(args)
+        if method == 'install':
             for script in piptfo_scripts(namespace):
-                target = LOCAL_BIN_ROOT.joinpath(script.name)
+                target = PIPTFO_BIN.joinpath(script.name)
                 print(f'Linking {target} -> {script}')
                 try:
                     target.unlink()

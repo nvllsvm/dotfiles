@@ -13,6 +13,7 @@ if [[ -d "$PYENV_ROOT" ]]; then
 
     full-update add pyenv-update
     full-update add pip-update
+    full-update add piptfo --all update
 else
     unset PYENV_ROOT
 fi

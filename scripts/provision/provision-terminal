@@ -25,6 +25,7 @@ link_file httpie ~/.httpie
 link_file nvim ~/.config/nvim
 link_file psql/.psqlrc ~/.psqlrc
 link_file ranger ~/.config/ranger
+link_file piptfo ~/.config/piptfo
 link_file sqlite/.sqliterc ~/.sqliterc
 link_file tmux/.tmux.conf ~/.tmux.conf
 link_file zsh/.zshenv ~/.zshenv
@@ -73,5 +74,5 @@ if [[ $osname == Darwin* ]]; then
 fi
 
 zsh_command pip-update
-zsh_command 'pip install pipenv ranger-fm httpie pyzmq virtualenv speedtest-cli youtube_dl flake8'
+zsh_command 'pip install pipenv'
 zsh_command nvim-update
