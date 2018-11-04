@@ -1,2 +1,7 @@
 #!/usr/bin/env sh
 piptfo --all update > /dev/null 2>&1
+RET=$?
+if [ $RET -ne 0 ]; then
+    echo error: update failed >&2
+    exit $RET
+fi
