@@ -25,7 +25,6 @@ xinit-$(hostname) &
 pkill -9 -f mpd-notification
 mpd-notification &
 nm-applet &
-blueberry-tray &
 syncthing-gtk &
 
 exec i3
