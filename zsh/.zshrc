@@ -130,10 +130,10 @@ zshrc_host="$DOTFILES/zsh/hosts/$HOST/.zshrc"
 [[ -r "$zshrc_host" ]] && . "$zshrc_host"
 unset zshrc_host
 
-full-update add 'rm -f ~/.zcompdump && zsh -ic "echo -n"'
-full-update add 'exec zsh'
-
 path=(~/.bin ~/.local/bin "$path[@]")
 
 full-update add 'rm-broken-symlinks ~/.bin'
 full-update add 'rm-broken-symlinks ~/.local/bin'
+
+full-update add 'rm -f ~/.zcompdump && zsh -ic "echo -n"'
+full-update add 'exec zsh'
