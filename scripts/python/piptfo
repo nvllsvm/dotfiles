@@ -9,11 +9,13 @@ import sys
 
 import pkg_resources
 
-os.environ.setdefault('PIPTFO_CONFIG', '~/.config/piptfo')
+# fix a deficiency in pipenv
+# https://github.com/pypa/pipenv/issues/1798
+os.environ['PIP_USER'] = '0'
+
 os.environ.setdefault('PIPTFO_LOCAL', '~/.local/share/piptfo')
 os.environ.setdefault('PIPTFO_BIN', '~/.local/bin')
 
-PIPTFO_CONFIG = pathlib.Path(os.environ['PIPTFO_CONFIG']).expanduser().resolve()
 PIPTFO_LOCAL = pathlib.Path(os.environ['PIPTFO_LOCAL']).expanduser().resolve()
 PIPTFO_BIN = pathlib.Path(os.environ['PIPTFO_BIN']).expanduser().resolve()
 
@@ -31,23 +33,10 @@ def package_scripts(package):
     return scripts
 
 
-def pipenv(args, **kwargs):
-    os.environ['WORKON_HOME'] = str(PIPTFO_LOCAL)
-
-    # fix a deficiency in pipenv
-    # https://github.com/pypa/pipenv/issues/1798
-    os.environ['PIP_USER'] = '0'
-
-    return subprocess.run(
-        ['pipenv', *args],
-        check=True,
-        **kwargs
-    )
-
-
 def piptfo_scripts(namespace):
-    result = pipenv(
-        ['run', 'piptfo', namespace, 'scripts'],
+    result = subprocess.run(
+        ['pipenv', 'run', 'piptfo', 'scripts'],
+        check=True,
         stdout=subprocess.PIPE
     )
     return [
@@ -58,49 +47,71 @@ def piptfo_scripts(namespace):
 
 
 def pipenv_explicitly_installed():
-    result = pipenv(['graph', '--json-tree'], stdout=subprocess.PIPE)
+    result = subprocess.run(
+        ['piptfo', 'graph', '--json-tree'],
+        stdout=subprocess.PIPE
+    )
     return [package['package_name'] for package in json.loads(result.stdout)]
 
 
+def piptfo_list():
+    paths = []
+    if PIPTFO_LOCAL.exists():
+        paths.extend([
+            pipfile_path(env_path)
+            for env_path in PIPTFO_LOCAL.iterdir()
+        ])
+    return paths
+
+
 def piptfo_all(args):
-    for d in PIPTFO_CONFIG.iterdir():
-        if d.is_dir():
-            print(d)
-            pipenv(
-                ['run', 'piptfo', d.name, *args],
-            )
+    for path in piptfo_list():
+        print(f'Executing piptfo for {path}')
+        subprocess.run(
+            ['piptfo', path.name, *args],
+            check=True
+        )
+
+
+def pipfile_path(env_path):
+    with open(env_path.joinpath('.project')) as handle:
+        return pathlib.Path(handle.read()).expanduser().resolve()
 
 
 def main():
-    if sys.argv[1] == '-d':
-        global PIPTFO_CONFIG
-        PIPTFO_CONFIG = pathlib.Path(sys.argv[2]).expanduser().resolve()
-        os.environ['PIPTFO_CONFIG'] = str(PIPTFO_CONFIG)
-        sys.argv.pop(1)
-        sys.argv.pop(2)
     if sys.argv[1] == '--all':
         piptfo_all(sys.argv[2:])
         sys.exit()
+    elif sys.argv[1] == '--list':
+        for path in piptfo_list():
+            print(path)
+        sys.exit()
+
+    if 'PIPENV_PIPFILE' in os.environ:
+        namespace_pipfile = pathlib.Path(os.environ['PIPENV_PIPFILE']).expanduser().resolve()
     else:
-        namespace = sys.argv[1]
-        method = sys.argv[2]
-        args = sys.argv[2:]
+        if sys.argv[1] != '-f':
+            print('error: must supply pipfile', file=sys.stderr)
+            sys.exit(1)
 
-    namespace_root = PIPTFO_CONFIG.joinpath(namespace)
-    namespace_root.mkdir(parents=True, exist_ok=True)
+        sys.argv.pop(1)
+        namespace_pipfile = pathlib.Path(sys.argv[1]).expanduser().resolve()
+        sys.argv.pop(1)
+        os.environ['PIPENV_PIPFILE'] = str(namespace_pipfile)
 
-    namespace_pipfile = namespace_root.joinpath('Pipfile')
-    namespace_pipfile.touch()
+    namespace = pathlib.Path(namespace_pipfile).parent.name
 
-    os.environ['PIPENV_PIPFILE'] = str(namespace_pipfile)
+    os.environ['WORKON_HOME'] = str(PIPTFO_LOCAL.joinpath(namespace))
 
-    if method == 'scripts':
+    args = sys.argv[1:]
+
+    if args[0] == 'scripts':
         for package in pipenv_explicitly_installed():
             for script in package_scripts(package):
                 print(script)
     else:
-        pipenv(args)
-        if method == 'install':
+        subprocess.run(['pipenv', *args], check=True)
+        if args[0] == 'install':
             for script in piptfo_scripts(namespace):
                 target = PIPTFO_BIN.joinpath(script.name)
                 print(f'Linking {target} -> {script}')
