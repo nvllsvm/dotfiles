@@ -63,7 +63,7 @@ def piptfo_list():
             env_path
             for env_path in PIPTFO_LOCAL.iterdir()
         ])
-    return paths
+    return sorted(paths)
 
 
 def piptfo_all(args):
@@ -81,12 +81,12 @@ def pipfile_path(env_path):
 
 
 def main():
-    if sys.argv[1] == '--all':
-        piptfo_all(sys.argv[2:])
-        sys.exit()
-    elif sys.argv[1] == '--list':
+    if len(sys.argv) == 1 or sys.argv[1] == '--list':
         for path in piptfo_list():
-            print(path)
+            print(path.name)
+        sys.exit()
+    elif sys.argv[1] == '--all':
+        piptfo_all(sys.argv[2:])
         sys.exit()
 
     if 'PIPENV_PIPFILE' in os.environ:
