@@ -2,9 +2,9 @@
 set -e
 
 echo Updating piptfo environment ...
-piptfo neovim install > /dev/null 2>&1
-piptfo neovim update > /dev/null 2>&1
-ln -sf "$(piptfo neovim --venv)/bin/python" ~/.config/nvim/plugged/python
+piptfo -f $DOTFILES/piptfo/neovim/Pipfile install > /dev/null 2>&1
+piptfo -n neovim update > /dev/null 2>&1
+ln -sf "$(piptfo -n neovim --venv)/bin/python" ~/.config/nvim/plugged/python
 
 if [ ! -f ~/.config/nvim/autoload/plug.vim ]; then
     echo Installing plugin manager environment ...

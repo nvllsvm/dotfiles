@@ -13,6 +13,8 @@ import pkg_resources
 # https://github.com/pypa/pipenv/issues/1798
 os.environ['PIP_USER'] = '0'
 
+os.environ['PIPENV_IGNORE_VIRTUALENVS'] = '1'
+
 os.environ.setdefault('PIPTFO_LOCAL', '~/.local/share/piptfo')
 os.environ.setdefault('PIPTFO_BIN', '~/.local/bin')
 
@@ -75,7 +77,7 @@ def piptfo_all(args):
 
 def pipfile_path(env_path):
     with open(env_path.joinpath('.project')) as handle:
-        return pathlib.Path(handle.read()).expanduser().resolve()
+        return pathlib.Path(handle.read(), 'Pipfile').expanduser().resolve()
 
 
 def main():
@@ -89,15 +91,21 @@ def main():
 
     if 'PIPENV_PIPFILE' in os.environ:
         namespace_pipfile = pathlib.Path(os.environ['PIPENV_PIPFILE']).expanduser().resolve()
-    else:
-        if sys.argv[1] != '-f':
-            print('error: must supply pipfile', file=sys.stderr)
-            sys.exit(1)
-
+    elif sys.argv[1] == '-f':
         sys.argv.pop(1)
         namespace_pipfile = pathlib.Path(sys.argv[1]).expanduser().resolve()
         sys.argv.pop(1)
         os.environ['PIPENV_PIPFILE'] = str(namespace_pipfile)
+    elif sys.argv[1] == '-n':
+        sys.argv.pop(1)
+        namespace = sys.argv[1]
+        sys.argv.pop(1)
+        namespace_dir = PIPTFO_LOCAL.joinpath(namespace)
+        for d in namespace_dir.iterdir():
+            if d.is_dir():
+                namespace_pipfile = pipfile_path(d)
+                os.environ['PIPENV_PIPFILE'] = str(namespace_pipfile)
+                break
 
     namespace = pathlib.Path(namespace_pipfile).parent.name
 
