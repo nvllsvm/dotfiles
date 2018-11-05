@@ -128,6 +128,7 @@ def main():
                     target.unlink()
                 except FileNotFoundError:
                     pass
+                target.parent.mkdir(parents=True, exist_ok=True)
                 target.symlink_to(script)
 
     with open(PIPTFO_LOCAL.joinpath(namespace, '.project'), 'w') as handle:
