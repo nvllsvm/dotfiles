@@ -46,3 +46,5 @@ link_file ncmpcpp ~/.config/ncmpcpp
 if ! [ -e $HOME/.base16_theme ]; then
     zsh_command -i base16_default-dark
 fi
+
+zsh_command "piptfo -f $DOTFILES/piptfo/base16-shell-preview/Pipfile install"
