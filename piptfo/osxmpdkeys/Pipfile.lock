@@ -1,0 +1,29 @@
+{
+    "_meta": {
+        "hash": {
+            "sha256": "da4c4f113fcb035ca32cf9394b91908f39be590cc13a610c9df3143fc1dac728"
+        },
+        "pipfile-spec": 6,
+        "requires": {
+            "python_version": "3.7"
+        },
+        "sources": [
+            {
+                "name": "pypi",
+                "url": "https://pypi.org/simple",
+                "verify_ssl": true
+            }
+        ]
+    },
+    "default": {
+        "osxmmkeys": {
+            "git": "https://github.com/nvllsvm/osxmmkeys.git",
+            "ref": "bc7eaa5fb7c8c2db5808f32762dca38d10402f14"
+        },
+        "osxmpdkeys": {
+            "git": "https://github.com/pushrax/osxmpdkeys.git",
+            "ref": "6aec262baa6b42d131e862b0c7fdf4850fcd5960"
+        }
+    },
+    "develop": {}
+}
