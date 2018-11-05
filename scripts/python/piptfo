@@ -60,7 +60,7 @@ def piptfo_list():
     paths = []
     if PIPTFO_LOCAL.exists():
         paths.extend([
-            pipfile_path(env_path)
+            env_path
             for env_path in PIPTFO_LOCAL.iterdir()
         ])
     return paths
@@ -70,7 +70,7 @@ def piptfo_all(args):
     for path in piptfo_list():
         print(f'Executing piptfo for {path}')
         subprocess.run(
-            ['piptfo', path.name, *args],
+            ['piptfo', '-n', path.name, *args],
             check=True
         )
 
@@ -101,11 +101,9 @@ def main():
         namespace = sys.argv[1]
         sys.argv.pop(1)
         namespace_dir = PIPTFO_LOCAL.joinpath(namespace)
-        for d in namespace_dir.iterdir():
-            if d.is_dir():
-                namespace_pipfile = pipfile_path(d)
-                os.environ['PIPENV_PIPFILE'] = str(namespace_pipfile)
-                break
+        with open(namespace_dir.joinpath('.project')) as handle:
+            namespace_pipfile = pathlib.Path(handle.read(), 'Pipfile')
+            os.environ['PIPENV_PIPFILE'] = str(namespace_pipfile)
 
     namespace = pathlib.Path(namespace_pipfile).parent.name
 
@@ -128,6 +126,9 @@ def main():
                 except FileNotFoundError:
                     pass
                 target.symlink_to(script)
+
+    with open(PIPTFO_LOCAL.joinpath(namespace, '.project'), 'w') as handle:
+        handle.write(str(namespace_pipfile.parent))
 
 
 if __name__ == '__main__':

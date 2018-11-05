@@ -73,7 +73,6 @@ if [[ $osname == Darwin* ]]; then
 fi
 
 zsh_command pip-update
-zsh_command 'pip install pipenv'
 
 for name in flake8 httpie ranger-fm speedtest-cli youtube_dl; do
     zsh_command "piptfo -f $DOTFILES/piptfo/$name/Pipfile install"
