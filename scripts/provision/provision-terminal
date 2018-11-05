@@ -60,7 +60,7 @@ fi
 if [[ $osname == Linux* ]]; then
     link_file pip ~/.config/pip
 
-    if command -v pacman; then
+    if command -v pacman > /dev/null; then
         link_file pacman ~/.config/pacman
         sudo pacman -S --noconfirm dash
         ln -sf "$(which dash)" "$HOME/.local/bin/sh"
