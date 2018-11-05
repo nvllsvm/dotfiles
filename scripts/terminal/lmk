@@ -1,13 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-if ! [ -z "$VIRTUAL_ENV" ]; then
-    PYTHON3_BIN=$(which -a python3 | grep -v "^$VIRTUAL_ENV" | head -n 1 | tr -d '\n')
-else
-    PYTHON3_BIN=$(which python3)
-fi
-ZMQ_BIN=$(which zmq)
-
 TOPIC='lmk-fs-event'
 LINK_PWD=$(readlink -f "$PWD")
 
@@ -18,11 +11,11 @@ kill_all() {
 
 
 publish_message() {
-    "$PYTHON3_BIN" "$ZMQ_BIN" pub "$TOPIC" "$1"
+    zepusu pub "$TOPIC" "$1"
 }
 
 get_message() {
-    "$PYTHON3_BIN" "$ZMQ_BIN" sub -t "$TOPIC" | cut -f2- -d ' '
+    zepusu sub -t "$TOPIC" | cut -f2- -d ' '
 }
 
 
@@ -45,7 +38,7 @@ trap "kill_all" EXIT
 
 while true; do
     # exit tmux copy-mode
-    if [ -n $TMUX ]; then
+    if [ -n "$TMUX" ]; then
         tmux if -F -t $TMUX_PANE "#{pane_in_mode}" "send-keys -t $TMUX_PANE -X cancel"
     fi
 

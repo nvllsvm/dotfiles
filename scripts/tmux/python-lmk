@@ -4,18 +4,18 @@ SESSION=$(uuidgen)
 
 trap "tmux kill-session -t $SESSION 2> /dev/null" EXIT SIGHUP
 
-if [[ $(tmux display-message -p '#S' 2> /dev/null) == $TMUX_SESSION ]]; then
-    if [[ $1 == '-p' ]]; then
+if [ "$(tmux display-message -p '#S' 2> /dev/null)" = "$TMUX_SESSION" ]; then
+    if [ "$1" = '-p' ]; then
         PYTHON_BIN=$2
         shift
         shift
-    elif [[ -n $VIRTUAL_ENV ]]; then
+    elif [ -n "$VIRTUAL_ENV" ]; then
         PYTHON_BIN=python
     else
         PYTHON_BIN=python3
     fi
 
-    if [[ -z $1 ]]; then
+    if [ -z "$1" ]; then
         LMK_FILE=$(mktemp --suffix='.py')
         trap "rm -f "$LMK_FILE"" EXIT
         mkdir -p "$(dirname "$LMK_FILE")"
@@ -25,7 +25,7 @@ if [[ $(tmux display-message -p '#S' 2> /dev/null) == $TMUX_SESSION ]]; then
     fi
 
     cd $(dirname "$LMK_FILE")
-    if [[ -n $VIRTUAL_ENV ]]; then
+    if [ -n "$VIRTUAL_ENV" ]; then
         tmux split-window -h "VIRTUAL_ENV="$VIRTUAL_ENV" lmk $PYTHON_BIN $LMK_FILE"
     else
         tmux split-window -h "lmk $PYTHON_BIN $LMK_FILE"
@@ -41,7 +41,7 @@ if [[ $(tmux display-message -p '#S' 2> /dev/null) == $TMUX_SESSION ]]; then
 else
     unset TMUX
 
-    if [[ -n $VIRTUAL_ENV ]]; then
+    if [ -n "$VIRTUAL_ENV" ]; then
         tmux new-session -d -s $SESSION "TMUX_SESSION="$SESSION" VIRTUAL_ENV="$VIRTUAL_ENV" $0 "$@""
     else
         tmux new-session -d -s $SESSION "TMUX_SESSION="$SESSION" $0 "$@""

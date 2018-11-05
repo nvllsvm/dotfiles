@@ -105,6 +105,9 @@ def main():
             namespace_pipfile = pathlib.Path(handle.read(), 'Pipfile')
             os.environ['PIPENV_PIPFILE'] = str(namespace_pipfile)
 
+    namespace_pipfile.parent.mkdir(parents=True, exist_ok=True)
+    namespace_pipfile.touch()
+
     namespace = pathlib.Path(namespace_pipfile).parent.name
 
     os.environ['WORKON_HOME'] = str(PIPTFO_LOCAL.joinpath(namespace))
