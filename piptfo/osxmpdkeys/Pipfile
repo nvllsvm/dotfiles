@@ -5,7 +5,7 @@ name = "pypi"
 
 [packages]
 osxmmkeys = {git = "https://github.com/nvllsvm/osxmmkeys.git"}
-osxmpdkeys = {git = "https://github.com/pushrax/osxmpdkeys.git"}
+osxmpdkeys = "*"
 
 [dev-packages]
 
