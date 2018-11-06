@@ -9,7 +9,7 @@ log() {
 }
 
 log Updating piptfo environment ...
-piptfo -f $DOTFILES/piptfo/neovim/Pipfile install > /dev/null 2>&1
+piptfo -n neovim install neovim > /dev/null 2>&1
 piptfo -n neovim update > /dev/null 2>&1
 ln -sf "$(piptfo -n neovim --venv)/bin/python" ~/.config/nvim/plugged/python
 

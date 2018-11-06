@@ -25,6 +25,7 @@ link_file httpie ~/.httpie
 link_file nvim ~/.config/nvim
 link_file psql/.psqlrc ~/.psqlrc
 link_file ranger ~/.config/ranger
+link_file ptpython ~/.ptpython
 link_file sqlite/.sqliterc ~/.sqliterc
 link_file tmux/.tmux.conf ~/.tmux.conf
 link_file zsh/.zshenv ~/.zshenv
@@ -74,8 +75,8 @@ fi
 
 zsh_command pip-update
 
-for name in flake8 httpie ranger-fm speedtest-cli zepusu; do
-    zsh_command "piptfo -f $DOTFILES/piptfo/$name/Pipfile install"
+for name in flake8 httpie ptpython ranger-fm speedtest-cli zepusu; do
+    zsh_command "piptfo -n "$name" install "$name""
 done
 
 zsh_command nvim-update

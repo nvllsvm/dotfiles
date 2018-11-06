@@ -101,6 +101,10 @@ def main():
         namespace = sys.argv[1]
         sys.argv.pop(1)
         namespace_dir = PIPTFO_LOCAL.joinpath(namespace)
+        if not namespace_dir.exists():
+            namespace_dir.mkdir(parents=True, exist_ok=True)
+            with open(namespace_dir.joinpath('.project'), 'w') as handle:
+                handle.write(str(namespace_dir))
         with open(namespace_dir.joinpath('.project')) as handle:
             namespace_pipfile = pathlib.Path(handle.read(), 'Pipfile')
             os.environ['PIPENV_PIPFILE'] = str(namespace_pipfile)

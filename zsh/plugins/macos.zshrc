@@ -32,5 +32,4 @@ if [[ $OSTYPE == darwin* ]]; then
 
     full-update add brew-update
     full-update add dash-install
-    full-update add osxmpdkeys-update
 fi
