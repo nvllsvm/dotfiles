@@ -114,6 +114,13 @@ def main():
         os.environ['PIPENV_PIPFILE'] = str(namespace_pipfile)
 
     namespace_pipfile.parent.mkdir(parents=True, exist_ok=True)
+    # The file could alternatively be touched, but then pipenv would
+    # set the python_version to active version. That's not appropriate
+    # for piptfo so let's be generic unless specified otherwise.
+    if not namespace_pipfile.is_file():
+        with open(namespace_pipfile, 'w') as handle:
+            handle.write('[requires]\npython_version = "*"')
+
     namespace_pipfile.touch()
 
     namespace = pathlib.Path(namespace_pipfile).parent.name
