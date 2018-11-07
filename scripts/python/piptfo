@@ -81,11 +81,6 @@ def main():
 
     if 'PIPENV_PIPFILE' in os.environ:
         namespace_pipfile = pathlib.Path(os.environ['PIPENV_PIPFILE']).expanduser().resolve()
-    elif sys.argv[1] == '-f':
-        sys.argv.pop(1)
-        namespace_pipfile = pathlib.Path(sys.argv[1]).expanduser().resolve()
-        sys.argv.pop(1)
-        os.environ['PIPENV_PIPFILE'] = str(namespace_pipfile)
     elif sys.argv[1] == '-n':
         sys.argv.pop(1)
         namespace = sys.argv[1]
