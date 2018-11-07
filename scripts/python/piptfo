@@ -55,8 +55,6 @@ def package_files(package):
             for name, _ in parser.items('console_scripts'):
                 files.add(virtualenv.joinpath('bin', name))
 
-
-
     return files
 
 
