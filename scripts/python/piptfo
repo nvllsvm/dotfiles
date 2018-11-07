@@ -22,22 +22,17 @@ PIPTFO_LOCAL = pathlib.Path(os.environ['PIPTFO_LOCAL']).expanduser().resolve()
 PIPTFO_BIN = pathlib.Path(os.environ['PIPTFO_BIN']).expanduser().resolve()
 
 
-def package_scripts(package):
-    bin_root = pathlib.Path(os.environ['VIRTUAL_ENV'], 'bin').resolve()
-
+def package_files(package):
     dist = pkg_resources.get_distribution(package)
-
-    scripts = []
-    for line in dist.get_metadata_lines('RECORD'):
-        path = pathlib.Path(dist.location, line.split(',')[0]).resolve()
-        if path.parent == bin_root:
-            scripts.append(path)
-    return scripts
+    return [
+        pathlib.Path(dist.location, line.split(',')[0]).resolve()
+        for line in dist.get_metadata_lines('RECORD')
+    ]
 
 
 def piptfo_scripts(namespace):
     result = subprocess.run(
-        ['pipenv', 'run', 'piptfo', 'scripts'],
+        ['pipenv', 'run', 'piptfo', 'files'],
         check=True,
         stdout=subprocess.PIPE
     )
@@ -75,11 +70,6 @@ def piptfo_all(args):
         )
 
 
-def pipfile_path(env_path):
-    with open(env_path.joinpath('.project')) as handle:
-        return pathlib.Path(handle.read(), 'Pipfile').expanduser().resolve()
-
-
 def main():
     if len(sys.argv) == 1 or sys.argv[1] == '--list':
         for path in piptfo_list():
@@ -103,24 +93,21 @@ def main():
         namespace_dir = PIPTFO_LOCAL.joinpath(namespace)
         if not namespace_dir.exists():
             namespace_dir.mkdir(parents=True, exist_ok=True)
-            with open(namespace_dir.joinpath('.project'), 'w') as handle:
-                handle.write(str(namespace_dir))
-        with open(namespace_dir.joinpath('.project')) as handle:
-            namespace_pipfile = pathlib.Path(handle.read(), 'Pipfile')
-            os.environ['PIPENV_PIPFILE'] = str(namespace_pipfile)
+        namespace_pipfile = pathlib.Path(namespace_dir, 'Pipfile')
+        os.environ['PIPENV_PIPFILE'] = str(namespace_pipfile)
 
     namespace_pipfile.parent.mkdir(parents=True, exist_ok=True)
     namespace_pipfile.touch()
 
     namespace = pathlib.Path(namespace_pipfile).parent.name
 
-    os.environ['WORKON_HOME'] = str(PIPTFO_LOCAL.joinpath(namespace))
+    os.environ['PIPENV_VENV_IN_PROJECT'] = '1'
 
     args = sys.argv[1:]
 
-    if args[0] == 'scripts':
+    if args[0] == 'files':
         for package in pipenv_explicitly_installed():
-            for script in package_scripts(package):
+            for script in package_files(package):
                 print(script)
     else:
         subprocess.run(['pipenv', *args], check=True)
@@ -128,15 +115,13 @@ def main():
             for script in piptfo_scripts(namespace):
                 target = PIPTFO_BIN.joinpath(script.name)
                 print(f'Linking {target} -> {script}')
+                continue
                 try:
                     target.unlink()
                 except FileNotFoundError:
                     pass
                 target.parent.mkdir(parents=True, exist_ok=True)
                 target.symlink_to(script)
-
-    with open(PIPTFO_LOCAL.joinpath(namespace, '.project'), 'w') as handle:
-        handle.write(str(namespace_pipfile.parent))
 
 
 if __name__ == '__main__':
