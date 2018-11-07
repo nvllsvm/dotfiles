@@ -30,17 +30,26 @@ def package_files(package):
     ]
 
 
+def _force_link(target, source):
+    try:
+        target.unlink()
+    except FileNotFoundError:
+        pass
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.symlink_to(source)
+
+
 def link_package_files():
-    root = pathlib.Path(os.environ['PIPENV_PIPFILE']).parent
-    venv_root = root.joinpath('.venv')
+    piptfo_root = pathlib.Path(os.environ['PIPENV_PIPFILE']).parent
+
     for path in piptfo_files():
-        target = root.joinpath(path.relative_to(venv_root))
-        try:
-            target.unlink()
-        except FileNotFoundError:
-            pass
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.symlink_to(path)
+        relative_path = path.relative_to(piptfo_root.joinpath('.venv'))
+
+        target = piptfo_root.joinpath(relative_path)
+        _force_link(target, path)
+
+        if pathlib.Path('bin') in relative_path.parents:
+            _force_link(PIPTFO_BIN.joinpath(relative_path.relative_to(pathlib.Path('bin'))), path)
 
 
 def piptfo_files():
