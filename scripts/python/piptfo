@@ -30,7 +30,20 @@ def package_files(package):
     ]
 
 
-def piptfo_scripts(namespace):
+def link_package_files():
+    root = pathlib.Path(os.environ['PIPENV_PIPFILE']).parent
+    venv_root = root.joinpath('.venv')
+    for path in piptfo_files():
+        target = root.joinpath(path.relative_to(venv_root))
+        try:
+            target.unlink()
+        except FileNotFoundError:
+            pass
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.symlink_to(path)
+
+
+def piptfo_files():
     result = subprocess.run(
         ['pipenv', 'run', 'piptfo', 'files'],
         check=True,
@@ -106,17 +119,8 @@ def main():
                 print(script)
     else:
         subprocess.run(['pipenv', *args], check=True)
-        if args[0] == 'install':
-            for script in piptfo_scripts(namespace):
-                target = PIPTFO_BIN.joinpath(script.name)
-                print(f'Linking {target} -> {script}')
-                continue
-                try:
-                    target.unlink()
-                except FileNotFoundError:
-                    pass
-                target.parent.mkdir(parents=True, exist_ok=True)
-                target.symlink_to(script)
+        if args[0] in ('install', 'update'):
+            link_package_files()
 
 
 if __name__ == '__main__':
