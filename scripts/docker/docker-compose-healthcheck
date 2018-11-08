@@ -1,18 +1,32 @@
 #!/usr/bin/env sh
+TIMEOUT=60
+
 containers_healthy() {
     FORMAT='{{if .State.Health}}{{if ne .State.Health.Status "healthy"}}1{{end}}{{end}}'
-    return $(docker inspect -f "$FORMAT" $(docker-compose ps -q "$@") | sort -n | tail -n 1)
+    return $(docker inspect -f "$FORMAT" $(docker-compose ps -q) | sort -n | tail -n 1)
 }
 
+shseq() {
+    i=$1
+    while [ "$i" -lt "$2" ]; do
+        echo "$i"
+        i=$((i+1))
+    done
+}
 
 wait_for_containers_healthy() {
     printf "Waiting for healthy ."
-    until containers_healthy
-    do
-        printf "."
+
+    for i in $(shseq 1 "$TIMEOUT"); do
+        if containers_healthy; then
+            echo ' done'
+            return
+        fi
         sleep 1
+        printf '.'
     done
-    echo " done"
+    echo 'error: wait exceeded timeout' >&2
+    return 1
 }
 
 if [ "$1" = '-w' ]; then
