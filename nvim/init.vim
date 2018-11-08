@@ -148,5 +148,4 @@ let g:markdown_enable_spell_checking = 0
         set statusline+=%<%P                         " file position
 "}
 
-" workaround for https://github.com/neovim/neovim/issues/7861
-autocmd VimResized * redraw!
+autocmd FileType python nnoremap <leader>y :0,$!yapf<Cr><C-o>
