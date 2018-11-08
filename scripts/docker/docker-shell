@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-container_name="$(cat /dev/urandom | LC_ALL=C tr -cd 'a-f0-9' | head -c 32)"
+container_name="docker-shell-$$"
 trap "docker kill "${container_name}" > /dev/null 2>&1; true" HUP EXIT
 if [ -t 0 -a -t 1 -a -t 2 ]; then
     tty_flag="-t"

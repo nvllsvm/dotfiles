@@ -1,35 +1,27 @@
-#!/usr/bin/env bash
-EDITOR="$EDITOR -n"
-SESSION=$(uuidgen)
+#!/usr/bin/env sh
+SESSION="python-lmk-$$"
 
-trap "tmux kill-session -t $SESSION 2> /dev/null" EXIT SIGHUP
+trap "tmux kill-session -t $SESSION 2> /dev/null" EXIT HUP
 
 if [ "$(tmux display-message -p '#S' 2> /dev/null)" = "$TMUX_SESSION" ]; then
-    if [ "$1" = '-p' ]; then
-        PYTHON_BIN=$2
-        shift
-        shift
-    elif [ -n "$VIRTUAL_ENV" ]; then
-        PYTHON_BIN=python
-    else
-        PYTHON_BIN=python3
-    fi
-
     if [ -z "$1" ]; then
         LMK_FILE=$(mktemp --suffix='.py')
         trap "rm -f "$LMK_FILE"" EXIT
         mkdir -p "$(dirname "$LMK_FILE")"
-        touch "$LMK_FILE"
     else
         LMK_FILE="$1"
     fi
+    touch "$LMK_FILE"
 
-    cd $(dirname "$LMK_FILE")
-    if [ -n "$VIRTUAL_ENV" ]; then
-        tmux split-window -h "VIRTUAL_ENV="$VIRTUAL_ENV" lmk $PYTHON_BIN $LMK_FILE"
+    if [ "$1" = '-p' ]; then
+        PYTHON_BIN="$2"
+        shift
+        shift
     else
-        tmux split-window -h "lmk $PYTHON_BIN $LMK_FILE"
+        PYTHON_BIN=python3
     fi
+
+    tmux split-window -h "lmk $PYTHON_BIN $LMK_FILE"
 
     tmux select-pane -l
 
