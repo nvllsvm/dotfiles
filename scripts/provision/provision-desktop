@@ -38,7 +38,7 @@ elif [[ $osname == Darwin ]]; then
     link_file karabiner ~/.config/karabiner
 
     find "$PWD/macos/LaunchAgents" -type f -exec ln -sf {} ~/Library/LaunchAgents \;
-    zsh_command "piptfo -n osxmpdkeys install git+https://github.com/nvllsvm/osxmmkeys.git#egg=osxmmkeys osxmpdkeys"
+    zsh_command "piptfo -n osxmpdkeys install osxmpdkeys"
 fi
 
 link_file mpd ~/.config/mpd

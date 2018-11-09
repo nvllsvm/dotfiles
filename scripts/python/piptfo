@@ -162,7 +162,9 @@ def main():
             for script in package_files(package):
                 print(script)
     else:
-        subprocess.run(['pipenv', *args], check=True)
+        result = subprocess.run(['pipenv', *args])
+        if result.returncode != 0:
+            sys.exit(result.returncode)
         if args[0] in ('install', 'update'):
             link_package_files()
 
