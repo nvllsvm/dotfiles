@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 export COMPOSE_PROJECT_NAME=sol-docker 
-export COMPOSE_FILE="$HOME/Code/private/sol-docker/docker-compose.yml"
+export COMPOSE_FILE="$HOME/Code/sol-docker/docker-compose.yml"
 
 if [ "$1" = "restart" ]; then
     if [ -n "$2" ]; then
