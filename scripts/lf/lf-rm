@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+IFS="'printf '\n\t''"; rm -rf $fx
