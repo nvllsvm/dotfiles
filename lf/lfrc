@@ -1,9 +1,11 @@
+set ifs "\n"
+
 map S $$SHELL
 
 cmd delete ${{
     set -f
     printf "$fx\n"
-    printf "delete?[y/n]"
+    printf "delete?[y/n] "
     read ans
     [ $ans = "y" ] && rm -rf $fx
 }}
