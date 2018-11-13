@@ -6,5 +6,4 @@ if command -v lf > /dev/null; then
         }
         PROMPT="(lf)$PROMPT"
     fi
-    path+=("$DOTFILES/scripts/lf")
 fi
