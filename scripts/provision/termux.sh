@@ -11,7 +11,6 @@ pkg install \
     neovim \
     openssh \
     python-dev \
-    ranger \
     termux-api \
     tmux \
     zsh

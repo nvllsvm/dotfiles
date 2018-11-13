@@ -1,6 +1,4 @@
 #!/usr/bin/env sh
-TIMEOUT=60
-
 containers_healthy() {
     FORMAT='{{if .State.Health}}{{if ne .State.Health.Status "healthy"}}1{{end}}{{end}}'
     return $(docker inspect -f "$FORMAT" $(docker-compose ps -q) | sort -n | tail -n 1)
@@ -29,8 +27,11 @@ wait_for_containers_healthy() {
     return 1
 }
 
-if [ "$1" = '-w' ]; then
-    wait_for_containers_healthy "$@"
+if [ "$1" = '-t' ]; then
+    TIMEOUT=$2
+    shift
+    shift
+    wait_for_containers_healthy "$@" ${TIMEOUT}
 else
     containers_healthy "$@"
 fi

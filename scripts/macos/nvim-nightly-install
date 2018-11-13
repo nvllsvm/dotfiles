@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -e
 PREFIX="$HOME/.local"
-cd "$(git install https://github.com/neovim/neovim)"
+cd "$(git install -k https://github.com/neovim/neovim)"
 git checkout nightly
 
 current_version=$(git rev-parse HEAD)
