@@ -20,9 +20,11 @@ os.environ['PIPENV_IGNORE_VIRTUALENVS'] = '1'
 
 os.environ.setdefault('PIPTFO_LOCAL', '~/.local/share/piptfo')
 os.environ.setdefault('PIPTFO_BIN', '~/.local/bin')
+os.environ.setdefault('PIPTFO_MAN', '~/.local/share/man')
 
 PIPTFO_LOCAL = pathlib.Path(os.environ['PIPTFO_LOCAL']).expanduser().resolve()
 PIPTFO_BIN = pathlib.Path(os.environ['PIPTFO_BIN']).expanduser().resolve()
+PIPTFO_MAN = pathlib.Path(os.environ['PIPTFO_MAN']).expanduser().resolve()
 
 
 def package_files(package):
@@ -78,6 +80,9 @@ def link_package_files():
 
         if pathlib.Path('bin') in relative_path.parents:
             _force_link(PIPTFO_BIN.joinpath(relative_path.relative_to(pathlib.Path('bin'))), path)
+
+        if pathlib.Path('share', 'man') in relative_path.parents:
+            _force_link(PIPTFO_MAN.joinpath(relative_path.relative_to(pathlib.Path('share', 'man'))), path)
 
 
 def piptfo_files():
