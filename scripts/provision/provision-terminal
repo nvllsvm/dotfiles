@@ -78,7 +78,7 @@ zsh_command pip-update
 zsh_command 'PIP_REQUIRE_VIRTUALENV=0 pip install pipns'
 
 for name in flake8 httpie ptpython ranger-fm speedtest-cli zepusu; do
-    zsh_command "pipns -n "$name" install "$name""
+    zsh_command "pipns install "$name""
 done
 
 zsh_command nvim-update
