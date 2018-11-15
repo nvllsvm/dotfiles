@@ -7,7 +7,7 @@ if ! [ -x "$(command -v pip)" ]; then
     python -m ensurepip --user --default-pip
 fi
 
-if [ "$(pip list | grep -e '^pip ' -e '^setuptools ' -e '^wheel ' | wc -l)" != '4' ]; then
+if [ "$(pip list | grep -e '^pip ' -e '^setuptools ' -e '^wheel ' | wc -l)" != '3' ]; then
     pip install -U --force-reinstall pip setuptools wheel
 fi
 
