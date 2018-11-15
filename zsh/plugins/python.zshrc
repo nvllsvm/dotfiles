@@ -11,11 +11,11 @@ if [ -d "$PYENV_ROOT" ]; then
         "$path[@]"
     )
 
-    . ~/.piptfo/shell.sh &> /dev/null || true
+    . ~/.pipns/shell.sh &> /dev/null || true
 
     full-update add pyenv-update
     full-update add pip-update
-    full-update add piptfo-update
+    full-update add pipns-update
 else
     unset PYENV_ROOT
 fi

@@ -18,13 +18,13 @@ os.environ['PIP_USER'] = '0'
 
 os.environ['PIPENV_IGNORE_VIRTUALENVS'] = '1'
 
-os.environ.setdefault('PIPTFO_ROOT', '~/.piptfo')
+os.environ.setdefault('PIPNS_ROOT', '~/.pipns')
 
-PIPTFO_ROOT = pathlib.Path(os.environ['PIPTFO_ROOT']).expanduser().resolve()
-PIPTFO_ENVIRONMENTS = PIPTFO_ROOT.joinpath('environments')
-PIPTFO_BIN = PIPTFO_ROOT.joinpath('bin')
-PIPTFO_MAN = PIPTFO_ROOT.joinpath('share', 'man')
-PIPTFO_SHELL = PIPTFO_ROOT.joinpath('shell.sh')
+PIPNS_ROOT = pathlib.Path(os.environ['PIPNS_ROOT']).expanduser().resolve()
+PIPNS_ENVIRONMENTS = PIPNS_ROOT.joinpath('environments')
+PIPNS_BIN = PIPNS_ROOT.joinpath('bin')
+PIPNS_MAN = PIPNS_ROOT.joinpath('share', 'man')
+PIPNS_SHELL = PIPNS_ROOT.joinpath('shell.sh')
 
 
 def package_files(package):
@@ -70,24 +70,24 @@ def _force_link(target, source):
 
 
 def link_package_files():
-    piptfo_root = pathlib.Path(os.environ['PIPENV_PIPFILE']).parent
+    pipns_root = pathlib.Path(os.environ['PIPENV_PIPFILE']).parent
 
-    for path in piptfo_files():
-        relative_path = path.relative_to(piptfo_root.joinpath('.venv'))
+    for path in pipns_files():
+        relative_path = path.relative_to(pipns_root.joinpath('.venv'))
 
-        target = piptfo_root.joinpath(relative_path)
+        target = pipns_root.joinpath(relative_path)
         _force_link(target, path)
 
         if pathlib.Path('bin') in relative_path.parents:
-            _force_link(PIPTFO_BIN.joinpath(relative_path.relative_to(pathlib.Path('bin'))), path)
+            _force_link(PIPNS_BIN.joinpath(relative_path.relative_to(pathlib.Path('bin'))), path)
 
         if pathlib.Path('share', 'man') in relative_path.parents:
-            _force_link(PIPTFO_MAN.joinpath(relative_path.relative_to(pathlib.Path('share', 'man'))), path)
+            _force_link(PIPNS_MAN.joinpath(relative_path.relative_to(pathlib.Path('share', 'man'))), path)
 
 
-def piptfo_files():
+def pipns_files():
     result = subprocess.run(
-        ['pipenv', 'run', 'piptfo', 'files'],
+        ['pipenv', 'run', 'pipns', 'files'],
         check=True,
         stdout=subprocess.PIPE
     )
@@ -100,49 +100,49 @@ def piptfo_files():
 
 def pipenv_explicitly_installed():
     result = subprocess.run(
-        ['piptfo', 'graph', '--json-tree'],
+        ['pipns', 'graph', '--json-tree'],
         stdout=subprocess.PIPE
     )
     return [package['package_name'] for package in json.loads(result.stdout)]
 
 
-def piptfo_list():
+def pipns_list():
     paths = []
-    if PIPTFO_ENVIRONMENTS.exists():
+    if PIPNS_ENVIRONMENTS.exists():
         paths.extend([
             env_path
-            for env_path in PIPTFO_ENVIRONMENTS.iterdir()
+            for env_path in PIPNS_ENVIRONMENTS.iterdir()
         ])
     return sorted(paths)
 
 
-def piptfo_all(args):
-    for path in piptfo_list():
-        print(f'Executing piptfo for {path}')
+def pipns_all(args):
+    for path in pipns_list():
+        print(f'Executing pipns for {path}')
         subprocess.run(
-            ['piptfo', '-n', path.name, *args],
+            ['pipns', '-n', path.name, *args],
             check=True
         )
 
 
 def write_shell_integration():
-    PIPTFO_SHELL.write_text('\n'.join([
-        'export PATH="{}:$PATH"'.format(PIPTFO_BIN),
-        'export MANPATH="{}:$MANPATH"'.format(PIPTFO_MAN)
+    PIPNS_SHELL.write_text('\n'.join([
+        'export PATH="{}:$PATH"'.format(PIPNS_BIN),
+        'export MANPATH="{}:$MANPATH"'.format(PIPNS_MAN)
     ]))
 
 
 def main():
-    PIPTFO_ROOT.mkdir(parents=True, exist_ok=True)
+    PIPNS_ROOT.mkdir(parents=True, exist_ok=True)
 
     write_shell_integration()
 
     if len(sys.argv) == 1 or sys.argv[1] == '--list':
-        for path in piptfo_list():
+        for path in pipns_list():
             print(path.name)
         sys.exit()
     elif sys.argv[1] == '--all':
-        piptfo_all(sys.argv[2:])
+        pipns_all(sys.argv[2:])
         sys.exit()
 
     if 'PIPENV_PIPFILE' in os.environ:
@@ -151,7 +151,7 @@ def main():
         sys.argv.pop(1)
         namespace = sys.argv[1]
         sys.argv.pop(1)
-        namespace_dir = PIPTFO_ENVIRONMENTS.joinpath(namespace)
+        namespace_dir = PIPNS_ENVIRONMENTS.joinpath(namespace)
         if not namespace_dir.exists():
             namespace_dir.mkdir(parents=True, exist_ok=True)
         namespace_pipfile = pathlib.Path(namespace_dir, 'Pipfile')
@@ -160,7 +160,7 @@ def main():
     namespace_pipfile.parent.mkdir(parents=True, exist_ok=True)
     # The file could alternatively be touched, but then pipenv would
     # set the python_version to active version. That's not appropriate
-    # for piptfo so let's be generic unless specified otherwise.
+    # for pipns so let's be generic unless specified otherwise.
     if not namespace_pipfile.is_file():
         with open(namespace_pipfile, 'w') as handle:
             handle.write('[requires]\npython_version = "*"')
