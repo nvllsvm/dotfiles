@@ -126,7 +126,7 @@ def piptfo_all(args):
 
 
 def write_shell_integration():
-
+    PIPTFO_SHELL.mkdir(parents=True, exist_ok=True)
     PIPTFO_SHELL.write_text('\n'.join([
         'export PATH="{}:$PATH"'.format(PIPTFO_BIN),
         'export MANPATH="{}:$MANPATH"'.format(PIPTFO_MAN)
