@@ -23,7 +23,7 @@ mkdir -p ~/.config
 link_file git/.gitignore ~/.gitignore
 link_file httpie ~/.httpie
 link_file nvim ~/.config/nvim
-link_file lf ~/.config/lf
+link_file ranger ~/.config/ranger
 link_file psql/.psqlrc ~/.psqlrc
 link_file ptpython ~/.ptpython
 link_file sqlite/.sqliterc ~/.sqliterc
@@ -47,7 +47,6 @@ if [[ $osname == Darwin* ]]; then
         htop \
         kubectl \
         kubernetes-helm \
-        lf \
         libtool \
         mpd \
         ncmpcpp \
@@ -77,7 +76,7 @@ fi
 
 zsh_command pip-update
 
-for name in flake8 httpie ptpython speedtest-cli zepusu; do
+for name in flake8 httpie ptpython ranger-fm speedtest-cli zepusu; do
     zsh_command "piptfo -n "$name" install "$name""
 done
 
