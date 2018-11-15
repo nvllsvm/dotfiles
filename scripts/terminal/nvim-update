@@ -8,10 +8,10 @@ log() {
     echo ${MAGENTA}$@${RESET}
 }
 
-log Updating piptfo environment ...
-piptfo -n neovim install neovim > /dev/null 2>&1
-piptfo -n neovim update > /dev/null 2>&1
-ln -sf "$(piptfo -n neovim --venv)/bin/python" ~/.config/nvim/plugged/python
+log Updating pipns environment ...
+pipns -n neovim install neovim > /dev/null 2>&1
+pipns -n neovim update > /dev/null 2>&1
+ln -sf "$(pipns -n neovim --venv)/bin/python" ~/.config/nvim/plugged/python
 
 if [ ! -f ~/.config/nvim/autoload/plug.vim ]; then
     log Installing plugin manager environment ...

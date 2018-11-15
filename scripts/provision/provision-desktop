@@ -38,7 +38,7 @@ elif [[ $osname == Darwin ]]; then
     link_file karabiner ~/.config/karabiner
 
     find "$PWD/macos/LaunchAgents" -type f -exec ln -sf {} ~/Library/LaunchAgents \;
-    zsh_command "piptfo -n osxmpdkeys install osxmpdkeys"
+    zsh_command "pipns -n osxmpdkeys install osxmpdkeys"
 fi
 
 link_file mpd ~/.config/mpd
@@ -48,4 +48,4 @@ if ! [ -e $HOME/.base16_theme ]; then
     zsh_command -i base16_default-dark
 fi
 
-zsh_command "piptfo -n base16-shell-preview install base16-shell-preview"
+zsh_command "pipns -n base16-shell-preview install base16-shell-preview"

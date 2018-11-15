@@ -77,7 +77,7 @@ fi
 zsh_command pip-update
 
 for name in flake8 httpie ptpython ranger-fm speedtest-cli zepusu; do
-    zsh_command "piptfo -n "$name" install "$name""
+    zsh_command "pipns -n "$name" install "$name""
 done
 
 zsh_command nvim-update
