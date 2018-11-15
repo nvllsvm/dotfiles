@@ -1,6 +1,6 @@
 export PYENV_ROOT=~/.local/git/pyenv
 
-if [[ -d "$PYENV_ROOT" ]]; then
+if [ -d "$PYENV_ROOT" ]; then
     export PYTHONUSERBASE=~/.local/pythonuser
 
     path=(
@@ -10,6 +10,8 @@ if [[ -d "$PYENV_ROOT" ]]; then
         "${PYENV_ROOT}/shims"
         "$path[@]"
     )
+
+    . ~/.piptfo/shell.sh &> /dev/null || true
 
     full-update add pyenv-update
     full-update add pip-update

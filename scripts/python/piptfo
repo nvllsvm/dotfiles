@@ -18,13 +18,13 @@ os.environ['PIP_USER'] = '0'
 
 os.environ['PIPENV_IGNORE_VIRTUALENVS'] = '1'
 
-os.environ.setdefault('PIPTFO_LOCAL', '~/.local/share/piptfo')
-os.environ.setdefault('PIPTFO_BIN', '~/.local/bin')
-os.environ.setdefault('PIPTFO_MAN', '~/.local/share/man')
+os.environ.setdefault('PIPTFO_ROOT', '~/.piptfo')
 
-PIPTFO_LOCAL = pathlib.Path(os.environ['PIPTFO_LOCAL']).expanduser().resolve()
-PIPTFO_BIN = pathlib.Path(os.environ['PIPTFO_BIN']).expanduser().resolve()
-PIPTFO_MAN = pathlib.Path(os.environ['PIPTFO_MAN']).expanduser().resolve()
+PIPTFO_ROOT = pathlib.Path(os.environ['PIPTFO_ROOT']).expanduser().resolve()
+PIPTFO_ENVIRONMENTS = PIPTFO_ROOT.joinpath('environments')
+PIPTFO_BIN = PIPTFO_ROOT.joinpath('bin')
+PIPTFO_MAN = PIPTFO_ROOT.joinpath('share', 'man')
+PIPTFO_SHELL = PIPTFO_ROOT.joinpath('shell.sh')
 
 
 def package_files(package):
@@ -108,10 +108,10 @@ def pipenv_explicitly_installed():
 
 def piptfo_list():
     paths = []
-    if PIPTFO_LOCAL.exists():
+    if PIPTFO_ENVIRONMENTS.exists():
         paths.extend([
             env_path
-            for env_path in PIPTFO_LOCAL.iterdir()
+            for env_path in PIPTFO_ENVIRONMENTS.iterdir()
         ])
     return sorted(paths)
 
@@ -125,7 +125,17 @@ def piptfo_all(args):
         )
 
 
+def write_shell_integration():
+
+    PIPTFO_SHELL.write_text('\n'.join([
+        'export PATH="{}:$PATH"'.format(PIPTFO_BIN),
+        'export MANPATH="{}:$MANPATH"'.format(PIPTFO_MAN)
+    ]))
+
+
 def main():
+    write_shell_integration()
+
     if len(sys.argv) == 1 or sys.argv[1] == '--list':
         for path in piptfo_list():
             print(path.name)
@@ -140,7 +150,7 @@ def main():
         sys.argv.pop(1)
         namespace = sys.argv[1]
         sys.argv.pop(1)
-        namespace_dir = PIPTFO_LOCAL.joinpath(namespace)
+        namespace_dir = PIPTFO_ENVIRONMENTS.joinpath(namespace)
         if not namespace_dir.exists():
             namespace_dir.mkdir(parents=True, exist_ok=True)
         namespace_pipfile = pathlib.Path(namespace_dir, 'Pipfile')
@@ -172,6 +182,7 @@ def main():
             sys.exit(result.returncode)
         if args[0] in ('install', 'update'):
             link_package_files()
+
 
 
 if __name__ == '__main__':
