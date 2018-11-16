@@ -20,7 +20,7 @@ elif [ -n "$1" ]; then
 fi
 
 mkdir -p $env_root
-if [ "$(python -c 'import sys; print(sys.version_info >= (3,3))')" = 'False' ]; then
+if command -v virtualenv > /dev/null 2>&1; then
     set +e
     virtualenv -q -p python $env_folder
     if [ $? -ne 0 ]; then
