@@ -2,8 +2,8 @@
 
 CONFIG_DIR=~/.config/i3
 
-rm -r $CONFIG_DIR
-mkdir $CONFIG_DIR
+rm -rf $CONFIG_DIR
+mkdir -p $CONFIG_DIR
 cat "$DOTFILES"/i3/general > $CONFIG_DIR/config
 
 HOST_CONFIG="$DOTFILES/i3/$HOSTNAME"
