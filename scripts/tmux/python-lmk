@@ -3,7 +3,7 @@ SESSION="python-lmk-$$"
 
 trap "tmux kill-session -t $SESSION 2> /dev/null" EXIT HUP
 
-if [ "$(tmux display-message -p '#S' 2> /dev/null)" = "$TMUX_SESSION" ]; then
+if [ -n "$TMUX_SESSION" -a  "$(tmux display-message -p '#S' 2> /dev/null)" = "$TMUX_SESSION" ]; then   
     if [ -z "$1" ]; then
         LMK_FILE=$(mktemp --suffix='.py')
         trap "rm -f "$LMK_FILE"" EXIT
