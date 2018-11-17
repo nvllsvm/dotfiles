@@ -47,13 +47,13 @@ EOF
 
 cd $env_folder
 direnv allow
-cd -
+cd - > /dev/null
 
 cp $env_folder/.envrc .
 
 . $env_folder/bin/activate
 
-pip install --upgrade pip setuptools wheel
+pip install -q --upgrade pip setuptools wheel
 
 direnv allow
 direnv reload
