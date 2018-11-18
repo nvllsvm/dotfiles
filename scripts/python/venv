@@ -1,11 +1,11 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 set -e
 
-env_root=~/.local/share/virtualenvs
-parent=$(realpath $(pwd))
-env_folder=$env_root/$(printf $parent | sha256sum | awk '{print $1}')
+env_root="$HOME/.local/share/virtualenvs"
+parent="$(python -c 'import os; print(os.path.realpath(os.getcwd()))')"
+env_folder="$env_root/$(echo "$parent" | sha256sum | awk '{print $1}')"
 
-rm -rf $env_folder .envrc
+rm -rf "$env_folder" .envrc
 unset VIRTUAL_ENV
 
 if [ "$1" = '-d' ]; then
@@ -15,45 +15,29 @@ elif [ -e Pipfile ]; then
     pipenv clean
     env_folder=$(pipenv --venv)
 elif [ -n "$1" ]; then
-    eval "$(pyenv init -)"
-    pyenv shell $1
+    eval "$(pyenv sh-shell "$1")"
 fi
 
-mkdir -p $env_root
+mkdir -p "$env_root"
+
+trap 'rm -rf "$env_folder' EXIT
 if command -v virtualenv > /dev/null 2>&1; then
-    set +e
-    virtualenv -q -p python $env_folder
-    if [ $? -ne 0 ]; then
-        rm -r $env_folder
-        exit 1
-    fi
-    set -e
+    virtualenv -q -p python "$env_folder" > /dev/null
 else
-    set +e
-    python -m venv $env_folder
-    if [ $? -ne 0 ]; then
-        rm -r $env_folder
-        exit 1
-    fi
-    set -e
+    python -m venv "$env_folder"
 fi
+trap - EXIT
 
-echo . $env_folder/bin/activate > $env_folder/.envrc
-ln -s $parent $env_folder/.parent
-cat > $env_folder/pip.conf<<EOF
+echo ". $env_folder/bin/activate" > "$env_folder/.envrc"
+ln -s "$parent" "$env_folder/.parent"
+cat > "$env_folder/pip.conf"<<EOF
 [global]
 user = false
 EOF
 
-cd $env_folder
-direnv allow
-cd - > /dev/null
-
-cp $env_folder/.envrc .
-
-. $env_folder/bin/activate
-
-pip install -q --upgrade pip setuptools wheel
+(cd "$env_folder" && direnv allow)
+cp "$env_folder/.envrc" .
+"$env_folder/bin/pip" install -q --upgrade pip setuptools wheel
 
 direnv allow
 direnv reload
