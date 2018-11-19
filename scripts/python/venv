@@ -20,13 +20,11 @@ fi
 
 mkdir -p "$env_root"
 
-trap 'rm -rf "$env_folder' EXIT
 if command -v virtualenv > /dev/null 2>&1; then
     virtualenv -q -p python "$env_folder" > /dev/null
 else
     python -m venv "$env_folder"
 fi
-trap - EXIT
 
 echo ". $env_folder/bin/activate" > "$env_folder/.envrc"
 ln -s "$parent" "$env_folder/.parent"
