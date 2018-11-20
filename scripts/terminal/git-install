@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -e
 
-if [[ $1 == '-k' ]]; then
+if [ "$1" = '-k' ]; then
     NO_CLEAN="1"
     shift
 fi
 
-if [[ $1 == '-v' ]]; then
+if [ "$1" = '-v' ]; then
     VERBOSE="1"
     shift
 fi
@@ -18,19 +18,21 @@ REPO_NAME="${REPO_NAME%.git}"
 REPO_DIR="$BASE_DIR/$REPO_NAME"
 
 if [ -z "$REPO_URL" ]; then
-    echo error: missing url
+    echo error: missing url >&2
     exit 1
 fi
 
 
-echo $REPO_DIR
+echo "$REPO_DIR"
 
 _update() {
-    test -d "$REPO_DIR" || git clone "$REPO_URL" "$REPO_DIR"
+    if ! [ -d "$REPO_DIR" ]; then
+        git clone "$REPO_URL" "$REPO_DIR"
+    fi
 
     cd "$REPO_DIR"
 
-    if [ -z $NO_CLEAN ]; then
+    if [ -z "$NO_CLEAN" ]; then
         echo cleaning!
         git clean -xdf
     fi
@@ -39,7 +41,7 @@ _update() {
     git pull
 }
 
-if [ -z $VERBOSE ]; then
+if [ -z "$VERBOSE" ]; then
     _update > /dev/null
 else
     _update
