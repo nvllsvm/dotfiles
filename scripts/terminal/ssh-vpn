@@ -1,5 +1,5 @@
-#!/bin/sh
+#!/usr/bin/env sh
 TARGET="$1"
-SSH_HOST=$(echo "$TARGET" | cut -f 2 -d '@' | cut -f 1 -d ':')
-REAL_HOST=$(ssh -G "$SSH_HOST" | awk '/^hostname / { print $2 }')
-sshuttle --dns -r "$TARGET" 0/0 -x "$REAL_HOST"
+SSH_HOST="$(echo "$TARGET" | cut -f 2 -d '@' | cut -f 1 -d ':')"
+REAL_HOST="$(ssh -G "$SSH_HOST" | awk '/^hostname / { print $2 }')"
+exec sshuttle --dns -r "$TARGET" 0/0 -x "$REAL_HOST"

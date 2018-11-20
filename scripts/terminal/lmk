@@ -2,7 +2,7 @@
 set -e
 
 TOPIC='lmk-fs-event'
-LINK_PWD=$(readlink -f "$PWD")
+LINK_PWD="$(readlink -f "$PWD")"
 
 kill_all() {
     jobs -rp | xargs -L 1 pkill -P &> /dev/null || true
@@ -19,15 +19,15 @@ get_message() {
 }
 
 
-if [[ $1 == '-a' ]]; then
+if [ "$1" = '-a' ]; then
     LMK_ANY=1
     shift
 fi
 
-if [ -z $1 ]; then
+if [ -z "$1" ]; then
     publish_message "$PWD"
     exit
-elif [ $1 = '--path' ]; then
+elif [ "$1" = '--path' ]; then
     publish_message "$(readlink -f "$2")"
     exit
 fi
@@ -48,8 +48,8 @@ while true; do
 
     disown
     while true; do
-        EVENT_PATH=$(get_message)
-        if [ -n LMK_ANY ]; then
+        EVENT_PATH="$(get_message)"
+        if [ -n "$LMK_ANY" ]; then
             break
         elif [ "$EVENT_PATH"/ = "$PWD"/* ] || [ "$EVENT_PATH"/ = "$LINK_PWD"/* ]; then
             break

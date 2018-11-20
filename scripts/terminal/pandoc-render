@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
 file="$1"
 
@@ -10,12 +10,12 @@ fi
 filename=$(basename "$file")
 extension="${filename##*.}"
 
-if [ "${extension}" == "md" ]; then
+if [ "${extension}" = "md" ]; then
     pandoc_format=gfm
-elif [ "${extension}" == "rst" ]; then
+elif [ "${extension}" = "rst" ]; then
     pandoc_format=rst
 else
-    echo error: unknown filetype
+    echo error: unknown filetype >&2
     exit 1
 fi
 

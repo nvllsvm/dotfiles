@@ -1,20 +1,20 @@
-#!/bin/bash
+#!/usr/bin/env sh
 set -e
 
 NORDVPN_PROTOCOL=tcp
 NORDVPN_DIR=~/.local/share/nordvpn/ovpn_$NORDVPN_PROTOCOL
 EXTRA_SCRIPT=$(which update-resolv-conf)
 
-if [[ $1 == 'update' ]]; then
+if [ "$1" = 'update' ]; then
     rm -rf ~/.local/share/nordvpn
     curl https://downloads.nordcdn.com/configs/archives/servers/ovpn.zip > ~/ovpn.zip
     7z x ~/ovpn.zip "-o$HOME/.local/share/nordvpn"
     rm ~/ovpn.zip
     grep -r -L SHA512 ~/.local/share/nordvpn | xargs rm
     exit
-elif [[ $1 == 'random' ]]; then
+elif [ "$1" = 'random' ]; then
     config_file="$NORDVPN_DIR/$(ls $NORDVPN_DIR | grep ^us | shuf | head -n 1)"
-elif [[ -n $1  ]]; then
+elif [ -n "$1" ]; then
     echo Unknown argument: \"$1\"
     exit 1
 else
