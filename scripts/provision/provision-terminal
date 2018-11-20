@@ -21,7 +21,6 @@ zsh_command() {
 mkdir -p ~/.config
 
 link_file git/.gitignore ~/.gitignore
-link_file httpie ~/.httpie
 link_file nvim ~/.config/nvim
 link_file ranger ~/.config/ranger
 link_file psql/.psqlrc ~/.psqlrc
@@ -77,7 +76,7 @@ fi
 zsh_command pip-update
 zsh_command 'PIP_REQUIRE_VIRTUALENV=0 pip install pipns'
 
-for name in flake8 httpie ptpython ranger-fm speedtest-cli zepusu; do
+for name in flake8 ranger-fm speedtest-cli zepusu; do
     zsh_command "pipns install "$name""
 done
 
