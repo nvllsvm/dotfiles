@@ -66,6 +66,7 @@ Plug 'godlygeek/tabular'
 Plug 'iamcco/mathjax-support-for-mkdp'
 Plug 'iamcco/markdown-preview.vim'
 Plug 'zah/nim.vim'
+Plug 'pedrohdz/vim-yaml-folds'
 call plug#end()
 
 let g:jedi#completions_enabled = 0

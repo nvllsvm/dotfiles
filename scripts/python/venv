@@ -2,7 +2,10 @@
 set -e
 
 env_root="$HOME/.local/share/virtualenvs"
+
+# Avoids dependency on realpath
 parent="$(python -c 'import os; print(os.path.realpath(os.getcwd()))')"
+
 env_folder="$env_root/$(echo "$parent" | sha256sum | awk '{print $1}')"
 
 rm -rf "$env_folder" .envrc
