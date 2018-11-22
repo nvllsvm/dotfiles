@@ -29,8 +29,15 @@ else
     python -m venv "$env_folder"
 fi
 
-echo ". $env_folder/bin/activate" > "$env_folder/.envrc"
 ln -s "$parent" "$env_folder/.parent"
+
+cat > "$env_folder/.envrc" << EOF
+. $env_folder/bin/activate
+# export PIP_USER even though it's disabled in pip.conf
+# tox doesn't seem to respect the venv's pip.conf
+export PIP_USER=0
+EOF
+
 cat > "$env_folder/pip.conf"<<EOF
 [global]
 user = false
