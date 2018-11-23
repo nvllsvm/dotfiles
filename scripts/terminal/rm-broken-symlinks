@@ -1,2 +1,4 @@
 #!/usr/bin/env sh
-find "$1" -xtype l -delete
+if [ -d "$1" ]; then
+    find "$1" -xtype l -delete
+fi
