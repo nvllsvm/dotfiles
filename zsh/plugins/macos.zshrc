@@ -21,15 +21,6 @@ if [[ $OSTYPE == darwin* ]]; then
         fi
     }
 
-    # roughly match util-linux
-    uuidgen() {
-        if [ "$#" -eq 0 ]; then
-            /usr/bin/uuidgen | tr "[:upper:]" "[:lower:]"
-        else
-            /usr/bin/uuidgen "$@"
-        fi
-    }
-
     full-update add brew-update
     full-update add dash-install
     full-update add nvim-nightly-install
