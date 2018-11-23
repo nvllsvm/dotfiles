@@ -9,7 +9,6 @@ kill_all() {
     pkill -P $$ &> /dev/null || true
 }
 
-
 publish_message() {
     zepusu pub "$TOPIC" "$1"
 }
@@ -39,7 +38,7 @@ trap "kill_all" EXIT
 while true; do
     # exit tmux copy-mode
     if [ -n "$TMUX" ]; then
-        tmux if -F -t $TMUX_PANE "#{pane_in_mode}" "send-keys -t $TMUX_PANE -X cancel"
+        tmux if -F -t "$TMUX_PANE" "#{pane_in_mode}" "send-keys -t $TMUX_PANE -X cancel"
     fi
 
     kill_all
@@ -49,9 +48,7 @@ while true; do
     disown
     while true; do
         EVENT_PATH=$(get_message)
-        if [ -n "$LMK_ANY" ]; then
-            break
-        elif [ "$EVENT_PATH"/ = "$PWD"/* ] || [ "$EVENT_PATH"/ = "$LINK_PWD"/* ]; then
+        if [ -n "$LMK_ANY" ] || [[ "$EVENT_PATH"/ = "$PWD"/* ]] || [[ "$EVENT_PATH"/ = "$LINK_PWD"/* ]]; then
             break
         fi
     done
