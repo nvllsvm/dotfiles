@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import argparse
-import os
 import pathlib
 import subprocess
 
@@ -35,19 +34,21 @@ MUTAGEN_CLASS = {
 
 
 def cue_track_count(path):
-    try:
-        with open(path) as f:
-            lines = f.readlines()
-    except UnicodeDecodeError:
-        detector = chardet.UniversalDetector()
-        with open(path, 'rb') as f:
-            data = f.read()
-            detector.feed(data)
-        detector.close()
-        lines = data.decode(detector.result['encoding']).split('\n')
-        with open(path, 'w') as f:
-            f.write('\n'.join(lines))
-    return len([l for l in lines if l.strip().startswith('TRACK ')])
+    """Return the number of tracks in a .cue file
+
+    Also converts the file to UTF-8 if it's not
+    """
+    data = path.read_bytes()
+    text = data.decode(chardet.detect(data)['encoding'])
+    utf8_data = data.encode()
+    if data != utf8_data:
+        path.write_text(text)
+
+    return sum(
+        1
+        for line in text.split('\n')
+        if line.strip().startswith('TRACK ')
+    )
 
 
 def split_flac(flac_path, cue_path):
@@ -157,17 +158,24 @@ def safe_rename(source, name):
             source.rename(target)
 
 
+def all_dirs(root):
+    directories = []
+    stack = [root]
+    while stack:
+        for path in stack.pop().iterdir():
+            if path.is_dir():
+                directories.append(path)
+                stack.append(path)
+    return sorted(directories)
+
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('directory')
+    parser.add_argument('directory', type=pathlib.Path)
     parser.add_argument('-t', '--check-tags', action='store_const', const=True)
     args = parser.parse_args()
 
-    music_dir = pathlib.Path(args.directory)
-
-    for root, dirs, files in os.walk(music_dir):
-        root_path = pathlib.Path(root)
-
+    for root_path in all_dirs(args.directory):
         rename_extensions(root_path)
         organize_images(root_path)
         check_cue_files(root_path)

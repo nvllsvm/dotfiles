@@ -1,0 +1,79 @@
+#!/usr/bin/env python3
+import argparse
+import concurrent.futures
+import logging
+import pathlib
+import subprocess
+
+import harmonize.app as harmonize
+import mutagen
+
+LOGGER = logging.getLogger('reencode-lossless')
+
+
+def copy_tags(source, target):
+    metadata_source = mutagen.File(source)
+    metadata_target = mutagen.File(target)
+    metadata_target.update(metadata_source)
+    metadata_target.save()
+
+
+def reencode(source):
+    LOGGER.info('Processing %s', source)
+    with harmonize.decode_flac_to_stdout(source) as decode:
+        with harmonize.TempPath(dir=source.parent, suffix='.flac') as tmp:
+            encode = subprocess.Popen(
+                ['flac', '-s', '--best', '-V', '-f', '-o', tmp, '-'],
+                stdin=decode.stdout,
+                stdout=subprocess.DEVNULL
+            )
+            encode.wait()
+            if encode.returncode:
+                raise subprocess.CalledProcessError(
+                    encode.returncode, encode.args)
+            copy_tags(source, tmp)
+            source.unlink()
+            tmp.rename(source)
+
+
+def all_files(root):
+    files = []
+    stack = [root]
+    while stack:
+        for path in stack.pop().iterdir():
+            if path.is_file():
+                files.append(path)
+            elif path.is_dir():
+                stack.append(path)
+    return sorted(files)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('directory', type=pathlib.Path)
+    args = parser.parse_args()
+
+    logging.basicConfig(
+        format='%(levelname)s %(message)s',
+        level=logging.INFO)
+
+    with concurrent.futures.ProcessPoolExecutor() as pool:
+        future_to_path = {
+            pool.submit(reencode, path): path
+            for path in all_files(args.directory)
+            if path.suffix.lower() in ('.flac', '.ape')
+        }
+        errors = []
+        for future in concurrent.futures.as_completed(future_to_path):
+            try:
+                future.result()
+            except Exception as e:
+                LOGGER.exception(e)
+                errors.append(future_to_path[future])
+
+    for path in sorted(errors):
+        LOGGER.error('Error %s', path)
+
+
+if __name__ == '__main__':
+    main()
