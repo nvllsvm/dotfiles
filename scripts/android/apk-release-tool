@@ -1,10 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 UNSIGNED_APK="$1"
 RELEASE_KEY="$2"
 
 if [[ -z "${UNSIGNED_APK}" || -z "${RELEASE_KEY}" ]]; then
-    echo usage: $(basename "$0") apk key
+    echo usage: "$(basename "$0")" apk key
     echo error: required arguments missing
     exit 1
 fi
