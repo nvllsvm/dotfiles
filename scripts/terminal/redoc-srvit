@@ -1,0 +1,34 @@
+#!/usr/bin/env sh
+set -e
+
+REDOC_URL='https://cdn.jsdelivr.net/npm/redoc/bundles/redoc.standalone.js'
+
+temp_dir="$(mktemp -d -p /tmp)"
+
+cleanup() {
+    kill HUP srvit
+    rm -rf "$temp_dir"
+}
+
+trap cleanup HUP EXIT
+
+cp "$@" "$temp_dir"
+
+cd "$temp_dir"
+
+cat > index.html<<EOF
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ReDoc</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>body { margin: 0; padding: 0; }</style>
+  </head>
+  <body>
+    <redoc spec-url='/swagger.yaml'></redoc>
+    <script src="$REDOC_URL"></script>
+  </body>
+</html>
+EOF
+srvit
