@@ -40,8 +40,7 @@ def cue_track_count(path):
     """
     data = path.read_bytes()
     text = data.decode(chardet.detect(data)['encoding'])
-    utf8_data = data.encode()
-    if data != utf8_data:
+    if data != text:
         path.write_text(text)
 
     return sum(
