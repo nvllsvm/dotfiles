@@ -6,7 +6,7 @@ REDOC_URL='https://cdn.jsdelivr.net/npm/redoc/bundles/redoc.standalone.js'
 temp_dir="$(mktemp -d -p /tmp)"
 
 cleanup() {
-    kill HUP srvit
+    kill -HUP "$srvit_pid"
     rm -rf "$temp_dir"
 }
 
@@ -31,4 +31,6 @@ cat > index.html<<EOF
   </body>
 </html>
 EOF
-srvit
+srvit &
+srvit_pid=$!
+wait
