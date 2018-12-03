@@ -61,7 +61,7 @@ def main():
         future_to_path = {
             pool.submit(reencode, path): path
             for path in all_files(args.directory)
-            if path.suffix.lower() in ('.flac', '.ape')
+            if path.suffix.lower() in ('.flac')
         }
         errors = []
         for future in concurrent.futures.as_completed(future_to_path):
