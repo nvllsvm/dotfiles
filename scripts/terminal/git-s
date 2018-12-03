@@ -20,7 +20,18 @@ if [ "$EC" != 0 ]; then
 fi
 
 log Remote
-git remote -v
+output=''
+for remote in $(git remote); do
+    fetch_remote="$(git remote get-url "${remote}")"
+    push_remote="$(git remote get-url --push "${remote}")"
+    if [ "${fetch_remote}" = "${push_remote}" ]; then
+        output="${output}${remote} ${fetch_remote}\n"
+    else
+        output="${output}${remote} ${fetch_remote} (fetch)\n"
+        output="${output}${remote} ${push_remote} (push)\n"
+    fi
+done
+echo "${output}" | column -t
 
 log All Branch
 git branch -vv
