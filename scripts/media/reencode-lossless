@@ -20,6 +20,7 @@ def copy_tags(source, target):
 
 def reencode(source):
     LOGGER.info('Processing %s', source)
+    return
     with harmonize.decode_flac_to_stdout(source) as decode:
         with harmonize.TempPath(dir=source.parent, suffix='.flac') as tmp:
             encode = subprocess.Popen(
@@ -61,7 +62,7 @@ def main():
         future_to_path = {
             pool.submit(reencode, path): path
             for path in all_files(args.directory)
-            if path.suffix.lower() in ('.flac')
+            if path.suffix.lower() in ('.flac', )
         }
         errors = []
         for future in concurrent.futures.as_completed(future_to_path):
