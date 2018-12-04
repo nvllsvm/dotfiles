@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import concurrent.futures
+import contextlib
 import logging
 import pathlib
 import subprocess
@@ -18,10 +19,42 @@ def copy_tags(source, target):
     metadata_target.save()
 
 
+@contextlib.contextmanager
+def decode_ape_to_stdout(path):
+    """Decode a FLAC file to stdout
+
+    Decodes through any errors.
+
+    :param pathlib.Path path: The FLAC file path
+    """
+    process = subprocess.Popen(
+        ['mac', path, '-', '-d'],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+    )
+    yield process
+    process.wait()
+    # Decode errors may are non-fatal, but may indicate a problem
+    stderr = process.stderr.read()
+    if process.returncode:
+        raise subprocess.CalledProcessError(
+            process.returncode,
+            process.args,
+            stderr=stderr
+        )
+
+
 def reencode(source):
     LOGGER.info('Processing %s', source)
-    return
-    with harmonize.decode_flac_to_stdout(source) as decode:
+
+    suffix = source.suffix.lower()
+
+    decode_contexts = {
+        '.flac': harmonize.decode_flac_to_stdout,
+        '.ape': decode_ape_to_stdout
+    }
+
+    with decode_contexts[suffix](source) as decode:
         with harmonize.TempPath(dir=source.parent, suffix='.flac') as tmp:
             encode = subprocess.Popen(
                 ['flac', '-s', '--best', '-V', '-f', '-o', tmp, '-'],
@@ -34,7 +67,7 @@ def reencode(source):
                     encode.returncode, encode.args)
             copy_tags(source, tmp)
             source.unlink()
-            tmp.rename(source)
+            tmp.rename(source.with_suffix(suffix))
 
 
 def all_files(root):
@@ -62,7 +95,7 @@ def main():
         future_to_path = {
             pool.submit(reencode, path): path
             for path in all_files(args.directory)
-            if path.suffix.lower() in ('.flac', )
+            if path.suffix.lower() in ('.flac', '.ape')
         }
         errors = []
         for future in concurrent.futures.as_completed(future_to_path):
