@@ -67,7 +67,7 @@ def reencode(source):
                     encode.returncode, encode.args)
             copy_tags(source, tmp)
             source.unlink()
-            tmp.rename(source.with_suffix(suffix))
+            tmp.rename(source.with_suffix('.flac'))
 
 
 def all_files(root):
