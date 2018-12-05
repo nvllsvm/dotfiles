@@ -1,9 +1,15 @@
 #!/usr/bin/env sh
-NOTES_DIR="${SYNCTHING_DIR}"/Notes
-NOTES_FILE="$NOTES_DIR/$1"
+set -e
+
+cd "${SYNCTHING_DIR}"/Notes
+
 if [ -t 1 ]; then
-    mkdir -p "$(dirname "${NOTES_FILE}")"
-    exec "${EDITOR}" "${NOTES_FILE}"
+    if [ -n "$1" ]; then
+        mkdir -p "$(dirname "$1")"
+        exec "${EDITOR}" "$1"
+    else
+        exec "${EDITOR}" misc.md
+    fi
 else
-    echo "${NOTES_DIR}"
+    pwd
 fi
