@@ -1,5 +1,5 @@
 #!/bin/sh
-DOSBOX_BIN=$(which -a dosbox | head -n 2 | tail -n 1)
+DOSBOX_BIN="$(which -a dosbox | grep -v "^$0$" | head -n 1)"
 TEMP_CONFIG=$(mktemp)
 
 trap "rm ${TEMP_CONFIG}" EXIT
