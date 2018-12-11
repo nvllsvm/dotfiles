@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+export CONSUL_HTTP_HOST=http://consul.aweber.io
+IMAGE=consul
+if [ "$1" = '--pull' ]; then
+    docker pull "$IMAGE"
+    exit
+fi
+exec docker-shell -e CONSUL_HTTP_HOST "$IMAGE" consul "$@"

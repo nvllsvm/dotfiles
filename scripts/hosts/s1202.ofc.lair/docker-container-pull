@@ -4,7 +4,7 @@ psql --pull > /dev/null &
 redis-cli --pull > /dev/null &
 srvit --pull > /dev/null &
 
-for image in "alpine" "alpine:edge"; do
+for image in "alpine" "alpine:edge" "consul"; do
     docker pull "$image" > /dev/null &
 done
 
