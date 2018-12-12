@@ -57,7 +57,7 @@ Plug 'scrooloose/nerdtree'
 Plug 'gregsexton/MatchTag'
 Plug 'zchee/deoplete-jedi'
 Plug 'Vimjas/vim-python-pep8-indent'
-Plug 'neomake/neomake'
+"Plug 'neomake/neomake'
 Plug 'plasticboy/vim-markdown'
 Plug 'chriskempson/base16-vim'
 Plug 'dbeniamine/todo.txt-vim'
@@ -107,7 +107,7 @@ augroup my_neomake_highlights
       \ hi NeomakeWarning ctermbg=yellow
 augroup END
 
-autocmd! BufWritePost * Neomake
+"autocmd! BufWritePost * Neomake
 autocmd BufWritePost * call system("lmk --path '" . expand('%:p') . "\' &")
 
 let base16colorspace=256
