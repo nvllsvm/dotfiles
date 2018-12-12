@@ -1,7 +1,0 @@
-#!/usr/bin/env sh
-set -e
-if [ -n "$1" ]; then
-    git remote remove upstream 2> /dev/null || true
-    git remote add upstream "$1"
-fi
-git fetch upstream
