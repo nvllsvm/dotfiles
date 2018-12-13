@@ -57,7 +57,7 @@ Plug 'scrooloose/nerdtree'
 Plug 'gregsexton/MatchTag'
 Plug 'zchee/deoplete-jedi'
 Plug 'Vimjas/vim-python-pep8-indent'
-"Plug 'neomake/neomake'
+Plug 'neomake/neomake'
 Plug 'plasticboy/vim-markdown'
 Plug 'chriskempson/base16-vim'
 Plug 'dbeniamine/todo.txt-vim'
@@ -92,8 +92,6 @@ autocmd BufWinEnter * normal zR
 set list listchars=tab:»·,trail:·
 
 let g:neomake_python_enabled_makers = ['flake8']
-" E501 is line length of 80 characters
-"let g:neomake_python_flake8_maker = { 'args': ['--ignore=E501'], }
 
 let g:neomake_warning_sign = {'text': 'W'}
 let g:neomake_error_sign = {'text': 'E'}
@@ -107,7 +105,7 @@ augroup my_neomake_highlights
       \ hi NeomakeWarning ctermbg=yellow
 augroup END
 
-"autocmd! BufWritePost * Neomake
+autocmd! BufWritePost * Neomake
 autocmd BufWritePost * call system("lmk --path '" . expand('%:p') . "\' &")
 
 let base16colorspace=256

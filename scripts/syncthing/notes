@@ -11,5 +11,9 @@ if [ -t 1 ]; then
         exec "${EDITOR}" misc.md
     fi
 else
-    pwd
+    if [ -n "$1" ]; then
+        echo "$(pwd)/$1"
+    else
+        pwd
+    fi
 fi
