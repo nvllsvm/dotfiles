@@ -137,3 +137,8 @@ full-update add 'rm-broken-symlinks ~/.local/bin'
 
 full-update add 'rm -f ~/.zcompdump && zsh -ic "echo -n"'
 full-update add 'exec zsh'
+
+zreset() {
+    reset
+    exec zsh
+}
