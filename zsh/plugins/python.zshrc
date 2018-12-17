@@ -11,7 +11,7 @@ if [ -d "$PYENV_ROOT" ]; then
         "$path[@]"
     )
 
-    . ~/.pipns/shell.sh &> /dev/null || true
+    . ~/.local/share/pipns/shell.sh &> /dev/null || true
 
     full-update add pyenv-update
     full-update add pip-update
