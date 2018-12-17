@@ -63,6 +63,7 @@ if [[ $osname == Linux* ]]; then
     if command -v pacman > /dev/null; then
         link_file pacman ~/.config/pacman
         sudo pacman -S --noconfirm dash
+        mkdir -p ~/.local/bin
         ln -sf "$(which dash)" "$HOME/.local/bin/sh"
     fi
 fi
