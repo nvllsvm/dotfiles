@@ -3,14 +3,14 @@
 STEP=10
 MINIMUM=1
 
-if [ $1 = "dec" ]; then
-    if [ $(xbacklight -get) -gt $STEP ]; then
+if [ "$1" = "dec" ]; then
+    if [l "$(xbacklight -get)" -gt "$STEP" ]; then
         xbacklight -dec $STEP
     else
         xbacklight -set $MINIMUM
     fi
-elif [ $1 = "inc" ]; then
-    if [ $(xbacklight -get) -lt $STEP ]; then
+elif [ "$1" = "inc" ]; then
+    if [ "$(xbacklight -get)" -lt "$STEP" ]; then
         xbacklight -set $STEP
     else
         xbacklight -inc $STEP
