@@ -1,10 +1,10 @@
-export GOENV_ROOT=~/.local/git/goenv
+export GOENV_ROOT=$HOME/.local/git/goenv
 
 if [ -d "$GOENV_ROOT" ]; then
     path=(
         "$DOTFILES/scripts/go"
         "$GOENV_ROOT/bin"
-        "~/go/bin"
+        "$HOME/go/bin"
         "$path[@]"
     )
 
