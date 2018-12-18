@@ -25,6 +25,7 @@ server {
     location / {
         root /content;
         index index.html;
+        autoindex on;
     }
 }
 EOF
