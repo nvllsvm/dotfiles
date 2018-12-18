@@ -1,3 +1,0 @@
-#!/usr/bin/env sh
-ln -sf ~/.android/sdk/platform-tools/adb ~/.local/bin/adb
-ln -sf ~/.android/sdk/platform-tools/fastboot ~/.local/bin/fastboot
