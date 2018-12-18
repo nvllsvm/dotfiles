@@ -2,8 +2,6 @@
 set -e
 xmodmap-caps-to-esc
 
-libinput-gestures-setup restart
-
 TOUCHPAD_ID=$(xinput list --id-only 'DLL0665:01 06CB:76AD Touchpad')
 
 xinput --set-prop $TOUCHPAD_ID 'libinput Accel Speed' 1

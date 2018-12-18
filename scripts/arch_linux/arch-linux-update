@@ -7,7 +7,7 @@ log() {
     printf "${MAGENTA}$1 ...${RESET}\n"
 }
 
-if ! command -v yay; then
+if ! command -v yay > /dev/null 2>&1; then
     mkdir /tmp/yay-install
     trap 'rm -rf /tmp/yay-install' INT EXIT
     cd /tmp/yay-install
