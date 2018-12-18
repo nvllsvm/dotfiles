@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+git install -k https://github.com/syndbg/goenv
