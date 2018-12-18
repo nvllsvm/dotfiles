@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 IMAGE=nginx:alpine
 PORT=8000
 
@@ -7,12 +7,7 @@ if [ "$1" = '--pull' ]; then
     exit
 fi
 
-if ! [ -t 0 ]; then
-    TEMP_DIR=$(mktemp -d /tmp/srvit.XXXXXXXXX)
-    HTML_DIR=$TEMP_DIR
-    trap "rm -rf "$TEMP_DIR"" EXIT
-    cat > "$TEMP_DIR/index.html"
-elif [ -n "$1" ]; then
+if [ -n "$1" ]; then
     HTML_DIR="$(realpath "$1")"
 else
     HTML_DIR=$(pwd)
@@ -36,13 +31,21 @@ EOF
 
 echo http://localhost:$PORT
 
-container_name="docker_shell-$(uuidgen | tr -d -)"
-trap "rm -rf $TEMP_DIR; docker kill "${container_name}" >& /dev/null || true" HUP EXIT
+container_name="srvit-$PORT"
 
+cleanup() {
+    set +e
+    rm -rf "${NGINX_CONFIG}"
+    docker kill "${container_name}" > /dev/null 2>&1
+}
+
+trap cleanup HUP EXIT
+
+# Run as root to avoid permission issues accessing files
 docker run \
     --rm \
     --name ${container_name} \
     -p ${PORT}:80 \
     -v "${NGINX_CONFIG}":/etc/nginx/conf.d/default.conf \
-    -v "${HTML_DIR}":/content \
-    "${IMAGE}"
+    -v "${HTML_DIR}":/content:ro \
+    "${IMAGE}" sh -c "sed -i 's/user.\snginx/user root/g' /etc/nginx/nginx.conf && nginx -g 'daemon off;'"

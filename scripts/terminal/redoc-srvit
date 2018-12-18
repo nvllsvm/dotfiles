@@ -3,9 +3,16 @@ set -e
 
 REDOC_URL='https://cdn.jsdelivr.net/npm/redoc/bundles/redoc.standalone.js'
 
+if [ -z "$1" ]; then
+    SWAGGER_FILE='swagger.yaml'
+else
+    SWAGGER_FILE="$(basename "$1")"
+fi
+
 temp_dir="$(mktemp -d -p /tmp)"
 
 cleanup() {
+    set +e
     kill -HUP "$srvit_pid"
     rm -rf "$temp_dir"
 }
@@ -26,7 +33,7 @@ cat > index.html<<EOF
     <style>body { margin: 0; padding: 0; }</style>
   </head>
   <body>
-    <redoc spec-url='/swagger.yaml'></redoc>
+    <redoc spec-url="/$SWAGGER_FILE"></redoc>
     <script src="$REDOC_URL"></script>
   </body>
 </html>
