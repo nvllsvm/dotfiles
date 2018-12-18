@@ -76,7 +76,7 @@ fi
 zsh_command pip-update
 zsh_command 'PIP_REQUIRE_VIRTUALENV=0 pip install pipns'
 
-for name in flake8 ranger-fm speedtest-cli zepusu; do
+for name in flake8 httpie ranger-fm speedtest-cli zepusu; do
     zsh_command "pipns install "$name""
 done
 
