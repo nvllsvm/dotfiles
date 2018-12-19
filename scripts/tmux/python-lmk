@@ -7,7 +7,6 @@ if [ -n "$TMUX_SESSION" -a  "$(tmux display-message -p '#S' 2> /dev/null)" = "$T
     if [ -z "$1" ]; then
         LMK_FILE=$(mktemp --suffix='.py')
         trap "rm -f "$LMK_FILE"" EXIT
-        mkdir -p "$(dirname "$LMK_FILE")"
     else
         LMK_FILE="$1"
     fi
@@ -21,7 +20,7 @@ if [ -n "$TMUX_SESSION" -a  "$(tmux display-message -p '#S' 2> /dev/null)" = "$T
         PYTHON_BIN=python3
     fi
 
-    tmux split-window -h "lmk $PYTHON_BIN $LMK_FILE"
+    tmux split-window -h "lmk -a $PYTHON_BIN $LMK_FILE"
 
     tmux select-pane -l
 
