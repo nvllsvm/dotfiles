@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+docker-shell \
+    -v "$HOME/.jellyfin_dev:/config" \
+    -v /mnt/storage1/Shows:/media/Shows1:ro \
+    -v /mnt/storage2/Movies:/media/Movies:ro \
+    -v /mnt/storage2/Shows:/media/Shows2:ro \
+    --env-file ~/Code/sol-docker/environment/jellyfin.env \
+    -p 8000:8096 \
+    jellyfin/jellyfin:dev
