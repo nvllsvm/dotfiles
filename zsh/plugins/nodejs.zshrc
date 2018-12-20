@@ -20,7 +20,7 @@ if [ -d "$NVM_DIR" ]; then
     }
 
     for cmd in "$_nvm_load[@]"; do
-        alias $cmd="nvm-load && $cmd"
+        eval "alias $cmd='nvm-load && $cmd'"
     done
 
     path=("${DOTFILES}/scripts/nodejs" "$path[@]")
