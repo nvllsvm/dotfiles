@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+import argparse
+import pathlib
+
+import chardet
+
+
+def convert_to_utf8(path):
+    data = path.read_bytes()
+    text = data.decode(chardet.detect(data)['encoding'])
+    text_utf8 = text.encode()
+    if data != text_utf8:
+        print(f'Encoding {path}')
+        path.write_bytes(text_utf8)
+    else:
+        print(f'Already encoded {path}')
+
+
+def main():
+    parser = argparse.ArgumentParser(description='Reencode files in UTF-8')
+    parser.add_argument('file', type=pathlib.Path)
+    args = parser.parse_args()
+
+    convert_to_utf8(args.file)
+
+
+if __name__ == '__main__':
+    main()
