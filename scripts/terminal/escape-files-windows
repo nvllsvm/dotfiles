@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import argparse
-import os
 import pathlib
 import string
 import subprocess
@@ -10,10 +9,16 @@ VALID.extend(string.ascii_letters)
 VALID.extend(string.digits)
 
 
-def pfiles(path):
-    for root, dirs, files in os.walk(path):
-        for f in files:
-            yield pathlib.Path(root, f)
+def all_files(root):
+    files = []
+    stack = [root]
+    while stack:
+        for path in stack.pop().iterdir():
+            if path.is_file():
+                files.append(path)
+            elif path.is_dir():
+                stack.append(path)
+    return sorted(files)
 
 
 def escape_path(path):
@@ -34,7 +39,7 @@ def escape_path(path):
 def rename_files(root, dry_run=True):
     renamed_paths = []
 
-    for f in pfiles(root):
+    for f in all_files(root):
         new_f = escape_path(f)
         if new_f != f:
             if new_f.exists() or new_f in renamed_paths:
@@ -48,12 +53,12 @@ def rename_files(root, dry_run=True):
             print()
 
     if not dry_run:
-        subprocess.run(('find', root, '-type', 'd', '-empty', '-delete'))
+        subprocess.run(['empty-tree', '-r', root])
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('directory')
+    parser.add_argument('directory', type=pathlib.Path)
     parser.add_argument('-c', '--commit',
                         action='store_const', const='True',
                         help='commit renames to disk. otherwise dry run')

@@ -8,7 +8,7 @@ import sys
 import enzyme
 
 
-VALID_LANGUAGES = set(['eng', 'und', None])
+DEFAULT_KEEP_LANGUAGES = {'eng'}
 
 
 class MKVFile:
@@ -99,15 +99,25 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('input_directory', type=pathlib.Path)
     parser.add_argument('output_directory', type=pathlib.Path)
+    parser.add_argument(
+        '-k',
+        '--keep',
+        action='append',
+        help='Language to keep',
+    )
     args = parser.parse_args()
 
     input_directory = args.input_directory.absolute()
     output_directory = args.output_directory.absolute()
 
+    if args.keep:
+        valid_languages = set(args.keep)
+    else:
+        valid_languages = DEFAULT_KEEP_LANGUAGES
     for path in mkv_files(input_directory):
         print(path)
         mkv = MKVFile(path)
-        invalid_languages = mkv.languages - VALID_LANGUAGES
+        invalid_languages = mkv.languages - valid_languages
         target = output_directory.joinpath(path.relative_to(input_directory))
         audio = mkv.matching_audio_tracks(invalid_languages)
         subtitle = mkv.matching_subtitle_tracks(invalid_languages)

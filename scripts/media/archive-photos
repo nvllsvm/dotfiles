@@ -1,97 +1,74 @@
 #!/usr/bin/env python3
 import argparse
-import os
-import shutil
+import datetime
+import pathlib
+import sys
 
 
-def parse_filename(filename, index, separated=False):
-    if separated:
-        year = filename[index:index+4]
-        month = filename[index+5:index+7]
-        day = filename[index+8:index+9]
-    else:
-        year = filename[index:index+4]
-        month = filename[index+4:index+6]
-        day = filename[index+6:index+8]
-
-    return year, month, day
-
-
-class MultimediaFile(object):
-    def __init__(self, filename, source_directory, target_directory,
-                 year, month, day, move_file=None):
-        self.filename = filename
-        self.source_directory = source_directory
-        self.target_directory = target_directory
-
-        self.year = year
-        self.month = month
-        self.day = day
-
-        try:
-            self.year = str(int(year))
-            self.month = str(int(month)).zfill(2)
-            self.day = str(int(day)).zfill(2)
-        except ValueError as e:
-            raise e
-
-        self.move_file = move_file
-
-    def archive(self):
-        archive_path = os.path.join(self.target_directory,
-                                    self.year,
-                                    self.month,
-                                    self.day)
-
-        if self.move_file:
-            if not os.path.isdir(archive_path):
-                os.makedirs(archive_path)
-
-        old_path = os.path.join(self.source_directory, self.filename)
-        new_path = os.path.join(archive_path, self.filename)
-
-        print(new_path)
-
-        if not os.path.isfile(new_path):
-            if self.move_file:
-                shutil.move(old_path, new_path)
+def parse_date(path):
+    try:
+        if path.startswith(('DOC', 'IMG', 'VID')) and path[3] in ('-', '_'):
+            dt = datetime.datetime(
+                int(path[4:8]),
+                int(path[8:10]),
+                int(path[10:12])
+            )
         else:
-            print(f'Error: {new_path} already exists')
+            raise ValueError('unknown date format')
+
+        lower_bound = datetime.timedelta(weeks=52 * 5)
+        upper_bound = datetime.timedelta(days=1)
+
+        now = datetime.datetime.utcnow()
+        if dt > (now + upper_bound):
+            raise ValueError('date in the future')
+        elif dt < (now - lower_bound):
+            raise ValueError('date too old')
+    except Exception as e:
+        print(
+            f'error: parse error "{path}" {e.args}', file=sys.stderr
+        )
+        sys.exit(1)
+    return dt
 
 
-def process_dir(source_directory, target_directory,
-                index, separated, move_file):
-    source_directory = os.path.abspath(source_directory)
+def all_files(root):
+    files = []
+    stack = [root]
+    while stack:
+        for path in stack.pop().iterdir():
+            if path.is_file():
+                files.append(path)
+            elif path.is_dir():
+                stack.append(path)
+    return sorted(files)
 
-    for root, dirs, files in os.walk(source_directory):
-        for f in files:
-            year, month, day = parse_filename(f, index, separated)
 
-            m = MultimediaFile(f, root, target_directory,
-                               year, month, day, move_file)
-            m.archive()
+def process_dir(source_directory, target_directory, dry_run):
+    for path in all_files(source_directory):
+        dt = parse_date(path.name)
 
+        target_path = target_directory.joinpath(
+            str(dt.year),
+            str(dt.month).zfill(2),
+            str(dt.day).zfill(2),
+            path.name
+        )
+        print(target_path.relative_to(target_directory))
 
-def get_arguments():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('source_directory')
-    parser.add_argument('target_directory')
-    parser.add_argument('-m', '--move-file', action='store_true',
-                        help='not a dry run')
-    parser.add_argument('index', type=int,
-                        help='starting index of date')
-    parser.add_argument('-s', '--separated', action='store_true',
-                        help='date parts are separated (ex. 2016-01-01)')
-    args = parser.parse_args()
-
-    return args
+        if not dry_run:
+            target_path.mkdir(parents=True, exist_ok=True)
+            path.rename(target_path)
 
 
 def main():
-    args = get_arguments()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('source_directory', type=pathlib.Path)
+    parser.add_argument('target_directory', type=pathlib.Path)
+    parser.add_argument('-d', '--dry-run', action='store_true')
+    args = parser.parse_args()
 
-    process_dir(args.source_directory, args.target_directory,
-                args.index, args.separated, args.move_file)
+    process_dir(args.source_directory, args.target_directory, args.dry_run)
 
 
 if __name__ == '__main__':
