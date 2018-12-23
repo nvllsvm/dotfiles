@@ -24,6 +24,7 @@ EXPECTED_TAGS = (
     'artist',
     'date',
     'genre',
+    'title',
     'tracknumber'
 )
 
