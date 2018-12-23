@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import argparse
-import os
+import pathlib
 import shutil
 import subprocess
 import sys
@@ -8,17 +8,14 @@ import sys
 import enzyme
 
 
-class MKVFile(object):
-    def __init__(self, directory, filename):
-        self.directory = directory
-        self.filename = filename
+VALID_LANGUAGES = set(['eng', 'und', None])
 
-        with open(self.path, 'rb') as f:
-            self.metadata = enzyme.MKV(f)
 
-    @property
-    def path(self):
-        return os.path.join(self.directory, self.filename)
+class MKVFile:
+    def __init__(self, path):
+        self.path = path
+        with self.path.open('rb') as handle:
+            self.metadata = enzyme.MKV(handle)
 
     @property
     def languages(self):
@@ -66,11 +63,11 @@ class MKVFile(object):
 
         return track_command
 
-    def remove_tracks(self, target_folder, audio=[], subtitle=[]):
-        if not os.path.isdir(target_folder):
-            os.makedirs(target_folder)
-
-        target_path = os.path.join(target_folder, self.filename)
+    def remove_tracks(self, target_path, audio=[], subtitle=[]):
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+        if target_path.exists():
+            print(f'error: already exists "{target_path}"', file=sys.stderr)
+            sys.exit(1)
         if audio or subtitle:
             conversion_call = ['mkvmerge', '-o', target_path]
 
@@ -81,41 +78,41 @@ class MKVFile(object):
 
             conversion_call += [self.path]
 
-            subprocess.check_call(conversion_call,
-                                  stdout=open(os.devnull, 'w'))
+            subprocess.run(conversion_call, stdout=subprocess.DEVNULL)
         else:
             shutil.copy(self.path, target_path)
 
 
+def mkv_files(root):
+    files = []
+    stack = [root]
+    while stack:
+        for path in stack.pop().iterdir():
+            if path.is_file() and path.suffix.lower() == '.mkv':
+                files.append(path)
+            elif path.is_dir():
+                stack.append(path)
+    return sorted(files)
+
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('input_directory')
-    parser.add_argument('output_directory')
+    parser.add_argument('input_directory', type=pathlib.Path)
+    parser.add_argument('output_directory', type=pathlib.Path)
     args = parser.parse_args()
 
-    input_directory = os.path.abspath(args.input_directory)
-    output_directory = args.output_directory
+    input_directory = args.input_directory.absolute()
+    output_directory = args.output_directory.absolute()
 
-    if os.path.exists(output_directory):
-        print('Error: output directory exists: {}'.format(output_directory))
-        sys.exit()
+    for path in mkv_files(input_directory):
+        print(path)
+        mkv = MKVFile(path)
+        invalid_languages = mkv.languages - VALID_LANGUAGES
+        target = output_directory.joinpath(path.relative_to(input_directory))
+        audio = mkv.matching_audio_tracks(invalid_languages)
+        subtitle = mkv.matching_subtitle_tracks(invalid_languages)
 
-    valid_languages = set(['eng', 'und', None])
-
-    for root, dirs, files in os.walk(input_directory):
-        dirs.sort()
-        for filename in sorted(files):
-            if filename.lower().endswith('.mkv'):
-                mkv_file = MKVFile(root, filename)
-                print(mkv_file.path)
-                invalid_languages = mkv_file.languages - valid_languages
-                new_root = root.replace(input_directory, output_directory, 1)
-
-                audio = mkv_file.matching_audio_tracks(invalid_languages)
-                subtitle = mkv_file.matching_subtitle_tracks(invalid_languages)
-                mkv_file.remove_tracks(new_root,
-                                       audio=audio,
-                                       subtitle=subtitle)
+        mkv.remove_tracks(target, audio=audio, subtitle=subtitle)
 
 
 if __name__ == '__main__':

@@ -1,71 +1,55 @@
 #!/usr/bin/env python3
 import argparse
-import os
 import pathlib
-import re
 import sys
 
-TITLES_FILE = 'source'
-DEFAULT_PATTERN = r'.*S\d*E(\d*).*.mkv'
+
+def mkv_files(root):
+    return [
+        path
+        for path in root.iterdir()
+        if path.is_file() and path.suffix == '.mkv'
+    ]
 
 
-def get_titles(path):
-    with open(path) as f:
-        return {
-            number: line.strip().replace('/', '-')
-            for number, line in enumerate(f, 1)
-        }
-
-
-def get_new_path(path, pattern, titles):
-    if path.name.endswith('.mkv'):
-        matches = pattern.match(path.name)
-        try:
-            number = int(matches.group(1))
-        except AttributeError:
-            print('Unable to match in file', path)
-            sys.exit(1)
-        return pathlib.Path(
-            path.parent, f'{number:02d} - {titles[number]}.mkv'
-        )
-
-
-def process(path, regex):
-    pattern = re.compile(regex)
-    for root, dirs, files in os.walk(path):
-        try:
-            titles_path = pathlib.Path(root, TITLES_FILE)
-            titles = get_titles(pathlib.Path(root, TITLES_FILE))
-        except FileNotFoundError:
-            continue
-
-        paths = {}
-        for path in (pathlib.Path(root, f) for f in sorted(files)):
-            new_path = get_new_path(path, pattern, titles)
-            if new_path:
-                if new_path.exists():
-                    print('File already exists', new_path)
-                    sys.exit(1)
-                print(path.name, '\n', new_path.name, '\n', sep='')
-                paths[path] = new_path
-
-        should_rename = input('Should rename? (y/N)  ')
-        if should_rename.lower() == 'y':
-            for old_path, new_path in paths.items():
-                old_path.rename(new_path)
-
-            titles_path.unlink()
+def read_titles(path):
+    return [
+        line.replace('/', '-')
+        for line in path.read_text().split('\n')
+        if line
+    ]
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.description = f"{parser.prog} directory {DEFAULT_PATTERN}"
-    parser.add_argument('directory')
-    parser.add_argument('-r', '--regex', default=DEFAULT_PATTERN)
+    parser.description = f'{parser.prog} directory'
+    parser.add_argument('directory', type=pathlib.Path)
+    parser.add_argument('-t', '--titles', default='titles', type=pathlib.Path)
+    parser.add_argument('-f', '--force', action='store_const', const=True)
+    parser.add_argument('-d', '--dryrun', action='store_const', const=True)
     args = parser.parse_args()
 
-    pattern = f'^{args.regex}$'
-    process(args.directory, pattern)
+    titles = read_titles(args.titles)
+    files = sorted(mkv_files(args.directory))
+
+    new_names = {}
+    for num, (title, path) in enumerate(zip(titles, files), 1):
+        formatted_num = str(num).zfill(2)
+        if formatted_num not in path.name and not args.force:
+            print(
+                f'error: "{formatted_num}" not in "{path.name}"',
+                file=sys.stderr
+            )
+            sys.exit(1)
+        new_names[path] = f'{formatted_num} - {title}'
+
+    for path, new_name in new_names.items():
+        target = path.with_name(new_name).with_suffix(path.suffix)
+        print(path.name)
+        print(target.name)
+        print()
+        if not args.dryrun:
+            path.rename(target)
 
 
 if __name__ == '__main__':
