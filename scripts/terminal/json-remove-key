@@ -2,5 +2,5 @@
 set -e
 key="$1"
 for f in $(rg -l -t json "$key"); do
-    cat "$f" | jq "del(.$key)" | soakout "$f"
+    cat "$f" | jq "del(.$key)" | sponge "$f"
 done
