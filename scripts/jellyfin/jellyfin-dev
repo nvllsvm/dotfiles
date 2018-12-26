@@ -5,8 +5,8 @@ if [ -z "$1" ]; then
 fi
 docker-shell \
     -v "$HOME/.jellyfin_dev:/config" \
-    -v /home/ar/.jellyfin_dev/music:/media/Music \
-    -v /home/ar/.jellyfin_dev/video:/media/Video \
+    -v "$HOME/.jellyfin_dev/music:/media/Music" \
+    -v "$HOME/.jellyfin_dev/video:/media/Video" \
     --net=host \
-    --user $(id -u):$(id -g) \
+    --user "$(id -u):$(id -g)" \
     "$1"
