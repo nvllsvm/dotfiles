@@ -30,7 +30,7 @@ def decode_ape_to_stdout(path):
     process = subprocess.Popen(
         ['mac', path, '-', '-d'],
         stdout=subprocess.PIPE,
-        stderr=subprocess.DEVNULL,
+        stderr=subprocess.PIPE,
     )
     yield process
     process.wait()
