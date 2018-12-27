@@ -1,40 +1,40 @@
-#!/bin/sh
+#!/usr/bin/env sh
 set -e
 
-MODE=$1
+MODE="$1"
 
 
 phobos() {
-    if [[ -z $MODE ]]; then
-        if [[ -z $(xrandr | grep '^DP1 connected ' ) ]]; then
+    if [ -z "$MODE" ]; then
+        if [ -z "$(xrandr | grep '^DP1 connected ')" ]; then
             MODE=internal
         else
             MODE=external
         fi
     fi
 
-    xrandr-custom-resolution eDP1 1600 900
-    xrandr-custom-resolution eDP1 1280 720
+    xrandr-custom-resolution eDP1 1600 900 60
+    xrandr-custom-resolution eDP1 1280 720 60
 
-    if [[ $MODE == "internal" ]]; then
+    if [ "$MODE" = "internal" ]; then
         xrandr \
             --output HDMI1 --off \
             --output DP1 --off \
             --output eDP1 --primary --mode 3200x1800 --pos 0x0 --rotate normal
         set-x-dpi 192
-    elif [[ $MODE == "internal-half" ]]; then
+    elif [ "$MODE" = "internal-half" ]; then
         xrandr \
             --output HDMI1 --off \
             --output DP1 --off \
             --output eDP1 --primary --mode 1600x900 --pos 0x0 --rotate normal
         set-x-dpi 138
-    elif [[ $MODE == "internal-720" ]]; then
+    elif [ "$MODE" = "internal-720" ]; then
         xrandr \
             --output HDMI1 --off \
             --output DP1 --off \
             --output eDP1 --primary --mode 1280x720 --pos 0x0 --rotate normal
         set-x-dpi 96
-    elif [[ $MODE == "external" ]]; then
+    elif [ "$MODE" = "external" ]; then
         xrandr \
             --output HDMI1 --off \
             --output eDP1 --off \
@@ -48,15 +48,15 @@ phobos() {
 
 
 mars() {
-    if [[ -z $MODE ]]; then
-        if [[ $(xrandr | grep -e '^DP-2 ' -e '^DP-4 ' | grep ' connected' | wc -l) == '2' ]]; then
+    if [ -z "$MODE" ]; then
+        if [ "$(xrandr | grep -e '^DP-2 ' -e '^DP-4 ' | grep ' connected' | wc -l)" = '2' ]; then
             MODE=multi
         else
             MODE=single
         fi
     fi
 
-    if [[ $MODE == "single" ]]; then
+    if [ "$MODE" = "single" ]; then
         xrandr \
             --output DP-0 --off \
             --output DP-1 --off \
@@ -68,7 +68,7 @@ mars() {
             --output HDMI-0 --off \
             --output DP-4 --primary --mode 1920x1200 --pos 0x0 --rotate normal
         set-x-dpi 96
-    elif [[ $MODE == "multi" ]]; then
+    elif [ "$MODE" = "multi" ]; then
         xrandr \
             --output DP-0 --off \
             --output DP-1 --off \
@@ -88,21 +88,21 @@ mars() {
 
 
 deimos() {
-    if [[ -z $MODE ]]; then
-        if [[ -z $(xrandr | grep '^DP1 connected ' ) ]]; then
+    if [ -z "$MODE" ]; then
+        if [ -z "$(xrandr | grep '^DP1 connected ')" ]; then
             MODE=internal
         else
             MODE=external
         fi
     fi
-    if [[ $MODE == "internal" ]]; then
+    if [ "$MODE" = "internal" ]; then
         xrandr \
             --output DP1 --off \
             --output HDMI1 --off \
             --output HDMI2 --off \
             --output eDP1 --primary --mode 720x1280 --pos 0x0 --rotate right
         set-x-dpi 96 large
-    elif [[ $MODE == "external" ]]; then
+    elif [ "$MODE" = "external" ]; then
         xrandr \
             --output DP1 --primary --mode 1920x1200 --pos 0x0 \
             --output HDMI1 --off \
@@ -116,7 +116,8 @@ apollo() {
     set-x-dpi 192
 }
 
-case "$HOSTNAME" in
+hostname="$(uname -n)"
+case "$hostname" in
     "deimos")
         deimos
         ;;
@@ -130,7 +131,7 @@ case "$HOSTNAME" in
         apollo
         ;;
     *)
-        printf "WARN: Host \'$HOSTNAME\' undefined"
+        echo "WARN: Host '$hostname' undefined" >&2
         set-x-dpi 96
         ;;
 esac

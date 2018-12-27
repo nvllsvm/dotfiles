@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 xset dpms 0 5
 i3lock -n -c 000000
 xset -dpms

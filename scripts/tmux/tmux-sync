@@ -10,19 +10,22 @@ if [ -z "$2" ]; then
 elif [ -n "$TMUX" ]; then
     clear
 
-    command=${@:1:1}
-    first_arg=${@:2:1}
+    command="$1"
+    shift
 
-    declare -i num_args
-    num_args=$#-1
+    num_args=$#
 
-    for i in "${@:3}"; do
-        tmux split-window -h "$(pane_command "$command" "$i")"
+    first_arg="$1"
+    shift
+
+    for i in $(seq 1 $#); do
+        tmux split-window -h "$(pane_command "$command" "$1")"
+        shift
     done
 
-    if [ $num_args = 2 ]; then
+    if [ $num_args = 3 ]; then
         tmux select-layout even-horizontal
-    elif [ $num_args = 3 ]; then
+    elif [ $num_args = 4 ]; then
         tmux select-layout even-vertical
     else
         tmux select-layout tiled

@@ -1,2 +1,2 @@
-#!/bin/sh
-maim -s -n 1 ~/"$(date +%Y-%m-%d\ %H:%M:%S.%3N).png"
+#!/usr/bin/env sh
+maim -s -n 1 "$HOME/$(date +%Y-%m-%d\ %H:%M:%S.%3N).png"

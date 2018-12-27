@@ -1,8 +1,7 @@
-#!/bin/bash
-if [ -z "$4" ]; then
-    REFRESH=60
-else
-    REFRESH=$4
+#!/usr/bin/env sh
+if [ $# != '4' ]; then
+    echo "usage: $0 OUTPUT WIDTH HEIGHT REFRESH" >&2
+    exit 1
 fi
 
 cvt_output=$(cvt $2 $3 $REFRESH | tail -n 1 | awk '{$1=$2=""}1')

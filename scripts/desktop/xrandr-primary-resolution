@@ -1,2 +1,2 @@
-#!/bin/sh
+#!/usr/bin/env sh
 xrandr | grep ' connected' | grep primary | tr '+' ' ' | awk '{print $4}'

@@ -2,7 +2,7 @@
 
 . ~/.zshrc
 
-export XAUTHORITY=/home/$USERNAME/.Xauthority
+export XAUTHORITY=~/.Xauthority
 export DISPLAY=$(
     ps e -u $USERNAME | \
     sed -rn 's/.* DISPLAY=(:[0-9]*).*/\1/p' | \

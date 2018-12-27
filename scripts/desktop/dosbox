@@ -1,8 +1,12 @@
-#!/bin/sh
+#!/usr/bin/env sh
 DOSBOX_BIN="$(which -a dosbox | grep -v "^$0$" | head -n 1)"
-TEMP_CONFIG=$(mktemp)
+TEMP_CONFIG="$(mktemp)"
 
-trap "rm ${TEMP_CONFIG}" EXIT
+cleanup() {
+    rm "${TEMP_CONFIG}"
+}
+
+trap cleanup EXIT
 
 cat > "${TEMP_CONFIG}" <<EOF
 [sdl]

@@ -1,7 +1,0 @@
-#!/usr/bin/env sh
-set -e
-alias bw="$(which -a bw | grep -v "^$0$" | head -n 1)"
-trap "bw lock > /dev/null" EXIT
-export BW_SESSION="$(bw unlock --raw)"
-bw sync > /dev/null
-bw "$@"

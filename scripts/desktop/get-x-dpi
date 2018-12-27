@@ -1,2 +1,2 @@
-#!/bin/sh
+#!/usr/bin/env sh
 xdpyinfo | grep resolution | awk '{print $2}' | cut -f 1 -d x
