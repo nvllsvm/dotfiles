@@ -18,22 +18,36 @@ get_message() {
 }
 
 
-if [ "$1" = '-a' ]; then
-    LMK_ANY=1
-    shift
-fi
-
 if [ -z "$1" ]; then
     publish_message "$PWD"
     exit
-elif [ "$1" = '--path' ]; then
+elif [ "$1" = '-p' ]; then
     publish_message "$(readlink -f "$2")"
     exit
 fi
 
+while true; do
+    if [ "$1" = '-a' ]; then
+        LMK_ANY=1
+        shift
+    elif [ "$1" = '-i' ]; then
+        LMK_INFO=1
+        shift
+    else
+        break
+    fi
+done
 
 trap "exit 1" SIGINT
 trap "kill_all" EXIT
+
+exec_command() {
+    "$@"
+    if [ -n "$LMK_INFO" ]; then
+        echo
+        echo "lmk complete - $?"
+    fi
+}
 
 while true; do
     # exit tmux copy-mode
@@ -43,7 +57,7 @@ while true; do
 
     kill_all
     clear
-    "$@" &
+    exec_command "$@" &
 
     disown
     while true; do

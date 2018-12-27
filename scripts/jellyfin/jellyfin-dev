@@ -1,12 +1,2 @@
 #!/usr/bin/env sh
-if [ -z "$1" ]; then
-    echo error: must specify image path >&2
-    exit 1
-fi
-docker-shell \
-    -v "$HOME/.jellyfin_dev:/config" \
-    -v "$HOME/.jellyfin_dev/music:/media/Music" \
-    -v "$HOME/.jellyfin_dev/video:/media/Video" \
-    --net=host \
-    --user "$(id -u):$(id -g)" \
-    "$1"
+exec dotnet ~/Code/jellyfin/debug/jellyfin.dll -programdata ~/.jellyfin_dev

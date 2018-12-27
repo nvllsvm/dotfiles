@@ -1,2 +1,0 @@
-#!/usr/bin/env sh
-exec dotnet $1/jellyfin.dll -programdata ~/.jellyfin_debug
