@@ -23,9 +23,9 @@ elif [ -n "$TMUX" ]; then
         shift
     done
 
-    if [ $num_args = 3 ]; then
+    if [ $num_args = 2 ]; then
         tmux select-layout even-horizontal
-    elif [ $num_args = 4 ]; then
+    elif [ $num_args = 3 ]; then
         tmux select-layout even-vertical
     else
         tmux select-layout tiled

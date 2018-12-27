@@ -21,7 +21,7 @@ get_message() {
 if [ -z "$1" ]; then
     publish_message "$PWD"
     exit
-elif [ "$1" = '-p' ]; then
+elif [ "$1" = '--path' ]; then
     publish_message "$(readlink -f "$2")"
     exit
 fi
