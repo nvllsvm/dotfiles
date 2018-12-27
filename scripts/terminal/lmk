@@ -42,10 +42,12 @@ trap "exit 1" SIGINT
 trap "kill_all" EXIT
 
 exec_command() {
+    set +e
     "$@"
+    ret=$?
     if [ -n "$LMK_INFO" ]; then
         echo
-        echo "lmk complete - $?"
+        echo "lmk complete - $ret"
     fi
 }
 
