@@ -1,10 +1,11 @@
 #!/usr/bin/env sh
+set -e
 
 STEP=10
 MINIMUM=1
 
 if [ "$1" = "dec" ]; then
-    if [l "$(xbacklight -get)" -gt "$STEP" ]; then
+    if [ "$(xbacklight -get)" -gt "$STEP" ]; then
         xbacklight -dec $STEP
     else
         xbacklight -set $MINIMUM
@@ -15,6 +16,9 @@ elif [ "$1" = "inc" ]; then
     else
         xbacklight -inc $STEP
     fi
+elif [ "$#" = '0' ]; then
+    xbacklight -get
+    exit
 else
     cat << EOF
 inc:  Increase backlight by 10
