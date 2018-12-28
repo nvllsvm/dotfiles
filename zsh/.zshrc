@@ -19,9 +19,6 @@ setopt share_history
 
 bindkey "^[[A" history-beginning-search-backward
 bindkey "^[[B" history-beginning-search-forward
-# Programs like dotnet override the uparrow's keycode in VTE terminals
-bindkey "^[OA" history-beginning-search-backward
-bindkey "^[OB" history-beginning-search-forward
 
 alias ls='ls --color=auto --group-directories-first'
 alias diff='diff --color=auto'
@@ -61,7 +58,16 @@ function zle-line-init zle-keymap-select {
 zle -N zle-line-init
 zle -N zle-keymap-select
 
+add-zsh-hook precmd set_cursor_key_to_cursor
 add-zsh-hook precmd exit_status
+
+set_cursor_key_to_cursor () {
+    # fixes some misbehaving applications like dotnet.
+    # application mode remaps arrows to ex. ^[OA and
+    # breaks history search
+    printf '\e[?1l'
+}
+
 
 exit_status () {
     exit_status=$?
