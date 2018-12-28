@@ -54,7 +54,7 @@ def main():
         '-r', dest='remove', action='store_const', const=True,
         help='remove the trees from disk'
     )
-    parser.add_argument('path', type=pathlib.Path)
+    parser.add_argument('path', type=pathlib.Path, nargs='?', default='.')
     args = parser.parse_args()
 
     for path in sorted(empty_trees(args.path)):
