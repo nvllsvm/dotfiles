@@ -19,6 +19,9 @@ setopt share_history
 
 bindkey "^[[A" history-beginning-search-backward
 bindkey "^[[B" history-beginning-search-forward
+# Programs like dotnet override the uparrow's keycode in VTE terminals
+bindkey "^[OA" history-beginning-search-backward
+bindkey "^[OB" history-beginning-search-forward
 
 alias ls='ls --color=auto --group-directories-first'
 alias diff='diff --color=auto'
