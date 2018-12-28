@@ -62,9 +62,9 @@ add-zsh-hook precmd set_cursor_key_to_cursor
 add-zsh-hook precmd exit_status
 
 set_cursor_key_to_cursor () {
-    # fixes some misbehaving applications like dotnet.
+    # fixes some misbehaving combinations like dotnet and VTE terminals.
     # application mode remaps arrows to ex. ^[OA and
-    # breaks history search
+    # breaks history search.
     printf '\e[?1l'
 }
 
