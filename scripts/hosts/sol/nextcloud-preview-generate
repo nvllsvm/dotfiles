@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+sol-docker exec nextcloud su www-data -s /bin/sh -c './occ preview:generate-all'
