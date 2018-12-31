@@ -24,12 +24,15 @@ def main():
     parser = argparse.ArgumentParser()
     parser.description = f'{parser.prog} directory'
     parser.add_argument('directory', type=pathlib.Path)
-    parser.add_argument('-t', '--titles', default='titles')
+    parser.add_argument('-t', '--titles', type=pathlib.Path)
     parser.add_argument('-f', '--force', action='store_const', const=True)
     parser.add_argument('-d', '--dryrun', action='store_const', const=True)
     args = parser.parse_args()
 
-    titles = read_titles(args.directory.joinpath(args.titles))
+    titles_path = args.titles
+    if args.titles is None:
+        titles_path = args.directory.joinpath('titles')
+    titles = read_titles(titles_path)
     files = sorted(mkv_files(args.directory))
 
     new_names = {}
