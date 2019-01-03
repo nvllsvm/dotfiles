@@ -2,7 +2,7 @@ if [[ $OSTYPE == darwin* ]]; then
     export LC_ALL=en_US.UTF-8
     export LANG=en_US.UTF-8
 
-    for pkg in {'coreutils','findutils','gnu-sed','grep'}; do
+    for pkg in {'coreutils','diffutils','findutils','gnu-sed','grep'}; do
         path=(/usr/local/opt/"${pkg}"/libexec/gnubin "$path[@]")
         manpath+=(/usr/local/opt/"${pkg}"/libexec/gnuman)
     done
