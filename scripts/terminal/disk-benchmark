@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+set -e
+
+TEMP_FILE="$(mktemp -p "$1")"
+
+cleanup() {
+    rm "${TEMP_FILE}"
+}
+
+trap cleanup EXIT
+
+dd if=/dev/zero "of=${TEMP_FILE}" bs=1M count=1024 conv=fdatasync,notrunc status=progress
+sudo sh -c 'echo 3 > /proc/sys/vm/drop_caches'
+dd "if=${TEMP_FILE}" of=/dev/null bs=1M count=1024 status=progress
