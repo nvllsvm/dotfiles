@@ -2,8 +2,8 @@
 set -e
 IMAGE=nvllsvm/harmonize:dev
 
-SOURCE=/mnt/storage1/Audio/Library
-TARGET=/mnt/storage1/Audio/MP3
+SOURCE=/mnt/pool1/Audio/Library
+TARGET=/mnt/pool1/Audio/MP3
 
 docker pull "$IMAGE" > /dev/null
 
