@@ -24,7 +24,6 @@ link_file git/.gitignore ~/.gitignore
 link_file nvim ~/.config/nvim
 link_file ranger ~/.config/ranger
 link_file psql/.psqlrc ~/.psqlrc
-link_file ptpython ~/.ptpython
 link_file tmux/.tmux.conf ~/.tmux.conf
 link_file zsh/.zshenv ~/.zshenv
 link_file zsh/.zshrc ~/.zshrc
