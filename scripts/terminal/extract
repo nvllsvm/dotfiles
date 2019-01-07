@@ -11,5 +11,11 @@ done
 
 for filename in "$@"; do
     target="${filename%.*}"
-    7z x -spe -o"${target}" "${filename}"
+    tarext=".tar."
+    if test "${filename#*$tarext}" != "$filename"; then
+        target="${target%.*}"
+        7z x "${filename}" -so | 7z x -aoa -si -ttar -o"${target}"
+    else
+        7z x -spe -o"${target}" "${filename}"
+    fi
 done
