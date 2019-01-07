@@ -112,8 +112,8 @@ def main():
 
     if args.keep:
         valid_languages = set(args.keep)
-        if '' in valid_languages:
-            valid_languages.remove('')
+        if 'und' in valid_languages:
+            valid_languages.remove('und')
             valid_languages.add(None)
     else:
         valid_languages = DEFAULT_KEEP_LANGUAGES
