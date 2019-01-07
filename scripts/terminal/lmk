@@ -4,7 +4,8 @@ set -e
 TOPIC='lmk-fs-event'
 LINK_PWD="$(readlink -f "$PWD")"
 
-YELLOW='\033[1;33m'
+GREEN='\033[1;32m'
+RED='\033[1;31m'
 RESET_COLOR='\033[0m'
 
 kill_all() {
@@ -20,6 +21,14 @@ get_message() {
     zepusu sub -t "$TOPIC" | cut -f2- -d ' '
 }
 
+if [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
+    cat << EOF
+usage: lmk [-a] [-w] [COMMAND [ARGUMENT ...]]
+  -a     Listen for all lmk events
+  -w     Wait for first event before executing
+EOF
+    exit
+fi
 
 if [ -z "$1" ]; then
     publish_message "$PWD"
@@ -33,6 +42,9 @@ while true; do
     if [ "$1" = '-a' ]; then
         LMK_ANY=1
         shift
+    elif [ "$1" = '-w' ]; then
+        LMK_WAIT_FIRST=1
+        shift
     else
         break
     fi
@@ -45,20 +57,30 @@ exec_command() {
     set +e
     "$@"
     ret=$?
-    printf '\n%blmk complete - %s - Exit %s%b' "$YELLOW" "$(date -u +"%Y-%m-%d %H:%M:%S")" $ret "$RESET_COLOR"
+    if [ "$ret" != '0' ]; then
+        color="$RED"
+    else
+        color="$GREEN"
+    fi
+    printf '%bExit %s - %s%b' "$color" "$ret" "$(date -u +"%Y-%m-%d %H:%M:%S")" "$RESET_COLOR"
 }
 
 while true; do
-    # exit tmux copy-mode
-    if [ -n "$TMUX" ]; then
-        tmux if -F -t "$TMUX_PANE" "#{pane_in_mode}" "send-keys -t $TMUX_PANE -X cancel"
+    if [ -n "$LMK_WAIT_FIRST" ]; then
+        unset LMK_WAIT_FIRST
+    else
+        # exit tmux copy-mode
+        if [ -n "$TMUX" ]; then
+            tmux if -F -t "$TMUX_PANE" "#{pane_in_mode}" "send-keys -t $TMUX_PANE -X cancel"
+        fi
+
+        kill_all
+        clear
+        exec_command "$@" &
+
+        disown
     fi
 
-    kill_all
-    clear
-    exec_command "$@" &
-
-    disown
     while true; do
         EVENT_PATH=$(get_message)
         if [ -n "$LMK_ANY" ] || [[ "$EVENT_PATH"/ = "$PWD"/* ]] || [[ "$EVENT_PATH"/ = "$LINK_PWD"/* ]]; then
