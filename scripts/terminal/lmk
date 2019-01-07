@@ -4,6 +4,9 @@ set -e
 TOPIC='lmk-fs-event'
 LINK_PWD="$(readlink -f "$PWD")"
 
+YELLOW='\033[1;33m'
+RESET_COLOR='\033[0m'
+
 kill_all() {
     jobs -rp | xargs -L 1 pkill -P &> /dev/null || true
     pkill -P $$ &> /dev/null || true
@@ -30,25 +33,19 @@ while true; do
     if [ "$1" = '-a' ]; then
         LMK_ANY=1
         shift
-    elif [ "$1" = '-i' ]; then
-        LMK_INFO=1
-        shift
     else
         break
     fi
 done
 
-trap "exit 1" SIGINT
+trap "exit 1" INT
 trap "kill_all" EXIT
 
 exec_command() {
     set +e
     "$@"
     ret=$?
-    if [ -n "$LMK_INFO" ]; then
-        echo
-        echo "lmk complete - $ret"
-    fi
+    printf '\n%blmk complete - %s - Exit %s%b' "$YELLOW" "$(date -u +"%Y-%m-%d %H:%M:%S")" $ret "$RESET_COLOR"
 }
 
 while true; do
