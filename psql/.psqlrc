@@ -1,12 +1,3 @@
--- Make history ignore all lines entered that were preceded by spaces, and ignore any entries that matched the previous line entered.
-\set HISTCONTROL ignoreboth
-
--- Keep a different history file for each database name you log on to.
-\set HISTFILE ~/.psql_history_:DBNAME
-
--- Keep a history of the last 2000 commands.
-\set HISTSIZE 2000
-
 -- Instead of displaying nulls as blank space, which look the same as empty strings (but are not the same!), show nulls as [NULL].
 \pset null '[NULL]'
 
