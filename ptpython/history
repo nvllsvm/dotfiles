@@ -1,0 +1,13 @@
+
+# 2018-11-06 21:22:12.051161
++import pathlib
+
+# 2018-11-06 21:22:21.978444
++p = pathlib.Path('/home/ar/.local/share/piptfo/flake8/.venv/lib/python3.7/site-packages/flake8/main/mercurial.py')
++
+
+# 2018-11-06 21:22:23.242514
++p
+
+# 2018-11-06 21:22:40.562328
++p.relative_to('/home/ar/.local/share/piptfo/flake8/.venv/')
