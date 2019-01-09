@@ -2,7 +2,7 @@
 set -e
 
 DOCKER_IMAGE=nvllsvm/lgogdownloader
-GOG_DIR=/mnt/storage1/Games/PC/GOG.com
+GOG_DIR=/mnt/pool1/Games/PC/GOG.com
 
 docker pull $DOCKER_IMAGE > /dev/null
 docker run \
