@@ -67,6 +67,7 @@ Plug 'iamcco/mathjax-support-for-mkdp'
 Plug 'iamcco/markdown-preview.vim'
 Plug 'zah/nim.vim'
 Plug 'pedrohdz/vim-yaml-folds'
+Plug 'junegunn/fzf'
 call plug#end()
 
 let g:jedi#completions_enabled = 0
@@ -133,6 +134,7 @@ autocmd FileType nerdtree setlocal relativenumber
 au BufNewFile,BufRead *.avsc set filetype=json
 
 au FileType python set foldmethod=indent
+au FileType python nnoremap <leader>y :0,$!yapf<Cr><C-o>
 
 let g:markdown_enable_spell_checking = 0
 
@@ -147,4 +149,9 @@ let g:markdown_enable_spell_checking = 0
         set statusline+=%<%P                         " file position
 "}
 
-autocmd FileType python nnoremap <leader>y :0,$!yapf<Cr><C-o>
+nnoremap <leader>f :FZF<Cr>
+
+nnoremap <leader>l :ls<Cr>
+nnoremap <leader>n :bn<Cr>
+nnoremap <leader>p :bp<Cr>
+nnoremap <leader>d :bd<Cr>
