@@ -112,10 +112,6 @@ deimos() {
     fi
 }
 
-apollo() {
-    set-x-dpi 192
-}
-
 hostname="$(uname -n)"
 case "$hostname" in
     "deimos")
@@ -126,9 +122,6 @@ case "$hostname" in
         ;;
     "phobos")
         phobos
-        ;;
-    "apollo")
-        apollo
         ;;
     *)
         echo "WARN: Host '$hostname' undefined" >&2
