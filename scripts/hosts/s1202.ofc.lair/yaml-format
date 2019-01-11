@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+bin="$(which -a "$(basename "$0")" | grep -v "^$0$" | head -n 1)"
+exec pipns -n pyyaml run "$bin" "$@"
