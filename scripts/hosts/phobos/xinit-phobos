@@ -2,7 +2,7 @@
 set -e
 xmodmap-caps-to-esc
 
-TOUCHPAD_ID=$(xinput list --id-only 'DLL0665:01 06CB:76AD Touchpad')
+TOUCHPAD_ID=$(xinput list --id-only 'DLL082A:01 06CB:76AD Touchpad')
 
 xinput --set-prop $TOUCHPAD_ID 'libinput Accel Speed' 0.5
 xinput --set-prop $TOUCHPAD_ID 'libinput Tapping Enabled' 1
