@@ -2,7 +2,7 @@
 
 set -e
 
-HOME_BACKUP_DIR=/mnt/pool1/Backup/sol/home
+HOME_BACKUP_DIR=/storage/Backup/sol/home
 
 backup_home() {
     echo Backing up home ...
