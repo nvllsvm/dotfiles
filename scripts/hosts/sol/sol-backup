@@ -2,13 +2,7 @@
 
 set -e
 
-STORAGE1=/mnt/storage1
-STORAGE2=/mnt/storage2
-
-BACKUP1=/mnt/backup1
-BACKUP2=/mnt/backup2
-
-HOME_BACKUP_DIR=$STORAGE1/Backup/sol/home
+HOME_BACKUP_DIR=/mnt/pool1/Backup/sol/home
 
 backup_home() {
     echo Backing up home ...
@@ -20,33 +14,5 @@ backup_home() {
         ~draje $HOME_BACKUP_DIR
 }
 
-backup_storage1() {
-    echo Backing up storage1 ...
-    sudo rsync -av --progress --delete \
-        --exclude Downloads/Torrent/incomplete \
-        --exclude Downloads/Torrent/completed \
-        --exclude sort \
-        $STORAGE1/ $BACKUP1
-}
-
-backup_storage2() {
-    echo Backing up storage2 ...
-    sudo rsync -av --progress --delete $STORAGE2/ $BACKUP2
-}
-
-check_mounted() {
-    if ! mount | awk '{print $3}' | grep $1$ > /dev/null ; then
-        echo Error: $1 not mounted
-    fi
-}
-
-check_mounted $STORAGE1
-check_mounted $STORAGE2
-check_mounted $BACKUP1
-check_mounted $BACKUP2
-
 backup_home
-backup_storage1
-backup_storage2
-
 wasabi-sync
