@@ -1,2 +1,12 @@
 #!/usr/bin/env sh
-exec dotnet ~/Code/jellyfin/debug/jellyfin.dll -programdata ~/.jellyfin_dev
+set -e
+
+cd ~/Code/jellyfin
+
+OUTPUT_DIR="$(pwd)/debug"
+dotnet publish \
+    --configuration debug \
+    --output "${OUTPUT_DIR}" \
+    Jellyfin.Server
+
+dotnet "${OUTPUT_DIR}/jellyfin.dll" -programdata ~/.jellyfin_dev
