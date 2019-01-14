@@ -12,7 +12,6 @@ if [ "$(pip list | grep -e '^pip ' -e '^setuptools ' -e '^wheel ' | wc -l)" != '
 fi
 
 ood_packages="$(pip list --outdated --format=freeze)"
-
-if ! [ -z "${ood_packages}" ]; then
-    echo "${ood_packages}" | grep -v '^\-e' | cut -d = -f 1 | xargs pip install --upgrade
+if [ -n "${ood_packages}" ]; then
+    pip install --upgrade $(echo "${ood_packages}" | cut -d = -f 1)
 fi
