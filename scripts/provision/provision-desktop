@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+set -e
+
+cd "$(dirname "$0")/../.."
 
 link_file() {
     source_path="$PWD/$1"
@@ -33,11 +36,58 @@ if [[ $osname == Linux* ]]; then
     link_file zsh/.zprofile ~/.zprofile
     link_file environment.d ~/.config/environment.d
 
+    if command -v pacman 2> /dev/null; then
+        yay -S --noconfirm \
+            arandr \
+            argyllcms \
+            blueberry \
+            calibre \
+            compton \
+            dunst \
+            firefox \
+            gnome-settings-daemon \
+            gnome-themes-extra \
+            gnome-themes-extra \
+            hsetroot \
+            i3-wm \
+            i3blocks \
+            i3lock \
+            kid3-qt \
+            maim \
+            mpd \
+            mpd-notification \
+            mpv \
+            ncmpcpp \
+            network-manager-applet \
+            networkmanager \
+            nomacs \
+            noto-fonts \
+            noto-fonts-cjk \
+            noto-fonts-emoji \
+            noto-fonts-extra \
+            pamixer \
+            pavucontrol \
+            rambox-bin \
+            rofi \
+            syncthing \
+            syncthing-gtk \
+            tamzen-font \
+            termite \
+            transmission-remote-gtk \
+            ttf-dejavu \
+            xbindkeys \
+            xclip \
+            xorg-server \
+            xorg-xdpyinfo \
+            xorg-xinit \
+            xorg-xinput \
+            xorg-xprop \
+            xss-lock \
+            yacreader-nopdf
+    fi
+
     systemctl --user enable syncthing
 
-    if command -v pacman 2> /dev/null; then
-        sudo pacman -S gnome-themes-extra
-    fi
 elif [[ $osname == Darwin ]]; then
     link_file karabiner ~/.config/karabiner
 

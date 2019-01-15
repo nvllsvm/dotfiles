@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
+cd "$(dirname "$0")/../.."
+
 link_file() {
     source_path="$PWD/$1"
     target_path="$2"
@@ -61,7 +63,30 @@ if [[ $osname == Linux* ]]; then
 
     if command -v pacman > /dev/null; then
         link_file pacman ~/.config/pacman
-        sudo pacman -S --noconfirm dash
+        yay -S --noconfirm \
+            aria2 \
+            aspell-en \
+            dash \
+            direnv \
+            docker \
+            docker-compose \
+            fuse2 \
+            fzf \
+            grub \
+            htop \
+            intel-ucode \
+            jq \
+            neovim \
+            openssh \
+            p7zip \
+            pandoc \
+            pkgfile \
+            python \
+            reflector \
+            ripgrep \
+            rsync \
+            sshfs \
+            yay
         mkdir -p ~/.local/bin
         ln -sf "$(which dash)" "$HOME/.local/bin/sh"
     fi
@@ -71,8 +96,7 @@ zsh_command '$DOTFILES/scripts/python/pyenv-update'
 if [[ $osname == Darwin* ]]; then
     zsh_command 'pyenv global 3.7.1'
 fi
-
-zsh_command pip-update
+zsh_command '$DOTFILES/scripts/python/pip-update'
 zsh_command 'PIP_REQUIRE_VIRTUALENV=0 pip install pipns'
 
 for name in flake8 httpie ranger-fm speedtest-cli zepusu; do
