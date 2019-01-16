@@ -1,21 +1,44 @@
 #!/usr/bin/env bash
 set -e
-for filename in "$@"; do
-    target="${filename%.*}"
 
-    if [ -d "${target}" ]; then
-        echo Error: directory exists \"${target}\"
-        exit 1
+gen_target() {
+    target="${filename%.*}"
+    if [ -n "$EXTRACT_BASE" ]; then
+        target="$EXTRACT_BASE/$(basename "$target")"
+    fi
+    if [ -n "$EXTRACT_IN_DIR" ]; then
+        target="$(dirname "$target")"
+    fi
+    echo "$target"
+}
+
+
+while true; do
+    if [ "$1" = '-i' ]; then
+        EXTRACT_IN_DIR=1
+        shift
+    elif [ "$1" = '-r' ]; then
+        EXTRACT_RM=1
+        shift
+    elif [ "$1" = '-d' ]; then
+        EXTRACT_BASE="$2"
+        shift
+        shift
+    else
+        break
     fi
 done
 
 for filename in "$@"; do
-    target="${filename%.*}"
+    target="$(gen_target "$filename")"
     tarext=".tar."
     if test "${filename#*$tarext}" != "$filename"; then
-        target="${target%.*}"
+        target="$(gen_target "$target")"
         7z x "${filename}" -so | 7z x -aoa -si -ttar -o"${target}"
     else
         7z x -spe -o"${target}" "${filename}"
+    fi
+    if [ -n "$EXTRACT_RM" ]; then
+        rm "$filename"
     fi
 done
