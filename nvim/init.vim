@@ -45,15 +45,10 @@ endfunction
 
 command FixEmpty :set expandtab | :retab | call StripTrailingWhitespace() | :%s/\r//ge
 
-nmap <C-n> :NERDTreeToggle<CR>
 nmap <C-t> :TableFormat<CR>
-
-let NERDTreeQuitOnOpen=1
-let NERDTreeIgnore=['^__pycache__$[[dir]]', '\.pyc$']
 
 call plug#begin('~/.config/nvim/plugged')
 Plug 'Shougo/deoplete.nvim'
-Plug 'scrooloose/nerdtree'
 Plug 'gregsexton/MatchTag'
 Plug 'zchee/deoplete-jedi'
 Plug 'Vimjas/vim-python-pep8-indent'
@@ -68,6 +63,10 @@ Plug 'iamcco/markdown-preview.vim'
 Plug 'zah/nim.vim'
 Plug 'pedrohdz/vim-yaml-folds'
 Plug 'junegunn/fzf'
+
+Plug 'francoiscabrol/ranger.vim'
+Plug 'rbgrouleff/bclose.vim'
+
 call plug#end()
 
 let g:jedi#completions_enabled = 0
@@ -128,9 +127,6 @@ command JSON :%!jq -S '.'
 au FileType json set tabstop=2
 au FileType json set shiftwidth=2
 
-let NERDTreeShowLineNumbers=1
-autocmd FileType nerdtree setlocal relativenumber
-
 au BufNewFile,BufRead *.avsc set filetype=json
 
 au FileType python set foldmethod=indent
@@ -149,7 +145,7 @@ let g:markdown_enable_spell_checking = 0
         set statusline+=%<%P                         " file position
 "}
 
-nnoremap <leader>f :FZF<Cr>
+nnoremap <leader>z :FZF<Cr>
 
 nnoremap <leader>l :ls<Cr>
 nnoremap <leader>n :bn<Cr>
