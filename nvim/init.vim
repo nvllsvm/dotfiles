@@ -43,6 +43,17 @@ function StripTrailingWhitespace()
   endif
 endfunction
 
+function _LMK(...)
+    set splitright
+    vsp
+    set nonu
+    set nornu
+    exec "terminal lmk -a '" . a:1 . "' '" . expand("%:p") . "'"
+    wincmd h
+endfunction
+
+command! -nargs=1 LMK call _LMK(<args>)
+
 command FixEmpty :set expandtab | :retab | call StripTrailingWhitespace() | :%s/\r//ge
 
 nmap <C-t> :TableFormat<CR>

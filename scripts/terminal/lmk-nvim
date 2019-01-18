@@ -1,0 +1,23 @@
+#!/usr/bin/env sh
+set -e
+
+if [ -n "$2" ]; then
+    WORKFILE="$2"
+else
+    WORKFILE="$(mktemp)"
+    cleanup() {
+        rm -f "$WORKFILE"
+    }
+    trap cleanup EXIT
+fi
+
+COMMAND="$1"
+
+if [ -z "$COMMAND" ]; then
+    cat >&2 << EOF
+usage lmk-nvim: COMMAND [FILE]
+EOF
+    exit 1
+fi
+
+nvim "$WORKFILE" -c "set ft=$COMMAND | LMK '$COMMAND'"
