@@ -54,6 +54,7 @@ if [[ $osname == Linux* ]]; then
             i3lock \
             kid3-qt \
             maim \
+            mpc \
             mpd \
             mpd-notification \
             mpv \
@@ -87,6 +88,8 @@ if [[ $osname == Linux* ]]; then
     fi
 
     systemctl --user enable syncthing
+    systemctl --user enable mpd
+    systemctl --user enable mpd-notification
 
 elif [[ $osname == Darwin ]]; then
     link_file karabiner ~/.config/karabiner
