@@ -162,3 +162,5 @@ nnoremap <leader>l :ls<Cr>
 nnoremap <leader>n :bn<Cr>
 nnoremap <leader>p :bp<Cr>
 nnoremap <leader>d :bd<Cr>
+
+let g:netrw_dirhistmax = 0
