@@ -11,7 +11,6 @@ set +a
 
 setxkbmap -option terminate:ctrl_alt_bksp
 xset -dpms; xset s off
-setup-outputs
 
 i3-config-build
 
@@ -26,5 +25,7 @@ pkill -9 -f mpd-notification
 mpd-notification &
 nm-applet &
 syncthing-gtk &
+
+setup-outputs
 
 exec i3
