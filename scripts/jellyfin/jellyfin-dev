@@ -9,4 +9,4 @@ dotnet publish \
     --output "${OUTPUT_DIR}" \
     Jellyfin.Server
 
-dotnet "${OUTPUT_DIR}/jellyfin.dll" -programdata ~/.jellyfin_dev
+dotnet "${OUTPUT_DIR}/jellyfin.dll" -programdata ~/.jellyfin_dev "$@"
