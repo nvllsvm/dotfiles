@@ -152,3 +152,13 @@ zreset() {
     reset
     exec zsh
 }
+
+temp-context() {
+    (
+        CONTEXT_DIR="$(mktemp -d)";
+        cleanup() { rm -rf "$CONTEXT_DIR" };
+        trap cleanup EXIT;
+        cd "$CONTEXT_DIR"
+        zsh 
+    )
+}
