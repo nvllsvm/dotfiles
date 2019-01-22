@@ -159,6 +159,6 @@ temp-context() {
         cleanup() { rm -rf "$CONTEXT_DIR" };
         trap cleanup EXIT;
         cd "$CONTEXT_DIR"
-        zsh 
+        zsh
     )
 }
