@@ -35,11 +35,11 @@ nmap <C-c> :set cursorcolumn!<CR>
 
 function StripTrailingWhitespace()
   if !&binary && &filetype != 'diff'
-    normal mz
-    normal Hmy
+    normal! mz
+    normal! Hmy
     %s/\s\+$//e
-    normal 'yz<CR>
-    normal `z
+    normal! 'yz<CR>
+    normal! `z
   endif
 endfunction
 
@@ -98,7 +98,7 @@ autocmd StdinReadPre * let s:std_in=1
 nnoremap <silent> <C-l> :nohl<CR><C-l>
 
 " open all folds automatically
-autocmd BufWinEnter * normal zR
+autocmd BufWinEnter * normal! zR
 
 " show trailing spaces
 set list listchars=tab:»·,trail:·
