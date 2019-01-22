@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+set -uex
+
+VERSION="$1"
+tmux split-window "ssh pi3_arm64_1 ./build.sh $VERSION; read"
+tmux split-window "ssh pi3_armv7_1 ./build.sh $VERSION; read"
+cd ~/Code/jellyfin
+rm -rf *
+git checkout .
+git clean -xdf
+git pull
+git submodule update --init
+docker build . -t jellyfin/jellyfin:$VERSION-amd64
+docker push jellfin/jellyfin:$VERSION-amd64
