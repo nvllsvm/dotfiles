@@ -49,6 +49,7 @@ function _LMK(...)
     set nonu
     set nornu
     exec "terminal lmk -a '" . a:1 . "' '" . expand("%:p") . "'"
+    normal! G
     wincmd h
 endfunction
 
