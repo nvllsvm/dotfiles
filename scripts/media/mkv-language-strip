@@ -30,20 +30,17 @@ class MKVFile:
         return languages
 
     def matching_audio_tracks(self, languages):
-        audio_tracks = []
-        for track in self.metadata.audio_tracks:
-            if track.language in languages:
-                audio_tracks.append(track.number - 1)
-
-        return audio_tracks
+        return self._matching_tracks(self.metadata.audio_tracks, languages)
 
     def matching_subtitle_tracks(self, languages):
-        subtitle_tracks = []
-        for track in self.metadata.subtitle_tracks:
-            if track.language in languages:
-                subtitle_tracks.append(track.number - 1)
+        return self._matching_tracks(self.metadata.subtitle_tracks, languages)
 
-        return subtitle_tracks
+    def _matching_tracks(self, metadata_tracks, languages):
+        tracks = []
+        for track in metadata_tracks:
+            if track.language in languages:
+                tracks.append(track.number - 1)
+        return tracks
 
     def track_string(self, track_type, track_list):
         track_command = []
@@ -97,35 +94,46 @@ def mkv_files(root):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('input_directory', type=pathlib.Path)
-    parser.add_argument('output_directory', type=pathlib.Path)
+    parser.add_argument('input_directory', type=pathlib.Path, nargs='?')
+    parser.add_argument('output_directory', type=pathlib.Path, nargs='?')
     parser.add_argument(
         '-k',
         '--keep',
         action='append',
         help='Language to keep',
     )
+    parser.add_argument(
+        '-i',
+        '--info',
+        action='store_const',
+        const=True,
+        help='Show track language information'
+    )
     args = parser.parse_args()
-
     input_directory = args.input_directory.absolute()
-    output_directory = args.output_directory.absolute()
 
-    if args.keep:
-        valid_languages = set(args.keep)
-        if 'und' in valid_languages:
-            valid_languages.remove('und')
-            valid_languages.add(None)
+    if args.info:
+        for path in mkv_files(input_directory):
+            mkv = MKVFile(path)
+            print(path.relative_to(input_directory), mkv.languages)
     else:
-        valid_languages = DEFAULT_KEEP_LANGUAGES
-    for path in mkv_files(input_directory):
-        print(path)
-        mkv = MKVFile(path)
-        invalid_languages = mkv.languages - valid_languages
-        target = output_directory.joinpath(path.relative_to(input_directory))
-        audio = mkv.matching_audio_tracks(invalid_languages)
-        subtitle = mkv.matching_subtitle_tracks(invalid_languages)
+        output_directory = args.output_directory.absolute()
 
-        mkv.remove_tracks(target, audio=audio, subtitle=subtitle)
+        if args.keep:
+            valid_languages = set(args.keep)
+            if 'und' in valid_languages:
+                valid_languages.add(None)
+        else:
+            valid_languages = DEFAULT_KEEP_LANGUAGES
+        for path in mkv_files(input_directory):
+            print(path)
+            mkv = MKVFile(path)
+            invalid_languages = mkv.languages - valid_languages
+            target = output_directory.joinpath(path.relative_to(input_directory))
+            audio = mkv.matching_audio_tracks(invalid_languages)
+            subtitle = mkv.matching_subtitle_tracks(invalid_languages)
+
+            mkv.remove_tracks(target, audio=audio, subtitle=subtitle)
 
 
 if __name__ == '__main__':
