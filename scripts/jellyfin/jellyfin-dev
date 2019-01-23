@@ -1,12 +1,31 @@
 #!/usr/bin/env sh
 set -e
 
+JELLYFIN_DATA=~/.jellyfin_dev
+
 cd ~/Code/jellyfin
 
-OUTPUT_DIR="$(pwd)/debug"
-dotnet publish \
-    --configuration debug \
-    --output "${OUTPUT_DIR}" \
-    Jellyfin.Server
+if [ "$1" = 'docker' ]; then
+    if [ -z "$2" ]; then
+        IMAGE=jellyfin_dev
+        docker build . -t jellyfin_dev
+    else
+        IMAGE="jellyfin/jellyfin:$2"
+    fi
+    docker-shell \
+        -v "$JELLYFIN_DATA:/config" \
+        --net host \
+        --user $(id -u):$(id -g) \
+        "$IMAGE"
+elif [ "$1" = 'dotnet' ]; then
+    OUTPUT_DIR="$(pwd)/debug"
+    dotnet publish \
+        --configuration debug \
+        --output "${OUTPUT_DIR}" \
+        Jellyfin.Server
 
-dotnet "${OUTPUT_DIR}/jellyfin.dll" -programdata ~/.jellyfin_dev "$@"
+    dotnet "${OUTPUT_DIR}/jellyfin.dll" -programdata ~/.jellyfin_dev "$@"
+else
+    echo "usage: jellyfin-dev {docker,dotnet}" >&2
+    exit 1
+fi
