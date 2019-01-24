@@ -39,6 +39,7 @@ if [[ $osname == Darwin* ]]; then
         coreutils \
         curl \
         direnv \
+        fd \
         findutils \
         fzf \
         git \
