@@ -14,7 +14,6 @@ if [ "$1" = 'docker' ]; then
     fi
     docker-shell \
         -v "$JELLYFIN_DATA:/config" \
-        -v "/storage:/storage" \
         --net host \
         --user $(id -u):$(id -g) \
         "$IMAGE"
