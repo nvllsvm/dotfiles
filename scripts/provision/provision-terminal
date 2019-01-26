@@ -71,6 +71,7 @@ if [[ $osname == Linux* ]]; then
             direnv \
             docker \
             docker-compose \
+            fd \
             fuse2 \
             fzf \
             grub \
