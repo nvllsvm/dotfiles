@@ -91,20 +91,6 @@ envfile() {
     set -a; . "$@"; set +a
 }
 
-sudo-command-line() {
-    [[ -z $BUFFER ]] && zle up-history
-    if [[ $BUFFER == sudo\ * ]]; then
-        LBUFFER="${LBUFFER#sudo }"
-    else
-        LBUFFER="sudo $LBUFFER"
-    fi
-}
-
-zle -N sudo-command-line
-# Defined shortcut keys: [Esc] [Esc]
-bindkey '^r' sudo-command-line
-bindkey -M vicmd '^r' sudo-command-line
-
 fpath=($DOTFILES/zsh/functions $fpath)
 compinit -C
 
