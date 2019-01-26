@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 import argparse
+import contextlib
 import pathlib
 import shutil
 import subprocess
 import sys
+import tempfile
 
 import enzyme
 
@@ -60,24 +62,53 @@ class MKVFile:
 
         return track_command
 
-    def remove_tracks(self, target_path, audio=[], subtitle=[]):
-        target_path.parent.mkdir(parents=True, exist_ok=True)
-        if target_path.exists():
-            print(f'error: already exists "{target_path}"', file=sys.stderr)
+    def remove_tracks(self, target, audio=[], subtitle=[]):
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if target.exists():
+            print(f'error: already exists "{target}"', file=sys.stderr)
             sys.exit(1)
-        if audio or subtitle:
-            conversion_call = ['mkvmerge', '-o', target_path]
 
-            conversion_call += self.track_string('audio',
-                                                 audio)
-            conversion_call += self.track_string('subtitle',
-                                                 subtitle)
-
+        with TempPath(dir=target.parent) as temp:
+            conversion_call = ['mkvmerge', '-o', temp]
+            conversion_call += self.track_string('audio', audio)
+            conversion_call += self.track_string('subtitle', subtitle)
             conversion_call += [self.path]
 
-            subprocess.run(conversion_call, stdout=subprocess.DEVNULL)
+            subprocess.run(
+                conversion_call, stdout=subprocess.DEVNULL, check=True
+            )
+
+            temp.rename(target)
+
+
+def delete_if_exists(path):
+    """Delete a file or directory if it exists
+    :param pathlib.Path path:
+    """
+    try:
+        if path.is_file():
+            path.unlink()
         else:
-            shutil.copy(self.path, target_path)
+            shutil.rmtree(path)
+    except FileNotFoundError:
+        pass
+
+
+@contextlib.contextmanager
+def TempPath(**kwargs):
+    """Wrapper around tempfile.NamedTemporaryFile which returns a path object
+    Unlike tempfile.NamedTemporaryFile, the FileNotFoundError exception is not
+    raised if the file is deleted before the context closes.
+    :rtype: pathlib.Path
+    """
+    with tempfile.NamedTemporaryFile(**kwargs, delete=False) as tmp:
+        temp_path = pathlib.Path(tmp.name)
+        try:
+            yield temp_path
+        except Exception:
+            delete_if_exists(temp_path)
+            raise
+    delete_if_exists(temp_path)
 
 
 def mkv_files(root):
@@ -121,10 +152,11 @@ def main():
 
         if args.keep:
             valid_languages = set(args.keep)
-            if 'und' in valid_languages:
-                valid_languages.add(None)
         else:
             valid_languages = DEFAULT_KEEP_LANGUAGES
+        if 'und' in valid_languages:
+            valid_languages.add(None)
+
         for path in mkv_files(input_directory):
             print(path)
             mkv = MKVFile(path)
