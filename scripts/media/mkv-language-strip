@@ -10,7 +10,7 @@ import tempfile
 import enzyme
 
 
-DEFAULT_KEEP_LANGUAGES = {'eng', 'und'}
+DEFAULT_LANGUAGES = {'eng', 'und'}
 
 
 class MKVFile:
@@ -150,10 +150,7 @@ def main():
     else:
         output_directory = args.output_directory.absolute()
 
-        if args.keep:
-            valid_languages = set(args.keep)
-        else:
-            valid_languages = DEFAULT_KEEP_LANGUAGES
+        valid_languages = set(args.keep) if args.keep else DEFAULT_LANGUAGES
         if 'und' in valid_languages:
             valid_languages.add(None)
 
