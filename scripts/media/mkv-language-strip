@@ -8,7 +8,7 @@ import sys
 import enzyme
 
 
-DEFAULT_KEEP_LANGUAGES = {'eng'}
+DEFAULT_KEEP_LANGUAGES = {'eng', 'und'}
 
 
 class MKVFile:
@@ -129,7 +129,7 @@ def main():
             print(path)
             mkv = MKVFile(path)
             invalid_languages = mkv.languages - valid_languages
-            target = output_directory.joinpath(path.relative_to(input_directory))
+            target = output_directory / path.relative_to(input_directory)
             audio = mkv.matching_audio_tracks(invalid_languages)
             subtitle = mkv.matching_subtitle_tracks(invalid_languages)
 

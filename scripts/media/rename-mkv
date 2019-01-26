@@ -31,7 +31,7 @@ def main():
 
     titles_path = args.titles
     if args.titles is None:
-        titles_path = args.directory.joinpath('titles')
+        titles_path = args.directory / 'titles'
     titles = read_titles(titles_path)
     files = sorted(mkv_files(args.directory))
 
