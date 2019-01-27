@@ -19,6 +19,7 @@ if [ "$1" = 'docker' ]; then
         --net host \
         --user $(id -u):$(id -g) \
         --volume "/storage/Video:/storage/Video" \
+        --volume "/dev/dri:/dev/dri" \
         "$IMAGE"
 elif [ "$1" = 'dotnet' ]; then
     OUTPUT_DIR="$(pwd)/debug"
