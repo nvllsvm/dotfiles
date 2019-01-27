@@ -18,6 +18,7 @@ if [ "$1" = 'docker' ]; then
         -v "$JELLYFIN_DATA:/config" \
         --net host \
         --user $(id -u):$(id -g) \
+        --volume "/storage/Video:/media" \
         "$IMAGE"
 elif [ "$1" = 'dotnet' ]; then
     OUTPUT_DIR="$(pwd)/debug"
