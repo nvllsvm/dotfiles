@@ -91,6 +91,7 @@ mars() {
             --output DVI-I-0 --off \
             --output DVI-I-1 --off \
             --output HDMI-0 --primary --mode 1920x1080 --pos 0x0 --rotate normal
+        set-x-dpi 96 large
     else
         printf "Options:\n- single\n- multi"
         exit 1
