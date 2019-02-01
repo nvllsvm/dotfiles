@@ -3,4 +3,4 @@ workspace 10 output DP-2
 bindsym $mod+F1 exec setup-outputs multi
 bindsym $mod+F2 exec setup-outputs single
 bindsym $mod+F3 exec setup-outputs tv
-bindsym $mod+F4 exec setup-outputs tv
+bindsym $mod+F4 exec setup-outputs tv-half
