@@ -22,24 +22,28 @@ phobos() {
             --output DP1 --off \
             --output eDP1 --primary --mode 3200x1800 --pos 0x0 --rotate normal
         set-x-dpi 192
+        apply-display-calibration
     elif [ "$MODE" = "internal-half" ]; then
         xrandr \
             --output HDMI1 --off \
             --output DP1 --off \
             --output eDP1 --primary --mode 1600x900 --pos 0x0 --rotate normal
         set-x-dpi 138
+        apply-display-calibration
     elif [ "$MODE" = "internal-720" ]; then
         xrandr \
             --output HDMI1 --off \
             --output DP1 --off \
             --output eDP1 --primary --mode 1280x720 --pos 0x0 --rotate normal
         set-x-dpi 96
+        apply-display-calibration
     elif [ "$MODE" = "external" ]; then
         xrandr \
             --output HDMI1 --off \
             --output eDP1 --off \
             --output DP1 --primary --mode 1920x1200 --pos 0x0 --rotate normal
         set-x-dpi 96
+        apply-display-calibration clear
     else
         printf "Options:\n- internal\n- internal-half\n- external"
         exit 1
@@ -68,6 +72,7 @@ mars() {
             --output HDMI-0 --off \
             --output DP-4 --primary --mode 1920x1200 --pos 0x0 --rotate normal
         set-x-dpi 96
+        apply-display-calibration
     elif [ "$MODE" = "multi" ]; then
         xrandr \
             --output DP-0 --off \
@@ -80,7 +85,21 @@ mars() {
             --output DP-2 --mode 1920x1200 --pos 1920x0 --rotate normal \
             --output DP-4 --primary --mode 1920x1200 --pos 0x0 --rotate normal
         set-x-dpi 96
+        apply-display-calibration
     elif [ "$MODE" = "tv" ]; then
+        xrandr \
+            --output DP-0 --off \
+            --output DP-1 --off \
+            --output DP-2 --off \
+            --output DP-3 --off \
+            --output DP-4 --off \
+            --output DP-5 --off \
+            --output DVI-I-0 --off \
+            --output DVI-I-1 --off \
+            --output HDMI-0 --primary --mode 3840x2160 --pos 0x0 --rotate normal
+        set-x-dpi 192
+        apply-display-calibration clear
+    elif [ "$MODE" = "tv-half" ]; then
         xrandr \
             --output DP-0 --off \
             --output DP-1 --off \
@@ -92,6 +111,7 @@ mars() {
             --output DVI-I-1 --off \
             --output HDMI-0 --primary --mode 1920x1080 --pos 0x0 --rotate normal
         set-x-dpi 96 large
+        apply-display-calibration clear
     else
         printf "Options:\n- single\n- multi"
         exit 1
@@ -114,6 +134,7 @@ deimos() {
             --output HDMI2 --off \
             --output eDP1 --primary --mode 720x1280 --pos 0x0 --rotate right
         set-x-dpi 96 large
+        apply-display-calibration
     elif [ "$MODE" = "external" ]; then
         xrandr \
             --output DP1 --primary --mode 1920x1200 --pos 0x0 \
@@ -121,6 +142,7 @@ deimos() {
             --output HDMI2 --off \
             --output eDP1 --off
         set-x-dpi 96
+        apply-display-calibration clear
     fi
 }
 
@@ -140,5 +162,3 @@ case "$hostname" in
         set-x-dpi 96
         ;;
 esac
-
-apply-display-calibration
