@@ -5,6 +5,8 @@ NORDVPN_PROTOCOL=tcp
 NORDVPN_DIR=~/.local/share/nordvpn/ovpn_$NORDVPN_PROTOCOL
 EXTRA_SCRIPT=$(which update-resolv-conf)
 
+mkdir -p "$NORDVPN_DIR"
+
 if [ "$1" = 'update' ]; then
     rm -rf ~/.local/share/nordvpn
     curl https://downloads.nordcdn.com/configs/archives/servers/ovpn.zip > ~/ovpn.zip
