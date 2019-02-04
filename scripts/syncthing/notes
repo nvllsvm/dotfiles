@@ -3,17 +3,20 @@ set -e
 
 cd "${SYNCTHING_DIR}"/Notes
 
-if [ -t 1 ]; then
-    if [ -n "$1" ]; then
-        mkdir -p "$(dirname "$1")"
-        exec "${EDITOR}" "$1"
+if [ "$1" = '-p' ]; then
+    abspath="$(pwd)/$2"
+    if [ -e "$abspath" ]; then
+        echo "$abspath"
+        exit
     else
-        exec "${EDITOR}" misc.md
+        echo error: path "$abspath" not found >&2
+        exit 1
     fi
+fi
+
+if [ -n "$1" ]; then
+    mkdir -p "$(dirname "$1")"
+    exec "${EDITOR}" "$1"
 else
-    if [ -n "$1" ]; then
-        echo "$(pwd)/$1"
-    else
-        pwd
-    fi
+    exec "${EDITOR}" misc.md
 fi
