@@ -1,2 +1,18 @@
 #!/usr/bin/env sh
-exec shtty --pull denji/docker-image_optim sh
+set -e
+IMAGE=denji/docker-image_optim
+container_name="image_optim-$$"
+trap "docker kill "${container_name}" > /dev/null 2>&1; true" HUP EXIT
+if [ -t 0 -a -t 1 -a -t 2 ]; then
+    tty_flag="-t"
+fi
+docker pull "${IMAGE}" > /dev/null
+docker run \
+    --rm \
+    -i $tty_flag \
+    --name "${container_name}" \
+    --volume "$(pwd):$(pwd)" \
+    --workdir "$(pwd)" \
+    --user "$(id -u):$(id -g)" \
+    "${IMAGE}" \
+    image_optim "$@"
