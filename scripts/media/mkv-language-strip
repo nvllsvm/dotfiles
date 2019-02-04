@@ -65,13 +65,12 @@ class MKVFile:
         return track_command
 
     def build_mkvmerge_command(self, target, audio=[], subtitle=[]):
-        parts = [
+        return [
             'mkvmerge', '-o', target,
             *self.track_string('audio', audio),
             *self.track_string('subtitle', subtitle),
             self.path
         ]
-        return ' '.join(shlex.quote(str(part)) for part in parts)
 
     def remove_tracks(self, target, audio=[], subtitle=[]):
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -81,9 +80,7 @@ class MKVFile:
 
         with TempPath(dir=target.parent) as temp:
             subprocess.run(
-                self.build_mkvmerge_command(
-                    self.path, target, audio, subtitle
-                ),
+                self.build_mkvmerge_command(target, audio, subtitle),
                 stdout=subprocess.DEVNULL,
                 check=True
             )
@@ -178,7 +175,10 @@ def main():
             subtitle = mkv.matching_subtitle_tracks(invalid_languages)
 
             if args.dryrun:
-                print(mkv.build_mkvmerge_command(target, audio=audio, subtitle=subtitle))
+                parts = mkv.build_mkvmerge_command(
+                    target, audio=audio, subtitle=subtitle
+                )
+                print(' '.join(shlex.quote(str(part)) for part in parts))
             else:
                 mkv.remove_tracks(target, audio=audio, subtitle=subtitle)
 
