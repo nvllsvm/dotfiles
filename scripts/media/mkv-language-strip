@@ -2,6 +2,7 @@
 import argparse
 import contextlib
 import pathlib
+import shlex
 import shutil
 import subprocess
 import sys
@@ -44,7 +45,8 @@ class MKVFile:
                 tracks.append(track.number - 1)
         return tracks
 
-    def track_string(self, track_type, track_list):
+    @staticmethod
+    def track_string(track_type, track_list):
         track_command = []
         if track_list:
             track_command += ['--' + track_type + '-tracks']
@@ -62,6 +64,15 @@ class MKVFile:
 
         return track_command
 
+    def build_mkvmerge_command(self, target, audio=[], subtitle=[]):
+        parts = [
+            'mkvmerge', '-o', target,
+            *self.track_string('audio', audio),
+            *self.track_string('subtitle', subtitle),
+            self.path
+        ]
+        return ' '.join(shlex.quote(str(part)) for part in parts)
+
     def remove_tracks(self, target, audio=[], subtitle=[]):
         target.parent.mkdir(parents=True, exist_ok=True)
         if target.exists():
@@ -69,15 +80,13 @@ class MKVFile:
             sys.exit(1)
 
         with TempPath(dir=target.parent) as temp:
-            conversion_call = ['mkvmerge', '-o', temp]
-            conversion_call += self.track_string('audio', audio)
-            conversion_call += self.track_string('subtitle', subtitle)
-            conversion_call += [self.path]
-
             subprocess.run(
-                conversion_call, stdout=subprocess.DEVNULL, check=True
+                self.build_mkvmerge_command(
+                    self.path, target, audio, subtitle
+                ),
+                stdout=subprocess.DEVNULL,
+                check=True
             )
-
             temp.rename(target)
 
 
@@ -140,6 +149,12 @@ def main():
         const=True,
         help='Show track language information'
     )
+    parser.add_argument(
+        '-d',
+        '--dryrun',
+        action='store_const',
+        const=True
+    )
     args = parser.parse_args()
     input_directory = args.input_directory.absolute()
 
@@ -162,7 +177,10 @@ def main():
             audio = mkv.matching_audio_tracks(invalid_languages)
             subtitle = mkv.matching_subtitle_tracks(invalid_languages)
 
-            mkv.remove_tracks(target, audio=audio, subtitle=subtitle)
+            if args.dryrun:
+                print(mkv.build_mkvmerge_command(target, audio=audio, subtitle=subtitle))
+            else:
+                mkv.remove_tracks(target, audio=audio, subtitle=subtitle)
 
 
 if __name__ == '__main__':
