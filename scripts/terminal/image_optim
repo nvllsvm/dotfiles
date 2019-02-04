@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-exec shtty --pull denji/docker-image_optim image_optim
+exec shtty --pull denji/docker-image_optim sh
