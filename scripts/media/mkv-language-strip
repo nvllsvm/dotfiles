@@ -80,7 +80,7 @@ class MKVFile:
 
         with TempPath(dir=target.parent) as temp:
             subprocess.run(
-                self.build_mkvmerge_command(target, audio, subtitle),
+                self.build_mkvmerge_command(temp, audio, subtitle),
                 stdout=subprocess.DEVNULL,
                 check=True
             )
