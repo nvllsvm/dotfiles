@@ -9,21 +9,22 @@ parent="$(python -c 'import os; print(os.path.realpath(os.getcwd()))')"
 env_folder="$env_root/$(printf "%s" "$parent" | sha256sum | awk '{print $1}')"
 
 rm -rf "$env_folder" .envrc
+pipenv --rm > /dev/null 2>&1 || true
 unset VIRTUAL_ENV
 
 if [ "$1" = '-d' ]; then
-    pipenv --rm > /dev/null 2>&1 || true
     exit
-elif [ -e Pipfile ]; then
-    pipenv clean
-    env_folder=$(pipenv --venv)
 elif [ -n "$1" ]; then
     eval "$(pyenv sh-shell "$1")"
 fi
 
 mkdir -p "$env_root"
 
-if command -v virtualenv > /dev/null 2>&1; then
+if [ -e Pipfile ]; then
+    pipenv --rm > /dev/null 2>&1 || true
+    pipenv install
+    env_folder=$(pipenv --venv)
+elif command -v virtualenv > /dev/null 2>&1; then
     virtualenv -q -p python "$env_folder" > /dev/null
 else
     python -m venv "$env_folder"
@@ -32,7 +33,7 @@ fi
 ln -s "$parent" "$env_folder/.parent"
 
 cat > "$env_folder/.envrc" << EOF
-. $env_folder/bin/activate
+. "$env_folder/bin/activate"
 # export PIP_USER even though it's disabled in pip.conf
 # tox doesn't seem to respect the venv's pip.conf
 export PIP_USER=0
