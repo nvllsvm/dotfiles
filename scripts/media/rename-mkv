@@ -26,6 +26,7 @@ def main():
     parser.add_argument('directory', type=pathlib.Path)
     parser.add_argument('-t', '--titles', type=pathlib.Path)
     parser.add_argument('-f', '--force', action='store_const', const=True)
+    parser.add_argument('-r', '--raw', action='store_const', const=True)
     parser.add_argument('-d', '--dryrun', action='store_const', const=True)
     args = parser.parse_args()
 
@@ -37,14 +38,17 @@ def main():
 
     new_names = {}
     for num, (title, path) in enumerate(zip(titles, files), 1):
-        formatted_num = str(num).zfill(2)
-        if formatted_num not in path.name and not args.force:
-            print(
-                f'error: "{formatted_num}" not in "{path.name}"',
-                file=sys.stderr
-            )
-            sys.exit(1)
-        new_names[path] = f'{formatted_num} - {title}'
+        if args.raw:
+            new_names[path] = title
+        else:
+            formatted_num = str(num).zfill(2)
+            if formatted_num not in path.name and not args.force:
+                print(
+                    f'error: "{formatted_num}" not in "{path.name}"',
+                    file=sys.stderr
+                )
+                sys.exit(1)
+            new_names[path] = f'{formatted_num} - {title}'
 
     for path, new_name in new_names.items():
         target = path.with_name(new_name).with_suffix(path.suffix)
