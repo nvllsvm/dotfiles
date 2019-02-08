@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -e
 
-NORDVPN_PROTOCOL=tcp
+NORDVPN_PROTOCOL=udp
 NORDVPN_DIR=~/.local/share/nordvpn/ovpn_$NORDVPN_PROTOCOL
 EXTRA_SCRIPT=$(which update-resolv-conf)
 
