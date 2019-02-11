@@ -25,7 +25,7 @@ COMMAND="$1"
 
 if [ -z "$COMMAND" ]; then
     cat >&2 << EOF
-usage lmk-nvim: COMMAND [FILE]
+usage nvim-repl: COMMAND [FILE]
 EOF
     exit 1
 fi
@@ -34,4 +34,4 @@ if [ -z "$FILETYPE" ]; then
     FILETYPE="$COMMAND"
 fi
 
-nvim "$WORKFILE" -c "set ft=$FILETYPE | LMK '$COMMAND'"
+nvim "$WORKFILE" -c "set ft=$FILETYPE | REPL '$COMMAND'"
