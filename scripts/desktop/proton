@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+export STEAM_COMPAT_DATA_PATH="$HOME/.steam/proton"
+mkdir -p "$STEAM_COMPAT_DATA_PATH"
+~/.steam/steam/steamapps/common/Proton\ 3.16\ Beta/proton run "$@"
