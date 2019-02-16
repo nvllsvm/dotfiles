@@ -1,14 +1,36 @@
 #!/usr/bin/env sh
 set -uex
 
+IMAGE="jellyfin/jellyfin"
 VERSION="$1"
-tmux split-window "ssh pi3_arm64_1 ./build.sh $VERSION; read"
-tmux split-window "ssh pi3_armv7_1 ./build.sh $VERSION; read"
+if [ -z "$VERSION" ]; then
+    echo error: must specify version >&2
+    exit 1
+fi
+
 cd ~/Code/jellyfin
+
 rm -rf *
 git checkout .
 git clean -xdf
 git pull
 git submodule update --init
-docker build . -t jellyfin/jellyfin:$VERSION-amd64
-docker push jellfin/jellyfin:$VERSION-amd64
+
+docker run --rm --privileged multiarch/qemu-user-static:register
+
+docker build . -t jellyfin/jellyfin:$VERSION-amd64 --no-cache -f Dockerfile
+docker build . -t jellyfin/jellyfin:$VERSION-arm --no-cache -f Dockerfile.arm
+docker build . -t jellyfin/jellyfin:$VERSION-arm64 --no-cache -f Dockerfile.arm64
+
+docker push jellyfin/jellyfin:$VERSION-amd64
+docker push jellyfin/jellyfin:$VERSION-arm64
+docker push jellyfin/jellyfin:$VERSION-arm
+
+for tag in "${VERSION}" latest; do
+    docker manifest create "${IMAGE}:${tag}" \
+        "${IMAGE}:${VERSION}-arm64" \
+        "${IMAGE}:${VERSION}-amd64" \
+        "${IMAGE}:${VERSION}-arm"
+
+    docker manifest push --purge "${IMAGE}:${tag}"
+done
