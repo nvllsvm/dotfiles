@@ -8,23 +8,15 @@ if [ -z "$VERSION" ]; then
     exit 1
 fi
 
-cd ~/Code/jellyfin
+docker run --rm --privileged multiarch/qemu-user-static:register || true
 
-rm -rf *
-git checkout .
-git clean -xdf
-git pull
-git submodule update --init
+docker build . -t "${IMAGE}":$VERSION-amd64 --no-cache -f Dockerfile
+docker build . -t "${IMAGE}":$VERSION-arm --no-cache -f Dockerfile.arm
+docker build . -t "${IMAGE}":$VERSION-arm64 --no-cache -f Dockerfile.arm64
 
-docker run --rm --privileged multiarch/qemu-user-static:register
-
-docker build . -t jellyfin/jellyfin:$VERSION-amd64 --no-cache -f Dockerfile
-docker build . -t jellyfin/jellyfin:$VERSION-arm --no-cache -f Dockerfile.arm
-docker build . -t jellyfin/jellyfin:$VERSION-arm64 --no-cache -f Dockerfile.arm64
-
-docker push jellyfin/jellyfin:$VERSION-amd64
-docker push jellyfin/jellyfin:$VERSION-arm64
-docker push jellyfin/jellyfin:$VERSION-arm
+docker push "${IMAGE}":$VERSION-amd64
+docker push "${IMAGE}":$VERSION-arm64
+docker push "${IMAGE}":$VERSION-arm
 
 for tag in "${VERSION}" latest; do
     docker manifest create "${IMAGE}:${tag}" \
