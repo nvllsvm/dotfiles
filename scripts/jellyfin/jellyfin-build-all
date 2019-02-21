@@ -10,9 +10,9 @@ fi
 
 docker run --rm --privileged multiarch/qemu-user-static:register || true
 
-docker build . -t "${IMAGE}":$VERSION-amd64 --no-cache -f Dockerfile
-docker build . -t "${IMAGE}":$VERSION-arm --no-cache -f Dockerfile.arm
-docker build . -t "${IMAGE}":$VERSION-arm64 --no-cache -f Dockerfile.arm64
+docker build --no-cache --pull . -t "${IMAGE}":$VERSION-amd64 -f Dockerfile
+docker build --no-cache --pull . -t "${IMAGE}":$VERSION-arm -f Dockerfile.arm
+docker build --no-cache --pull . -t "${IMAGE}":$VERSION-arm64 -f Dockerfile.arm64
 
 for arch in amd64 arm arm64; do
     docker push "${IMAGE}":$VERSION-$arch
