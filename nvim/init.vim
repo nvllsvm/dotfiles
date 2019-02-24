@@ -74,7 +74,7 @@ nmap <C-t> :TableFormat<CR>
 call plug#begin('~/.config/nvim/plugged')
 Plug 'Shougo/deoplete.nvim'
 Plug 'gregsexton/MatchTag'
-Plug 'Shougo/deoplete-jedi'
+Plug 'deoplete-plugins/deoplete-jedi'
 Plug 'Vimjas/vim-python-pep8-indent'
 Plug 'neomake/neomake'
 Plug 'plasticboy/vim-markdown'
