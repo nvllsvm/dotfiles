@@ -179,3 +179,5 @@ nnoremap <leader>d :bd<Cr>
 let g:netrw_dirhistmax = 0
 
 autocmd VimResized * wincmd =
+
+let g:ranger_replace_netrw = 1
