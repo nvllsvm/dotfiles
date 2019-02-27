@@ -2,7 +2,7 @@
 set -e
 
 gen_target() {
-    target="${filename%.*}"
+    target="${1%.*}"
     if [ -n "$EXTRACT_BASE" ]; then
         target="$EXTRACT_BASE/$(basename "$target")"
     fi
@@ -32,7 +32,7 @@ done
 for filename in "$@"; do
     target="$(gen_target "$filename")"
     tarext=".tar."
-    if test "${filename#*$tarext}" != "$filename"; then
+    if [ "${filename#*$tarext}" != "$filename" ]; then
         target="$(gen_target "$target")"
         7z x "${filename}" -so | 7z x -aoa -si -ttar -o"${target}"
     else
