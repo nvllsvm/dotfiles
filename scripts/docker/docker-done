@@ -16,3 +16,8 @@ log "Pruning volumes ..."
 docker volume prune -f
 log "Pruning networks ..."
 docker network prune -f
+
+if [ "$1" = '--system' ]; then
+    log "Pruning images ..."
+    docker system prune -f
+fi
