@@ -22,16 +22,6 @@ get_message() {
     fanpipe --subscribe --topic "$FANPIPE_TOPIC"
 }
 
-if [ "$1" = '--help' ]; then
-    cat << EOF
-usage: lmk [-a] [-w] [--help] [COMMAND [ARGUMENT ...]]
-	-a, --all		Listen for all lmk events
-	-w, --wait		Wait for first event before executing
-	--help			Display this help and exit
-EOF
-    exit
-fi
-
 if [ -z "$1" ]; then
     publish_message "$PWD"
     exit
@@ -47,6 +37,14 @@ while true; do
     elif [ "$1" = '-w' ] || [ "$1" = '--wait' ]; then
         LMK_WAIT_FIRST=1
         shift
+    elif [ "$1" = '--help' ]; then
+        cat << EOF
+usage: lmk [-a] [-w] [--help] [COMMAND [ARGUMENT ...]]
+	-a, --all		Listen for all lmk events
+	-w, --wait		Wait for first event before executing
+	--help			Display this help and exit
+EOF
+        exit
     else
         break
     fi

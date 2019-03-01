@@ -5,6 +5,17 @@ PIPEDIR="${TMPDIR:-/tmp}"
 PIPEPREFIX="fanpipe"
 TOPIC=''
 
+show_usage() {
+    cat << EOF
+usage: fanpipe (-p|-s) [-f] [-t TOPIC] [MESSAGE [MESSAGE ...]]
+	-p, --publish		publish to a pipe
+	-s, --subscribe		subscribe to a pipe until one message is received
+	-f, --follow		subscribe indefinitely
+	-t, --topic=TOPIC	topic name
+	    --help		display this help and exit
+EOF
+}
+
 while true; do
     if [ "$1" = '--publish' ] || [ "$1" = '-p' ]; then
         PUBLISH=1
@@ -19,6 +30,9 @@ while true; do
         TOPIC="$(echo "$2" | base64)"
         shift
         shift
+    elif [ "$1" = '--help' ]; then
+        show_usage
+        exit
     else
         break
     fi
@@ -53,15 +67,6 @@ elif [ -n "$SUBSCRIBE" ]; then
         fi
     done
 else
-    cat << EOF
-usage: fanpipe (-p|-s) [-f] [-t TOPIC] [MESSAGE [MESSAGE ...]]
-	-p, --publish		publish to a pipe
-	-s, --subscribe		subscribe to a pipe until one message is received
-	-f, --follow		subscribe indefinitely
-	-t, --topic=TOPIC	topic name
-	    --help		display this help and exit
-EOF
-    if [ "$1" != '--help' ]; then
-        exit 1
-    fi
+    show_usage >&2
+    exit 1
 fi
