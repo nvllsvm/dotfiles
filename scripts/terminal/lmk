@@ -22,11 +22,12 @@ get_message() {
     zepusu sub -t "$TOPIC" | cut -f2- -d ' '
 }
 
-if [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
+if [ "$1" = '--help' ]; then
     cat << EOF
-usage: lmk [-a] [-w] [COMMAND [ARGUMENT ...]]
-  -a     Listen for all lmk events
-  -w     Wait for first event before executing
+usage: lmk [-a] [-w] [--help] [COMMAND [ARGUMENT ...]]
+  -a		Listen for all lmk events
+  -w		Wait for first event before executing
+  --help	display this help and exit
 EOF
     exit
 fi
