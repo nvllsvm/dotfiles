@@ -1,0 +1,67 @@
+#!/usr/bin/env sh
+set -e
+
+PIPEDIR="${TMPDIR:-/tmp}"
+PIPEPREFIX="fanpipe"
+TOPIC=''
+
+while true; do
+    if [ "$1" = '--publish' ] || [ "$1" = '-p' ]; then
+        PUBLISH=1
+        shift
+    elif [ "$1" = '--subscribe' ] || [ "$1" = '-s' ]; then
+        SUBSCRIBE=1
+        shift
+    elif [ "$1" = '--follow' ] || [ "$1" = '-f' ]; then
+        FOLLOW=1
+        shift
+    elif [ "$1" = '--topic' ] || [ "$1" = '-t' ]; then
+        TOPIC="$(echo "$2" | base64)"
+        shift
+        shift
+    else
+        break
+    fi
+done
+
+for pipe in "${PIPEDIR}/${PIPEPREFIX}-"*; do
+    if [ -e "$pipe" ]; then
+        pid="$(echo "$pipe" | cut -d- -f2)"
+        if ! ps -p "$pid" > /dev/null; then
+            rm -f "$pipe"
+        fi
+    fi
+done
+
+if [ -n "$PUBLISH" ]; then
+    for pipe in "${PIPEDIR}/${PIPEPREFIX}-"*"-${TOPIC}" ; do
+        if [ -e "$pipe" ]; then
+            echo "$*" > "$pipe"
+        fi
+    done
+elif [ -n "$SUBSCRIBE" ]; then
+    pipe="${PIPEDIR}/${PIPEPREFIX}-$$-${TOPIC}"
+    exit_trap() {
+        rm -f "$pipe"
+    }
+    trap exit_trap EXIT
+    mkfifo "$pipe"
+    while true; do
+        cat "$pipe"
+        if [ -z "${FOLLOW}" ]; then
+            break
+        fi
+    done
+else
+    cat << EOF
+usage: fanpipe (-p|-s) [-f] [-t TOPIC] [MESSAGE [MESSAGE ...]]
+	-p, --publish		publish to a pipe
+	-s, --subscribe		subscribe to a pipe until one message is received
+	-f, --follow		subscribe indefinitely
+	-t, --topic=TOPIC	topic name
+	    --help		display this help and exit
+EOF
+    if [ "$1" != '--help' ]; then
+        exit 1
+    fi
+fi

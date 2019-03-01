@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-TOPIC='lmk-fs-event'
+FANPIPE_TOPIC='lmk-fs-event'
 LINK_PWD="$(readlink -f "$PWD")"
 
 GREEN='\033[1;32m'
@@ -15,19 +15,19 @@ kill_all() {
 }
 
 publish_message() {
-    zepusu pub "$TOPIC" "$1"
+    fanpipe --publish --topic "$FANPIPE_TOPIC" "$1"
 }
 
 get_message() {
-    zepusu sub -t "$TOPIC" | cut -f2- -d ' '
+    fanpipe --subscribe --topic "$FANPIPE_TOPIC"
 }
 
 if [ "$1" = '--help' ]; then
     cat << EOF
 usage: lmk [-a] [-w] [--help] [COMMAND [ARGUMENT ...]]
-  -a		Listen for all lmk events
-  -w		Wait for first event before executing
-  --help	display this help and exit
+	-a, --all		Listen for all lmk events
+	-w, --wait		Wait for first event before executing
+	--help			Display this help and exit
 EOF
     exit
 fi
@@ -41,10 +41,10 @@ elif [ "$1" = '--path' ]; then
 fi
 
 while true; do
-    if [ "$1" = '-a' ]; then
+    if [ "$1" = '-a' ] || [ "$1" = '--all' ]; then
         LMK_ANY=1
         shift
-    elif [ "$1" = '-w' ]; then
+    elif [ "$1" = '-w' ] || [ "$1" = '--wait' ]; then
         LMK_WAIT_FIRST=1
         shift
     else
