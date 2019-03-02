@@ -1,1 +1,1 @@
-export SYNCTHING_DIR=/mnt/storage1/Syncthing
+export SYNCTHING_DIR=/storage/Syncthing
