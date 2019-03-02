@@ -22,14 +22,6 @@ get_message() {
     fanpipe --subscribe --topic "$FANPIPE_TOPIC"
 }
 
-if [ -z "$1" ]; then
-    publish_message "$PWD"
-    exit
-elif [ "$1" = '--path' ]; then
-    publish_message "$(readlink -f "$2")"
-    exit
-fi
-
 while true; do
     if [ "$1" = '-a' ] || [ "$1" = '--all' ]; then
         LMK_ANY=1
@@ -49,6 +41,15 @@ EOF
         break
     fi
 done
+
+if [ -z "$1" ]; then
+    publish_message "$PWD"
+    exit
+elif [ "$1" = '--path' ]; then
+    publish_message "$(readlink -f "$2")"
+    exit
+fi
+
 
 trap "exit 1" INT
 trap "kill_all" EXIT
