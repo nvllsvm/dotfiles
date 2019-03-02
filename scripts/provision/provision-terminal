@@ -67,6 +67,7 @@ if [[ $osname == Linux* ]]; then
         yay -S --noconfirm \
             aria2 \
             aspell-en \
+            bind-tools \
             dash \
             direnv \
             docker \
