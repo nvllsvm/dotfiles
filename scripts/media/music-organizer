@@ -112,7 +112,10 @@ def check_metadata(path, metadata):
 
 
 def fix_tracknumber(path, metadata):
-    tracknumber = metadata['tracknumber'][0]
+    try:
+        tracknumber = metadata['tracknumber'][0]
+    except KeyError:
+        return
 
     if '/' in tracknumber:
         tracknumber, all_tracks = tracknumber.split('/')
@@ -135,7 +138,11 @@ def rename_extensions(path):
 
 
 def rename_from_tags(path, metadata):
-    title = metadata['title'][0]
+    try:
+        title = metadata['title'][0]
+    except KeyError:
+        return
+
     try:
         tracknumber = int(metadata['tracknumber'][0])
     except ValueError:
@@ -197,7 +204,10 @@ def main():
                     check_metadata(path, metadata)
                     fix_tracknumber(path, metadata)
                     rename_from_tags(path, metadata)
-                    albums.add(metadata['album'][0])
+                    try:
+                        albums.add(metadata['album'][0])
+                    except KeyError:
+                        pass
 
             if len(albums) > 1:
                 LOGGER.error(f'Multiple album tags in "{root_path}"')
