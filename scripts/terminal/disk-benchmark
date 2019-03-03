@@ -1,7 +1,27 @@
 #!/usr/bin/env sh
 set -e
 
-TEMP_FILE="$(mktemp -p "$1")"
+if [ $# -eq 0 ]; then
+    cat << EOF
+usage: disk-benchmark [-s SIZE] FILE
+	-s	size in megabytes. defaults to 1024M
+EOF
+    exit 1
+fi
+
+if [ "$1" = '-s' ]; then
+    FILESIZE="$2"
+    shift; shift
+else
+    FILESIZE=1024
+fi
+
+TEMP_FILE="$1"
+
+if [ -e "$TEMP_FILE" ]; then
+    echo 'error: file already exists' >&2
+    exit 1
+fi
 
 cleanup() {
     rm "${TEMP_FILE}"
@@ -9,6 +29,6 @@ cleanup() {
 
 trap cleanup EXIT
 
-dd if=/dev/zero "of=${TEMP_FILE}" bs=1M count=1024 conv=fdatasync,notrunc status=progress
+dd if=/dev/zero "of=$TEMP_FILE" bs=1M count="$FILESIZE" conv=fdatasync,notrunc status=progress
 sudo sh -c 'echo 3 > /proc/sys/vm/drop_caches'
-dd "if=${TEMP_FILE}" of=/dev/null bs=1M count=1024 status=progress
+dd "if=$TEMP_FILE" of=/dev/null bs=1M count="$FILESIZE" status=progress
