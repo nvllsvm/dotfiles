@@ -44,6 +44,15 @@ def decode_ape_to_stdout(path):
         )
 
 
+@contextlib.contextmanager
+def pipe_wave_to_stdout(path):
+    process = subprocess.Popen(
+        ['cat', path],
+        stdout=subprocess.PIPE
+    )
+    yield process
+
+
 def reencode(source):
     LOGGER.info('Processing %s', source)
 
@@ -51,7 +60,8 @@ def reencode(source):
 
     decode_contexts = {
         '.flac': harmonize.decode_flac_to_stdout,
-        '.ape': decode_ape_to_stdout
+        '.ape': decode_ape_to_stdout,
+        '.wav': pipe_wave_to_stdout
     }
 
     with decode_contexts[suffix](source) as decode:
@@ -95,7 +105,7 @@ def main():
         future_to_path = {
             pool.submit(reencode, path): path
             for path in all_files(args.directory)
-            if path.suffix.lower() in ('.flac', '.ape')
+            if path.suffix.lower() in ('.flac', '.ape', '.wav')
         }
         errors = []
         for future in concurrent.futures.as_completed(future_to_path):
