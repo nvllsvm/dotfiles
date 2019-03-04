@@ -30,7 +30,7 @@ def main():
         default=os.environ.get('RABBITMQ_PASSWORD')
     )
     parser.add_argument(
-        '-a', '--ack', action='store_const', const=True, default=False
+        '-a', '--ack', action='store_true', default=False
     )
     parser.add_argument('-t', '--tag')
     parser.add_argument('queue')

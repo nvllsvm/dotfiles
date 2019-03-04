@@ -11,8 +11,7 @@ def main():
     parser.add_argument(
         '-d',
         dest='directory',
-        action='store_const',
-        const=True,
+        action='store_true',
         help='output the directory instead of file'
     )
     args = parser.parse_args()

@@ -142,15 +142,13 @@ def main():
     parser.add_argument(
         '-i',
         '--info',
-        action='store_const',
-        const=True,
+        action='store_true',
         help='Show track language information'
     )
     parser.add_argument(
         '-d',
         '--dryrun',
-        action='store_const',
-        const=True
+        action='store_true'
     )
     args = parser.parse_args()
     input_directory = args.input_directory.absolute()

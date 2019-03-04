@@ -44,7 +44,7 @@ def calculate_size(value, is_nested=False):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '-n', '--nested', action='store_const', const=True,
+        '-n', '--nested', action='store_true',
         default=False,
         help='Set if the input is a nested element of an item'
     )

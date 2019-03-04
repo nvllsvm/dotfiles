@@ -60,7 +60,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('directory', type=pathlib.Path)
     parser.add_argument('-c', '--commit',
-                        action='store_const', const='True',
+                        action='store_true',
                         help='commit renames to disk. otherwise dry run')
     args = parser.parse_args()
 

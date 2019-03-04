@@ -184,7 +184,7 @@ def all_dirs(root):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('directory', type=pathlib.Path)
-    parser.add_argument('-t', '--check-tags', action='store_const', const=True)
+    parser.add_argument('-t', '--check-tags', action='store_true')
     args = parser.parse_args()
 
     logging.basicConfig(format='%(levelname)s %(message)s', level=logging.INFO)

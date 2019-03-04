@@ -51,7 +51,7 @@ def main():
         description='List the tops of empty directory trees.'
     )
     parser.add_argument(
-        '-r', dest='remove', action='store_const', const=True,
+        '-r', dest='remove', action='store_true',
         help='remove the trees from disk'
     )
     parser.add_argument('path', type=pathlib.Path, nargs='?', default='.')
