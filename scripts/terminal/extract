@@ -1,29 +1,47 @@
 #!/usr/bin/env bash
 set -e
 
+show_help() {
+    cat << EOF
+usage: extract [-i] [-r] [-d] FILE [FILE ...]
+	-c	create a child directory for each archive and extract there
+	-p	parent directory to extract to. defaults to directory where archive resides
+	-r	remove archive after successful extraction
+EOF
+}
+
+
 gen_target() {
     target="${1%.*}"
     if [ -n "$EXTRACT_BASE" ]; then
         target="$EXTRACT_BASE/$(basename "$target")"
     fi
-    if [ -n "$EXTRACT_IN_DIR" ]; then
+    if [ -z "$EXTRACT_IN_CHILD" ]; then
         target="$(dirname "$target")"
     fi
     echo "$target"
 }
 
 
+if [ $# -eq 0 ]; then
+    show_help >&2
+    exit 1
+fi
+
 while true; do
-    if [ "$1" = '-i' ]; then
-        EXTRACT_IN_DIR=1
+    if [ "$1" = '-c' ]; then
+        EXTRACT_IN_CHILD=1
         shift
     elif [ "$1" = '-r' ]; then
         EXTRACT_RM=1
         shift
-    elif [ "$1" = '-d' ]; then
-        EXTRACT_BASE="$2"
+    elif [ "$1" = '-p' ]; then
+        EXTRACT_BASE="$(realpath "$2")"
         shift
         shift
+    elif [ "$1" = '--help' ]; then
+        show_help
+        exit
     else
         break
     fi
