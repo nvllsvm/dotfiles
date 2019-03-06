@@ -41,19 +41,21 @@ done
 for pipe in "${PIPEDIR}/${PIPEPREFIX}-"*; do
     if [ -e "$pipe" ]; then
         pid="$(echo "$pipe" | cut -d- -f2)"
-        if ! ps -p "$pid" > /dev/null 2>&1; then
+        if ! kill -0 "$pid" > /dev/null 2>&1; then
             rm -f "$pipe"
         fi
     fi
 done
 
 if [ -n "$PUBLISH" ]; then
-    if [ -t 0 ]; then
-        printf '%s' "$*" | tee "${PIPEDIR}/${PIPEPREFIX}-"*"-${TOPIC}" > /dev/null
-        exit
-    else
-        cat - | tee "${PIPEDIR}/${PIPEPREFIX}-"*"-${TOPIC}" > /dev/null
-        exit
+    data="$*"
+    set "${PIPEDIR}/${PIPEPREFIX}-"*"-${TOPIC}"
+    if [ "$1" != "${PIPEDIR}/${PIPEPREFIX}-*-${TOPIC}" ]; then
+        if [ -t 0 ]; then
+            printf '%s' "$data" | tee "$@" > /dev/null
+        else
+            cat - | tee "$@" > /dev/null
+        fi
     fi
 elif [ -n "$SUBSCRIBE" ]; then
     pipe="${PIPEDIR}/${PIPEPREFIX}-$$-${TOPIC}"
