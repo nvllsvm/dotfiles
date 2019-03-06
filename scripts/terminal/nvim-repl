@@ -29,13 +29,15 @@ write_template() {
 
 
 while true; do
-    if [ "$1" = '-s' ]; then
-        FILETYPE="$2"
-        shift
-        shift
-    else
-        break
-    fi
+    case "$1" in
+        -s)
+            FILETYPE="$2"
+            shift
+            shift
+            ;;
+        *)
+            break
+    esac
 done
 
 COMMAND="$1"

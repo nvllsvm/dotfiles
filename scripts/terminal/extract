@@ -29,22 +29,27 @@ if [ $# -eq 0 ]; then
 fi
 
 while true; do
-    if [ "$1" = '-c' ]; then
-        EXTRACT_IN_CHILD=1
-        shift
-    elif [ "$1" = '-r' ]; then
-        EXTRACT_RM=1
-        shift
-    elif [ "$1" = '-p' ]; then
-        EXTRACT_BASE="$(realpath "$2")"
-        shift
-        shift
-    elif [ "$1" = '--help' ]; then
-        show_help
-        exit
-    else
-        break
-    fi
+    case "$1" in
+        -c)
+            EXTRACT_IN_CHILD=1
+            shift
+            ;;
+        -r)
+            EXTRACT_RM=1
+            shift
+            ;;
+        -p)
+            EXTRACT_BASE="$(realpath "$2")"
+            shift
+            shift
+            ;;
+        --help)
+            show_help
+            exit
+            ;;
+        *)
+            break
+    esac
 done
 
 for filename in "$@"; do

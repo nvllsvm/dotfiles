@@ -7,7 +7,7 @@ LINK_PWD="$(readlink -f "$PWD")"
 GREEN='\033[1;32m'
 RED='\033[1;31m'
 RESET_COLOR='\033[0m'
-REVERSE_COLOR='\033[7m'
+#REVERSE_COLOR='\033[7m'
 
 kill_all() {
     jobs -rp | xargs -L 1 pkill -P &> /dev/null || true
@@ -22,24 +22,33 @@ get_message() {
     fanpipe --subscribe --topic "$FANPIPE_TOPIC"
 }
 
-while true; do
-    if [ "$1" = '-a' ] || [ "$1" = '--all' ]; then
-        LMK_ANY=1
-        shift
-    elif [ "$1" = '-w' ] || [ "$1" = '--wait' ]; then
-        LMK_WAIT_FIRST=1
-        shift
-    elif [ "$1" = '--help' ]; then
-        cat << EOF
+show_help() {
+    cat << EOF
 usage: lmk [-a] [-w] [--help] [COMMAND [ARGUMENT ...]]
-	-a, --all		Listen for all lmk events
-	-w, --wait		Wait for first event before executing
-	--help			Display this help and exit
+	-a, --all	Listen for all lmk events
+	-w, --wait	Wait for first event before executing
+	    --help	Display this help and exit
 EOF
-        exit
-    else
-        break
-    fi
+}
+
+
+while true; do
+    case "$1" in
+        -a|--all)
+            LMK_ANY=1
+            shift
+            ;;
+        -w|--wait)
+            LMK_WAIT_FIRST=1
+            shift
+            ;;
+        --help)
+            show_help
+            exit
+            ;;
+        *)
+            break
+    esac
 done
 
 if [ -z "$1" ]; then
