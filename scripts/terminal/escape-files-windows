@@ -2,7 +2,6 @@
 import argparse
 import pathlib
 import string
-import subprocess
 
 VALID = [' ', '.', '-', '_', '(', ')', '[', ']', "'"]
 VALID.extend(string.ascii_letters)
@@ -25,10 +24,6 @@ def escape_path(path):
     new_parts = []
     for part in path.parts:
         new_part = ''.join([c for c in part if c in VALID])
-
-        # replace multiple spaces with single space
-        # TODO: preserve existing consecutive spaces
-        new_part = ' '.join(new_part.split())
 
         if not new_part:
             raise ValueError(f'Unable to escape {path}')
