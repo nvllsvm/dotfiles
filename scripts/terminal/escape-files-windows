@@ -52,9 +52,6 @@ def rename_files(root, dry_run=True):
             print(new_f)
             print()
 
-    if not dry_run:
-        subprocess.run(['empty-tree', '-r', root])
-
 
 def main():
     parser = argparse.ArgumentParser()
