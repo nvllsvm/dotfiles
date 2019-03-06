@@ -27,7 +27,7 @@ while true; do
         FOLLOW=1
         shift
     elif [ "$1" = '--topic' ] || [ "$1" = '-t' ]; then
-        TOPIC="$(echo "$2" | base64)"
+        TOPIC="$2"
         shift
         shift
     elif [ "$1" = '--help' ]; then
