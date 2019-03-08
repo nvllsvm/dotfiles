@@ -11,7 +11,7 @@ if [ "$1" = 'prune' ]; then
     for p in "$ENV_ROOT/"*/.parent; do
         if [ -L "$p" ]; then
             real="$(pyrealpath "$p")"
-            if ! [ -e "$real" ]; then
+            if ! [ -e "$real/.envrc" ]; then
                 venvdir="$(dirname "$p")"
                 echo Removing venv for "$real"
                 rm -rf "$venvdir"
