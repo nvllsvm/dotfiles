@@ -1,12 +1,30 @@
 #!/usr/bin/env sh
 set -e
 
-env_root="$HOME/.local/share/virtualenvs"
+ENV_ROOT="$HOME/.local/share/virtualenvs"
+
+pyrealpath() {
+    printf "%s" "$1" | python -c 'import os; import sys; print(os.path.realpath(sys.stdin.read()))'
+}
+
+if [ "$1" = 'prune' ]; then
+    for p in "$ENV_ROOT/"*/.parent; do
+        if [ -L "$p" ]; then
+            real="$(pyrealpath "$p")"
+            if ! [ -e "$real" ]; then
+                venvdir="$(dirname "$p")"
+                echo Removing venv for "$real"
+                rm -rf "$venvdir"
+            fi
+        fi
+    done
+    exit
+fi
 
 # Avoids dependency on realpath
-parent="$(python -c 'import os; print(os.path.realpath(os.getcwd()))')"
+parent="$(pyrealpath "$(pwd)")"
 
-env_folder="$env_root/$(printf "%s" "$parent" | sha256sum | awk '{print $1}')"
+env_folder="$ENV_ROOT/$(printf "%s" "$parent" | sha256sum | awk '{print $1}')"
 
 rm -rf "$env_folder" .envrc
 pipenv --rm > /dev/null 2>&1 || true
@@ -18,7 +36,7 @@ elif [ -n "$1" ]; then
     eval "$(pyenv sh-shell "$1")"
 fi
 
-mkdir -p "$env_root"
+mkdir -p "$ENV_ROOT"
 
 if [ -e Pipfile ]; then
     pipenv --rm > /dev/null 2>&1 || true
