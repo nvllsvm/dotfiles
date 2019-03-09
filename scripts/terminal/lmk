@@ -25,9 +25,9 @@ get_message() {
 show_help() {
     cat << EOF
 usage: lmk [-a] [-w] [--help] [COMMAND [ARGUMENT ...]]
-	-a, --all	Listen for all lmk events
-	-w, --wait	Wait for first event before executing
-	    --help	Display this help and exit
+    -a, --all       Listen for all lmk events
+    -w, --wait      Wait for first event before executing
+        --help      Display this help and exit
 EOF
 }
 
