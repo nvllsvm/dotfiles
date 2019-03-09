@@ -8,11 +8,11 @@ TOPIC=''
 show_usage() {
     cat << EOF
 usage: fanpipe (-p|-s) [-f] [-t TOPIC] [MESSAGE [MESSAGE ...]]
-	-p, --publish		publish to a pipe
-	-s, --subscribe		subscribe to a pipe until one message is received
-	-f, --follow		subscribe indefinitely
-	-t, --topic=TOPIC	topic name
-	    --help		display this help and exit
+    -p, --publish       publish to a pipe
+    -s, --subscribe     subscribe to a pipe until one message is received
+    -f, --follow        subscribe indefinitely
+    -t, --topic=TOPIC   topic name
+        --help          display this help and exit
 EOF
 }
 
