@@ -16,7 +16,7 @@ if [ -d "$PYENV_ROOT" ]; then
     full-update add pyenv-update
     full-update add pip-update
     full-update add pipns-update
-    full-update add venv prune
+    full-update add 'venv prune'
 else
     unset PYENV_ROOT
 fi
