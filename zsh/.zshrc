@@ -128,8 +128,8 @@ unset zshrc_host
 
 path=(~/.bin ~/.local/bin "$path[@]")
 
-full-update add 'find ~/.bin -xtype l -delete'
-full-update add 'find ~/.local/bin -xtype l -delete'
+full-update add 'if [ -d ~/.bin ]; then; find ~/.bin -xtype l -delete; fi'
+full-update add 'if [ -d ~/.local/bin ]; then; find ~/.local/bin -xtype l -delete; fi'
 
 full-update add 'rm -f ~/.zcompdump && zsh -ic "echo -n"'
 full-update add 'exec zsh'
