@@ -1,23 +1,35 @@
 #!/usr/bin/env sh
 set -e
 
-if [ $# -eq 0 ]; then
+show_usage() {
     cat << EOF
 usage: disk-benchmark [-s SIZE] FILE
-	-s	size in megabytes. defaults to 1024M
+    -s, --size      size in megabytes. defaults to 1024M
+        --help      show help and exit
 EOF
-    exit 1
-fi
+}
 
-if [ "$1" = '-s' ]; then
-    FILESIZE="$2"
-    shift; shift
-else
-    FILESIZE=1024
-fi
+FILESIZE=1024
+while true; do
+    case "$1" in
+        -s)
+            FILESIZE="$2"
+            shift; shift
+            ;;
+        --help)
+            show_usage
+            exit
+            ;;
+        *)
+            if [ $# -eq 0 ]; then
+                show_usage >&2
+                echo 'error: missing file' >&2
+                exit 1
+            fi
+    esac
+done
 
 TEMP_FILE="$1"
-
 if [ -e "$TEMP_FILE" ]; then
     echo 'error: file already exists' >&2
     exit 1
