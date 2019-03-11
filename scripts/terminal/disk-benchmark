@@ -26,6 +26,7 @@ while true; do
                 echo 'error: missing file' >&2
                 exit 1
             fi
+            break
     esac
 done
 
@@ -36,7 +37,7 @@ if [ -e "$TEMP_FILE" ]; then
 fi
 
 cleanup() {
-    rm "${TEMP_FILE}"
+    rm -f "${TEMP_FILE}"
 }
 
 trap cleanup EXIT
