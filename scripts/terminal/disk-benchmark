@@ -43,5 +43,16 @@ cleanup() {
 trap cleanup EXIT
 
 dd if=/dev/zero "of=$TEMP_FILE" bs=1M count="$FILESIZE" conv=fdatasync,notrunc status=progress
-sudo sh -c 'echo 3 > /proc/sys/vm/drop_caches'
+case "$(uname)" in
+    Linux)
+        sudo sh -c 'echo 3 > /proc/sys/vm/drop_caches'
+        ;;
+    Darwin)
+        sync
+        sudo purge
+        ;;
+    *)
+        echo error: unhandled OS >&2
+        exit 1
+esac
 dd "if=$TEMP_FILE" of=/dev/null bs=1M count="$FILESIZE" status=progress
