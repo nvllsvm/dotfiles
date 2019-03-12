@@ -2,6 +2,7 @@
 set -e
 for f in "$@"; do
     OUTDIR="${f}.tmp"
+    rm -rf "$OUTDIR"
     7z x "$f" -o"${OUTDIR}"
     image_optim -r "${OUTDIR}"
     mv "$f" "$f".bak
