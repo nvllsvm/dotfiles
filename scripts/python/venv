@@ -3,11 +3,49 @@ set -e
 
 ENV_ROOT="$HOME/.local/share/virtualenvs"
 
+show_help() {
+    cat << EOF
+usage: venv [--delete|--prune] [PYENV_VERSION]
+
+simplified virtualenvs with direnv
+
+    -d, --delete    delete the virtualenv
+        --prune     prune orphan virtualenvs
+        --help      show help and exit
+EOF
+}
+
 pyrealpath() {
     printf "%s" "$1" | python -c 'import os; import sys; print(os.path.realpath(sys.stdin.read()))'
 }
 
-if [ "$1" = 'prune' ]; then
+PRUNE=''
+DELETE=''
+while true; do
+    case "$1" in
+        -d|--delete)
+            DELETE=1
+            shift
+            ;;
+        --prune)
+            PRUNE=1
+            shift
+            ;;
+        --help)
+            show_help
+            exit
+            ;;
+        *)
+            break
+    esac
+done
+
+if [ -n "$PRUNE" ] && [ -n "$DELETE" ]; then
+    echo error: delete and prune many not be used together >&2
+    exit 1
+fi
+
+if [ -n "$PRUNE" ]; then
     for p in "$ENV_ROOT/"*/.parent; do
         if [ -L "$p" ]; then
             real="$(pyrealpath "$p")"
@@ -30,7 +68,7 @@ rm -rf "$env_folder" .envrc
 pipenv --rm > /dev/null 2>&1 || true
 unset VIRTUAL_ENV
 
-if [ "$1" = '-d' ]; then
+if [ -n "$DELETE" ]; then
     exit
 elif [ -n "$1" ]; then
     eval "$(pyenv sh-shell "$1")"
