@@ -4,9 +4,9 @@ set -e
 show_help() {
     cat << EOF
 usage: extract [-i] [-r] [-d] FILE [FILE ...]
-    -c  create a child directory for each archive and extract there
-    -p  parent directory to extract to. defaults to directory where archive resides
-    -r  remove archive after successful extraction
+    -c      create a child directory for each archive and extract there
+    -p      parent directory to extract to. defaults to directory where archive resides
+    -r      remove archive after successful extraction
 EOF
 }
 
