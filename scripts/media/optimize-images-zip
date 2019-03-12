@@ -1,12 +1,11 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 set -e
 for f in "$@"; do
-    TEMP_DIR=$(mktemp -d)
-    trap "rm -rf "${TEMP_DIR}"" EXIT
-    7z x "$f" "-o"${TEMP_DIR}""
-    image_optim -r "${TEMP_DIR}"
+    OUTDIR="${f}.tmp"
+    7z x "$f" -o"${OUTDIR}"
+    image_optim -r "${OUTDIR}"
     mv "$f" "$f".bak
-    7z a -mm=Deflate -mfb=258 -mpass=15 "$f".zip "${TEMP_DIR}"/.
+    7z a -mm=Deflate -mfb=258 -mpass=15 "$f".zip "$OUTDIR"/.
     mv "$f".zip "$f"
-    rm -rf $TEMP_DIR
+    rm -rf "$OUTDIR"
 done
