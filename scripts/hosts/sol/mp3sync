@@ -17,3 +17,12 @@ harmonize() {
 }
 
 harmonize -n 8 "$SOURCE" "$TARGET"
+
+printf 'Updating Airsonic library .'
+airsonic-cli startScan > /dev/null
+
+while [ "$(airsonic-cli getScanStatus | jq '.scanning')" = 'true' ]; do
+    printf .
+    sleep 1
+done
+echo ' Done'
