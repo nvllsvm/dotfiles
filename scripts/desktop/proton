@@ -1,4 +1,33 @@
 #!/usr/bin/env sh
 export STEAM_COMPAT_DATA_PATH="$HOME/.steam/proton"
+PROTON_BASE=~/.steam/steam/steamapps/common/Proton\ 3.16\ Beta
+PROTON_PREFIX="$STEAM_COMPAT_DATA_PATH/pfx"
 mkdir -p "$STEAM_COMPAT_DATA_PATH"
-~/.steam/steam/steamapps/common/Proton\ 3.16\ Beta/proton run "$@"
+show_help() {
+        cat << EOF
+usage: proton [--show-prefix] PROGRAM [ARG ...]
+    --show-prefix   show proton prefix path and exit
+    --help          show help and exit
+EOF
+}
+
+
+case "$1" in
+    --help)
+        show_help
+        exit
+        ;;
+    --show-prefix)
+        echo "$PROTON_PREFIX"
+        exit
+        ;;
+    *)
+        break
+esac
+
+if [ $# -eq 0 ]; then
+    show_help >&2
+    exit 1
+fi
+
+"$PROTON_BASE"/proton run "$@"
