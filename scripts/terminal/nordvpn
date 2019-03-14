@@ -1,26 +1,74 @@
 #!/usr/bin/env sh
 set -e
 
+NORDVPN_BASE=~/.local/share/nordvpn
+EXTRA_SCRIPT="$(which update-resolv-conf)"
+CONFIG_URL='https://downloads.nordcdn.com/configs/archives/servers/ovpn.zip'
+RECOMMENDED_URL='https://nordvpn.com/wp-admin/admin-ajax.php?action=servers_recommendations'
+
+show_help() {
+    cat << EOF
+usage: nordvpn [--help] [--random] [--update]
+
+connect to the recommended NordVPN server
+
+    --help          show help and exit
+    --random        use a random server instead of the recommended
+    --tcp           use TCP (default UDP)
+    --update        update OpenVPN config files and exit
+EOF
+}
+
+update_config() {
+    echo "Updating OpenVPN configuration ..."
+    rm -rf "$NORDVPN_BASE"
+    mkdir -p "$NORDVPN_BASE"
+    target="$NORDVPN_BASE/ovpn.zip"
+    curl -sSf "$CONFIG_URL" -o "$target"
+    7z x "$target" "-o$NORDVPN_BASE" > /dev/null
+    rm "$target"
+    grep -r -L SHA512 "$NORDVPN_BASE" | xargs rm
+}
+
+RANDOM_CONFIG=''
 NORDVPN_PROTOCOL=udp
-NORDVPN_DIR=~/.local/share/nordvpn/ovpn_$NORDVPN_PROTOCOL
-EXTRA_SCRIPT=$(which update-resolv-conf)
+while true; do
+    case "$1" in
+        --help)
+            show_help
+            exit
+            ;;
+        --update)
+            update_config
+            exit
+            ;;
+        --random)
+            RANDOM_CONFIG=1
+            shift
+            ;;
+        --tcp)
+            NORDVPN_PROTOCOL=tcp
+            shift
+            ;;
+        *)
+            if [ $# -ne 0 ]; then
+                show_help >&2
+                exit 1
+            fi
+            break
+    esac
+done
 
-mkdir -p "$NORDVPN_DIR"
+NORDVPN_DIR="$NORDVPN_BASE/ovpn_$NORDVPN_PROTOCOL"
 
-if [ "$1" = 'update' ]; then
-    rm -rf ~/.local/share/nordvpn
-    curl https://downloads.nordcdn.com/configs/archives/servers/ovpn.zip > ~/ovpn.zip
-    7z x ~/ovpn.zip "-o$HOME/.local/share/nordvpn"
-    rm ~/ovpn.zip
-    grep -r -L SHA512 ~/.local/share/nordvpn | xargs rm
-    exit
-elif [ "$1" = 'random' ]; then
+if ! [ -d "$NORDVPN_DIR" ]; then
+    update_config
+fi
+
+if [ -n "$RANDOM_CONFIG" ]; then
     config_file="$NORDVPN_DIR/$(ls $NORDVPN_DIR | grep ^us | shuf | head -n 1)"
-elif [ -n "$1" ]; then
-    echo Unknown argument: \"$1\"
-    exit 1
 else
-    recommended_ip=$(curl -s 'https://nordvpn.com/wp-admin/admin-ajax.php?action=servers_recommendations' | jq -r '.[0].station')
+    recommended_ip=$(curl -s "$RECOMMENDED_URL" | jq -r '.[0].station')
     config_file="$(grep -lr " $recommended_ip " $NORDVPN_DIR)"
 fi
 
