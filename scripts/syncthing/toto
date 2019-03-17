@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
-you_typoed() {
-    base64 -d << EOF | play -
+decode_audio() {
+    base64 -d << EOF
 T2dnUwACAAAAAAAAAABSiqcVAAAAAEOz0p8BE09wdXNIZWFkAQE4AYC7AAAAAABPZ2dTAAAAAAAA
 AAAAAFKKpxUBAAAAXYbMlwP///5PcHVzVGFncx0AAABsaWJvcHVzIDEuMywgbGlib3B1c2VuYyAw
 LjIuMQIAAAAjAAAARU5DT0RFUj1vcHVzZW5jIGZyb20gb3B1cy10b29scyAwLjI6AAAARU5DT0RF
@@ -137,4 +137,11 @@ v9NkU4Pxp6UcUgTYNFrT1G4AjksEbEsAjtAAGKYIB2MkYf6/2R5U/KE=
 EOF
 }
 
-you_typoed > /dev/null 2>&1 &
+if command -v play > /dev/null; then
+    decode_audio | play - > /dev/null 2>&1 &
+elif command -v play > /dev/null; then
+    decode_audio | mpv - > /dev/null 2>&1 &
+else
+    echo 'error: requires either play (sox) or mpv' >&2
+    exit 1
+fi

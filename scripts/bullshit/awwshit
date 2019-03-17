@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
-play_it() {
-    openssl base64 -d << EOF | play -
+decode_audio() {
+    openssl base64 -d << EOF
 T2dnUwACAAAAAAAAAAA8DahJAAAAALa7wyoBE09wdXNIZWFkAQE4AUSsAAAAAABPZ2dTAAAAAAAA
 AAAAADwNqEkBAAAACspmjwP///5PcHVzVGFncx0AAABsaWJvcHVzIDEuMywgbGlib3B1c2VuYyAw
 LjIuMQIAAAAjAAAARU5DT0RFUj1vcHVzZW5jIGZyb20gb3B1cy10b29scyAwLjI6AAAARU5DT0RF
@@ -60,4 +60,11 @@ HBbBVJ+DUlxdtXb78zsPQ2DeygP/symn9qu74X5SJw==
 EOF
 }
 
-play_it > /dev/null 2>&1 &
+if command -v play > /dev/null; then
+    decode_audio | play - > /dev/null 2>&1 &
+elif command -v play > /dev/null; then
+    decode_audio | mpv - > /dev/null 2>&1 &
+else
+    echo 'error: requires either play (sox) or mpv' >&2
+    exit 1
+fi

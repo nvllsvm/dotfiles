@@ -1,13 +1,33 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 set -e
-UNSIGNED_APK="$1"
-RELEASE_KEY="$2"
 
-if [[ -z "${UNSIGNED_APK}" || -z "${RELEASE_KEY}" ]]; then
-    echo usage: "$(basename "$0")" apk key
-    echo error: required arguments missing
-    exit 1
-fi
+show_help() {
+    cat << EOF
+usage: apk-release-tool APK KEY
+
+Positional Arguments:
+    APK     unsigned apk
+    KEY     key to sign with
+EOF
+}
+
+while true; do
+    case "$1" in
+        --help)
+            show_help
+            exit
+            ;;
+        *)
+            if [ $# -ne 2 ]; then
+                show_help >&2
+                echo error: missing required arguments >&2
+                exit 1
+            fi
+            UNSIGNED_APK="$1"
+            RELEASE_KEY="$2"
+            break
+    esac
+done
 
 ALIGNED_APK=$(echo "${UNSIGNED_APK}" | sed 's/-unsigned\.apk$/-aligned.apk/')
 RELEASE_APK=$(echo "${UNSIGNED_APK}" | sed 's/-unsigned\.apk$/.apk/')
