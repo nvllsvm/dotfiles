@@ -3,6 +3,7 @@ path=(
     "${DOTFILES}"/scripts/media
     "${DOTFILES}"/scripts/rabbitmq
     "${DOTFILES}"/scripts/desktop
+    "${DOTFILES}"/scripts/bullshit
     "$path[@]"
 )
 
