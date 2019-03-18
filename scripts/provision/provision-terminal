@@ -38,6 +38,7 @@ if [[ $osname == Darwin* ]]; then
         automake \
         coreutils \
         curl \
+        dash \
         direnv \
         fd \
         findutils \
@@ -90,10 +91,11 @@ if [[ $osname == Linux* ]]; then
             rsync \
             sshfs \
             yay
-        mkdir -p ~/.local/bin
-        ln -sf "$(which dash)" "$HOME/.local/bin/sh"
     fi
 fi
+
+mkdir -p ~/.local/bin
+ln -sf "$(which dash)" "$HOME/.local/bin/sh"
 
 zsh_command '$DOTFILES/scripts/python/pyenv-update'
 if [[ $osname == Darwin* ]]; then
