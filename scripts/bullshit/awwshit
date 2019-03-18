@@ -64,6 +64,8 @@ if command -v play > /dev/null; then
     decode_audio | play - > /dev/null 2>&1 &
 elif command -v mpv > /dev/null; then
     decode_audio | mpv - > /dev/null 2>&1 &
+elif command -v ffplay > /dev/null; then
+    decode_audio | ffplay -nodisp -autoexit - > /dev/null 2>&1 &
 else
     echo 'error: requires either play (sox) or mpv' >&2
     exit 1
