@@ -87,6 +87,8 @@ Plug 'iamcco/markdown-preview.vim'
 Plug 'zah/nim.vim'
 Plug 'pedrohdz/vim-yaml-folds'
 Plug 'junegunn/fzf'
+Plug 'dhruvasagar/vim-table-mode'
+
 
 Plug 'francoiscabrol/ranger.vim'
 Plug 'rbgrouleff/bclose.vim'
@@ -189,4 +191,3 @@ augroup XML
     autocmd FileType xml :syntax on
     autocmd FileType xml :%foldopen!
 augroup END
-
