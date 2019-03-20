@@ -181,3 +181,12 @@ let g:netrw_dirhistmax = 0
 autocmd VimResized * wincmd =
 
 let g:ranger_replace_netrw = 1
+
+augroup XML
+    autocmd!
+    autocmd FileType xml let g:xml_syntax_folding=1
+    autocmd FileType xml setlocal foldmethod=syntax
+    autocmd FileType xml :syntax on
+    autocmd FileType xml :%foldopen!
+augroup END
+
