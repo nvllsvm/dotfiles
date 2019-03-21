@@ -83,7 +83,7 @@ Plug 'dbeniamine/todo.txt-vim'
 Plug 'udalov/kotlin-vim'
 Plug 'godlygeek/tabular'
 Plug 'iamcco/mathjax-support-for-mkdp'
-Plug 'iamcco/markdown-preview.vim'
+Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }}
 Plug 'zah/nim.vim'
 Plug 'pedrohdz/vim-yaml-folds'
 Plug 'junegunn/fzf'
