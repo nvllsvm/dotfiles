@@ -77,13 +77,15 @@ Plug 'gregsexton/MatchTag'
 Plug 'deoplete-plugins/deoplete-jedi'
 Plug 'Vimjas/vim-python-pep8-indent'
 Plug 'neomake/neomake'
-Plug 'plasticboy/vim-markdown'
 Plug 'chriskempson/base16-vim'
 Plug 'dbeniamine/todo.txt-vim'
+
 Plug 'udalov/kotlin-vim'
+
 Plug 'godlygeek/tabular'
+Plug 'plasticboy/vim-markdown'
+
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }}
-Plug 'zah/nim.vim'
 Plug 'pedrohdz/vim-yaml-folds'
 Plug 'junegunn/fzf'
 Plug 'dhruvasagar/vim-table-mode'
