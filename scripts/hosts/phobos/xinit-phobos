@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 set -e
-xmodmap-caps-to-esc
+setxkbmap -option caps:ctrl_modifier
 
 TOUCHPAD_ID=$(xinput list --id-only 'DLL082A:01 06CB:76AD Touchpad')
 
