@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-exec xdg-open "$@"
+exec xdg-open "$@" >/dev/null 2>&1 &
