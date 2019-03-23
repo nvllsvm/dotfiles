@@ -19,6 +19,13 @@ gen_target() {
     if [ -z "$EXTRACT_IN_CHILD" ]; then
         target="$(dirname "$target")"
     fi
+    while true; do
+        if [ -e "$target" ]; then
+            target="${target}_"
+        else
+            break
+        fi
+    done
     echo "$target"
 }
 
