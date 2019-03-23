@@ -18,32 +18,25 @@ phobos() {
 
     if [ "$MODE" = "internal" ]; then
         xrandr \
-            --output HDMI1 --off \
             --output DP1 --off \
+            --output DP2 --off \
             --output eDP1 --primary --mode 3200x1800 --pos 0x0 --rotate normal
         set-x-dpi 192
         apply-display-calibration
     elif [ "$MODE" = "internal-half" ]; then
         xrandr \
-            --output HDMI1 --off \
             --output DP1 --off \
+            --output DP2 --off \
             --output eDP1 --primary --mode 1600x900 --pos 0x0 --rotate normal
         set-x-dpi 138
         apply-display-calibration
     elif [ "$MODE" = "internal-720" ]; then
         xrandr \
-            --output HDMI1 --off \
             --output DP1 --off \
+            --output DP2 --off \
             --output eDP1 --primary --mode 1280x720 --pos 0x0 --rotate normal
         set-x-dpi 96
         apply-display-calibration
-    elif [ "$MODE" = "external" ]; then
-        xrandr \
-            --output HDMI1 --off \
-            --output eDP1 --off \
-            --output DP1 --primary --mode 1920x1200 --pos 0x0 --rotate normal
-        set-x-dpi 96
-        apply-display-calibration clear
     else
         printf "Options:\n- internal\n- internal-half\n- external"
         exit 1
