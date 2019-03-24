@@ -1,7 +1,5 @@
 #!/usr/bin/env sh
 set -e
-setxkbmap -option caps:ctrl_modifier
-
 TOUCHPAD_ID=$(xinput list --id-only 'DLL082A:01 06CB:76AD Touchpad')
 
 xinput --set-prop $TOUCHPAD_ID 'libinput Accel Speed' 0.5

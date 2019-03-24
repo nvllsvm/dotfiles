@@ -1,3 +1,2 @@
 #!/bin/sh
 xmodmap -e "keycode 135 = Super_L"
-setxkbmap -option caps:ctrl_modifier
