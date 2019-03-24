@@ -1,31 +1,57 @@
 #!/bin/bash
 set -e
 
-CLEAR_ONLY=$1
-
 clear_existing_calibration() {
     dispwin -h |& grep Output | awk '{print $1}' | xargs -n 1 dispwin -c -d
-
-    if [[ $CLEAR_ONLY == 'clear' ]]; then
-        exit
-    fi
 }
+
+show_help() {
+    cat << EOF
+usage: apply-display-calibration [--help] [--clear]
+
+no args will apply display calibration automatically
+
+    --reset     reset display calibration
+    --help      show help and exit
+EOF
+}
+
+
+while true; do
+    case "$1" in
+        --help)
+            show_help
+            exit
+            ;;
+        --reset)
+            clear_existing_calibration
+            exit
+            ;;
+        *)
+            if [ $# -ne 0 ]; then
+                show_help
+                echo error: unknown arguments >&2
+                exit 1
+            fi
+            break
+    esac
+done
+
+
+clear_existing_calibration
 
 case "$HOSTNAME" in
     "mars")
-        clear_existing_calibration
         dispwin -h |& grep Output | \
         awk '{print $1}' | \
         xargs -I % -n 1 dispwin -c -d% $DOTFILES/icc/dell_u2412m_custom.icc
         ;;
     "deimos")
-        clear_existing_calibration
         dispwin -h |& grep Output | \
         awk '{print $1}' | \
         xargs -I % -n 1 dispwin -c -d% $DOTFILES/icc/dell_u2412m_custom.icc
         ;;
     "phobos")
-        clear_existing_calibration
         dispwin -d1 $DOTFILES/icc/xps13_phobos.icc
         ;;
     *)
