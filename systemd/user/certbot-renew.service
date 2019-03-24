@@ -1,0 +1,6 @@
+[Unit]
+Description=Certbot renew
+
+[Service]
+ExecStart=zsh -ic /home/ar/Code/certs-nullsum.net/renew.sh
+SyslogIdentifier=certbot-renew

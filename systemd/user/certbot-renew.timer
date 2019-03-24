@@ -1,0 +1,9 @@
+[Unit]
+Description=Run certbot-renew every 1 day
+
+[Timer]
+OnBootSec=1day
+OnUnitActiveSec=1day
+
+[Install]
+WantedBy=timers.target
