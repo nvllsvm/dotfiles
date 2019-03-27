@@ -71,7 +71,12 @@ unset VIRTUAL_ENV
 if [ -n "$DELETE" ]; then
     exit
 elif [ -n "$1" ]; then
-    eval "$(pyenv sh-shell "$1")"
+    version="$1"
+    found="$(pyenv versions --bare | grep '[0-9].[0-9]\+.[0-9]\+' | sort -r --version-sort | grep "^$version" | head -n 1)"
+    if [ -n "$found" ]; then
+        version="$found"
+    fi
+    eval "$(pyenv sh-shell "$version")"
 fi
 
 mkdir -p "$ENV_ROOT"
