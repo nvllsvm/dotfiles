@@ -76,6 +76,7 @@ elif [ -n "$1" ]; then
     if [ -n "$found" ]; then
         version="$found"
     fi
+    echo "Using '$version' from pyenv"
     eval "$(pyenv sh-shell "$version")"
 fi
 
