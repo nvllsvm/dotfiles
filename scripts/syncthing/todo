@@ -16,8 +16,24 @@ if [ "$1" = '-l' ]; then
    exit
 fi
 
+if [ "$1" = '-d' ]; then
+    shift
+    DUE="due:$(date -I)"
+    data="$(grep "$DUE" ~/Syncthing/Notes/todo.txt | sed "s/$DUE//g" | sort)"
+    if [ -t 1 ]; then
+        color_opt=always
+    else
+        color_opt=never
+    fi
+    for filter in "$@"; do
+        data="$(echo "$data" | grep --color="$color_opt" -i "$filter")"
+    done
+    echo "$data"
+    exit
+fi
+
 if [ -z "$1" ]; then
     "${EDITOR}" "${TODO_FILE}"
 else
-    echo $(date +%Y-%m-%d) $@ >> "${TODO_FILE}"
+    echo "$(date -I)" "$@" >> "${TODO_FILE}"
 fi
