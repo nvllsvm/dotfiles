@@ -11,6 +11,10 @@ backup_home() {
         --exclude Code/sol-docker/volumes/jellyfin/logs \
         --exclude Code/sol-docker/volumes/jellyfin/cache \
         --exclude .cache \
+        --exclude .local \
+        --exclude .npm \
+        --exclude .nuget \
+        --exclude .rustup \
         ~ar $HOME_BACKUP_DIR
 }
 
