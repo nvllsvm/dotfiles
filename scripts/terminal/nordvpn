@@ -73,9 +73,11 @@ else
 fi
 
 echo using $config_file
-exec sudo openvpn \
+sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sudo openvpn \
     --config $config_file \
     --script-security 2 \
     --auth-user-pass $DOTFILES_PRIVATE/nordvpn/auth \
     --up $EXTRA_SCRIPT \
     --down $EXTRA_SCRIPT
+sudo sysctl -w net.ipv6.conf.all.disable_ipv6=0
