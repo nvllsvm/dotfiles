@@ -1,6 +1,8 @@
 #!/usr/bin/env sh
 export STEAM_COMPAT_DATA_PATH="$HOME/.steam/proton"
-PROTON_BASE=~/.steam/steam/steamapps/common/Proton\ 3.16\ Beta
+STEAMAPPS_COMMON=~/.steam/steam/steamapps/common
+PROTON_VERSION="$(ls "$STEAMAPPS_COMMON" | grep '^Proton' | sort --version-sort | tail -n 1)"
+PROTON_BASE="$STEAMAPPS_COMMON/$PROTON_VERSION"
 PROTON_PREFIX="$STEAM_COMPAT_DATA_PATH/pfx"
 mkdir -p "$STEAM_COMPAT_DATA_PATH"
 show_help() {
@@ -30,4 +32,5 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
+echo Using "$PROTON_VERSION"
 "$PROTON_BASE"/proton run "$@"
