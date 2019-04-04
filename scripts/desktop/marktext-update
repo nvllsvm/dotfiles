@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+scp 'sol.nullsum.net:~/Code/marktext/build/*AppImage' ~/.local/bin/marktext
