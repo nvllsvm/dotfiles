@@ -17,10 +17,12 @@ if [ "$1" = 'docker' ]; then
         #--volume "/dev/dri:/dev/dri" \
     mkdir -p "$JELLYFIN_DATA"
     docker-shell \
-        -v "$JELLYFIN_DATA:/config" \
+        -v "$JELLYFIN_DATA/config:/config" \
+        -v "$JELLYFIN_DATA/cache:/cache" \
         --net host \
         --user "$(id -u):$(id -g)" \
-        --volume "/storage/Video:/storage/Video:ro" \
+        --volume "/storage/Video:/media:ro" \
+        --volume "/storage/Audio/MP3:/audio:ro" \
         "$IMAGE"
 elif [ "$1" = 'dotnet' ]; then
     OUTPUT_DIR="$(pwd)/debug"
