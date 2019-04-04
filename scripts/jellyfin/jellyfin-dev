@@ -10,16 +10,17 @@ rm -rf debug
 if [ "$1" = 'docker' ]; then
     if [ -z "$2" ]; then
         IMAGE=jellyfin_dev
-        docker build . -t jellyfin_dev
+        docker build . -t jellyfin_dev --pull
     else
         IMAGE="jellyfin/jellyfin:$2"
     fi
+        #--volume "/dev/dri:/dev/dri" \
+    mkdir -p "$JELLYFIN_DATA"
     docker-shell \
         -v "$JELLYFIN_DATA:/config" \
         --net host \
-        --user $(id -u):$(id -g) \
-        --volume "/storage/Video:/storage/Video" \
-        --volume "/dev/dri:/dev/dri" \
+        --user "$(id -u):$(id -g)" \
+        --volume "/storage/Video:/storage/Video:ro" \
         "$IMAGE"
 elif [ "$1" = 'dotnet' ]; then
     OUTPUT_DIR="$(pwd)/debug"
