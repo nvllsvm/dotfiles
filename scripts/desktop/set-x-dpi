@@ -1,5 +1,4 @@
 #!/bin/zsh
-
 DPI=${1#0}
 
 XRESOURCES_TEMP_FILE=/tmp/dpi_xresources
@@ -67,14 +66,14 @@ gsettings set org.gnome.settings-daemon.plugins.xsettings overrides \
 
 xrdb $XRESOURCES_TEMP_FILE
 
-pkill -9 dunst
+load-xresources-theme || true
+
+pkill -9 dunst || true
 dunst \
     -font "$FONT_NAME $FONT_SIZE" \
-    -frame_width $BORDER_WIDTH \
-    -max_icon_size $DUNST_MAX_ICON_SIZE \
-    -geometry $DUNST_GEOMETRY &
-
-load-xresources-theme
+    -frame_width "$BORDER_WIDTH" \
+    -max_icon_size "$DUNST_MAX_ICON_SIZE" \
+    -geometry "$DUNST_GEOMETRY" &
 
 i3 restart
 
