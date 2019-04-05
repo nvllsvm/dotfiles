@@ -69,8 +69,6 @@ command! -nargs=1 REPL call _REPLInit(<args>)
 
 command FixEmpty :set expandtab | :retab | call StripTrailingWhitespace() | :%s/\r//ge
 
-nmap <C-t> :TableFormat<CR>
-
 call plug#begin('~/.config/nvim/plugged')
 Plug 'Shougo/deoplete.nvim'
 Plug 'gregsexton/MatchTag'
