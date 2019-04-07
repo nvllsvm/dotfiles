@@ -1,0 +1,10 @@
+[Unit]
+Description=undervolt xps13 9360 - suspend
+After=suspend.target
+
+[Service]
+Type=oneshot
+ExecStart=/home/ar/.dotfiles/public/scripts/hosts/phobos/undervolt-phobos
+
+[Install]
+WantedBy=sleep.target
