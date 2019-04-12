@@ -104,6 +104,7 @@ if [[ $osname == Linux* ]]; then
         yes | pkg install \
             curl \
             fd \
+            findutils \
             neovim \
             openssh \
             python-dev \
