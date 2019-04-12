@@ -97,13 +97,19 @@ if [[ $osname == Linux* ]]; then
     fi
 
     if command -v termux-info > /dev/null; then
-        pkg install \
+        rm -f ~/../usr/etc/motd
+
+        pkg update
+        yes | pkg upgrade
+        yes | pkg install \
+            curl \
             fd \
             neovim \
             openssh \
             python-dev \
             ranger \
-            ripgrep
+            ripgrep \
+            tmux
     fi
 fi
 
