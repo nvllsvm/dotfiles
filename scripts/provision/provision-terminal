@@ -96,7 +96,7 @@ if [[ $osname == Linux* ]]; then
             yay
     fi
 
-    if command -v pkg > /dev/null; then
+    if command -v termux-info > /dev/null; then
         pkg install \
             fd \
             neovim \
@@ -117,8 +117,14 @@ fi
 zsh_command '$DOTFILES/scripts/python/pip-update'
 zsh_command 'PIP_REQUIRE_VIRTUALENV=0 pip install pipns'
 
-for name in flake8 httpie ranger-fm speedtest-cli; do
+# python on android doesn't support link and breaks ranger
+# https://github.com/termux/termux-packages/blob/master/packages/ranger/ranger-core-actions.py.patch
+for name in flake8 httpie speedtest-cli; do
     zsh_command "pipns install "$name""
 done
+
+if ! command -v termux-info > /dev/null; then
+    zsh_command 'pipns install ranger-fm'
+fi
 
 zsh_command nvim-update
