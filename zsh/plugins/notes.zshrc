@@ -1,1 +1,1 @@
-compdef '_files -W ~/Notes' notes
+compdef '_files -W "${NOTES_DIR:-~/Notes}"' notes
