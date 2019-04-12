@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
 set -e
 
 cd "$(dirname "$0")/../.."
@@ -29,6 +29,9 @@ link_file psql/.psqlrc ~/.psqlrc
 link_file tmux/.tmux.conf ~/.tmux.conf
 link_file zsh/.zshenv ~/.zshenv
 link_file zsh/.zshrc ~/.zshrc
+
+. ~/.zshenv
+. ~/.zshrc
 
 osname=$(uname)
 if [[ $osname == Darwin* ]]; then
