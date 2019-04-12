@@ -92,6 +92,16 @@ if [[ $osname == Linux* ]]; then
             tmux \
             yay
     fi
+
+    if command -v pkg > /dev/null; then
+        pkg install \
+            fd \
+            neovim \
+            openssh \
+            python-dev \
+            ranger \
+            ripgrep
+    fi
 fi
 
 mkdir -p ~/.local/bin
