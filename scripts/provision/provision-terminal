@@ -102,6 +102,7 @@ if [[ $osname == Linux* ]]; then
         pkg update
         yes | pkg upgrade
         yes | pkg install \
+            clang \
             curl \
             fd \
             findutils \
