@@ -1,7 +1,8 @@
 #!/usr/bin/env sh
 set -e
 
-cd "${SYNCTHING_DIR}"/Notes
+NOTES_DIR="${NOTES_DIR:-$HOME/Notes}"
+cd "${NOTES_DIR}"
 
 if [ "$1" = '-d' ]; then
     abspath="$(pwd)/$2"

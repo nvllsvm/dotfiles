@@ -1,9 +1,10 @@
 #!/usr/bin/env sh
 set -e
 
-TODO_FILE="${SYNCTHING_DIR}"/Notes/todo.txt
+NOTES_DIR="${NOTES_DIR:-$HOME/Notes}"
+TODO_FILE="${NOTES_DIR}/todo.txt"
 
-if [ "$(ls "${SYNCTHING_DIR}/Notes" | grep '^todo.*.txt' | wc -l)" -gt 1 ] ; then
+if [ "$(ls "${NOTES_DIR}" | grep '^todo.*.txt' | wc -l)" -gt 1 ] ; then
     echo error: sync conflict detected >&2
     exit 1
 fi
@@ -19,7 +20,7 @@ fi
 if [ "$1" = '-d' ]; then
     shift
     DUE="due:$(date -I)"
-    data="$(grep "$DUE" ~/Syncthing/Notes/todo.txt | sed "s/$DUE//g" | sort)"
+    data="$(grep "$DUE" "${TODO_FILE}" | sed "s/$DUE//g" | sort)"
     if [ -t 1 ]; then
         color_opt=always
     else

@@ -1,7 +1,0 @@
-#!/usr/bin/env sh
-if [ -z $1 ]; then
-    DATE=$(date +%Y-%m-%d)
-else
-    DATE=$1
-fi
-exec "${EDITOR}" "${SYNCTHING_DIR}"/Notes/Journal/${DATE}
