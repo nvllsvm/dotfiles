@@ -17,7 +17,7 @@ if [ -d "$BASE16_SHELL" ]; then
     _base16 () {
         ln -fs $1 ~/.base16_theme
         . ~/.base16_theme
-        if [[ "$OSTYPE" != "darwin"* ]]; then
+        if [[ "$OSTYPE" != "darwin"* ]] && ! command -v termux-info > /dev/null; then
             load-xresources-theme
         fi
     }
