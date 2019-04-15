@@ -9,5 +9,5 @@ elif command -v pbcopy > /dev/null; then
     exec pbpaste
 else
     echo error: no suitable clipboard command detected >&2
-    exit
+    exit 1
 fi
