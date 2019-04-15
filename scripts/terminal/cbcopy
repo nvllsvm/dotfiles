@@ -7,4 +7,7 @@ elif command -v termux-clipboard-set > /dev/null; then
     exec termux-clipboard-set
 elif command -v pbcopy > /dev/null; then
     exec pbcopy
+else
+    echo error: no suitable clipboard command detected >&2
+    exit 1
 fi
