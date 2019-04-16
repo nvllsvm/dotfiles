@@ -109,6 +109,7 @@ if [[ $osname == Linux* ]]; then
             fzf \
             neovim \
             openssh \
+            p7zip \
             python-dev \
             ranger \
             ripgrep \
