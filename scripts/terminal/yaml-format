@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import pathlib
+import sys
 
 import yaml
 
@@ -11,14 +12,14 @@ def main():
     parser.add_argument('-r', dest='replace', action='store_true')
     args = parser.parse_args()
 
-    data = yaml.load(args.file.read_text())
+    data = yaml.safe_load(args.file.read_text())
     formatted = yaml.dump(
         data, default_flow_style=False, default_style=False, indent=4
     )
     if args.replace:
         args.file.write_text(formatted)
     else:
-        print(formatted)
+        sys.stdout.write(formatted)
 
 
 if __name__ == '__main__':
