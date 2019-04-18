@@ -9,30 +9,30 @@ import pika
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '-p', '--port',
+        '--port',
         type=int,
         default=os.environ.get('RABBITMQ_PORT', 5672)
     )
     parser.add_argument(
-        '-H', '--host',
+        '--host',
         default=os.environ.get('RABBITMQ_HOST', 'localhost')
     )
     parser.add_argument(
-        '-v', '--vhost',
+        '--vhost',
         default=os.environ.get('RABBITMQ_VHOST', '/')
     )
     parser.add_argument(
-        '-u', '--username',
+        '--username',
         default=os.environ.get('RABBITMQ_USERNAME')
     )
     parser.add_argument(
-        '-P', '--password',
+        '--password',
         default=os.environ.get('RABBITMQ_PASSWORD')
     )
     parser.add_argument(
-        '-a', '--ack', action='store_true', default=False
+        '--ack', action='store_true', default=False
     )
-    parser.add_argument('-t', '--tag')
+    parser.add_argument('--tag')
     parser.add_argument('queue')
     args = parser.parse_args()
 
