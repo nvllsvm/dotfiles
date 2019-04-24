@@ -1,0 +1,17 @@
+#!/usr/bin/env python3
+import argparse
+import sys
+import zlib
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-d', '--decompress', action='store_true')
+args = parser.parse_args()
+
+data = sys.stdin.buffer.read()
+
+if args.decompress:
+    result = zlib.decompress(data)
+else:
+    result = zlib.compress(data)
+
+sys.stdout.buffer.write(result)

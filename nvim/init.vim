@@ -147,10 +147,16 @@ endfunction
 
 autocmd FileType yaml setlocal shiftwidth=2 tabstop=2
 
-command JSON :%!jq -S '.'
+function _JSONify()
+    set syntax=json
+    %!jq -S '.'
+    normal zR
+endfunction
 
-au FileType json set tabstop=2
+command JSON call _JSONify()
+
 au FileType json set shiftwidth=2
+au FileType json set tabstop=2
 
 au BufNewFile,BufRead *.avsc set filetype=json
 
