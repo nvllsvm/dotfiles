@@ -1,0 +1,10 @@
+[Unit]
+Description=undervolt gpd win 2 - boot
+After=tlp.service
+
+[Service]
+Type=oneshot
+ExecStart=/home/ar/.dotfiles/public/scripts/hosts/deimos/undervolt-deimos
+
+[Install]
+WantedBy=default.target
