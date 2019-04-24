@@ -7,6 +7,7 @@ import pika
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--content-encoding', default=None)
     parser.add_argument('--content-type', default=None)
     parser.add_argument('--exchange', required=True)
     parser.add_argument('--routing-key', required=True)
@@ -23,6 +24,7 @@ def main():
             routing_key=args.routing_key,
             body=content,
             properties=pika.BasicProperties(
+                content_encoding=args.content_encoding,
                 content_type=args.content_type,
                 type=args.type
             )
