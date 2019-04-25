@@ -59,6 +59,7 @@ if [[ $osname == Darwin* ]]; then
         ripgrep \
         stern \
         tmux \
+        tmux-xpanes \
         zsh
 fi
 
@@ -93,6 +94,7 @@ if [[ $osname == Linux* ]]; then
             rsync \
             sshfs \
             tmux \
+            tmux-xpanes \
             yay
     fi
 
