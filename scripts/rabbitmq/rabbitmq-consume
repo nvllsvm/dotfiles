@@ -53,7 +53,7 @@ def main():
         )
     )
     channel = connection.channel()
-    channel.basic_consume(on_message, args.queue, consumer_tag=args.tag)
+    channel.basic_consume(args.queue, on_message, consumer_tag=args.tag)
     try:
         channel.start_consuming()
     except KeyboardInterrupt:
