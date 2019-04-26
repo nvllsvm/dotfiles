@@ -131,7 +131,13 @@ path=(~/.bin ~/.local/bin "$path[@]")
 full-update add 'if [ -d ~/.bin ]; then; find ~/.bin -xtype l -delete; fi'
 full-update add 'if [ -d ~/.local/bin ]; then; find ~/.local/bin -xtype l -delete; fi'
 
-full-update add 'rm -f ~/.zcompdump && zsh -ic "echo -n"'
+zsh_reload_comp() {
+    rm -f ~/.zcompdump
+    zsh -ic "echo -n"
+    exec zsh
+}
+
+full-update add 'zsh_reload_comp'
 full-update add 'exec zsh'
 
 zreset() {
