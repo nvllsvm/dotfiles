@@ -27,7 +27,6 @@ update_config() {
     curl -sSf "$CONFIG_URL" -o "$target"
     7z x "$target" "-o$NORDVPN_BASE" > /dev/null
     rm "$target"
-    grep -r -L SHA512 "$NORDVPN_BASE" | xargs rm
 }
 
 RANDOM_CONFIG=''
@@ -72,10 +71,10 @@ else
     config_file="$(grep -lr " $recommended_ip " $NORDVPN_DIR)"
 fi
 
-echo using $config_file
+echo "using $config_file"
 sudo openvpn \
-    --config $config_file \
+    --config "$config_file" \
     --script-security 2 \
-    --auth-user-pass $DOTFILES_PRIVATE/nordvpn/auth \
-    --up $EXTRA_SCRIPT \
-    --down $EXTRA_SCRIPT
+    --auth-user-pass "$DOTFILES_PRIVATE/nordvpn/auth" \
+    --up "$EXTRA_SCRIPT" \
+    --down "$EXTRA_SCRIPT"
