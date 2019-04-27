@@ -69,6 +69,10 @@ if [ -n "$RANDOM_CONFIG" ]; then
 else
     recommended_ip=$(curl -s "$RECOMMENDED_URL" | jq -r '.[0].station')
     config_file="$(grep -lr " $recommended_ip " $NORDVPN_DIR)"
+    if ! [ -e "$config_file" ]; then
+        echo error: recommend config not cached. Run --update >&2
+        exit 1
+    fi
 fi
 
 echo "using $config_file"
