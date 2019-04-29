@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-exec /usr/bin/undervolt --core -120 --cache -120 --gpu -120
+exec /usr/bin/undervolt --core -20 --cache -20 --gpu -20
