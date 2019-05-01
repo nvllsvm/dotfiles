@@ -1,2 +1,0 @@
-#!/usr/bin/env sh
-exec /usr/bin/undervolt --core -50 --cache -50 --gpu -50
