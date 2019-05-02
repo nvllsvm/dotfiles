@@ -31,7 +31,7 @@ def main():
         sys.stderr.write('error: built-in module\n')
         sys.exit(1)
 
-    if args.directory is not None:
+    if args.directory:
         print(os.path.dirname(path))
     else:
         print(path)
