@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
 import argparse
-import pathlib
 import sys
 import zlib
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-d', '--decompress', action='store_true')
-parser.add_argument('file', nargs='?', type=pathlib.Path)
+parser.add_argument(
+    'file', nargs='?', type=argparse.FileType('rb'), default=sys.stdin.buffer
+)
 args = parser.parse_args()
 
-if args.file:
-    data = args.file.read_bytes()
-else:
-    data = sys.stdin.buffer.read()
+data = args.file.read()
 
 if args.decompress:
     result = zlib.decompress(data)
