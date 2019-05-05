@@ -88,7 +88,6 @@ if [[ $osname == Linux* ]]; then
             neovim \
             openssh \
             p7zip \
-            pandoc \
             pkgfile \
             python \
             reflector \
