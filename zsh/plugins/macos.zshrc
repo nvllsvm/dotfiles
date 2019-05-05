@@ -1,6 +1,7 @@
 if [[ $OSTYPE == darwin* ]]; then
     export LC_ALL=en_US.UTF-8
     export LANG=en_US.UTF-8
+    export HOMEBREW_NO_ANALYTICS=1
 
     for pkg in {'coreutils','diffutils','findutils','gnu-sed','grep'}; do
         path=(/usr/local/opt/"${pkg}"/libexec/gnubin "$path[@]")
