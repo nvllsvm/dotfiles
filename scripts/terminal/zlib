@@ -3,14 +3,50 @@ import argparse
 import sys
 import zlib
 
-parser = argparse.ArgumentParser()
-parser.add_argument('-d', '--decompress', action='store_true')
-parser.add_argument(
-    'file', nargs='?', type=argparse.FileType('rb'), default=sys.stdin.buffer
-)
-args = parser.parse_args()
 
-data = args.file.read()
-sys.stdout.buffer.write(
-    zlib.decompress(data) if args.decompress else zlib.compress(data)
-)
+def _iterfile(handle):
+    while True:
+        data = handle.read(zlib.DEF_BUF_SIZE)
+        if data:
+            yield data
+        else:
+            break
+
+
+def _zlib_decompress(data):
+    decompressor = zlib.decompressobj()
+    for chunk in data:
+        yield decompressor.decompress(chunk)
+    remaining = decompressor.flush()
+    if remaining:
+        yield remaining
+
+
+def _zlib_compress(data):
+    compressor = zlib.compressobj()
+    for chunk in data:
+        yield compressor.compress(chunk)
+    remaining = compressor.flush()
+    if remaining:
+        yield remaining
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-d', '--decompress', action='store_true')
+    parser.add_argument(
+        'file', nargs='?', type=argparse.FileType('rb'),
+        default=sys.stdin.buffer
+    )
+    args = parser.parse_args()
+
+    if args.decompress:
+        for chunk in _zlib_decompress(_iterfile(args.file)):
+            sys.stdout.buffer.write(chunk)
+    else:
+        for chunk in _zlib_compress(_iterfile(args.file)):
+            sys.stdout.buffer.write(chunk)
+
+
+if __name__ == '__main__':
+    main()
