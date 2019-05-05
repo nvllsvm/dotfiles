@@ -231,11 +231,13 @@ WOL_DISABLE=Y
 # A value of 0 disables, >=1 enables power saving (recommended: 1).
 # Default: <none>
 SOUND_POWER_SAVE_ON_AC=0
-SOUND_POWER_SAVE_ON_BAT=1
+# enabling results in audible noise cycling on gpd win 2
+SOUND_POWER_SAVE_ON_BAT=0
 
 # Disable controller too (HDA only): Y/N.
 # Note: effective only when SOUND_POWER_SAVE_ON_AC/BAT is activated.
 # Default: Y
+# enabling results in audible noise cycling on gpd win 2
 SOUND_POWER_SAVE_CONTROLLER=N
 
 # Power off optical drive in UltraBay/MediaBay: 0=disable, 1=enable.
