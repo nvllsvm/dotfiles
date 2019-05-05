@@ -11,10 +11,6 @@ parser.add_argument(
 args = parser.parse_args()
 
 data = args.file.read()
-
-if args.decompress:
-    result = zlib.decompress(data)
-else:
-    result = zlib.compress(data)
-
-sys.stdout.buffer.write(result)
+sys.stdout.buffer.write(
+    zlib.decompress(data) if args.decompress else zlib.compress(data)
+)
