@@ -72,7 +72,7 @@ command FixEmpty :set expandtab | :retab | call StripTrailingWhitespace() | :%s/
 call plug#begin('~/.config/nvim/plugged')
 Plug 'Shougo/deoplete.nvim'
 Plug 'gregsexton/MatchTag'
-Plug 'deoplete-plugins/deoplete-jedi'
+Plug 'deoplete-plugins/deoplete-jedi', { 'do': ':UpdateRemotePlugins' }
 Plug 'Vimjas/vim-python-pep8-indent'
 Plug 'neomake/neomake'
 Plug 'chriskempson/base16-vim'

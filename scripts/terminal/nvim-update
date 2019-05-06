@@ -15,10 +15,10 @@ if [ ! -f ~/.config/nvim/autoload/plug.vim ]; then
 fi
 
 log Updating pipns environment ...
-pipns install neovim > /dev/null 2>&1
-pipns -n neovim update > /dev/null 2>&1
+pipns install pynvim > /dev/null 2>&1
+pipns -n pynvim update > /dev/null 2>&1
 mkdir -p ~/.config/nvim/plugged
-ln -sf "$(pipns -n neovim --venv)/bin/python" ~/.config/nvim/plugged/python
+ln -sf "$(pipns -n pynvim --venv)/bin/python" ~/.config/nvim/plugged/python
 
 log Updating plugins ...
-nvim -c 'PlugUpgrade | PlugUpdate | PlugClean | silent UpdateRemotePlugins' -c 'qa'
+nvim -c 'PlugUpgrade | PlugUpdate | PlugClean' -c 'qa'
