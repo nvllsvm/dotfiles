@@ -28,5 +28,3 @@ else
     fi
     dunstify --replace=10002 Volume $ARGS
 fi
-
-pkill -RTMIN+1 i3blocks

@@ -1,0 +1,23 @@
+general {
+    colors = true
+    interval = 5
+    separator = "  |  "
+    output_format = "None"
+}
+
+order += "battery all"
+order += "volume master"
+order += "tztime local"
+
+volume master {
+    device = "pulse"
+}
+
+battery all {
+    format = "%status %percentage"
+    integer_battery_capacity = true
+}
+
+tztime local {
+    format = "%Y-%m-%d %H:%M"
+}
