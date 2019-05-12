@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+exec qrencode -t ANSIUTF8 "$@"
