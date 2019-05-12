@@ -88,6 +88,7 @@ Plug 'pedrohdz/vim-yaml-folds'
 Plug 'junegunn/fzf'
 Plug 'dhruvasagar/vim-table-mode'
 
+Plug 'rust-lang/rust.vim'
 
 Plug 'francoiscabrol/ranger.vim'
 Plug 'rbgrouleff/bclose.vim'
