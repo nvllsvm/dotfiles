@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+"""Show Python module filesystem paths"""
 import argparse
 import os
 import pkgutil
@@ -6,7 +7,7 @@ import sys
 
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('module')
     parser.add_argument(
         '-d',

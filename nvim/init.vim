@@ -1,6 +1,8 @@
 let g:python3_host_prog=glob('~/.config/nvim/plugged/python')
 
 let g:deoplete#sources#jedi#python_path=system("python")
+let g:deoplete#sources#jedi#ignore_errors=1
+let g:deoplete#sources#jedi#show_docstring=1
 
 if !empty($PYTHONPATH)
     let g:deoplete#sources#jedi#extra_path=[$PYTHONPATH]
@@ -32,6 +34,8 @@ set nowrap
 
 set cursorline
 nmap <C-c> :set cursorcolumn!<CR>
+
+set hidden
 
 function StripTrailingWhitespace()
   if !&binary && &filetype != 'diff'
@@ -82,17 +86,15 @@ Plug 'udalov/kotlin-vim'
 
 Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
-
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }}
+
 Plug 'pedrohdz/vim-yaml-folds'
 Plug 'junegunn/fzf'
 Plug 'dhruvasagar/vim-table-mode'
 
 Plug 'rust-lang/rust.vim'
 
-Plug 'francoiscabrol/ranger.vim'
 Plug 'rbgrouleff/bclose.vim'
-
 call plug#end()
 
 let g:jedi#completions_enabled = 0
@@ -166,29 +168,21 @@ au FileType python nnoremap <leader>y :0,$!yapf<Cr><C-o>
 
 let g:markdown_enable_spell_checking = 0
 
-" Status Line {
-        set laststatus=2                             " always show statusbar
-        set statusline=
-        set statusline+=%-4.3n\                     " buffer number
-        set statusline+=%f\                          " filename
-        set statusline+=%h%m%r%w                     " status flags
-        set statusline+=%=                           " right align remainder
-        set statusline+=%-14(%l,%c%V%)               " line, character
-        set statusline+=%<%P                         " file position
-"}
-
 nnoremap <leader>z :FZF<Cr>
 
-nnoremap <leader>l :ls<Cr>
+nnoremap <leader>f :Ex<Cr>
+
 nnoremap <leader>n :bn<Cr>
 nnoremap <leader>p :bp<Cr>
 nnoremap <leader>d :bd<Cr>
+nnoremap <leader>l :buffers<CR>:buffer<Space>
 
+let g:netrw_banner = 0
 let g:netrw_dirhistmax = 0
+let g:netrw_list_hide = '^.git/$,.pyc$,^../,^./'
+let g:netrw_bufsettings="noma nomod nu nobl nowrap ro rnu"
 
 autocmd VimResized * wincmd =
-
-let g:ranger_replace_netrw = 1
 
 augroup XML
     autocmd!
