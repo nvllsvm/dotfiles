@@ -18,7 +18,8 @@ log Updating pipns environment ...
 pipns -n pynvim install pynvim > /dev/null 2>&1
 pipns -n pynvim update > /dev/null 2>&1
 mkdir -p ~/.config/nvim/plugged
-ln -sf "$(pipns -n pynvim --venv)/bin/python" ~/.config/nvim/plugged/python
+venv="$(pipns -n pynvim --venv)"
+ln -sf "${venv}/bin/python" ~/.config/nvim/plugged/python
 
 log Updating plugins ...
 nvim -c 'PlugUpgrade | PlugUpdate | PlugClean' -c 'qa'
