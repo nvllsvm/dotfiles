@@ -77,7 +77,6 @@ if [[ $osname == Linux* ]]; then
             dash \
             direnv \
             docker \
-            docker-compose \
             fd \
             fuse2 \
             fzf \
@@ -132,7 +131,7 @@ zsh_command 'PIP_REQUIRE_VIRTUALENV=0 pip install pipns'
 
 # python on android doesn't support link and breaks ranger
 # https://github.com/termux/termux-packages/blob/master/packages/ranger/ranger-core-actions.py.patch
-for name in flake8 httpie speedtest-cli; do
+for name in docker-compose flake8 httpie speedtest-cli; do
     zsh_command "pipns -n "$name" install "$name""
 done
 
