@@ -106,6 +106,7 @@ if [[ $osname == Linux* ]]; then
         yes | pkg install \
             clang \
             curl \
+            dnsutils \
             fd \
             findutils \
             fzf \
@@ -115,6 +116,7 @@ if [[ $osname == Linux* ]]; then
             python-dev \
             ranger \
             ripgrep \
+            termux-api \
             tmux
     fi
 fi
