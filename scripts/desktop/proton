@@ -33,4 +33,4 @@ if [ $# -eq 0 ]; then
 fi
 
 echo Using "$PROTON_VERSION"
-"$PROTON_BASE"/proton run "$@"
+exec "$PROTON_BASE"/proton run "$@"
