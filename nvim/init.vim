@@ -184,6 +184,10 @@ let g:netrw_bufsettings="noma nomod nu nobl nowrap ro rnu"
 
 autocmd VimResized * wincmd =
 
+augroup MARKDOWN
+    autocmd FileType markdown nnoremap <leader>m :MarkdownPreview<Cr>
+augroup END
+
 augroup XML
     autocmd!
     autocmd FileType xml let g:xml_syntax_folding=1
