@@ -1,2 +1,2 @@
 #compdef lmk
-_arguments : {-a,--all} {-w,--wait} --help '*::command arguments:_normal'
+_arguments : {-a,--all} {-q,--quiet} {-w,--wait} --help '*::command arguments:_normal'

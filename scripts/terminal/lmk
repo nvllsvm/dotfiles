@@ -26,6 +26,7 @@ show_help() {
     cat << EOF
 usage: lmk [-a] [-w] [--help] [COMMAND [ARGUMENT ...]]
     -a, --all       Listen for all lmk events
+    -q, --quiet     Suppress the exit status line
     -w, --wait      Wait for first event before executing
         --help      Display this help and exit
 EOF
@@ -36,6 +37,10 @@ while true; do
     case "$1" in
         -a|--all)
             LMK_ANY=1
+            shift
+            ;;
+        -q|--quiet)
+            LMK_SHOW_EXIT_STATUS=
             shift
             ;;
         -w|--wait)
@@ -76,7 +81,9 @@ exec_command() {
         # printf '%b%%%b\n' "$REVERSE_COLOR" "$RESET_COLOR"
         printf '\n'
     fi
-    printf '%bExit %s - %s%b' "$color" "$ret" "$(date -u +"%Y-%m-%d %H:%M:%S")" "$RESET_COLOR"
+    if [ -n "$LMK_SHOW_EXIT_STATUS" ]; then
+        printf '%bExit %s - %s%b' "$color" "$ret" "$(date -u +"%Y-%m-%d %H:%M:%S")" "$RESET_COLOR"
+    fi
 }
 
 
