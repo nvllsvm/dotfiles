@@ -77,10 +77,12 @@ call plug#begin('~/.config/nvim/plugged')
 Plug 'Shougo/deoplete.nvim'
 Plug 'gregsexton/MatchTag'
 Plug 'deoplete-plugins/deoplete-jedi', { 'do': ':UpdateRemotePlugins' }
-Plug 'Vimjas/vim-python-pep8-indent'
 Plug 'neomake/neomake'
 Plug 'chriskempson/base16-vim'
 Plug 'dbeniamine/todo.txt-vim'
+
+Plug 'Vimjas/vim-python-pep8-indent'
+Plug 'davidhalter/jedi-vim'
 
 Plug 'udalov/kotlin-vim'
 
@@ -174,7 +176,7 @@ nnoremap <leader>f :Ex<Cr>
 
 nnoremap <leader>n :bn<Cr>
 nnoremap <leader>p :bp<Cr>
-nnoremap <leader>d :bd<Cr>
+nnoremap <leader>D :bd<Cr>
 nnoremap <leader>l :buffers<CR>:buffer<Space>
 
 let g:netrw_banner = 0
@@ -195,3 +197,6 @@ augroup XML
     autocmd FileType xml :syntax on
     autocmd FileType xml :%foldopen!
 augroup END
+
+let g:jedi#completions_enabled = 0
+let g:jedi#use_splits_not_buffers = "bottom"
