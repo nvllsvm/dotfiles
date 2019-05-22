@@ -165,9 +165,6 @@ au FileType json set tabstop=2
 
 au BufNewFile,BufRead *.avsc set filetype=json
 
-au FileType python set foldmethod=indent
-au FileType python nnoremap <leader>y :0,$!yapf<Cr><C-o>
-
 let g:markdown_enable_spell_checking = 0
 
 nnoremap <leader>z :FZF<Cr>
@@ -198,5 +195,10 @@ augroup XML
     autocmd FileType xml :%foldopen!
 augroup END
 
-let g:jedi#completions_enabled = 0
-let g:jedi#use_splits_not_buffers = "bottom"
+augroup PYTHON
+    au FileType python set foldmethod=indent
+    au FileType python nnoremap <leader>y :0,$!yapf<Cr><C-o>
+    let g:jedi#completions_enabled = 0
+    let g:jedi#use_splits_not_buffers = "bottom"
+    let g:jedi#usages_command = "<leader>N"
+augroup END
