@@ -135,9 +135,11 @@ zsh_command 'PIP_REQUIRE_VIRTUALENV=0 pip install pipns'
 
 # python on android doesn't support link and breaks ranger
 # https://github.com/termux/termux-packages/blob/master/packages/ranger/ranger-core-actions.py.patch
-for name in docker-compose flake8 httpie speedtest-cli; do
+for name in docker-compose httpie speedtest-cli; do
     zsh_command "pipns -n "$name" install "$name""
 done
+
+zsh_command "pipns -n flake8 install flake8 flake8-import-order flake8-quotes flake8-comprehensions"
 
 if ! command -v termux-info > /dev/null; then
     zsh_command 'pipns -n ranger-fm install ranger-fm'
