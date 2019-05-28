@@ -1,2 +1,13 @@
 #!/usr/bin/env sh
-exec /usr/local/bin/zsh -ic 'exec mpdkeys'
+log() {
+    printf '%s %s\n' "$(date)" "$1"
+}
+
+while true; do
+    log 'Starting mpdkys'
+    /usr/local/bin/zsh -ic 'exec mpdkeys'
+    ret=$?
+    log "mpdkys Exit Code $ret"
+    sleep 1
+done
+

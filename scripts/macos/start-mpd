@@ -1,2 +1,12 @@
 #!/usr/bin/env sh
-exec /usr/local/bin/mpd --no-daemon ~/.config/mpd/mpd.conf
+log() {
+    printf '%s %s\n' "$(date)" "$1"
+}
+
+while true; do
+    log 'Starting MPD'
+    /usr/local/bin/mpd --no-daemon ~/.config/mpd/mpd.conf
+    ret=$?
+    log "MPD Exit Code $ret"
+    sleep 1
+done
