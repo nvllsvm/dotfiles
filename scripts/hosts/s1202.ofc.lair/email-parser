@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+import argparse
+import collections
+import email
+import json
+import pathlib
+
+
+def _argparse_path_not_exists(path):
+    path = pathlib.Path(path)
+    if path.is_file():
+        raise argparse.ArgumentTypeError('path must not be a file')
+    return path
+
+
+def main():
+    parser = argparse.ArgumentParser('raw email decoder')
+    parser.add_argument(
+        'file', type=argparse.FileType('r'), help='raw email content'
+    )
+    parser.add_argument(
+        'dir', type=_argparse_path_not_exists,
+        help='directory to output to. created if it does not exist.'
+    )
+    args = parser.parse_args()
+
+    args.dir.mkdir(parents=True, exist_ok=True)
+    message = email.message_from_file(args.file)
+
+    args.dir.joinpath('headers.json').write_text(
+        json.dumps(dict(message.items()))
+    )
+
+    ct_counts = collections.defaultdict(int)
+    for part in message.walk():
+        ct = part.get_content_type().replace('/', '_')
+        target = args.dir.joinpath(f'{ct}_{ct_counts[ct]}')
+        ct_counts[ct] += 1
+        target.write_bytes(part.as_bytes())
+
+
+if __name__ == '__main__':
+    main()
