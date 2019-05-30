@@ -1,25 +1,23 @@
 #!/usr/bin/env python3
 import argparse
-import pathlib
 import sys
 
+import pyaml
 import yaml
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('file', type=pathlib.Path)
-    parser.add_argument('-r', dest='replace', action='store_true')
+    parser.add_argument('file', nargs='?', type=argparse.FileType('r'))
     args = parser.parse_args()
 
-    data = yaml.safe_load(args.file.read_text())
-    formatted = yaml.dump(
-        data, default_flow_style=False, default_style=False, indent=4
-    )
-    if args.replace:
-        args.file.write_text(formatted)
+    if args.file:
+        content = args.file.read()
     else:
-        sys.stdout.write(formatted)
+        content = sys.stdin.read()
+    data = yaml.safe_load(content)
+    formatted = pyaml.dump(data, vspacing=[1, 0])
+    sys.stdout.write(formatted)
 
 
 if __name__ == '__main__':

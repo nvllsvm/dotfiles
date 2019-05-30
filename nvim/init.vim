@@ -160,6 +160,14 @@ endfunction
 
 command JSON call _JSONify()
 
+function _YAMLify()
+    set syntax=yaml
+    %!yaml-format
+    normal zR
+endfunction
+
+command YAML call _YAMLify()
+
 au FileType json set shiftwidth=2
 au FileType json set tabstop=2
 
