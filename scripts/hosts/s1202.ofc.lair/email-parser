@@ -25,18 +25,21 @@ def parse_headers(message: email.message.Message) -> dict:
 
 
 def main():
-    parser = argparse.ArgumentParser('raw email decoder')
-    parser.add_argument(
-        'file', type=argparse.FileType('r'), help='raw email content'
+    parser = argparse.ArgumentParser(
+        'email-parser',
+        description='Parse a raw email into separate, decoded files'
     )
     parser.add_argument(
-        'dir', type=_argparse_path_not_exists,
+        'email', type=argparse.FileType('r'), help='raw email content'
+    )
+    parser.add_argument(
+        'output', type=_argparse_path_not_exists,
         help='directory to output to. created if it does not exist.'
     )
     args = parser.parse_args()
 
-    message = email.message_from_file(args.file)
-    output_dir = args.dir
+    message = email.message_from_file(args.email)
+    output_dir = args.output
 
     output_dir.mkdir(parents=True, exist_ok=True)
 
