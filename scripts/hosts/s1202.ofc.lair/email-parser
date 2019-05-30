@@ -27,8 +27,25 @@ def main():
     args.dir.mkdir(parents=True, exist_ok=True)
     message = email.message_from_file(args.file)
 
+    headers = {
+        key[0]: message.get_all(key[0])
+        for key in message.items()
+    }
+
+    headers = {}
+    for key, _ in message.items():
+        value = message.get_all(key)
+        if len(value) == 1:
+            value = value[0]
+        headers[key] = value
+
     args.dir.joinpath('headers.json').write_text(
-        json.dumps(dict(message.items()))
+        json.dumps(
+            headers,
+            sort_keys=True,
+            indent=2,
+            ensure_ascii=False
+        )
     )
 
     ct_counts = collections.defaultdict(int)
@@ -36,7 +53,10 @@ def main():
         ct = part.get_content_type().replace('/', '_')
         target = args.dir.joinpath(f'{ct}_{ct_counts[ct]}')
         ct_counts[ct] += 1
-        target.write_bytes(part.as_bytes())
+        if not part.is_multipart():
+            target.write_bytes(
+                part.get_payload(decode=True)
+            )
 
 
 if __name__ == '__main__':
