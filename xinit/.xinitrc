@@ -14,8 +14,6 @@ setxkbmap -option caps:escape
 
 xset -dpms; xset s off
 
-i3-config-build
-
 compton &
 /usr/lib/gsd-xsettings &
 xbindkeys &
