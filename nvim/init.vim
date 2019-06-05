@@ -97,6 +97,8 @@ Plug 'dhruvasagar/vim-table-mode'
 Plug 'rust-lang/rust.vim'
 
 Plug 'rbgrouleff/bclose.vim'
+
+Plug 'chrisbra/csv.vim'
 call plug#end()
 
 let g:jedi#completions_enabled = 0
@@ -211,3 +213,8 @@ augroup PYTHON
     let g:jedi#use_splits_not_buffers = "bottom"
     let g:jedi#usages_command = "<leader>N"
 augroup END
+
+aug CSV_Editing
+    let g:csv_autocmd_arrange = 1
+    au InsertLeave *.csv :%ArrangeColumn!
+aug end
