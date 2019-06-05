@@ -217,4 +217,5 @@ augroup END
 aug CSV_Editing
     let g:csv_autocmd_arrange = 1
     au InsertLeave *.csv :%ArrangeColumn!
+    let b:csv_arrange_align = 'lr*'
 aug end
