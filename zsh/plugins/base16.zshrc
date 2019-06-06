@@ -1,26 +1,11 @@
 BASE16_SHELL=$HOME/.local/git/base16-shell/
 
 if [ -d "$BASE16_SHELL" ]; then
-    if [[ -z $SSH_TTY ]] && [[ -z $TMUX ]]; then
-        if [ -f ~/.base16_theme ]; then
-          . ~/.base16_theme
-        fi
-    fi
+    export BASE16_SHELL_HOOKS=~/hooks
 
-    for script in $BASE16_SHELL/scripts/base16*.sh; do
-      script_name=${script##*/}
-      script_name=${script_name%.sh}
-      theme=${script_name#*-}
-      alias "base16_${theme}"="_base16 $script"
-    done;
-
-    _base16 () {
-        ln -fs $1 ~/.base16_theme
+    if [ -z $SSH_TTY ] && [ -z $TMUX ] && [ -f ~/.base16_theme ]; then
         . ~/.base16_theme
-        if [[ "$OSTYPE" != "darwin"* ]] && ! command -v termux-info > /dev/null; then
-            load-xresources-theme
-        fi
-    }
+    fi
 
     path=("$DOTFILES"/scripts/base16 "$path[@]")
 
