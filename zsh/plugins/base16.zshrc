@@ -1,4 +1,4 @@
-BASE16_SHELL=$HOME/.local/git/base16-shell/
+export BASE16_SHELL="$HOME/.local/git/base16-shell/"
 
 if [ -d "$BASE16_SHELL" ]; then
     export BASE16_SHELL_HOOKS="$DOTFILES/base16_shell_hooks"
