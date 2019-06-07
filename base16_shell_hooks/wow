@@ -1,2 +1,0 @@
-#!/usr/bin/env sh
-echo $BASE16_THEME > ~/fuck
