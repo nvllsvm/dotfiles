@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+set -e
+FILE="$1"
+
+tracks() {
+    mkvinfo-json --type subtitle "$FILE" | jq -r '.[] | select(.language |  IN(null, "und", "eng")) | .number | tostring | . + ":subtitle_" + .'
+}
+
+mkvextract "$FILE" tracks $(tracks)
+
