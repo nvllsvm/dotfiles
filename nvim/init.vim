@@ -218,5 +218,5 @@ aug CSV_Editing
     let g:csv_autocmd_arrange = 1
     au InsertLeave *.csv :%ArrangeColumn!
     let b:csv_arrange_align = 'l*'
-    set list& listchars&
+    aut FileType csv set list& listchars&
 aug end
