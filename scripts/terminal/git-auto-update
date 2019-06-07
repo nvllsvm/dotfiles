@@ -19,7 +19,7 @@ fi
 
 if [ "$(git status --porcelain | wc -l)" -gt 0 ]; then
     git add -A
-    git commit -m "git-auto-update $(date -Is)"
+    git commit -m "git-auto-update $(TZ=UTC date -Is)"
 fi
 
 branch=$(git rev-parse --abbrev-ref HEAD)
