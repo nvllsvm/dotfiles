@@ -39,6 +39,7 @@ if [[ $osname == Linux* ]]; then
 
     if command -v pacman 2> /dev/null; then
         yay -S --noconfirm \
+            adwaita-qt \
             arandr \
             argyllcms \
             blueberry \
