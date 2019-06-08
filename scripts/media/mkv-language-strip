@@ -39,36 +39,27 @@ class MKVFile:
         return self._matching_tracks(self.metadata.subtitle_tracks, languages)
 
     def _matching_tracks(self, metadata_tracks, languages):
-        tracks = []
-        for track in metadata_tracks:
-            if track.language in languages:
-                tracks.append(track.number - 1)
-        return tracks
+        return [
+            track
+            for track in metadata_tracks
+            if track.language in languages
+        ]
 
     @staticmethod
-    def track_string(track_type, track_list):
+    def excluded_track_string(track_type, tracks):
         track_command = []
-        if track_list:
-            track_command += ['--' + track_type + '-tracks']
-            invalid_tracks = "!"
-
-            first_track = True
-            for track in track_list:
-                if first_track:
-                    first_track = False
-                else:
-                    invalid_tracks += ','
-
-                invalid_tracks += str(track)
-            track_command += [invalid_tracks]
-
+        if tracks:
+            track_command += [
+                f'--{track_type}-tracks',
+                '!' + ','.join(str(track.number - 1) for track in tracks)
+            ]
         return track_command
 
     def build_mkvmerge_command(self, target, audio=[], subtitle=[]):
         return [
             'mkvmerge', '-o', target,
-            *self.track_string('audio', audio),
-            *self.track_string('subtitle', subtitle),
+            *self.excluded_track_string('audio', audio),
+            *self.excluded_track_string('subtitle', subtitle),
             self.path
         ]
 
