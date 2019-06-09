@@ -1,0 +1,61 @@
+#!/usr/bin/env python3
+import argparse
+import pathlib
+import os
+
+import enzyme
+
+
+DEFAULT_LANGUAGES = {'eng', 'und', None}
+
+
+class MKVFile:
+    def __init__(self, path):
+        self.path = path
+        with self.path.open('rb') as handle:
+            self.metadata = enzyme.MKV(handle)
+
+    def subtitle_tracks(self, languages=None):
+        return self._language_tracks(self.metadata.subtitle_tracks, languages)
+
+    def audio_tracks(self, languages=None):
+        return self._language_tracks(self.metadata.audio, languages)
+
+    def _language_tracks(self, tracks, languages=None):
+        if languages is not None:
+            tracks = [
+                track
+                for track in tracks
+                if track.language in languages
+            ]
+        return tracks
+
+
+def mkvmerge_tracks(path, include=None):
+    args = ['mkvextract', path, 'tracks']
+    if include:
+        args += [
+            f'{track.number - 1}:{path}.track_{track.number - 1}'
+            for track in include
+        ]
+    os.execvp('mkvextract', args)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('path', type=pathlib.Path)
+    parser.add_argument('--subtitle', action='store_true')
+    args = parser.parse_args()
+
+    metadata = MKVFile(args.path)
+
+    include = []
+    if args.subtitle:
+        include += metadata.subtitle_tracks(DEFAULT_LANGUAGES)
+
+    mkvmerge_tracks(args.path, include)
+
+
+if __name__ == '__main__':
+    main()
