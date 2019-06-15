@@ -2,5 +2,5 @@
 Description=Run git-repo-backup
 
 [Service]
-ExecStart=/usr/bin/env git-host-backup
+ExecStart=/home/ar/.dotfiles/private/scripts/hosts/sol/git-host-backup
 SyslogIdentifier=git-repo-backup
