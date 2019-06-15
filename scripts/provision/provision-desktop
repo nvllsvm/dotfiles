@@ -35,7 +35,7 @@ if [[ $osname == Linux* ]]; then
     link_file rofi ~/.config/rofi
     link_file xbindkeys/.xbindkeysrc ~/.xbindkeysrc
     link_file xinit/.xinitrc ~/.xinitrc
-    link_file zsh/.zprofile ~/.zprofile
+    link_file zsh/.zlogin ~/.zlogin
 
     if command -v pacman 2> /dev/null; then
         yay -S --noconfirm \
@@ -43,12 +43,11 @@ if [[ $osname == Linux* ]]; then
             arandr \
             argyllcms \
             blueberry \
-            calibre \
             compton \
             dunst \
             firefox \
+            foliate \
             gnome-settings-daemon \
-            gnome-themes-extra \
             gnome-themes-extra \
             hsetroot \
             i3-wm \
@@ -70,7 +69,6 @@ if [[ $osname == Linux* ]]; then
             noto-fonts-extra \
             pamixer \
             pavucontrol \
-            rambox-bin \
             rofi \
             syncthing \
             syncthing-gtk \
@@ -85,8 +83,7 @@ if [[ $osname == Linux* ]]; then
             xorg-xinit \
             xorg-xinput \
             xorg-xprop \
-            xss-lock \
-            yacreader-nopdf
+            xss-lock
     fi
 
     systemctl --user enable syncthing
