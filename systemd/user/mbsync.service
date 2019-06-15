@@ -1,0 +1,6 @@
+[Unit]
+Description=Run mbsync
+
+[Service]
+ExecStart=/usr/bin/env mbsync -a
+SyslogIdentifier=mbsync
