@@ -1,9 +1,39 @@
 #!/usr/bin/env zsh
 set -e
-if [ -z "$1" ]; then
-    . ~/.setxdpi
+
+show_help() {
+    cat << EOF
+usage: set-desktop-themes [--help] [--dpi DPI] [--large]
+
+    --dpi DPI   scale theme to this DPI
+    --help      show help and exit
+    --large     use large fonts
+EOF
+}
+
+while true; do
+    case "$1" in
+        --dpi)
+            DPI="$2"
+            shift
+            shift
+            ;;
+        --large)
+            LARGE=1
+            shift
+            ;;
+        --help)
+            show_help
+            exit
+            ;;
+        *)
+            break
+    esac
+done
+
+if [ -z "$DPI" ]; then
+    . ~/.setdesktoptheme
 else
-    DPI=${1#0}
     if [[ $DPI -le 138 ]]; then
         CURSOR_SIZE=16
 
@@ -34,7 +64,7 @@ else
         SCALING_FACTOR=2
     fi
 
-    if [[ $2 == 'large' ]]; then
+    if [[ -n "$LARGE" ]]; then
         FONT_NAME='DejaVu Sans Mono'
         FONT_SIZE=14
 
