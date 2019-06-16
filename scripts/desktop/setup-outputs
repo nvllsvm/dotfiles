@@ -50,10 +50,10 @@ mars() {
     fi
 
     DESKTOP_SINK='alsa_output.usb-Schiit_Audio_USB_Modi_Device-00.iec958-stereo'
-    TV_SINK="$(pactl list sinks short | awk '{print $2}' | grep alsa_output.pci-0000_01_00.1.hdmi-surround)"
+    TV_SINK="$(pactl list sinks short | awk '{print $2}' | grep alsa_output.pci-0000_01_00.1.hdmi)"
 
     if [ "$MODE" = "single" ]; then
-        paswitch "$DESKTOP_SINK" || true
+        paswitch "$DESKTOP_SINK"
         xrandr \
             --output DP-0 --off \
             --output DP-1 --off \
@@ -67,7 +67,7 @@ mars() {
         set-x-dpi 96
         apply-display-calibration --reset
     elif [ "$MODE" = "tv" ]; then
-        paswitch "$TV_SINK" || true
+        paswitch "$TV_SINK"
         xrandr \
             --output DP-0 --off \
             --output DP-1 --off \
@@ -81,7 +81,7 @@ mars() {
         set-x-dpi 192
         apply-display-calibration --reset
     elif [ "$MODE" = "tv-half" ]; then
-        paswitch "$TV_SINK" || true
+        paswitch "$TV_SINK"
         xrandr \
             --output DP-0 --off \
             --output DP-1 --off \
