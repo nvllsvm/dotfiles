@@ -1,43 +1,59 @@
 #!/usr/bin/env zsh
-DPI="${1:-$(get-x-dpi)}"
-DPI=${DPI#0}
-
-if [[ $DPI -le 138 ]]; then
-    CURSOR_SIZE=16
-
-    FONT_NAME=Tamzen
-    FONT_SIZE=9
-
-    ANTIALIAS=false
-
-    BORDER_WIDTH=1
-
-    DUNST_GEOMETRY=300x5-0+18
-    DUNST_MAX_ICON_SIZE=64
-
-    SCALING_FACTOR=1
+set -e
+if [ -z "$1" ]; then
+    . ~/.setxdpi
 else
-    CURSOR_SIZE=48
+    DPI=${1#0}
+    if [[ $DPI -le 138 ]]; then
+        CURSOR_SIZE=16
 
-    FONT_NAME='DejaVu Sans Mono'
-    FONT_SIZE=10
+        FONT_NAME=Tamzen
+        FONT_SIZE=9
 
-    ANTIALIAS=true
+        ANTIALIAS=false
 
-    BORDER_WIDTH=3
+        BORDER_WIDTH=1
 
-    DUNST_GEOMETRY=800x5-0+40
-    DUNST_MAX_ICON_SIZE=128
+        DUNST_GEOMETRY=300x5-0+18
+        DUNST_MAX_ICON_SIZE=64
 
-    SCALING_FACTOR=2
+        SCALING_FACTOR=1
+    else
+        CURSOR_SIZE=48
+
+        FONT_NAME='DejaVu Sans Mono'
+        FONT_SIZE=10
+
+        ANTIALIAS=true
+
+        BORDER_WIDTH=3
+
+        DUNST_GEOMETRY=800x5-0+40
+        DUNST_MAX_ICON_SIZE=128
+
+        SCALING_FACTOR=2
+    fi
+
+    if [[ $2 == 'large' ]]; then
+        FONT_NAME='DejaVu Sans Mono'
+        FONT_SIZE=14
+
+        ANTIALIAS=true
+    fi
 fi
 
-if [[ $2 == 'large' ]]; then
-    FONT_NAME='DejaVu Sans Mono'
-    FONT_SIZE=14
-
-    ANTIALIAS=true
-fi
+# save settings
+cat > ~/.setxdpi << EOF
+ANTIALIAS="$ANTIALIAS"
+BORDER_WIDTH="$BORDER_WIDTH"
+CURSOR_SIZE="$CURSOR_SIZE"
+DPI="$DPI"
+DUNST_GEOMETRY="$DUNST_GEOMETRY"
+DUNST_MAX_ICON_SIZE="$DUNST_MAX_ICON_SIZE"
+FONT_NAME="$FONT_NAME"
+FONT_SIZE="$FONT_SIZE"
+SCALING_FACTOR="$SCALING_FACTOR"
+EOF
 
 # changing org.gnome.desktop.interface cursor-size after xrdb steps
 # fucks up i3's scaling...
