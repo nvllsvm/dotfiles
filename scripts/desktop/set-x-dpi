@@ -78,4 +78,5 @@ dunst \
     -max_icon_size "$DUNST_MAX_ICON_SIZE" \
     -geometry "$DUNST_GEOMETRY" &
 
-i3 reload > /dev/null
+# need to restart to ensure cursor size on status bar is updated
+i3 restart &> /dev/null || true
