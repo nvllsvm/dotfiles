@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 MODIFIED_CONFIG=~/.config/termite/config
 
 mkdir -p ~/.config/termite

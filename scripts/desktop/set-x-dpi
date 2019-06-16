@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/usr/bin/env zsh
 DPI="${1:-$(get-x-dpi)}"
 DPI=${DPI#0}
 

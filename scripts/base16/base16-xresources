@@ -32,7 +32,7 @@ ATTRIBUTE_MAP = {
 }
 
 
-def current_base16_theme_colors(path):
+def base16_xresources(path):
     attributes = {}
     for line in path.read_text().split('\n'):
         line = line.strip()
@@ -53,16 +53,16 @@ def current_base16_theme_colors(path):
 
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser('base16-xresources')
     parser.add_argument(
-        '--current',
+        '--theme',
         metavar='FILE',
         type=pathlib.Path,
         default=pathlib.Path('~/.base16_theme').expanduser(),
         help='(default: ~/.base16_theme)'
     )
     args = parser.parse_args()
-    attributes = current_base16_theme_colors(args.current)
+    attributes = base16_xresources(args.theme)
     print(
         '\n'.join(
             f'*{ATTRIBUTE_MAP[attribute]} : #{color}'
