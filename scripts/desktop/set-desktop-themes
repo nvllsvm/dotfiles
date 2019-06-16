@@ -1,6 +1,8 @@
 #!/usr/bin/env zsh
 set -e
 
+CURRENT_THEME=~/.setdesktoptheme
+
 show_help() {
     cat << EOF
 usage: set-desktop-themes [--help] [--dpi DPI] [--large]
@@ -32,7 +34,7 @@ while true; do
 done
 
 if [ -z "$DPI" ]; then
-    . ~/.setdesktoptheme
+    . "$CURRENT_THEME"
 else
     if [[ $DPI -le 138 ]]; then
         CURSOR_SIZE=16
@@ -73,7 +75,7 @@ else
 fi
 
 # save settings
-cat > ~/.setxdpi << EOF
+cat > "$CURRENT_THEME" << EOF
 ANTIALIAS="$ANTIALIAS"
 BORDER_WIDTH="$BORDER_WIDTH"
 CURSOR_SIZE="$CURSOR_SIZE"

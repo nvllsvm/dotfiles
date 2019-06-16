@@ -1,4 +1,0 @@
-#!/usr/bin/env zsh
-if command -v set-x-dpi &> /dev/null; then
-    exec set-x-dpi
-fi
