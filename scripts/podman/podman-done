@@ -1,0 +1,54 @@
+#!/usr/bin/env sh
+YELLOW='\033[1;33m'
+RESET_COLOR='\033[0m'
+
+show_help() {
+    cat << EOF
+usage: podman-done [--help] [--system]
+
+remove all containers, networks, and volumes
+
+    --help          show help and exit
+    --system        also prune images and build cache
+EOF
+}
+
+
+PRUNE_SYSTEM=''
+while true; do
+    case "$1" in
+        --help)
+            show_help
+            exit
+            ;;
+        --system)
+            PRUNE_SYSTEM=1
+            shift
+            ;;
+        *)
+            if [ $# -ne 0 ]; then
+                show_help >&2
+                echo error: unexpected arguments >&2
+                exit 1
+            fi
+            break
+    esac
+done
+
+log() {
+    printf "%b%s%b\n" "${YELLOW}" "$@" "${RESET_COLOR}"
+}
+
+log "Removing all containers ..."
+all_containers=$(podman ps -aq)
+if [ -n "$all_containers" ]; then
+    podman rm -f $all_containers
+fi
+
+log "Pruning volumes ..."
+podman volume prune -f
+
+if [ -n "$PRUNE_SYSTEM" ]; then
+    log "Pruning images and build cache ..."
+    podman system prune -f
+fi
