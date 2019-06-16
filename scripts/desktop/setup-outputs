@@ -44,19 +44,16 @@ phobos() {
 }
 
 
-exclusive_pactl_profile() {
-    for card in $(pactl list cards short | awk '{print $2}' | grep -v "^$1$"); do
-        pactl set-card-profile "$card" off || true
-    done
-    pactl set-card-profile "$1" "$2" || true
-}
 mars() {
     if [ -z "$MODE" ]; then
         MODE=single
     fi
 
+    DESKTOP_SINK='alsa_output.usb-Schiit_Audio_USB_Modi_Device-00.iec958-stereo'
+    TV_SINK='alsa_output.pci-0000_01_00.1.hdmi-stereo-extra2'
+
     if [ "$MODE" = "single" ]; then
-        exclusive_pactl_profile alsa_card.usb-Schiit_Audio_USB_Modi_Device-00 output:iec958-stereo
+        paswitch "$DESKTOP_SINK" || true
         xrandr \
             --output DP-0 --off \
             --output DP-1 --off \
@@ -70,7 +67,7 @@ mars() {
         set-x-dpi 96
         apply-display-calibration --reset
     elif [ "$MODE" = "tv" ]; then
-        exclusive_pactl_profile alsa_card.pci-0000_01_00.1 output:hdmi-surround-extra1
+        paswitch "$TV_SINK" || true
         xrandr \
             --output DP-0 --off \
             --output DP-1 --off \
@@ -84,7 +81,7 @@ mars() {
         set-x-dpi 192
         apply-display-calibration --reset
     elif [ "$MODE" = "tv-half" ]; then
-        exclusive_pactl_profile alsa_card.pci-0000_01_00.1 output:hdmi-surround-extra1
+        paswitch "$TV_SINK" || true
         xrandr \
             --output DP-0 --off \
             --output DP-1 --off \
