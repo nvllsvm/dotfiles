@@ -2,5 +2,5 @@
 Description=Run mbsync
 
 [Service]
-ExecStart=/usr/bin/env mbsync -a
+ExecStart=mbsync -a
 SyslogIdentifier=mbsync

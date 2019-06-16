@@ -2,5 +2,5 @@
 Description=Run gog-update
 
 [Service]
-ExecStart=/home/ar/.dotfiles/public/scripts/hosts/sol/gog-update
+ExecStart=zsh -ic gog-update
 SyslogIdentifier=gog-update
