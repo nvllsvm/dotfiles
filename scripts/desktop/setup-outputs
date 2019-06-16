@@ -78,7 +78,7 @@ mars() {
             --output DVI-I-0 --off \
             --output DVI-I-1 --off \
             --output HDMI-0 --primary --mode 3840x2160 --pos 0x0 --rotate normal
-        set-x-dpi 192
+        set-x-dpi 192 large
         apply-display-calibration --reset
     elif [ "$MODE" = "tv-half" ]; then
         paswitch "$TV_SINK"
