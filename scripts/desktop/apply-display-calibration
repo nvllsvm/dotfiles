@@ -41,16 +41,6 @@ done
 clear_existing_calibration
 
 case "$HOSTNAME" in
-    "mars")
-        dispwin -h |& grep Output | \
-        awk '{print $1}' | \
-        xargs -I % -n 1 dispwin -c -d% $DOTFILES/icc/dell_u2412m_custom.icc
-        ;;
-    "deimos")
-        dispwin -h |& grep Output | \
-        awk '{print $1}' | \
-        xargs -I % -n 1 dispwin -c -d% $DOTFILES/icc/dell_u2412m_custom.icc
-        ;;
     "phobos")
         dispwin -d1 $DOTFILES/icc/xps13_phobos.icc
         ;;

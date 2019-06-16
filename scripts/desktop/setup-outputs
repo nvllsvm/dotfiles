@@ -44,16 +44,19 @@ phobos() {
 }
 
 
+exclusive_pactl_profile() {
+    for card in $(pactl list cards short | awk '{print $2}' | grep -v "^$1$"); do
+        pactl set-card-profile "$card" off || true
+    done
+    pactl set-card-profile "$1" "$2" || true
+}
 mars() {
     if [ -z "$MODE" ]; then
-        if [ "$(xrandr | grep -e '^DP-2 ' -e '^DP-4 ' | grep ' connected' | wc -l)" = '2' ]; then
-            MODE=multi
-        else
-            MODE=single
-        fi
+        MODE=single
     fi
 
     if [ "$MODE" = "single" ]; then
+        exclusive_pactl_profile alsa_card.usb-Schiit_Audio_USB_Modi_Device-00 output:iec958-stereo
         xrandr \
             --output DP-0 --off \
             --output DP-1 --off \
@@ -65,8 +68,9 @@ mars() {
             --output HDMI-0 --off \
             --output DP-4 --primary --mode 3440x1440 --refresh 144 --pos 0x0 --rotate normal
         set-x-dpi 96
-        apply-display-calibration
+        apply-display-calibration --reset
     elif [ "$MODE" = "tv" ]; then
+        exclusive_pactl_profile alsa_card.pci-0000_01_00.1 output:hdmi-surround-extra1
         xrandr \
             --output DP-0 --off \
             --output DP-1 --off \
@@ -78,8 +82,9 @@ mars() {
             --output DVI-I-1 --off \
             --output HDMI-0 --primary --mode 3840x2160 --pos 0x0 --rotate normal
         set-x-dpi 192
-        apply-display-calibration clear
+        apply-display-calibration --reset
     elif [ "$MODE" = "tv-half" ]; then
+        exclusive_pactl_profile alsa_card.pci-0000_01_00.1 output:hdmi-surround-extra1
         xrandr \
             --output DP-0 --off \
             --output DP-1 --off \
@@ -91,7 +96,7 @@ mars() {
             --output DVI-I-1 --off \
             --output HDMI-0 --primary --mode 1920x1080 --pos 0x0 --rotate normal
         set-x-dpi 96 large
-        apply-display-calibration clear
+        apply-display-calibration --reset
     else
         printf "Options:\n- single\n- multi"
         exit 1
@@ -122,7 +127,7 @@ deimos() {
             --output HDMI2 --off \
             --output eDP1 --off
         set-x-dpi 96
-        apply-display-calibration clear
+        apply-display-calibration --reset
     fi
 }
 
