@@ -68,6 +68,7 @@ if [[ $osname == Linux* ]]; then
             noto-fonts-emoji \
             noto-fonts-extra \
             pamixer \
+            paswitch \
             pavucontrol \
             rofi \
             syncthing \
