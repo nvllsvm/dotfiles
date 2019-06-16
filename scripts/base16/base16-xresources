@@ -61,10 +61,9 @@ def main():
         default=pathlib.Path('~/.base16_theme').expanduser(),
         help='(default: ~/.base16_theme)'
     )
-    parser.add_argument('tempfile', type=pathlib.Path)
     args = parser.parse_args()
     attributes = current_base16_theme_colors(args.current)
-    args.tempfile.write_text(
+    print(
         '\n'.join(
             f'*{ATTRIBUTE_MAP[attribute]} : #{color}'
             for attribute, color in attributes.items()

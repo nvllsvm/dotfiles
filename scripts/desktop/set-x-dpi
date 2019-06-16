@@ -1,7 +1,6 @@
 #!/bin/zsh
-DPI=${1#0}
-
-XRESOURCES_TEMP_FILE=/tmp/dpi_xresources
+DPI="${1:-$(get-x-dpi)}"
+DPI=${DPI#0}
 
 if [[ $DPI -le 138 ]]; then
     CURSOR_SIZE=16
@@ -40,7 +39,9 @@ if [[ $2 == 'large' ]]; then
     ANTIALIAS=true
 fi
 
-    cat > $XRESOURCES_TEMP_FILE <<- EOF
+# update xresources
+XRESOURCES_TEMP_FILE=/tmp/dpi_xresources
+cat > $XRESOURCES_TEMP_FILE <<- EOF
 *facename: ${FONT_NAME}
 *fontsize: ${FONT_SIZE}
 *font: xft:${FONT_NAME}:size=${FONT_SIZE}:antialias=${ANTIALIAS}:dpi=${DPI}
@@ -53,7 +54,10 @@ rofi.bw: ${BORDER_WIDTH}
 Xft.dpi: ${DPI}
 
 Xcursor.size: ${CURSOR_SIZE}
+$(base16-xresources)
 EOF
+xrdb $XRESOURCES_TEMP_FILE
+rm $XRESOURCES_TEMP_FILE
 
 xrandr --dpi $DPI
 
@@ -64,9 +68,8 @@ gsettings set org.gnome.desktop.interface scaling-factor $SCALING_FACTOR
 gsettings set org.gnome.settings-daemon.plugins.xsettings overrides \
     "{'Gdk/WindowScalingFactor': <$SCALING_FACTOR>, 'Gtk/CursorThemeSize': <$CURSOR_SIZE>}"
 
-xrdb $XRESOURCES_TEMP_FILE
-
-load-xresources-theme || true
+termite-config-reload
+hsetroot -solid $(xrdb -query | grep '*background' | awk '{print $2}')
 
 pkill -9 dunst || true
 dunst \
@@ -75,6 +78,4 @@ dunst \
     -max_icon_size "$DUNST_MAX_ICON_SIZE" \
     -geometry "$DUNST_GEOMETRY" &
 
-i3 restart
-
-rm $XRESOURCES_TEMP_FILE
+i3 reload > /dev/null

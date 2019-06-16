@@ -1,4 +1,4 @@
 #!/usr/bin/env zsh
-if [[ "$OSTYPE" != "darwin"* ]] && ! command -v termux-info > /dev/null; then
-    load-xresources-theme
+if command -v set-x-dpi &> /dev/null; then
+    exec set-x-dpi
 fi
