@@ -50,5 +50,10 @@ podman volume prune -f
 
 if [ -n "$PRUNE_SYSTEM" ]; then
     log "Pruning images and build cache ..."
-    podman system prune -f
+    podman system prune -f --all
+    all_images=$(podman image list -q)
+    log "Pruning images ..."
+    if [ -n "$all_images" ]; then
+        podman image rm -f $all_images
+    fi
 fi
