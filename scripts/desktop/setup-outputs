@@ -50,7 +50,7 @@ mars() {
     fi
 
     DESKTOP_SINK='alsa_output.usb-Schiit_Audio_USB_Modi_Device-00.iec958-stereo'
-    TV_SINK='alsa_output.pci-0000_01_00.1.hdmi-stereo-extra2'
+    TV_SINK="$(pactl list sinks short | awk '{print $2}' | grep alsa_output.pci-0000_01_00.1.hdmi-surround)"
 
     if [ "$MODE" = "single" ]; then
         paswitch "$DESKTOP_SINK" || true
