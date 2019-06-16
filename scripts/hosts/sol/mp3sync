@@ -5,13 +5,12 @@ IMAGE=nvllsvm/harmonize:dev
 SOURCE=/storage/Audio/Library
 TARGET=/storage/Audio/MP3
 
-export PODMAN_USERNS=
-
-podman pull -q "$IMAGE" > /dev/null
+docker pull "$IMAGE" > /dev/null
 
 harmonize() {
-    podman run \
+    docker run \
         --rm \
+        --user "$(id -u):$(id -g)" \
         -v "$SOURCE:$SOURCE" \
         -v "$TARGET:$TARGET" \
         "$IMAGE" "$@"
