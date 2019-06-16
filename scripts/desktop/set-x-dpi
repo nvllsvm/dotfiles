@@ -39,6 +39,13 @@ if [[ $2 == 'large' ]]; then
     ANTIALIAS=true
 fi
 
+# changing org.gnome.desktop.interface cursor-size after xrdb steps
+# fucks up i3's scaling...
+gsettings set org.gnome.desktop.interface cursor-size $CURSOR_SIZE
+gsettings set org.gnome.desktop.interface scaling-factor $SCALING_FACTOR
+gsettings set org.gnome.settings-daemon.plugins.xsettings overrides \
+    "{'Gdk/WindowScalingFactor': <$SCALING_FACTOR>, 'Gtk/CursorThemeSize': <$CURSOR_SIZE>}"
+
 # update xresources
 XRESOURCES_TEMP_FILE=/tmp/dpi_xresources
 cat > $XRESOURCES_TEMP_FILE <<- EOF
@@ -60,13 +67,6 @@ xrdb $XRESOURCES_TEMP_FILE
 rm $XRESOURCES_TEMP_FILE
 
 xrandr --dpi $DPI
-
-# changing org.gnome.desktop.interface cursor-size after xrdb steps
-# fucks up i3's scaling...
-gsettings set org.gnome.desktop.interface cursor-size $CURSOR_SIZE
-gsettings set org.gnome.desktop.interface scaling-factor $SCALING_FACTOR
-gsettings set org.gnome.settings-daemon.plugins.xsettings overrides \
-    "{'Gdk/WindowScalingFactor': <$SCALING_FACTOR>, 'Gtk/CursorThemeSize': <$CURSOR_SIZE>}"
 
 termite-config-reload
 hsetroot -solid $(xrdb -query | grep '*background' | awk '{print $2}')
