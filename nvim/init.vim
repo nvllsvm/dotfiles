@@ -92,6 +92,7 @@ Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }}
 
 Plug 'pedrohdz/vim-yaml-folds'
 Plug 'junegunn/fzf'
+Plug 'junegunn/fzf.vim'
 Plug 'dhruvasagar/vim-table-mode'
 
 Plug 'rust-lang/rust.vim'
