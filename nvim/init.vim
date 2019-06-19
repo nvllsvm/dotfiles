@@ -178,7 +178,7 @@ au BufNewFile,BufRead *.avsc set filetype=json
 
 let g:markdown_enable_spell_checking = 0
 
-nnoremap <leader>z :FZF<Cr>
+nnoremap <leader>z :Files<Cr>
 
 nnoremap <leader>f :Ex<Cr>
 
