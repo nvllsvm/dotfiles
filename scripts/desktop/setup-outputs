@@ -53,7 +53,7 @@ mars() {
     TV_SINK="$(pactl list sinks short | awk '{print $2}' | grep alsa_output.pci-0000_01_00.1.hdmi)"
 
     if [ "$MODE" = "single" ]; then
-        paswitch "$DESKTOP_SINK"
+        paswitch "$DESKTOP_SINK" || true
         xrandr \
             --output DP-0 --off \
             --output DP-1 --off \
@@ -67,7 +67,7 @@ mars() {
         set-desktop-themes --dpi 96
         apply-display-calibration --reset
     elif [ "$MODE" = "tv" ]; then
-        paswitch "$TV_SINK"
+        paswitch "$TV_SINK" || true
         xrandr \
             --output DP-0 --off \
             --output DP-1 --off \
@@ -81,7 +81,7 @@ mars() {
         set-desktop-themes --dpi 192 --large
         apply-display-calibration --reset
     elif [ "$MODE" = "tv-half" ]; then
-        paswitch "$TV_SINK"
+        paswitch "$TV_SINK" || true
         xrandr \
             --output DP-0 --off \
             --output DP-1 --off \
