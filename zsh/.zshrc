@@ -20,7 +20,7 @@ setopt share_history
 bindkey "^[[A" history-beginning-search-backward
 bindkey "^[[B" history-beginning-search-forward
 
-alias ls='ls --color=auto --group-directories-first'
+alias ls='ls -a --color=auto --group-directories-first'
 alias diff='diff --color=auto'
 
 setopt PROMPT_SUBST
