@@ -105,6 +105,7 @@ if [[ $osname == Linux* ]]; then
         yes | pkg upgrade
         yes | pkg install \
             clang \
+            coreutils \
             curl \
             direnv \
             dnsutils \
