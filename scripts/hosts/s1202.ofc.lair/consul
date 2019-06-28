@@ -1,7 +1,0 @@
-#!/usr/bin/env sh
-IMAGE=consul
-if [ "$1" = '--pull' ]; then
-    docker pull "$IMAGE"
-    exit
-fi
-exec docker-shell -v "$(pwd):$(pwd)" -w "$(pwd)" -e CONSUL_HTTP_ADDR "$IMAGE" consul "$@"
