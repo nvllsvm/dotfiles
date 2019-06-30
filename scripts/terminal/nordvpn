@@ -8,12 +8,14 @@ RECOMMENDED_URL='https://nordvpn.com/wp-admin/admin-ajax.php?action=servers_reco
 
 show_help() {
     cat << EOF
-usage: nordvpn [--help] [--random] [--update]
+usage: nordvpn [--help] [--random] [--server] [--update]
 
 connect to the recommended NordVPN server
 
     --help          show help and exit
+    --list          show available servers and exit
     --random        use a random server instead of the recommended
+    --server        connect to this server
     --tcp           use TCP (default UDP)
     --update        update OpenVPN config files and exit
 EOF
@@ -29,13 +31,27 @@ update_config() {
     rm "$target"
 }
 
+list_servers() {
+    cd "$NORDVPN_BASE/ovpn_$NORDVPN_PROTOCOL"
+    for f in *; do
+        f="${f%.*}"
+        echo "${f%.*}"
+    done
+}
+
+LIST_SERVERS=''
 RANDOM_CONFIG=''
+SERVER=''
 NORDVPN_PROTOCOL=udp
 while true; do
     case "$1" in
         --help)
             show_help
             exit
+            ;;
+        --list)
+            LIST_SERVERS=1
+            shift
             ;;
         --update)
             update_config
@@ -45,11 +61,20 @@ while true; do
             RANDOM_CONFIG=1
             shift
             ;;
+        --server)
+            SERVER="$2"
+            shift
+            shift
+            ;;
         --tcp)
             NORDVPN_PROTOCOL=tcp
             shift
             ;;
         *)
+            if [ -n "$SERVER" -a -n "$RANDOM_CONFIG" ]; then
+                echo error: cannot use --random and --server together >&2
+                exit 1
+            fi
             if [ $# -ne 0 ]; then
                 show_help >&2
                 exit 1
@@ -57,6 +82,11 @@ while true; do
             break
     esac
 done
+
+if [ -n "$LIST_SERVERS" ]; then
+    list_servers | sort
+    exit
+fi
 
 NORDVPN_DIR="$NORDVPN_BASE/ovpn_$NORDVPN_PROTOCOL"
 
@@ -66,6 +96,8 @@ fi
 
 if [ -n "$RANDOM_CONFIG" ]; then
     config_file="$NORDVPN_DIR/$(ls $NORDVPN_DIR | grep ^us | shuf | head -n 1)"
+elif [ -n "$SERVER" ]; then
+    config_file="$NORDVPN_DIR/$SERVER.$NORDVPN_PROTOCOL.ovpn"
 else
     recommended_ip=$(curl -s "$RECOMMENDED_URL" | jq -r '.[0].station')
     config_file="$(grep -lr " $recommended_ip " $NORDVPN_DIR)"
