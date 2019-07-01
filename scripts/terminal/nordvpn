@@ -34,8 +34,7 @@ update_config() {
 list_servers() {
     cd "$NORDVPN_BASE/ovpn_$NORDVPN_PROTOCOL"
     for f in *; do
-        f="${f%.*}"
-        echo "${f%.*}"
+        echo "${f%%.*}"
     done
 }
 
@@ -97,7 +96,7 @@ fi
 if [ -n "$RANDOM_CONFIG" ]; then
     config_file="$NORDVPN_DIR/$(ls $NORDVPN_DIR | grep ^us | shuf | head -n 1)"
 elif [ -n "$SERVER" ]; then
-    config_file="$NORDVPN_DIR/$SERVER.$NORDVPN_PROTOCOL.ovpn"
+    config_file="$NORDVPN_DIR/$SERVER.nordvpn.com.$NORDVPN_PROTOCOL.ovpn"
 else
     recommended_ip=$(curl -s "$RECOMMENDED_URL" | jq -r '.[0].station')
     config_file="$(grep -lr " $recommended_ip " $NORDVPN_DIR)"
