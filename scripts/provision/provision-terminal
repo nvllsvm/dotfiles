@@ -41,13 +41,17 @@ if [[ $osname == Darwin* ]]; then
         coreutils \
         curl \
         dash \
+        diffutils \
         direnv \
         docker-completion \
         docker-compose-completion \
         fd \
         findutils \
         fzf \
+        gawk \
         git \
+        gnu-sed \
+        gnu-tar \
         grep \
         htop \
         jq \

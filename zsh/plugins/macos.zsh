@@ -3,9 +3,9 @@ if [[ $OSTYPE == darwin* ]]; then
     export LANG=en_US.UTF-8
     export HOMEBREW_NO_ANALYTICS=1
 
-    for pkg in {'coreutils','diffutils','findutils','gnu-sed','grep'}; do
+    for pkg in coreutils diffutils findutils gawk gnu-sed gnu-tar grep; do
         path=(/usr/local/opt/"${pkg}"/libexec/gnubin "$path[@]")
-        manpath+=(/usr/local/opt/"${pkg}"/libexec/gnuman)
+        manpath=(/usr/local/opt/"${pkg}"/libexec/gnuman "$manpath[@]")
     done
 
     path=(/usr/local/sbin "$path[@]")
