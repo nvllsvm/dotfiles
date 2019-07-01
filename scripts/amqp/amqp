@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+import argparse
+import sys
+
+import pika
+
+
+def _consume(args):
+    parser = argparse.ArgumentParser()
+    args = parser.parse_args()
+
+    def on_message(channel, method_frame, header_frame, body):
+        sys.stdout.buffer.write(body)
+        if args.ack:
+            channel.basic_ack(delivery_tag=method_frame.delivery_tag)
+        else:
+            channel.basic_nack(delivery_tag=method_frame.delivery_tag)
+        raise KeyboardInterrupt
+
+    connection = pika.BlockingConnection(pika.URLParameters(args.url))
+    channel = connection.channel()
+    channel.basic_consume(args.queue, on_message, consumer_tag=args.tag)
+    try:
+        channel.start_consuming()
+    except KeyboardInterrupt:
+        channel.stop_consuming()
+    connection.close()
+
+
+def _publish(args):
+    content = sys.stdin.buffer.read()
+
+    with pika.BlockingConnection(pika.URLParameters(args.url)) as connection:
+        channel = connection.channel()
+        channel.basic_publish(
+            exchange=args.exchange,
+            routing_key=args.routing_key,
+            body=content,
+            properties=pika.BasicProperties(
+                content_encoding=args.content_encoding,
+                content_type=args.content_type,
+                type=args.type
+            )
+        )
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(dest='command', required=True)
+
+    parser_publish = subparsers.add_parser('publish')
+    parser_publish.set_defaults(func=_publish)
+    parser_publish.add_argument('--content-encoding', default=None)
+    parser_publish.add_argument('--content-type', default=None)
+    parser_publish.add_argument('--exchange', required=True)
+    parser_publish.add_argument('--routing-key', required=True)
+    parser_publish.add_argument('--type', default=None)
+    parser_publish.add_argument('--url', required=True, help='AMQP URL')
+
+    parser_consume = subparsers.add_parser('consume')
+    parser_consume.set_defaults(func=_consume)
+    parser_consume.add_argument('--url', required=True, help='AMQP URL')
+    parser_consume.add_argument('--ack', action='store_true', default=False)
+    parser_consume.add_argument('--tag')
+    parser_consume.add_argument('queue')
+
+    args = parser.parse_args()
+    args.func(args)
+
+
+if __name__ == '__main__':
+    main()

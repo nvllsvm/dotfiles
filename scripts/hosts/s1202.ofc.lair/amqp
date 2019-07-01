@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+bin="$DOTFILES/scripts/amqp/amqp"
+exec pipns -n pika run "$bin" "$@"
