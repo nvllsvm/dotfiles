@@ -134,12 +134,12 @@ ln -sf "$(which dash)" "$HOME/.local/bin/sh"
 
 zsh_command '$DOTFILES/scripts/python/pyenv-update'
 if [[ $osname == Darwin* ]]; then
-    zsh_command 'pyenv global 3.7.1'
+    zsh_command 'pyenv global 3.7.3'
 fi
 zsh_command '$DOTFILES/scripts/python/pip-update'
 zsh_command 'PIP_REQUIRE_VIRTUALENV=0 pip install pipns'
 
-for name in flake8 httpie speedtest-cli; do
+for name in flake8 speedtest-cli; do
     zsh_command "pipns -n "$name" install "$name""
 done
 
