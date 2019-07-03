@@ -5,8 +5,6 @@ autoload -U colors && colors
 autoload -U compinit
 autoload -U add-zsh-hook
 
-setopt completealiases
-
 HISTSIZE=1000
 SAVEHIST=1000
 HISTFILE=~/.zhistory
@@ -32,7 +30,7 @@ vi_mode_color=$default_mode_color
 prompt_user='%F{green}%n%f'
 prompt_separator='%F{black}.%f'
 prompt_current_dir='%F{cyan}%~%f'
-if ! [ -z $SSH_TTY ] && [ -z $TMUX ]; then
+if [ -n "$SSH_TTY" ] && [ -z "$TMUX" ]; then
     prompt_host='%F{$vi_mode_color}%m%f '
 else
     prompt_host=''
@@ -70,6 +68,8 @@ set_cursor_key_to_cursor () {
 
 
 exit_status () {
+    # when the previous command exits with a code != 0,
+    # show it on a new line
     exit_status=$?
     if [[ $exit_status -gt 0 ]]; then
         echo -e "${fg[red]}${exit_status}${reset_color}"
@@ -86,13 +86,6 @@ up() {
         fi
     done
 }
-
-envfile() {
-    set -a; . "$@"; set +a
-}
-
-autoload -Uz bracketed-paste-magic
-zle -N bracketed-paste bracketed-paste-magic
 
 full-update() {
     if [[ $1 == "add" ]]; then
@@ -122,15 +115,12 @@ zshrc_host="$DOTFILES/zsh/hosts/$HOST/.zshrc"
 unset zshrc_host
 
 for plugin in $DOTFILES/zsh/plugins/*; do
-    . $plugin
+    . "$plugin"
 done
 
-path=(~/.bin ~/.local/bin "$path[@]")
+path=(~/.local/bin "$path[@]")
 
 compinit -C
-
-full-update add 'if [ -d ~/.bin ]; then; find ~/.bin -xtype l -delete; fi'
-full-update add 'if [ -d ~/.local/bin ]; then; find ~/.local/bin -xtype l -delete; fi'
 
 zsh_reload_comp() {
     rm -f ~/.zcompdump
@@ -140,21 +130,3 @@ zsh_reload_comp() {
 
 full-update add 'zsh_reload_comp'
 full-update add 'exec zsh'
-
-zreset() {
-    reset
-    exec zsh
-}
-
-temp-context() {
-    (
-        # resolve symlink to be consistent when opening a tmux pane (etc)
-        # in the same directory
-        CONTEXT_DIR="$(readlink -f "$(mktemp -d)")";
-
-        cleanup() { rm -rf "$CONTEXT_DIR" };
-        trap cleanup EXIT;
-        cd "$CONTEXT_DIR"
-        zsh
-    )
-}
