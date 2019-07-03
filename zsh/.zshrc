@@ -91,9 +91,6 @@ envfile() {
     set -a; . "$@"; set +a
 }
 
-fpath=($DOTFILES/zsh/functions $fpath)
-compinit -C
-
 autoload -Uz bracketed-paste-magic
 zle -N bracketed-paste bracketed-paste-magic
 
@@ -118,15 +115,19 @@ exec-update() {
     fi
 }
 
-for plugin in $DOTFILES/zsh/plugins/*; do
-    . $plugin
-done
+fpath=("$DOTFILES/zsh/functions" "$fpath[@]")
 
 zshrc_host="$DOTFILES/zsh/hosts/$HOST/.zshrc"
 [[ -r "$zshrc_host" ]] && . "$zshrc_host"
 unset zshrc_host
 
+for plugin in $DOTFILES/zsh/plugins/*; do
+    . $plugin
+done
+
 path=(~/.bin ~/.local/bin "$path[@]")
+
+compinit -C
 
 full-update add 'if [ -d ~/.bin ]; then; find ~/.bin -xtype l -delete; fi'
 full-update add 'if [ -d ~/.local/bin ]; then; find ~/.local/bin -xtype l -delete; fi'
