@@ -110,9 +110,14 @@ exec-update() {
 
 fpath=("$DOTFILES/zsh/functions" "$fpath[@]")
 
-zshrc_host="$DOTFILES/zsh/hosts/$HOST/.zshrc"
-[[ -r "$zshrc_host" ]] && . "$zshrc_host"
-unset zshrc_host
+host_dir="$DOTFILES/zsh/hosts/$HOST"
+if [ -r "$host_dir/.zshrc" ]; then
+    . "$host_dir/.zshrc"
+fi
+if [ -d "$host_dir/functions" ]; then
+    fpath=("$host_dir/functions" "$fpath[@]")
+fi
+unset host_dir
 
 for plugin in $DOTFILES/zsh/plugins/*; do
     . "$plugin"
