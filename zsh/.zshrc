@@ -96,15 +96,9 @@ full-update() {
         fi
     else
         for command in "${update_commands[@]}"; do
-            exec-update $command
+            echo -e "\033[1;33mNow running $command \033[0m..."
+            eval "$command"
         done
-    fi
-}
-
-exec-update() {
-    if [ ! -z $@ ]; then
-        echo -e "\033[1;33mNow running $@ \033[0m..."
-        eval "$@"
     fi
 }
 
