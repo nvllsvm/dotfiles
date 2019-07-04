@@ -1,0 +1,3 @@
+#compdef adb
+## default adb completion is too slow for completing files
+_files
