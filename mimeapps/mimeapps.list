@@ -6,6 +6,7 @@ application/x-extension-shtml=firefox.desktop
 application/x-extension-xht=firefox.desktop
 application/x-extension-xhtml=firefox.desktop
 application/xhtml+xml=firefox.desktop
+audio/mpeg=mpv.desktop
 image/jpeg=nomacs.desktop
 image/png=nomacs.desktop
 text/html=firefox.desktop
