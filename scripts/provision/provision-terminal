@@ -23,11 +23,10 @@ zsh_command() {
 mkdir -p ~/.config
 
 link_file git/.gitignore ~/.gitignore
+link_file lf ~/.config/lf
 link_file nvim ~/.config/nvim
-link_file ranger ~/.config/ranger
 link_file psql/.psqlrc ~/.psqlrc
 link_file tmux/.tmux.conf ~/.tmux.conf
-link_file lf ~/.config/lf
 link_file zsh/.zshenv ~/.zshenv
 link_file zsh/.zshrc ~/.zshrc
 
@@ -37,7 +36,7 @@ link_file zsh/.zshrc ~/.zshrc
 osname=$(uname)
 if [[ $osname == Darwin* ]]; then
     link_file pip ~/Library/Application\ Support/pip
-    zsh_command '$DOTFILES/scripts/macos/brew-update'
+    zsh_command '$DOTFILES/scripts/commands/brew/brew-update'
     brew install \
         coreutils \
         curl \
@@ -75,7 +74,7 @@ if [[ $osname == Linux* ]]; then
 
     if command -v pacman > /dev/null; then
         link_file pacman ~/.config/pacman
-        yay -S --noconfirm \
+        yay -Syu --needed --noconfirm \
             aria2 \
             aspell-en \
             bind-tools \
@@ -99,6 +98,7 @@ if [[ $osname == Linux* ]]; then
             ripgrep \
             rsync \
             sshfs \
+            sshuttle \
             tmux \
             tmux-xpanes
     fi
@@ -132,25 +132,15 @@ fi
 mkdir -p ~/.local/bin
 ln -sf "$(which dash)" "$HOME/.local/bin/sh"
 
-zsh_command '$DOTFILES/scripts/python/pyenv-update'
+zsh_command '$DOTFILES/scripts/commands/pyenv/pyenv-update'
 if [[ $osname == Darwin* ]]; then
     zsh_command 'pyenv global 3.7.3'
 fi
-zsh_command '$DOTFILES/scripts/python/pip-update'
-zsh_command 'PIP_REQUIRE_VIRTUALENV=0 pip install pipns'
+zsh_command '$DOTFILES/scripts/commands/pip/pip-update'
+zsh_command '$DOTFILES/scripts/commands/pipns/pipns-update'
 
 for name in flake8 speedtest-cli; do
     zsh_command "pipns -n "$name" install "$name""
 done
-
-# python on android doesn't support link and breaks ranger
-# https://github.com/termux/termux-packages/blob/master/packages/ranger/ranger-core-actions.py.patch
-if ! command -v termux-info > /dev/null; then
-    zsh_command 'pipns -n ranger-fm install ranger-fm'
-fi
-
-if command -v docker > /dev/null; then
-    zsh_command 'pipns -n ranger-fm install docker-compose'
-fi
 
 zsh_command nvim-update
