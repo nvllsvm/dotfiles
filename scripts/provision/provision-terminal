@@ -89,6 +89,7 @@ if [[ $osname == Linux* ]]; then
             htop \
             intel-ucode \
             jq \
+            moreutils \
             neovim \
             openssh \
             p7zip \
@@ -99,8 +100,7 @@ if [[ $osname == Linux* ]]; then
             rsync \
             sshfs \
             tmux \
-            tmux-xpanes \
-            yay
+            tmux-xpanes
     fi
 
     if command -v termux-info > /dev/null; then
