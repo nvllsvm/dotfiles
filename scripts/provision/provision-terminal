@@ -88,6 +88,7 @@ if [[ $osname == Linux* ]]; then
             htop \
             intel-ucode \
             jq \
+            lf \
             moreutils \
             neovim \
             openssh \
