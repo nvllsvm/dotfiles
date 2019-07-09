@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+set -e
+cd /storage/Backup/nullsum_youtube
+youtube-dl 'https://www.youtube.com/user/Draje0'
