@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 if [ "$XDG_CURRENT_DESKTOP" = 'i3' ]; then
-    export XDG_CURRENT_DESKTOP='gnome'
+    export XDG_CURRENT_DESKTOP='GNOME'
 fi
 bin="$(which -a "$(basename "$0")" | grep -v "^$0$" | head -n 1)"
 exec "${bin}" "$@"
