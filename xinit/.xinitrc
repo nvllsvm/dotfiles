@@ -28,4 +28,5 @@ syncthing-gtk &
 
 setup-outputs
 
+export XDG_CURRENT_DESKTOP=i3
 exec i3
