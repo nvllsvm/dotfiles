@@ -1,7 +1,0 @@
-#!/usr/bin/env sh
-IMAGE='postgres:alpine'
-if [ "$1" = '--pull' ]; then
-    docker pull "$IMAGE"
-    exit
-fi
-exec shtty "$IMAGE" psql "$@"
