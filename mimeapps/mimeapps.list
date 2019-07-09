@@ -1,5 +1,5 @@
 [Default Applications]
-application/epub=com.github.johnfactotum.Foliate.desktop
+application/epub+zip=com.github.johnfactotum.Foliate.desktop
 application/pdf=org.gnome.Evince.desktop
 application/x-extension-htm=firefox.desktop
 application/x-extension-html=firefox.desktop

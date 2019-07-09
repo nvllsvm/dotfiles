@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+export XDG_CURRENT_DESKTOP="${XDG_CURRENT_DESKTOP:=GNOME}"
+bin="$(which -a xdg-mime | grep -v "^$0$" | head -n 1)"
+exec "${bin}" "$@"
