@@ -1,11 +1,13 @@
 [Default Applications]
-application/pdf=okularApplication_pdf.desktop
+application/epub=com.github.johnfactotum.Foliate.desktop
+application/pdf=org.gnome.Evince.desktop
 application/x-extension-htm=firefox.desktop
 application/x-extension-html=firefox.desktop
 application/x-extension-shtml=firefox.desktop
 application/x-extension-xht=firefox.desktop
 application/x-extension-xhtml=firefox.desktop
 application/xhtml+xml=firefox.desktop
+audio/flac=mpv.desktop
 audio/mpeg=mpv.desktop
 image/jpeg=nomacs.desktop
 image/png=nomacs.desktop
