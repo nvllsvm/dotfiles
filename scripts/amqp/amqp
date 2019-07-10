@@ -6,9 +6,6 @@ import pika
 
 
 def _consume(args):
-    parser = argparse.ArgumentParser()
-    args = parser.parse_args()
-
     def on_message(channel, method_frame, header_frame, body):
         sys.stdout.buffer.write(body)
         if args.ack:
@@ -17,14 +14,13 @@ def _consume(args):
             channel.basic_nack(delivery_tag=method_frame.delivery_tag)
         raise KeyboardInterrupt
 
-    connection = pika.BlockingConnection(pika.URLParameters(args.url))
-    channel = connection.channel()
-    channel.basic_consume(args.queue, on_message, consumer_tag=args.tag)
-    try:
-        channel.start_consuming()
-    except KeyboardInterrupt:
-        channel.stop_consuming()
-    connection.close()
+    with pika.BlockingConnection(pika.URLParameters(args.url)) as connection:
+        channel = connection.channel()
+        channel.basic_consume(args.queue, on_message, consumer_tag=args.tag)
+        try:
+            channel.start_consuming()
+        except KeyboardInterrupt:
+            channel.stop_consuming()
 
 
 def _publish(args):
