@@ -4,20 +4,25 @@ set -e
 NOTES_DIR="${NOTES_DIR:-$HOME/Notes}"
 cd "${NOTES_DIR}"
 
-if [ "$1" = '-d' ]; then
-    abspath="$(pwd)/$2"
-    if [ -e "$abspath" ]; then
-        echo "$abspath"
-        exit
-    else
-        echo error: path "$abspath" not found >&2
-        exit 1
-    fi
-fi
-
-if [ -n "$1" ]; then
-    mkdir -p "$(dirname "$1")"
-    exec "${EDITOR}" "$1"
-else
-    exec "${EDITOR}" misc.md
-fi
+while true; do
+    case "$1" in
+        -d)
+            abspath="$(pwd)/$2"
+            if [ -e "$abspath" ]; then
+                echo "$abspath"
+                exit
+            else
+                echo error: path "$abspath" not found >&2
+                exit 1
+            fi
+            ;;
+        *)
+            if [ -n "$1" ]; then
+                mkdir -p "$(dirname "$1")"
+                exec "${EDITOR}" "$1"
+            else
+                exec "${EDITOR}" misc.md
+            fi
+            break
+    esac
+done

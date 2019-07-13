@@ -9,32 +9,36 @@ if [ "$(ls "${NOTES_DIR}" | grep '^todo.*.txt' | wc -l)" -gt 1 ] ; then
     exit 1
 fi
 
-if [ "$1" = '-l' ]; then
-   TOKENIZED=$(sed 's/ /\n/g' "${TODO_FILE}" | sort -u)
-   echo "${TOKENIZED}" | grep '^@'
-   echo
-   echo "${TOKENIZED}" | grep '^+'
-   exit
-fi
-
-if [ "$1" = '-d' ]; then
-    shift
-    DUE="due:$(date -I)"
-    data="$(grep "$DUE" "${TODO_FILE}" | sed "s/$DUE//g" | sort)"
-    if [ -t 1 ]; then
-        color_opt=always
-    else
-        color_opt=never
-    fi
-    for filter in "$@"; do
-        data="$(echo "$data" | grep --color="$color_opt" -i "$filter")"
-    done
-    echo "$data"
-    exit
-fi
-
-if [ -z "$1" ]; then
-    "${EDITOR}" "${TODO_FILE}"
-else
-    echo "$(date -I)" "$@" >> "${TODO_FILE}"
-fi
+while true; do
+    case "$1" in
+        -l)
+            TOKENIZED=$(sed 's/ /\n/g' "${TODO_FILE}" | sort -u)
+            echo "${TOKENIZED}" | grep '^@'
+            echo
+            echo "${TOKENIZED}" | grep '^+'
+            exit
+            ;;
+        -d)
+            shift
+            DUE="due:$(date -I)"
+            data="$(grep "$DUE" "${TODO_FILE}" | sed "s/$DUE//g" | sort)"
+            if [ -t 1 ]; then
+                color_opt=always
+            else
+                color_opt=never
+            fi
+            for filter in "$@"; do
+                data="$(echo "$data" | grep --color="$color_opt" -i "$filter")"
+            done
+            echo "$data"
+            exit
+            ;;
+        *)
+            if [ -n "$1" ]; then
+                echo "$(date -I)" "$@" >> "${TODO_FILE}"
+            else
+                exec "${EDITOR}" "${TODO_FILE}"
+            fi
+            break
+    esac
+done
