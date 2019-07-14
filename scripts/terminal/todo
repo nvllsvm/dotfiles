@@ -9,28 +9,14 @@ if [ "$(ls "${NOTES_DIR}" | grep '^todo.*.txt' | wc -l)" -gt 1 ] ; then
     exit 1
 fi
 
+show_help() {
+    echo 'usage: todo TASK'
+}
+
 while true; do
     case "$1" in
-        -l)
-            TOKENIZED=$(sed 's/ /\n/g' "${TODO_FILE}" | sort -u)
-            echo "${TOKENIZED}" | grep '^@'
-            echo
-            echo "${TOKENIZED}" | grep '^+'
-            exit
-            ;;
-        -d)
-            shift
-            DUE="due:$(date -I)"
-            data="$(grep "$DUE" "${TODO_FILE}" | sed "s/$DUE//g" | sort)"
-            if [ -t 1 ]; then
-                color_opt=always
-            else
-                color_opt=never
-            fi
-            for filter in "$@"; do
-                data="$(echo "$data" | grep --color="$color_opt" -i "$filter")"
-            done
-            echo "$data"
+        --help)
+            show_help
             exit
             ;;
         *)
