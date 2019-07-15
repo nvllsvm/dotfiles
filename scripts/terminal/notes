@@ -21,7 +21,7 @@ while true; do
                 mkdir -p "$(dirname "$1")"
                 exec "${EDITOR}" "$1"
             else
-                exec "${EDITOR}" misc.md
+                exec "${EDITOR}" scratch.md
             fi
             break
     esac
