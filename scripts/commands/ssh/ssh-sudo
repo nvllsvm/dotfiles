@@ -5,4 +5,4 @@ read -rs sudopassword
 echo
 SERVER="$1"
 shift
-echo "$sudopassword" | ssh "$SERVER" "sudo -Sk \"-p$(echo -e \\b)\" "$@""
+echo "$sudopassword" | ssh "$SERVER" "sudo -Sk \"-p$(echo -e \\b)\" "$(shlex "$@")""
