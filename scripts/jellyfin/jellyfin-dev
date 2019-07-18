@@ -31,7 +31,7 @@ elif [ "$1" = 'dotnet' ]; then
         --output "${OUTPUT_DIR}" \
         Jellyfin.Server
 
-    dotnet "${OUTPUT_DIR}/jellyfin.dll" -programdata ~/.jellyfin_dev "$@"
+    dotnet "${OUTPUT_DIR}/jellyfin.dll" --datadir ~/.jellyfin_dev "$@"
 else
     echo "usage: jellyfin-dev {docker,dotnet}" >&2
     exit 1
