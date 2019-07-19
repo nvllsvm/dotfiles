@@ -105,6 +105,8 @@ if [[ $osname == Linux* ]]; then
     fi
 
     if command -v termux-info > /dev/null; then
+        echo HOST=termux > ~/../usr/etc/zshenv
+
         rm -f ~/../usr/etc/motd
 
         yes | pkg update
