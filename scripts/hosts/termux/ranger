@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+exec pipns -n ranger-fm run python -c 'import os, sys; os.link = os.symlink; import ranger; sys.exit(ranger.main())'
