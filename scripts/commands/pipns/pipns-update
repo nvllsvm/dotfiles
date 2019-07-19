@@ -8,4 +8,4 @@ if [ $RET -ne 0 ]; then
     echo error: update failed >&2
     exit $RET
 fi
-find ~/.local/share/pipns/bin -xtype l -delete
+find ~/.local/share/pipns/bin -xtype l -delete || true
