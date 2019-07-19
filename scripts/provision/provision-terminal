@@ -23,9 +23,7 @@ zsh_command() {
 mkdir -p ~/.config
 
 link_file git/.gitignore ~/.gitignore
-link_file lf ~/.config/lf
 link_file nvim ~/.config/nvim
-link_file psql/.psqlrc ~/.psqlrc
 link_file ranger ~/.config/ranger
 link_file tmux/.tmux.conf ~/.tmux.conf
 link_file zsh/.zshenv ~/.zshenv
