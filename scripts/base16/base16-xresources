@@ -3,7 +3,6 @@ import argparse
 import pathlib
 
 
-
 ATTRIBUTE_MAP = {
     'color00': 'color0',
     'color01': 'color1',
