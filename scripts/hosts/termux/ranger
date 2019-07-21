@@ -1,9 +1,0 @@
-#!/data/data/com.termux/files/home/.local/share/pipns/environments/ranger-fm/.venv/bin/python
-import os
-import sys
-
-# ugh - https://github.com/termux/termux-packages/blob/732fc3220d0d78ea3025ee45c163dba9152ff7aa/packages/ranger/ranger-core-actions.py.patch
-os.link = os.symlink
-
-import ranger
-sys.exit(ranger.main())
