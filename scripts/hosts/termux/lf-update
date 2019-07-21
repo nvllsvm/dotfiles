@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+set -e
+PREFIX="$HOME/.local"
+REPO_DIR="$(git install github:gokcehan/lf)"
+cd "$REPO_DIR"
+
+latest_version="$(git tag | sort --version-sort | tail -n 1)"
+git checkout "$latest_version"
+key="git-install/lf"
+if [ "$(kv $key)" != "$latest_version" ]; then
+    go build -ldflags="-X main.gVersion=$latest_version" .
+    mv "$PWD/lf" "$PREFIX/bin/lf"
+    kv $key "$latest_version"
+fi
