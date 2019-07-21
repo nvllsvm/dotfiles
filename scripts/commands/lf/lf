@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+bin="$(which -a "$(basename "$0")" | grep -v "^$0$" | head -n 1)"
+"${bin}" -remote quit 2> /dev/null || true
+"${bin}" "$@"
+ret=$?
+"${bin}" -remote quit 2> /dev/null || true
+exit $ret
