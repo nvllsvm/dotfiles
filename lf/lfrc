@@ -1,3 +1,4 @@
 set hidden
-set number
-set relativenumber
+map <c-n> :set relativenumber!
+map [ :updir; up; open
+map ] :updir; down; open
