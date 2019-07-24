@@ -3,8 +3,20 @@ format_json() {
     jq -S 'reduce (.[] | select(.key | endswith("/") | not)) as $item ({}; setpath($item.key | split("/"); ($item.value | @base64d)))'
 }
 
+remove_prefix() {
+    key="$(echo "$1" | sed 's/\//"\."/g')"
+    key='."'"$key"'"'
+    jq "$key"
+}
+
 if [ -t 0 ]; then
-    consul kv export "$@" | format_json
+    if [ "$#" -eq 1 ]; then
+        key="$(echo "$1" | sed 's/\/$//')"
+        consul kv export "$key" | format_json | remove_prefix "$key"
+    else
+        echo usage: consul-kv-tool [KEY] >&2
+        exit 1
+    fi
 else
     format_json
 fi
