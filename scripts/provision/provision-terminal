@@ -121,6 +121,7 @@ if [[ $osname == Linux* ]]; then
             fd \
             findutils \
             fzf \
+            man \
             neovim \
             openssh \
             p7zip \
