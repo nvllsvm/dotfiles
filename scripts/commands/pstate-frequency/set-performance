@@ -24,8 +24,8 @@ while true; do
             ;;
         *)
             if [ -z "$TARGET_MODE" ]; then
-                show_usage >&2
-                exit 1
+                sudo pstate-frequency -G
+                exit
             fi
             break
     esac
