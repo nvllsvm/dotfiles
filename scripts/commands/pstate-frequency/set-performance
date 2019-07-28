@@ -7,7 +7,6 @@ usage: set_performance [--help] (performance|powersave)
 EOF
 }
 
-
 TARGET_MODE=''
 while true; do
     case "$1" in
@@ -28,16 +27,12 @@ while true; do
                 show_usage >&2
                 exit 1
             fi
+            break
     esac
 done
 
-
 if [ "$TARGET_MODE" = "powersave" ]; then
-    pstate-frequency -S -g powersave
-    pstate-frequency -S -m 100
-    pstate-frequency -S -t off
+    sudo pstate-frequency -S -g powersave -m 100 -t off
 elif [ "$TARGET_MODE" = "performance" ]; then
-    pstate-frequency -S -g performance
-    pstate-frequency -S -m 100
-    pstate-frequency -S -t on
+    sudo pstate-frequency -S -g performance -m 100 -t on
 fi
