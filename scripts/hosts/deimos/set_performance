@@ -1,0 +1,32 @@
+#!/usr/bin/env sh
+set -e
+
+set_no_turbo() {
+    echo "$1" > /sys/devices/system/cpu/intel_pstate/no_turbo
+}
+
+show_usage() {
+    cat << EOF
+usage: set_performance [--help] (performance|powersave)
+EOF
+}
+
+
+if [ $# -eq 1 ]; then
+    if [ "$1" = "powersave" ]; then
+        set_no_turbo 1
+        pstate-frequency -S -g powersave
+        pstate-frequency -S -m 100
+        exit
+    elif [ "$1" = "performance" ]; then
+        set_no_turbo 0
+        pstate-frequency -S -g performance
+        pstate-frequency -S -m 500000
+        exit
+    elif [ "$1" = '--help' ]; then
+        show_usage
+        exit
+    fi
+fi
+show_usage >&2
+exit 1
