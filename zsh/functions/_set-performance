@@ -1,0 +1,4 @@
+#compdef set-performance
+_arguments : \
+    {performance,powersave} \
+    --help
