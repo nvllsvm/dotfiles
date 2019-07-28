@@ -1,4 +1,8 @@
 #compdef set-performance
-_arguments : \
-    {performance,powersave} \
-    --help
+subcmds=(
+    'performance:enable performance mode'
+    'powersave:enable powersave mode'
+)
+if (( CURRENT == 2 )); then
+    _describe -t subcmds 'set-performance' subcmds
+fi
