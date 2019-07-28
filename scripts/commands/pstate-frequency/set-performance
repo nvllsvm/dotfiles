@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#/usr/bin/env sh
 set -e
 
 show_usage() {
@@ -36,3 +36,5 @@ if [ "$TARGET_MODE" = "powersave" ]; then
 elif [ "$TARGET_MODE" = "performance" ]; then
     sudo pstate-frequency -S -g performance -m 100 -t on
 fi
+
+dunstify "$TARGET_MODE mode"
