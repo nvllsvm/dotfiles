@@ -1,0 +1,43 @@
+#!/usr/bin/env sh
+set -e
+
+show_usage() {
+    cat << EOF
+usage: set_performance [--help] (performance|powersave)
+EOF
+}
+
+
+TARGET_MODE=''
+while true; do
+    case "$1" in
+        performance|powersave)
+            if [ -n "$TARGET_MODE" ]; then
+                show_usage >&2
+                exit 1
+            fi
+            TARGET_MODE="$1"
+            shift
+            ;;
+        --help)
+            show_usage
+            exit
+            ;;
+        *)
+            if [ -z "$TARGET_MODE" ]; then
+                show_usage >&2
+                exit 1
+            fi
+    esac
+done
+
+
+if [ "$TARGET_MODE" = "powersave" ]; then
+    pstate-frequency -S -g powersave
+    pstate-frequency -S -m 100
+    pstate-frequency -S -t off
+elif [ "$TARGET_MODE" = "performance" ]; then
+    pstate-frequency -S -g performance
+    pstate-frequency -S -m 100
+    pstate-frequency -S -t on
+fi
