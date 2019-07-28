@@ -37,4 +37,4 @@ elif [ "$TARGET_MODE" = "performance" ]; then
     sudo pstate-frequency -S -g performance -m 100 -t on
 fi
 
-dunstify "$TARGET_MODE mode"
+dunstify --replace 12385 "$TARGET_MODE mode"
