@@ -85,6 +85,9 @@ if [[ $osname == Linux* ]]; then
             xorg-xinput \
             xorg-xprop \
             xss-lock
+
+        # for rofimoji
+        yay -S --asdeps xsel
     fi
 
     systemctl --user enable syncthing
