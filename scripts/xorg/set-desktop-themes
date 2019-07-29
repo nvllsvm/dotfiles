@@ -39,10 +39,10 @@ else
     if [[ $DPI -le 138 ]]; then
         CURSOR_SIZE=16
 
-        FONT_NAME=Tamzen
+        FONT_NAME='DejaVu Sans Mono'
         FONT_SIZE=9
 
-        ANTIALIAS=false
+        ANTIALIAS=true
 
         BORDER_WIDTH=1
 
