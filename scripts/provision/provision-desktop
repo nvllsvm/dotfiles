@@ -71,7 +71,7 @@ if [[ $osname == Linux* ]]; then
             paswitch \
             pavucontrol \
             rofi \
-            rofimoji \
+            rofimoji-git \
             syncthing \
             syncthing-gtk \
             termite \
