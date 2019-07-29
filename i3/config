@@ -43,6 +43,7 @@ bindsym $mod+Shift+q kill
 # start dmenu (a program launcher)
 #bindsym $mod+space exec dmenu_run -fn '$font-$fontSize'
 bindsym $mod+space exec rofi -show run
+bindsym ctrl+$mod+space exec rofimoji
 
 bindsym $mod+x [class="^.*"] border toggle
 
