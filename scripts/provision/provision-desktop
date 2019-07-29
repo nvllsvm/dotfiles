@@ -87,7 +87,7 @@ if [[ $osname == Linux* ]]; then
             xss-lock
 
         # for rofimoji
-        yay -S --asdeps xsel
+        yay -S --noconfirm --asdeps xsel
     fi
 
     systemctl --user enable syncthing
