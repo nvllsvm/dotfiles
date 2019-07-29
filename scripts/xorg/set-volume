@@ -11,7 +11,7 @@ if [ -z "$1" ]; then
     if [ "$(pamixer --get-mute)" = "true" ]; then
         echo Mute
     else
-        pamixer --get-volume
+        pamixer --get-volume || true
     fi
 else
     if [ "$1" = "mute" ]; then
@@ -24,7 +24,7 @@ else
     if [ "$(pamixer --get-mute)" = "true" ]; then
         ARGS="Mute"
     else
-        ARGS="-h int:value:$(pamixer --get-volume)"
+        ARGS="-h int:value:$(pamixer --get-volume || true)"
     fi
     dunstify --replace=10002 Volume $ARGS
 fi
