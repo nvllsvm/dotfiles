@@ -73,7 +73,6 @@ if [[ $osname == Linux* ]]; then
             rofi \
             syncthing \
             syncthing-gtk \
-            tamzen-font \
             termite \
             transmission-remote-gtk \
             ttf-dejavu \
