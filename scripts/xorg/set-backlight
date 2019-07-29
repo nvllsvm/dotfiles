@@ -4,20 +4,24 @@ set -e
 STEP=10
 MINIMUM=1
 
+floor() {
+    sed 's/\..*//g'
+}
+
 if [ "$1" = "dec" ]; then
-    if [ "$(xbacklight -get)" -gt "$STEP" ]; then
-        xbacklight -dec $STEP
+    if [ "$(light | floor)" -gt "$STEP" ]; then
+        light -U "$STEP"
     else
-        xbacklight -set $MINIMUM
+        light -S "$MINIMUM"
     fi
 elif [ "$1" = "inc" ]; then
-    if [ "$(xbacklight -get)" -lt "$STEP" ]; then
-        xbacklight -set $STEP
+    if [ "$(light | floor)" -lt "$STEP" ]; then
+        light -S "$STEP"
     else
-        xbacklight -inc $STEP
+        light -A "$STEP"
     fi
 elif [ "$#" = '0' ]; then
-    xbacklight -get
+    light | floor
     exit
 else
     cat << EOF
@@ -27,4 +31,4 @@ EOF
     exit 1
 fi
 
-dunstify Backlight -h int:value:$(xbacklight -get)
+dunstify Backlight -h int:value:$(light | floor)
