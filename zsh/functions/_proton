@@ -1,0 +1,5 @@
+#compdef proton
+_arguments : \
+    --help \
+    --show-prefix \
+    '*::command arguments:_normal'
