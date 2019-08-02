@@ -1,4 +1,8 @@
 #!/usr/bin/env sh
+
+# needed to fix interleaved log output
+#https://github.com/wercker/stern/issues/96
 export GOMAXPROCS=1
+
 bin="$(which -a stern | grep -v "^$0$" | head -n 1)"
 exec "${bin}" "$@"
