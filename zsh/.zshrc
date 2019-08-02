@@ -130,8 +130,7 @@ zsh_reload_comp() {
     exec zsh
 }
 
-full-update add 'zsh_reload_comp'
-full-update add 'exec zsh'
+full-update add 'zsh -ic zsh_reload_comp'
 
 pushd "$DOTFILES/scripts/commands" > /dev/null
 for c in *; do
