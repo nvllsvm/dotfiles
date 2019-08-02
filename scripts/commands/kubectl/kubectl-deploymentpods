@@ -1,11 +1,5 @@
 #!/usr/bin/env sh
-if [ "$1" != '-n' ] || [ $# != 3 ]; then
-    echo usage: $(basename "$0") -n NAMESPACE DEPLOYMENT >&2
-    exit 1
-fi
-NAMESPACE="$2"
-DEPLOYMENT="$3"
-
-SELECTOR="$(kubectl get deployment -n "${NAMESPACE}" "${DEPLOYMENT}" -o wide | awk '{print $9}' | tail -n 1)"
-PODS="$(kubectl get pods -n "${NAMESPACE}" -l "${SELECTOR}" -o 'jsonpath={range .items[*]}{" "}{.metadata.name}')"
-echo $PODS
+DEPLOYMENT="$1"
+shift
+SELECTOR="$(kubectl-deployment-selector "$DEPLOYMENT" "$@")"
+kubectl get pods "$@" -l "${SELECTOR}" -o 'jsonpath={range .items[*]}{"\n"}{.metadata.name}' | sed '/^$/d' | sort -u
