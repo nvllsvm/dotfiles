@@ -18,11 +18,10 @@ background = $background_color
 font = $fontname $fontsize
 EOF
 
-/usr/bin/kill -s SIGUSR1 $(pgrep -u $USER -x termite)
-
-while read -r line; do
-    pts=$(ps --ppid $line | grep zsh | awk '{print $2}')
+for pid in $(pgrep -u "$(whoami)" -x termite); do
+    /usr/bin/kill -s SIGUSR1 "$pid"
+    pts=$(ps --ppid "$pid" | grep zsh | awk '{print $2}')
     if [[ $pts == pts* ]]; then
         echo -n $(sh ~/.base16_theme) > /dev/$pts
     fi
-done <<< $(pgrep -x termite)
+done

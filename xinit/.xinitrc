@@ -14,17 +14,23 @@ set +a
 setxkbmap -option terminate:ctrl_alt_bksp
 setxkbmap -option caps:escape
 
-xset -dpms; xset s off
+xset -dpms
+xset s off
 
 compton &
 /usr/lib/gsd-xsettings &
 xbindkeys &
 xss-lock -- lock-screen &
 
-xinit-$(hostname) &
+if command -v xinit-$(hostname) > /dev/null; then
+    xinit-$(hostname)
+fi
 
-pkill -9 -f mpd-notification
-mpd-notification &
+if command -v mpd-notification > /dev/null; then
+    pkill -9 -f mpd-notification
+    mpd-notification &
+fi
+
 nm-applet &
 syncthing-gtk &
 
