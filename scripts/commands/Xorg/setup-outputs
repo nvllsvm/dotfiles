@@ -117,6 +117,9 @@ deimos() {
             --output eDP1 --primary --mode 720x1280 --pos 0x0 --rotate right
         set-desktop-themes --dpi 96 --large
         apply-display-calibration
+        xinput set-prop \
+            "$(xinput | grep Goodix | grep pointer | awk '{print $6}' | cut -d= -f2)" \
+            'Coordinate Transformation Matrix' 0 1 0 -1 0 1 0 0 1
     elif [ "$MODE" = "external" ]; then
         xrandr \
             --output DP1 --primary --mode 1920x1200 --pos 0x0 \
