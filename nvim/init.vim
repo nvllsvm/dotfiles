@@ -83,6 +83,7 @@ Plug 'dbeniamine/todo.txt-vim'
 
 Plug 'Vimjas/vim-python-pep8-indent'
 Plug 'davidhalter/jedi-vim'
+Plug 'fisadev/vim-isort'
 
 Plug 'udalov/kotlin-vim'
 
