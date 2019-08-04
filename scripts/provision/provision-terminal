@@ -97,6 +97,7 @@ if [[ $osname == Linux* ]]; then
             reflector \
             ripgrep \
             rsync \
+            shellcheck \
             sshfs \
             sshuttle \
             tmux \
