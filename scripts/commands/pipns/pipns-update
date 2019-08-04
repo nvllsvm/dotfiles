@@ -1,11 +1,7 @@
 #!/usr/bin/env sh
+set -e
 if ! command -v pipns > /dev/null; then
     PIP_REQUIRE_VIRTUALENV=0 pip install pipns
 fi
 pipns --all update > /dev/null 2>&1
-UPDATE_RET=$?
 pipns --prune
-if [ $UPDATE_RET -ne 0 ]; then
-    echo error: update failed >&2
-    exit $
-fi
