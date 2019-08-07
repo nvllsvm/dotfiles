@@ -2,19 +2,17 @@
 set -e
 
 NOTES_DIR="${NOTES_DIR:-$HOME/Notes}"
+if ! [ -d "$NOTES_DIR" ]; then
+    echo error: notes directory does not exist: \""$NOTES_DIR"\" >&2
+    exit 1
+fi
 cd "${NOTES_DIR}"
 
 while true; do
     case "$1" in
-        -d)
-            abspath="$(pwd)/$2"
-            if [ -e "$abspath" ]; then
-                echo "$abspath"
-                exit
-            else
-                echo error: path "$abspath" not found >&2
-                exit 1
-            fi
+        --)
+            shift
+            exec "$@"
             ;;
         *)
             if [ -n "$1" ]; then
