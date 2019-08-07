@@ -1,16 +1,14 @@
 #!/usr/bin/env sh
 set -e
 
-DOCKER_IMAGE=nvllsvm/lgogdownloader
+IMAGE=nvllsvm/lgogdownloader
 GOG_DIR=/storage/Games/PC/GOG.com
 
-docker pull $DOCKER_IMAGE > /dev/null
-docker run \
+podman pull -q $IMAGE > /dev/null
+podman run \
     --rm \
-    -e PUID=$(id -u) \
-    -e PGID=$(id -g) \
     -e HOME \
     -v $GOG_DIR:/downloads \
     -v ~/.cache/lgogdownloader:/cache \
     -v ~/.dotfiles/private/lgogdownloader:/config \
-    $DOCKER_IMAGE
+    $IMAGE
