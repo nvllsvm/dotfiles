@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+set -e
+RED='\033[1;31m'
+RESET_COLOR='\033[0m'
+PORT="$(docker-compose port "$@")"
+if [ -z "$PORT" ]; then
+    printf "%bERROR%b: No such port mapping: %s\n" "${RED}" "${RESET_COLOR}" "$*"
+    exit 1
+fi
+echo "$PORT" | cut -d: -f2
