@@ -36,8 +36,4 @@ syncthing-gtk &
 
 setup-outputs
 
-# wtf - needed for gpd win 2
-# fails to start correctly
-sleep 2
-
 exec i3
