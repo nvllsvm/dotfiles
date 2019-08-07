@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
+set-performance performance
 xmodmap -e "keycode 135 = Super_L"
 xinput set-prop \
     "$(xinput | grep Goodix | grep pointer | awk '{print $6}' | cut -d= -f2)" \
