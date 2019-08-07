@@ -117,7 +117,7 @@ set completeopt-=preview
 autocmd StdinReadPre * let s:std_in=1
 
 " <Ctrl-l> redraws the screen and removes any search highlighting.
-nnoremap <silent> <C-l> :nohl<CR><C-l>
+nnoremap <silent> <C-l> :nohl<CR>:NeomakeClean<CR><C-l>
 
 " open all folds automatically
 autocmd BufWinEnter * normal! zR
