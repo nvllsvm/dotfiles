@@ -79,7 +79,6 @@ if [[ $osname == Linux* ]]; then
             bind-tools \
             dash \
             direnv \
-            docker \
             fd \
             fuse2 \
             fzf \

@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+SIZE_BYTES="$(podman inspect "$1" | jq '.[].Size')"
+numfmt --to=iec "$SIZE_BYTES"

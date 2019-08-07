@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+podman inspect "$@" | jq -S '.[].Config.Labels'
