@@ -36,41 +36,32 @@ done
 if [ -z "$DPI" ]; then
     . "$CURRENT_THEME"
 else
-    if [[ $DPI -le 138 ]]; then
-        CURSOR_SIZE=16
+    FONT_NAME='DejaVu Sans Mono'
 
-        FONT_NAME='DejaVu Sans Mono'
-        FONT_SIZE=9
-
-        ANTIALIAS=true
-
+    if [ "$DPI" -le 138 ]; then
         BORDER_WIDTH=1
-
-        DUNST_GEOMETRY=300x5-0+18
+        CURSOR_SIZE=16
+        DUNST_GEOMETRY_Y=+18
         DUNST_MAX_ICON_SIZE=64
-
+        FONT_SIZE=9
         SCALING_FACTOR=1
+
+        if [ -n "$LARGE" ]; then
+            DUNST_GEOMETRY=300x5-0+28
+        else
+            DUNST_GEOMETRY=300x5-0+18
+        fi
     else
-        CURSOR_SIZE=48
-
-        FONT_NAME='DejaVu Sans Mono'
-        FONT_SIZE=10
-
-        ANTIALIAS=true
-
         BORDER_WIDTH=3
-
-        DUNST_GEOMETRY=800x5-0+40
+        CURSOR_SIZE=48
+        DUNST_GEOMETRY=800x5-0+44
         DUNST_MAX_ICON_SIZE=128
-
+        FONT_SIZE=10
         SCALING_FACTOR=2
     fi
 
-    if [[ -n "$LARGE" ]]; then
-        FONT_NAME='DejaVu Sans Mono'
+    if [ -n "$LARGE" ]; then
         FONT_SIZE=14
-
-        ANTIALIAS=true
     fi
 fi
 
@@ -99,7 +90,7 @@ XRESOURCES_TEMP_FILE=/tmp/dpi_xresources
 cat > $XRESOURCES_TEMP_FILE <<- EOF
 *facename: ${FONT_NAME}
 *fontsize: ${FONT_SIZE}
-*font: xft:${FONT_NAME}:size=${FONT_SIZE}:antialias=${ANTIALIAS}:dpi=${DPI}
+*font: xft:${FONT_NAME}:size=${FONT_SIZE}:antialias=true:dpi=${DPI}
 *boldFont:
 
 rofi.font: ${FONT_NAME} ${FONT_SIZE}
