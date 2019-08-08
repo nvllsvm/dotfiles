@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env sh
 set -e
 
 CURRENT_THEME=~/.setdesktoptheme
@@ -73,14 +73,13 @@ EOF
 
 # changing org.gnome.desktop.interface cursor-size after xrdb steps
 # fucks up i3's scaling...
-gsettings set org.gnome.desktop.interface cursor-size $CURSOR_SIZE
-gsettings set org.gnome.desktop.interface scaling-factor $SCALING_FACTOR
+gsettings set org.gnome.desktop.interface cursor-size "$CURSOR_SIZE"
+gsettings set org.gnome.desktop.interface scaling-factor "$SCALING_FACTOR"
 gsettings set org.gnome.settings-daemon.plugins.xsettings overrides \
     "{'Gdk/WindowScalingFactor': <$SCALING_FACTOR>, 'Gtk/CursorThemeSize': <$CURSOR_SIZE>}"
 
 # update xresources
-XRESOURCES_TEMP_FILE=/tmp/dpi_xresources
-cat > $XRESOURCES_TEMP_FILE <<- EOF
+xrdb << EOF
 *facename: ${FONT_NAME}
 *fontsize: ${FONT_SIZE}
 *font: xft:${FONT_NAME}:size=${FONT_SIZE}:antialias=true:dpi=${DPI}
@@ -95,35 +94,20 @@ Xft.dpi: ${DPI}
 Xcursor.size: ${CURSOR_SIZE}
 $(base16-xresources)
 EOF
-xrdb $XRESOURCES_TEMP_FILE
-rm $XRESOURCES_TEMP_FILE
 
-xrandr --dpi $DPI
+xrandr --dpi "$DPI"
 
 termite-config-reload
-hsetroot -solid $(xrdb -query | grep '*background' | awk '{print $2}')
+hsetroot -solid "$(xrdb -query | grep '\*background' | awk '{print $2}')"
 
-# need to restart to ensure cursor size on status bar is updated
-i3 restart &> /dev/null || true
-
-# need retry logic due to slow i3 restarts
-for i in {1..10}; do
-    i3_topbar_height="$(i3-msg -t get_tree | jq '[.nodes[].nodes[].nodes[].geometry.height] | max')"
-    if [ -n "$i3_topbar_height" -a "$i3_topbar_height" -gt 0 ]; then
-        break
-    else
-        sleep 0.25
-    fi
-done
-
-if [ -z "$i3_topbar_height" -o "$i3_topbar_height" -eq 0 ]; then
-    echo error: cannot determine i3 topbar height >&2
-    exit 1
+if pidof i3 > /dev/null; then
+    # need to restart to ensure cursor size on status bar is updated
+    i3 restart > /dev/null 2>&1 || true
 fi
 
-pkill -9 dunst || true
+pkill -9 -f dunst || true
 dunst \
     -font "$FONT_NAME $FONT_SIZE" \
     -frame_width "$BORDER_WIDTH" \
     -max_icon_size "$DUNST_MAX_ICON_SIZE" \
-    -geometry "$DUNST_GEOMETRY+$i3_topbar_height" &
+    -geometry "$DUNST_GEOMETRY" > /dev/null 2>&1 &
