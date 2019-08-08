@@ -29,6 +29,10 @@ while true; do
             exit
             ;;
         *)
+            if [ $# -ne 0 ]; then
+                echo error: unrecognized arguments >&2
+                exit 1
+            fi
             break
     esac
 done
