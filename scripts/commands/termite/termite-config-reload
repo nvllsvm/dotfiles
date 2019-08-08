@@ -1,15 +1,17 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
+set -e
+
 MODIFIED_CONFIG=~/.config/termite/config
 
 mkdir -p ~/.config/termite
-cp $DOTFILES/termite/config $MODIFIED_CONFIG
+cp "$DOTFILES/termite/config" "$MODIFIED_CONFIG"
 
 # set background prevents another color from flashing when spawning a new term
-background_color=$(xrdb -query | grep background | awk '{print $2}')
-fontname=$(xrdb -query | grep facename | awk '{$1=""; print $0}')
-fontsize=$(xrdb -query | grep fontsize | awk '{print $2}')
+background_color="$(xrdb -query | grep background | awk '{print $2}')"
+fontname="$(xrdb -query | grep facename | awk '{$1=""; print $0}')"
+fontsize="$(xrdb -query | grep fontsize | awk '{print $2}')"
 
-cat >> $MODIFIED_CONFIG<<EOF
+cat >> "$MODIFIED_CONFIG"<<EOF
 
 [colors]
 background = $background_color
@@ -18,10 +20,20 @@ background = $background_color
 font = $fontname $fontsize
 EOF
 
-for pid in $(pgrep -u "$(whoami)" -x termite); do
-    /usr/bin/kill -s SIGUSR1 "$pid"
-    pts=$(ps --ppid "$pid" | grep zsh | awk '{print $2}')
-    if [[ $pts == pts* ]]; then
-        echo -n $(sh ~/.base16_theme) > /dev/$pts
+reload_zsh() {
+    zsh_tty="$(ps hotty "$zsh_pid")"
+    if [ "$(echo "$zsh_tty" | cut -c1-3)" = 'pts' ]; then
+        printf '%s' "$(sh ~/.base16_theme)" > "/dev/$zsh_tty"
     fi
+}
+
+reload_termite() {
+    /usr/bin/kill -s SIGUSR1 "$termite_pid"
+    for zsh_pid in $(pgrep -u "$(whoami)" -x zsh -P "$termite_pid"); do
+        reload_zsh > /dev/null 2>&1 || true
+    done
+}
+
+for termite_pid in $(pgrep -u "$(whoami)" -x termite); do
+    reload_termite > /dev/null 2>&1 || true
 done
