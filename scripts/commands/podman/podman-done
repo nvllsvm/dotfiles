@@ -40,20 +40,14 @@ log() {
 }
 
 log "Removing all containers ..."
-all_containers=$(podman ps -aq)
-if [ -n "$all_containers" ]; then
-    podman rm -f $all_containers
-fi
+podman rm -af
 
 log "Pruning volumes ..."
 podman volume prune -f
 
 if [ -n "$PRUNE_SYSTEM" ]; then
     log "Pruning images and build cache ..."
-    podman system prune -f --all
-    all_images=$(podman image list -q)
+    podman system prune -af
     log "Pruning images ..."
-    if [ -n "$all_images" ]; then
-        podman image rm -f $all_images
-    fi
+    podman rmi -af
 fi
