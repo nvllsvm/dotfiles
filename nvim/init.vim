@@ -13,8 +13,6 @@ set tabstop=4
 set shiftwidth=4
 set expandtab
 
-let g:auto_save_events = ["InsertLeave", "TextChanged"]
-
 set mouse=a
 
 " line numbers
