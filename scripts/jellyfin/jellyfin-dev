@@ -10,17 +10,16 @@ rm -rf debug
 if [ "$1" = 'docker' ]; then
     if [ -z "$2" ]; then
         IMAGE=jellyfin_dev
-        docker build . -t jellyfin_dev --pull
+        buildah build-using-dockerfile -t jellyfin_dev --pull .
     else
         IMAGE="jellyfin/jellyfin:$2"
     fi
         #--volume "/dev/dri:/dev/dri" \
     mkdir -p "$JELLYFIN_DATA"
-    docker-shell \
+    podman-shell \
         -v "$JELLYFIN_DATA/config:/config" \
         -v "$JELLYFIN_DATA/cache:/cache" \
         --net host \
-        --user "$(id -u):$(id -g)" \
         --volume "/storage/Video:/media:ro" \
         --volume "/storage/Audio/MP3:/audio:ro" \
         "$IMAGE"

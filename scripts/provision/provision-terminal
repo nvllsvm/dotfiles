@@ -77,6 +77,7 @@ if [[ $osname == Linux* ]]; then
             aria2 \
             aspell-en \
             bind-tools \
+            buildah \
             dash \
             direnv \
             fd \
@@ -92,6 +93,7 @@ if [[ $osname == Linux* ]]; then
             openssh \
             p7zip \
             pkgfile \
+            podman \
             python \
             reflector \
             ripgrep \
