@@ -77,7 +77,6 @@ if [[ $osname == Linux* ]]; then
             aria2 \
             aspell-en \
             bind-tools \
-            buildah \
             dash \
             direnv \
             fd \
