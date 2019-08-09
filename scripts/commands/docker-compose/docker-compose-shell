@@ -1,5 +1,9 @@
 #!/usr/bin/env sh
+set -e
 # doesn't work with all compose files, but good enough for me
-exec docker-shell \
-    --network "$(basename "$(pwd)")"_default \
-    "$@"
+NETWORK="$(basename "$(pwd)")"_default
+if [ -n "$(docker network ls -q -f "name=$NETWORK")" ]; then
+    exec docker-shell --network "$NETWORK" "$@"
+else
+    exec docker-shell "$@"
+fi
