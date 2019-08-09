@@ -23,7 +23,7 @@ while true; do
             if [ -n "$1" ]; then
                 echo "$(date -I)" "$@" >> "${TODO_FILE}"
             else
-                exec "${EDITOR}" "${TODO_FILE}"
+                exec "${EDITOR}" -c AutoSaveToggle "${TODO_FILE}"
             fi
             break
     esac

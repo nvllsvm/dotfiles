@@ -13,6 +13,8 @@ set tabstop=4
 set shiftwidth=4
 set expandtab
 
+let g:auto_save_events = ["InsertLeave", "TextChanged"]
+
 set mouse=a
 
 " line numbers
@@ -101,6 +103,8 @@ Plug 'rust-lang/rust.vim'
 Plug 'rbgrouleff/bclose.vim'
 
 Plug 'chrisbra/csv.vim'
+
+Plug '907th/vim-auto-save'
 call plug#end()
 
 let g:jedi#completions_enabled = 0

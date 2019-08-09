@@ -8,6 +8,10 @@ if ! [ -d "$NOTES_DIR" ]; then
 fi
 cd "${NOTES_DIR}"
 
+editor() {
+    exec "${EDITOR}" -c AutoSaveToggle "$@"
+}
+
 while true; do
     case "$1" in
         --)
@@ -17,9 +21,9 @@ while true; do
         *)
             if [ -n "$1" ]; then
                 mkdir -p "$(dirname "$1")"
-                exec "${EDITOR}" "$1"
+                editor "$1"
             else
-                exec "${EDITOR}" scratch.md
+                editor scratch.md
             fi
             break
     esac
