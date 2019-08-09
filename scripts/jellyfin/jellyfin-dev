@@ -7,7 +7,7 @@ cd ~/Code/jellyfin
 
 rm -rf debug
 
-if [ "$1" = 'docker' ]; then
+if [ "$1" = 'podman' ]; then
     if [ -z "$2" ]; then
         IMAGE=jellyfin_dev
         buildah build-using-dockerfile -t jellyfin_dev --pull .
@@ -32,6 +32,6 @@ elif [ "$1" = 'dotnet' ]; then
 
     dotnet "${OUTPUT_DIR}/jellyfin.dll" --datadir ~/.jellyfin_dev "$@"
 else
-    echo "usage: jellyfin-dev {docker,dotnet}" >&2
+    echo "usage: jellyfin-dev {dotnet,podman}" >&2
     exit 1
 fi
