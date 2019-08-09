@@ -150,3 +150,7 @@ for name in flake8 speedtest-cli; do
 done
 
 zsh_command nvim-update
+
+if [ "$(hostname)" = 'sol' ]; then
+    link_file systemd ~/.config/systemd
+fi
