@@ -10,7 +10,7 @@ rm -rf debug
 if [ "$1" = 'podman' ]; then
     if [ -z "$2" ]; then
         IMAGE=jellyfin_dev
-        podman build -t jellyfin_dev --pull .
+        buildah build-using-dockerfile -t jellyfin_dev --pull .
     else
         IMAGE="jellyfin/jellyfin:$2"
     fi
