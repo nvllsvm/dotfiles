@@ -3,11 +3,11 @@ set -e
 
 show_help() {
     cat << EOF
-usage: batch-rename [--prepend TEXT] PATH [PATH...]
+usage: batch-rename [--apend TEXT] [--prepend TEXT] PATH [PATH...]
 
-    --help      show help then exit
-    --append    append text to paths
-    --prepend   prepend text to paths
+    --help          show help then exit
+    --append TEXT   append text to paths
+    --prepend TEXT  prepend text to paths
 EOF
 }
 
