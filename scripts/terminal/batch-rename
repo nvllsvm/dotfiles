@@ -3,11 +3,11 @@ set -e
 
 show_help() {
     cat << EOF
-usage: batch-rename [--apend TEXT] [--prepend TEXT] PATH [PATH...]
+usage: batch-rename [OPTIONS] PATH [PATH...]
 
-    --help          show help then exit
-    --append TEXT   append text to paths
-    --prepend TEXT  prepend text to paths
+    --help              show help then exit
+    --append TEXT       append text to paths
+    --prepend TEXT      prepend text to paths
 EOF
 }
 
@@ -51,6 +51,10 @@ append_prepend_path() {
     echo "$new_path"
 }
 
+
+strip_prefix_suffix_path() {
+    new_path="$(dirname "$1")/${PREPEND}$(basename "$1")${APPEND}"
+}
 
 for f in "$@"; do
     if [ -n "$PREPEND" ]; then
