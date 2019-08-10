@@ -28,11 +28,6 @@ if command -v xinit-$(hostname) > /dev/null; then
     xinit-$(hostname)
 fi
 
-if command -v mpd-notification > /dev/null; then
-    pkill -9 -f mpd-notification
-    mpd-notification &
-fi
-
 nm-applet &
 syncthing-gtk &
 

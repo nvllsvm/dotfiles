@@ -29,7 +29,6 @@ if [[ $osname == Linux* ]]; then
     link_file i3 ~/.config/i3
     link_file i3status ~/.config/i3status
     link_file mimeapps/mimeapps.list ~/.config/mimeapps.list
-    link_file mpd-notification/mpd-notification.conf ~/.config/mpd-notification.conf
     link_file mpv ~/.config/mpv
     link_file qt5ct ~/.config/qt5ct
     link_file rofi ~/.config/rofi
@@ -57,7 +56,6 @@ if [[ $osname == Linux* ]]; then
             maim \
             mpc \
             mpd \
-            mpd-notification \
             mpv \
             ncmpcpp \
             network-manager-applet \
@@ -92,7 +90,6 @@ if [[ $osname == Linux* ]]; then
 
     systemctl --user enable syncthing
     systemctl --user enable mpd
-    systemctl --user enable mpd-notification
 
 elif [[ $osname == Darwin ]]; then
     link_file karabiner ~/.config/karabiner
