@@ -1,6 +1,13 @@
 #!/usr/bin/env sh
 set -e
 
+show_help() {
+    cat >&2 << EOF
+usage nvim-repl: COMMAND [FILE]
+EOF
+}
+
+
 while true; do
     case "$1" in
         -s)
@@ -9,28 +16,23 @@ while true; do
             shift
             ;;
         *)
+            if [ $# -eq 0 ]; then
+                show_help >&2
+                exit 1
+            fi
+            COMMAND="$1"
+            if [ -n "$2" ]; then
+                WORKFILE="$2"
+            else
+                WORKFILE="$(mktemp)"
+                cleanup() {
+                    rm -f "$WORKFILE"
+                }
+                trap cleanup EXIT
+            fi
             break
     esac
 done
-
-COMMAND="$1"
-
-if [ -z "$COMMAND" ]; then
-    cat >&2 << EOF
-usage nvim-repl: COMMAND [FILE]
-EOF
-    exit 1
-fi
-
-if [ -n "$2" ]; then
-    WORKFILE="$2"
-else
-    WORKFILE="$(mktemp)"
-    cleanup() {
-        rm -f "$WORKFILE"
-    }
-    trap cleanup EXIT
-fi
 
 if [ -z "$FILETYPE" ]; then
     FILETYPE="$COMMAND"

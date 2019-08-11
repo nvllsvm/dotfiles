@@ -59,6 +59,7 @@ function _REPL()
 endfunction
 
 function _REPLInit(...)
+    AutoSaveToggle
     let g:repl_cmd = a:1
     autocmd BufWritePost * call _REPL()
     set splitright
