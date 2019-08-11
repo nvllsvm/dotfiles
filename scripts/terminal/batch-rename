@@ -52,10 +52,6 @@ append_prepend_path() {
 }
 
 
-strip_prefix_suffix_path() {
-    new_path="$(dirname "$1")/${PREPEND}$(basename "$1")${APPEND}"
-}
-
 for f in "$@"; do
     if [ -n "$PREPEND" ]; then
         f="$(append_prepend_path "$f")"
