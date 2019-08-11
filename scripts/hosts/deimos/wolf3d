@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+set -e
+
+show_dialog() {
+    zenity \
+        --width 400 \
+        --height 400 \
+        --hide-header \
+        --list \
+        --column Game \
+        *
+}
+
+cd ~/.local/share/ecwolf/games
+cd "$(show_dialog)"
+exec ../../ecwolf "$@"
