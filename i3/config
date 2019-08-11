@@ -167,7 +167,7 @@ bindsym $mod+b bar mode toggle
 
 bindsym $mod+Shift+s exec maim-clipboard
 bindsym $mod+Shift+f exec maim-file
-bindsym $mod+g exec lock-screen
+bindsym $mod+Escape exec lock-screen
 
 bindsym $mod+m move position center
 
