@@ -21,9 +21,9 @@ while true; do
         *)
             if [ -n "$1" ]; then
                 mkdir -p "$(dirname "$1")"
-                editor "$1"
+                editor -- "$1"
             else
-                editor scratch.md
+                editor -- scratch.md
             fi
             break
     esac
