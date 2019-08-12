@@ -1,2 +1,22 @@
 #compdef notes
-_files -W "${NOTES_DIR:-$HOME/Notes}"
+_notes() {
+  local ret=1
+
+  cd "${NOTES_DIR:-$HOME/Notes}"
+
+  _arguments -C \
+      '1::file:_files' \
+      '*::arg:->args' \
+      && ret=0
+
+  case $state in
+    (args)
+        case $line[1] in
+            (--)
+                _arguments '*:: :_normal' && ret=0
+                ;;
+        esac
+   esac
+}
+
+_notes "$@"
