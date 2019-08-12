@@ -1,0 +1,109 @@
+#!/usr/bin/env python3
+import argparse
+import datetime
+import pathlib
+import string
+import sys
+
+
+DEFAULT_TARGET = pathlib.Path('/storage/Personal Creations')
+PHOTO_DIR = 'Photos'
+VIDEO_DIR = 'Videos'
+
+PHOTO_EXT = set([
+    '.jpg',
+    '.png'
+])
+
+VIDEO_EXT = set([
+    '.mkv',
+    '.mp4'
+])
+
+
+def parse_date(path):
+    try:
+        if path.startswith(('DOC', 'IMG', 'VID')) and path[3] in ('-', '_'):
+            dt = datetime.datetime(
+                int(path[4:8]),
+                int(path[8:10]),
+                int(path[10:12])
+            )
+        elif not set(path[:10]) - set(string.digits):
+            dt = datetime.datetime.utcfromtimestamp(int(path[:10]))
+        else:
+            raise ValueError('unknown date format')
+
+        lower_bound = datetime.timedelta(weeks=52 * 5)
+        upper_bound = datetime.timedelta(days=1)
+
+        now = datetime.datetime.utcnow()
+        if dt > (now + upper_bound):
+            raise ValueError('date in the future')
+        elif dt < (now - lower_bound):
+            raise ValueError('date too old')
+    except Exception as e:
+        print(
+            f'error: parse error "{path}" {e.args}', file=sys.stderr
+        )
+        sys.exit(1)
+    return dt
+
+
+def all_files(root):
+    files = []
+    stack = [root]
+    while stack:
+        for path in stack.pop().iterdir():
+            if path.is_file():
+                files.append(path)
+            elif path.is_dir():
+                stack.append(path)
+    return sorted(files)
+
+
+def process_file(path, target_root, dry_run):
+    suffix = path.suffix.lower()
+    if suffix in PHOTO_EXT:
+        target_path = target_root.joinpath(PHOTO_DIR)
+    elif suffix in VIDEO_EXT:
+        target_path = target_root.joinpath(VIDEO_DIR)
+    else:
+        raise KeyError(f'unhandled suffix in {path}')
+
+    dt = parse_date(path.name)
+
+    target_path = target_path.joinpath(
+        str(dt.year),
+        str(dt.month).zfill(2),
+        str(dt.day).zfill(2),
+        path.name
+    )
+    print(target_path.relative_to(target_root))
+
+    if not dry_run:
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+        path.rename(target_path)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--target',
+        metavar='PATH',
+        type=pathlib.Path,
+        default=DEFAULT_TARGET,
+        help='target directory (default: %(default)s)')
+    parser.add_argument('-d', '--dry-run', action='store_true')
+    parser.add_argument('path', type=pathlib.Path)
+    args = parser.parse_args()
+
+    if args.path.is_file():
+        process_file(args.path, args.target, args.dry_run)
+    else:
+        for path in all_files(args.path):
+            process_file(path, args.target, args.dry_run)
+
+
+if __name__ == '__main__':
+    main()
