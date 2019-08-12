@@ -138,8 +138,8 @@ fi
 mkdir -p ~/.local/bin
 ln -sf "$(which dash)" "$HOME/.local/bin/sh"
 
-zsh_command '$DOTFILES/scripts/commands/pyenv/pyenv-update'
 if [[ $osname == Darwin* ]]; then
+    zsh_command '$DOTFILES/scripts/commands/pyenv/pyenv-update'
     zsh_command 'pyenv global 3.7.3'
 fi
 zsh_command '$DOTFILES/scripts/commands/pip/pip-update'
