@@ -127,7 +127,6 @@ compinit -C
 zsh_reload_comp() {
     rm -f ~/.zcompdump
     zsh -ic "echo -n"
-    exec zsh
 }
 
 full-update add 'zsh -ic zsh_reload_comp'
