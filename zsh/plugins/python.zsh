@@ -1,7 +1,7 @@
 export PYTHONUSERBASE=~/.local/pythonuser
 
 if [ -d "$PYTHONUSERBASE" ]; then
-    export PYENV_ROOT=~/.local/git/pyenv
+    export PYENV_ROOT=~/.local/share/pyenv
     if [ -d "$PYENV_ROOT" ]; then
         path=(
             "${PYENV_ROOT}/bin"

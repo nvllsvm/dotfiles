@@ -1,4 +1,4 @@
-export GOENV_ROOT=$HOME/.local/git/goenv
+export GOENV_ROOT=$HOME/.local/share/goenv
 
 if [ -d "$GOENV_ROOT" ]; then
     path=(

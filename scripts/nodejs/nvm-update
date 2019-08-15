@@ -1,4 +1,15 @@
 #!/usr/bin/env sh
-cd "$(git install -k https://github.com/creationix/nvm)"
-. ./nvm.sh
-nvm install node --latest-npm
+set -e
+XDG_DATA_DIR="${XDG_DATA_DIR:-$HOME/.local/share}"
+INSTALL_DIR="${XDG_DATA_DIR}/nvm"
+
+if ! [ -d "$INSTALL_DIR" ]; then
+    mkdir -p "$XDG_DATA_DIR"
+    git clone https://github.com/creationix/nvm "$INSTALL_DIR" > /dev/null
+else
+    cd "$INSTALL_DIR"
+    git clean -fd
+    git pull
+    . ./nvm.sh
+    nvm install node --latest-npm
+fi

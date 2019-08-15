@@ -1,2 +1,15 @@
 #!/usr/bin/env sh
-$(git install -k https://github.com/pyenv/pyenv)/bin/pyenv rehash
+set -e
+XDG_DATA_DIR="${XDG_DATA_DIR:-$HOME/.local/share}"
+INSTALL_DIR="${XDG_DATA_DIR}/goenv"
+
+if ! [ -d "$INSTALL_DIR" ]; then
+    mkdir -p "$XDG_DATA_DIR"
+    git clone https://github.com/pyenv/pyenv "$INSTALL_DIR" > /dev/null
+else
+    cd "$INSTALL_DIR"
+    git clean -fd
+    git pull
+fi
+
+"$INSTALL_DIR"/bin/pyenv rehash
