@@ -23,6 +23,6 @@ if [ -d "$PYTHONUSERBASE" ]; then
     full-update add pip-update
     full-update add pipns-update
     full-update add 'venv --prune'
-else
+elif ! command -v python > /dev/null; then
     unset PYTHONUSERBASE
 fi
