@@ -1,4 +1,4 @@
-export PYTHONUSERBASE=~/.local/pythonuser
+export PYTHONUSERBASE=~/.local/share/pythonuser
 
 if [ -d "$PYTHONUSERBASE" ]; then
     export PYENV_ROOT=~/.local/share/pyenv
