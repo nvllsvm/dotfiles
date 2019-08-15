@@ -1,4 +1,0 @@
-#!/usr/bin/env sh
-export ASPELL_CONF="per-conf ${DOTFILES}/aspell/aspell.conf; home-dir ${DOTFILES}/aspell"
-bin="$(which -a aspell | grep -v "^$0$" | head -n 1)"
-exec "${bin}" "$@"
