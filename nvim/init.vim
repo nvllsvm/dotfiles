@@ -76,7 +76,6 @@ command FixEmpty :set expandtab | :retab | call StripTrailingWhitespace() | :%s/
 
 call plug#begin('~/.config/nvim/plugged')
 Plug 'Shougo/deoplete.nvim'
-Plug 'gregsexton/MatchTag'
 Plug 'deoplete-plugins/deoplete-jedi', { 'do': ':UpdateRemotePlugins' }
 Plug 'neomake/neomake'
 Plug 'chriskempson/base16-vim'
@@ -86,13 +85,10 @@ Plug 'Vimjas/vim-python-pep8-indent'
 Plug 'davidhalter/jedi-vim'
 Plug 'fisadev/vim-isort'
 
-Plug 'udalov/kotlin-vim'
-
 Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }}
 
-Plug 'pedrohdz/vim-yaml-folds'
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 Plug 'dhruvasagar/vim-table-mode'
