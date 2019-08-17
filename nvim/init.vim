@@ -1,11 +1,11 @@
 let g:python3_host_prog=glob('~/.config/nvim/plugged/python')
 
-let g:deoplete#sources#jedi#python_path=system("python")
-let g:deoplete#sources#jedi#ignore_errors=1
-let g:deoplete#sources#jedi#show_docstring=1
+"let g:deoplete#sources#jedi#python_path=system("python")
+"let g:deoplete#sources#jedi#ignore_errors=1
+"let g:deoplete#sources#jedi#show_docstring=1
 
 if !empty($PYTHONPATH)
-    let g:deoplete#sources#jedi#extra_path=[$PYTHONPATH]
+"    let g:deoplete#sources#jedi#extra_path=[$PYTHONPATH]
 endif
 
 set ruler
@@ -76,13 +76,13 @@ command FixEmpty :set expandtab | :retab | call StripTrailingWhitespace() | :%s/
 
 call plug#begin('~/.config/nvim/plugged')
 Plug 'Shougo/deoplete.nvim'
-Plug 'deoplete-plugins/deoplete-jedi', { 'do': ':UpdateRemotePlugins' }
+"Plug 'deoplete-plugins/deoplete-jedi', { 'do': ':UpdateRemotePlugins' }
 Plug 'neomake/neomake'
 Plug 'chriskempson/base16-vim'
 Plug 'dbeniamine/todo.txt-vim'
 
 Plug 'Vimjas/vim-python-pep8-indent'
-Plug 'davidhalter/jedi-vim'
+"Plug 'davidhalter/jedi-vim'
 Plug 'fisadev/vim-isort'
 
 Plug 'godlygeek/tabular'
@@ -102,7 +102,7 @@ Plug 'chrisbra/csv.vim'
 Plug '907th/vim-auto-save'
 call plug#end()
 
-let g:jedi#completions_enabled = 0
+"let g:jedi#completions_enabled = 0
 
 " deoplete
 let g:deoplete#enable_at_startup = 1
@@ -210,9 +210,9 @@ augroup END
 augroup PYTHON
     au FileType python set foldmethod=indent
     au FileType python nnoremap <leader>y :0,$!yapf<Cr><C-o>
-    let g:jedi#completions_enabled = 0
-    let g:jedi#use_splits_not_buffers = "bottom"
-    let g:jedi#usages_command = "<leader>N"
+"    let g:jedi#completions_enabled = 0
+"    let g:jedi#use_splits_not_buffers = "bottom"
+"    let g:jedi#usages_command = "<leader>N"
 augroup END
 
 aug CSV_Editing
