@@ -1,4 +1,4 @@
-if command -v ranger > /dev/null; then
+if command -v fzf > /dev/null; then
     export FZF_DEFAULT_COMMAND="fd ."
 
     # Key bindings
