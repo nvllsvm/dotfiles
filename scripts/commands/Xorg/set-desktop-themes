@@ -111,7 +111,7 @@ fi
 
 pkill -9 -f dunst || true
 while true; do
-    height="$(i3-topbar-height)"
+    height="$(i3-msg -t get_tree | jq '[.nodes[].nodes[].nodes[].geometry.height] | max')"
     if [ "$height" = '0' ]; then
         sleep 0.25
         continue
