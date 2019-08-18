@@ -61,10 +61,9 @@ else
     if [ -n "$LARGE" ]; then
         FONT_SIZE=14
     fi
-fi
 
-# save settings
-cat > "$CURRENT_THEME" << EOF
+    # save settings
+    cat > "$CURRENT_THEME" << EOF
 BORDER_WIDTH="$BORDER_WIDTH"
 CURSOR_SIZE="$CURSOR_SIZE"
 DPI="$DPI"
@@ -74,6 +73,7 @@ FONT_NAME="$FONT_NAME"
 FONT_SIZE="$FONT_SIZE"
 SCALING_FACTOR="$SCALING_FACTOR"
 EOF
+fi
 
 # changing org.gnome.desktop.interface cursor-size after xrdb steps
 # fucks up i3's scaling...
@@ -110,6 +110,16 @@ if pidof i3 > /dev/null; then
 fi
 
 pkill -9 -f dunst || true
+while true; do
+    height="$(i3-topbar-height)"
+    if [ "$height" = '0' ]; then
+        sleep 0.25
+        continue
+    fi
+    DUNST_GEOMETRY="${DUNST_GEOMETRY}+${height}"
+    break
+done
+
 dunst \
     -font "$FONT_NAME $FONT_SIZE" \
     -frame_width "$BORDER_WIDTH" \
