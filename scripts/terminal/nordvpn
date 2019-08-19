@@ -2,7 +2,7 @@
 set -e
 
 NORDVPN_BASE=~/.local/share/nordvpn
-EXTRA_SCRIPT="$(which update-resolv-conf)"
+EXTRA_SCRIPT="$DOTFILES/scripts/openvpn/update-resolv-conf"
 CONFIG_URL='https://downloads.nordcdn.com/configs/archives/servers/ovpn.zip'
 RECOMMENDED_URL='https://nordvpn.com/wp-admin/admin-ajax.php?action=servers_recommendations'
 
