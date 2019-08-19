@@ -1,4 +1,9 @@
 #!/usr/bin/env sh
+BACKUP_DIR=/storage/Backup/sol/home
+if ! [ -d "$BACKUP_DIR" ]; then
+    echo "error: backup directory not found: $BACKUP_DIR" >&2
+    exit 1
+fi
 exec sudo rsync \
     -av \
     --progress \
@@ -11,4 +16,4 @@ exec sudo rsync \
     --exclude Code/sol-docker/volumes/jellyfin/cache \
     --exclude Code/sol-docker/volumes/jellyfin/config/log \
     --exclude Code/sol-docker/volumes/jellyfin/config/transcoding-temp \
-    ~ar /storage/Backup/sol/home
+    ~ar "$BACKUP_DIR"
