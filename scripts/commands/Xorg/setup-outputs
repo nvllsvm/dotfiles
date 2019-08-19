@@ -52,7 +52,7 @@ EOF
 
 mars() {
     if [ -z "$MODE" ]; then
-        MODE=single
+        MODE=desktop
     fi
 
     DESKTOP_SINK='alsa_output.usb-Schiit_Audio_USB_Modi_Device-00.iec958-stereo'
