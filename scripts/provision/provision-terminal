@@ -123,6 +123,7 @@ if [[ $osname == Linux* ]]; then
             fd \
             findutils \
             fzf \
+            jq \
             man \
             neovim \
             openssh \
