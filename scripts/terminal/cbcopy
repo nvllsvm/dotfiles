@@ -1,12 +1,14 @@
 #!/usr/bin/env sh
 if [ -n "$WAYLAND_DISPLAY" ]; then
     exec wl-copy
-elif command -v xclip > /dev/null; then
+elif [ -n "$XAUTHORITY" ]; then
     exec xclip -selection c
 elif command -v termux-clipboard-set > /dev/null; then
     exec termux-clipboard-set
 elif command -v pbcopy > /dev/null; then
     exec pbcopy
+elif command -v tmux > /dev/null; then
+    exec tmux load-buffer -
 else
     echo error: no suitable clipboard command detected >&2
     exit 1
