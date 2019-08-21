@@ -223,14 +223,12 @@ aug CSV_Editing
 aug end
 
 let g:clipboard = {
-      \   'name': 'myClipboard',
-      \   'copy': {
-      \      '+': 'cbcopy',
-      \      '*': 'cbcopy',
-      \   },
-      \   'paste': {
-      \      '+': 'cbpaste',
-      \      '*': 'cbpaste',
-      \   },
-      \   'cache_enabled': 1,
-      \ }
+    'copy': {
+        '+': 'cbcopy',
+        '*': 'cbcopy',
+    },
+    'paste': {
+        '+': 'cbpaste',
+        '*': 'cbpaste',
+    }
+}
