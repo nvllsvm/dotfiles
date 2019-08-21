@@ -110,16 +110,6 @@ if pidof i3 > /dev/null; then
 fi
 
 pkill -9 dunst || true
-while true; do
-    height="$(i3-msg -t get_tree | jq '[.nodes[].nodes[].nodes[].geometry.height] | max')"
-    if [ "$height" = '0' ]; then
-        sleep 0.25
-        continue
-    fi
-    DUNST_GEOMETRY="${DUNST_GEOMETRY}+${height}"
-    break
-done
-
 dunst \
     -font "$FONT_NAME $FONT_SIZE" \
     -frame_width "$BORDER_WIDTH" \
