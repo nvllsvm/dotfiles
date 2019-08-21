@@ -221,3 +221,16 @@ aug CSV_Editing
     let b:csv_arrange_align = 'l*'
     aut FileType csv set list& listchars&
 aug end
+
+let g:clipboard = {
+      \   'name': 'myClipboard',
+      \   'copy': {
+      \      '+': 'cbcopy',
+      \      '*': 'cbcopy',
+      \   },
+      \   'paste': {
+      \      '+': 'cbpaste',
+      \      '*': 'cbpaste',
+      \   },
+      \   'cache_enabled': 1,
+      \ }
