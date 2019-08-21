@@ -1,5 +1,6 @@
 let g:python3_host_prog=glob('~/.config/nvim/plugged/python')
 
+let g:deoplete#sources#jedi#python_path=system("python")
 let g:deoplete#sources#jedi#ignore_errors=1
 let g:deoplete#sources#jedi#show_docstring=1
 
@@ -208,7 +209,6 @@ augroup PYTHON
     au FileType python set foldmethod=indent
     au FileType python nnoremap <leader>y :0,$!yapf<Cr><C-o>
     let g:jedi#completions_enabled = 0
-    let g:jedi#use_splits_not_buffers = "bottom"
     let g:jedi#usages_command = "<leader>N"
 augroup END
 
