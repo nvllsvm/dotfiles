@@ -222,13 +222,4 @@ aug CSV_Editing
     aut FileType csv set list& listchars&
 aug end
 
-let g:clipboard = {
-    'copy': {
-        '+': 'cbcopy',
-        '*': 'cbcopy',
-    },
-    'paste': {
-        '+': 'cbpaste',
-        '*': 'cbpaste',
-    }
-}
+let g:clipboard = {'copy': {'+': 'cbcopy'}, 'paste': {'+': 'cbpaste'}}
