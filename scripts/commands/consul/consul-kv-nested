@@ -11,7 +11,7 @@ remove_prefix() {
 
 show_usage() {
     cat << EOF
-usage: consul-kv-tool [KEY]
+usage: consul-kv-nested [KEY]
 
 Format Consul keys into a nested JSON structure.
 
