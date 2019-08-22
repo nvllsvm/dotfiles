@@ -48,4 +48,14 @@ if [ -t 0 ]; then
     fi
 else
     format_json
+    if [ "$#" -eq 0 ]; then
+        format_json
+    elif [ "$#" -eq 1 ]; then
+        key="$(echo "$1" | sed 's/\/$//')"
+        format_json | remove_prefix "$key"
+    else
+        show_usage >&2
+        echo 'error: too many arguments' >&2
+        exit 1
+    fi
 fi
