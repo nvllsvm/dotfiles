@@ -9,12 +9,35 @@ remove_prefix() {
     jq -r "$key"
 }
 
+show_usage() {
+    echo 'usage: consul-kv-tool [KEY]'
+}
+
+while true; do
+    case "$1" in
+        -h|--help)
+            show_usage
+            exit
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
 if [ -t 0 ]; then
-    if [ "$#" -eq 1 ]; then
+    if [ "$#" -eq 0 ]; then
+        consul kv export | format_json
+    elif [ "$#" -eq 1 ]; then
         key="$(echo "$1" | sed 's/\/$//')"
-        consul kv export "$key" | format_json | remove_prefix "$key"
+        consul kv export -- "$key" | format_json | remove_prefix "$key"
     else
-        echo usage: consul-kv-tool [KEY] >&2
+        show_usage >&2
+        echo 'error: too many arguments' >&2
         exit 1
     fi
 else
