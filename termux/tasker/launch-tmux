@@ -1,0 +1,8 @@
+#!/data/data/com.termux/files/home/.termux/shell
+export LD_PRELOAD=${PREFIX}/lib/libtermux-exec.so
+env
+/usr/bin/env ls
+which zsh
+echo wow
+which tmux
+sleep 5
