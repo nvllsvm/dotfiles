@@ -10,7 +10,13 @@ remove_prefix() {
 }
 
 show_usage() {
-    echo 'usage: consul-kv-tool [KEY]'
+    cat << EOF
+usage: consul-kv-tool [KEY]
+
+Format Consul keys into a nested JSON structure.
+
+    -h, --help      show help and exit
+EOF
 }
 
 while true; do
