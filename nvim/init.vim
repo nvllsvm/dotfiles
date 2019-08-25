@@ -100,6 +100,8 @@ Plug 'rbgrouleff/bclose.vim'
 Plug 'chrisbra/csv.vim'
 
 Plug '907th/vim-auto-save'
+
+Plug 'udalov/kotlin-vim'
 call plug#end()
 
 " deoplete
