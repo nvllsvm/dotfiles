@@ -155,27 +155,6 @@ endfunction
 
 autocmd FileType yaml setlocal shiftwidth=2 tabstop=2
 
-function _JSONify()
-    set syntax=json
-    %!jq -S '.'
-    normal zR
-endfunction
-
-command JSON call _JSONify()
-
-function _YAMLify()
-    set syntax=yaml
-    %!yaml-format
-    normal zR
-endfunction
-
-command YAML call _YAMLify()
-
-au FileType json set shiftwidth=2
-au FileType json set tabstop=2
-
-au BufNewFile,BufRead *.avsc set filetype=json
-
 let g:markdown_enable_spell_checking = 0
 
 nnoremap <leader>z :Files<Cr>
@@ -194,6 +173,21 @@ let g:netrw_list_hide = '^.git/$,.pyc$,^../,^./'
 let g:netrw_bufsettings="noma nomod nu nobl nowrap ro rnu"
 
 autocmd VimResized * wincmd =
+
+augroup JSON
+    function _JSONify()
+        set syntax=json
+        %!jq -S '.'
+        normal zR
+    endfunction
+
+    command JSON call _JSONify()
+
+    au FileType json set shiftwidth=2
+    au FileType json set tabstop=2
+
+    au BufNewFile,BufRead *.avsc set filetype=json
+augroup END
 
 augroup MARKDOWN
     autocmd FileType markdown nnoremap <leader>m :MarkdownPreview<Cr>
