@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
+set -x
 
 file="$1"
 
@@ -28,7 +29,6 @@ render() {
         --standalone \
         --columns=10000 "$file"
 }
-
 
 if [ -n "$2" ]; then
     render > "$2"
