@@ -121,8 +121,8 @@ nnoremap <silent> <C-l> :nohl<CR>:NeomakeClean<CR><C-l>
 " open all folds automatically
 autocmd BufWinEnter * normal! zR
 
-" show trailing spaces
-set list listchars=tab:»·,trail:·
+" show trailing spaces and tabs
+autocmd FileType * set list listchars=tab:»·,trail:·
 
 let g:neomake_python_enabled_makers = ['flake8']
 
@@ -176,7 +176,7 @@ autocmd VimResized * wincmd =
 
 augroup JSON
     function _JSONify()
-        set syntax=json
+        set filetype=json
         %!jq -S '.'
         normal zR
     endfunction
@@ -214,5 +214,9 @@ aug CSV_Editing
     let b:csv_arrange_align = 'l*'
     aut FileType csv set list& listchars&
 aug end
+
+augroup GOLANG
+    aut FileType go set list& listchars&
+augroup END
 
 let g:clipboard = {'copy': {'+': 'cbcopy'}, 'paste': {'+': 'cbpaste'}}
