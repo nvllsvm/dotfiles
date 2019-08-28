@@ -3,13 +3,13 @@
 set -e
 
 randhex() {
-    cat /dev/urandom | LC_ALL=C tr -cd 'a-f0-9' | head -c $1
+    LC_ALL=C tr -cd 'a-f0-9' < /dev/urandom | head -c "$1"
 }
 
 uuid="$(randhex 8)-$(randhex 4)-$(randhex 4)-$(randhex 4)-$(randhex 12)"
 
 if [ -t 1 ]; then
-    echo $uuid
+    echo "$uuid"
 else
-    printf $uuid
+    printf '%s' "$uuid"
 fi
