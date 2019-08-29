@@ -40,5 +40,6 @@ if [ "$current_branch" != master ]; then
     git checkout "$current_branch"
     git stash pop --quiet
 else
-    git pull --all
+    git branch -u "${REMOTE}/master"
+    git rebase "${REMOTE}/master"
 fi
