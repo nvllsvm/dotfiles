@@ -1,0 +1,12 @@
+[core]
+    excludesfile = ~/.dotfiles/public/git/.gitignore
+[credential]
+	helper = cache
+[color]
+	ui = auto
+[difftool]
+	prompt = false
+[diff]
+	tool = vimdiff
+[difftool "vimdiff"]
+	cmd = nvim -d \"$LOCAL\" \"$REMOTE\"
