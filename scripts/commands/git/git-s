@@ -36,5 +36,15 @@ echo "${output}" | column -t
 log All Branch
 git branch -vv
 
-log Changes
-git status --short --show-stash
+stash="$(git stash list)"
+if [ -n "$stash" ]; then
+    log Stash
+    echo "$stash"
+fi
+
+status="$(git -c color.status=always status --short)"
+if [ -n "$status" ]; then
+    log Changes
+    echo "$status"
+fi
+
