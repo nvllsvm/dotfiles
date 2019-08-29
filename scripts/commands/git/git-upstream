@@ -29,12 +29,14 @@ if ! has_upstream_remote; then
     exit 1
 fi
 
+git fetch "$REMOTE"
+
 current_branch="$(git rev-parse --abbrev-ref HEAD)"
 if [ "$current_branch" != master ]; then
     git stash --all --quiet
     git checkout master
-    git branch -u upstream/master
-    git pull --all
+    git branch -u "${REMOTE}/master"
+    git rebase "${REMOTE}/master"
     git checkout "$current_branch"
     git stash pop --quiet
 else
