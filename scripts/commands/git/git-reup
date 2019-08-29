@@ -1,0 +1,86 @@
+#!/usr/bin/env sh
+set -e
+
+show_help() {
+    cat << EOF
+usage: git upstream REMOTE [URL]
+
+add and update upstream remote and branches
+
+    -b          use upstream for this branch
+    --help      show help and exit
+EOF
+}
+
+has_upstream_remote() {
+    git remote | grep -q "^${REMOTE}$"
+}
+
+
+local_branches_with_upstream_remote() {
+    git branch --format='%(upstream:remotename) %(refname:short)' | awk "{if (\$1 == \"$REMOTE\") print \$2}"
+}
+
+
+UPSTREAM_BRANCHES=''
+while true; do
+    case "$1" in
+        --help)
+            show_help
+            exit
+            ;;
+        -b)
+            UPSTREAM_BRANCHES="$2 ${UPSTREAM_BRANCHES}"
+            shift
+            shift
+            ;;
+        *)
+            if [ $# -eq 2 ]; then
+                REMOTE="$1"
+                SET_UPSTREAM="$2"
+            elif [ $# -eq 1 ]; then
+                REMOTE="$1"
+            elif [ $# -ne 0 ]; then
+                echo error: unknown arguments >&2
+                exit 1
+            fi
+            break
+            ;;
+    esac
+done
+
+current_branch="$(git branch --show-current)"
+if [ -z "$current_branch" ]; then
+    echo error: must be on a branch to use this command >&2
+    exit 1
+fi
+
+if [ -n "$SET_UPSTREAM" ]; then
+    if has_upstream_remote; then
+        git remote set-url "$REMOTE" -- "$SET_UPSTREAM"
+    else
+        git remote add "$REMOTE" -- "$SET_UPSTREAM"
+    fi
+fi
+
+if ! has_upstream_remote; then
+    echo error: remote is not set >&2
+    exit 1
+fi
+
+git fetch "$REMOTE"
+
+for branch in $UPSTREAM_BRANCHES; do
+    git branch -q "$branch" 2>/dev/null || true
+    git branch -u "${REMOTE}/${branch}" "${branch}"
+done
+
+branches="$(local_branches_with_upstream_remote)"
+if [ -n "$branches" ]; then
+    git stash --all --quiet 2> /dev/null || true
+    for branch in $branches; do
+        git rebase FETCH_HEAD "$branch"
+    done
+    git switch -q "$current_branch"
+    git stash pop --quiet 2> /dev/null || true
+fi
