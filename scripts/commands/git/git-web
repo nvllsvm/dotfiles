@@ -1,0 +1,36 @@
+#!/usr/bin/env sh
+set -e
+
+get_ssh_hostname() {
+    # this is incredibly fragile
+    sed -n '/^Host\s*'"$1"'$/,/^Host\s*/p' ~/.ssh/config | grep -i ' hostname ' | awk '{print $2}'
+}
+
+if [ -n "$1" ]; then
+    cd "$1"
+fi
+
+url=''
+for remote in upstream origin; do
+    url="$(git remote get-url "$remote" 2> /dev/null || true)"
+    if [ -n "$url" ]; then
+        break
+    fi
+done
+
+git_path="${url#*:}"
+git_host="${url%:*}"
+
+ssh_hostname="$(get_ssh_hostname $git_host)"
+case "$url" in
+    https://*|http://*)
+        open "${url}"
+        ;;
+    *)
+        if [ -n "$ssh_hostname" ]; then
+            open "https://${ssh_hostname}/${git_path}"
+        else
+            echo "error: cannot open \"${url}\"" >&2
+            exit 1
+        fi
+esac
