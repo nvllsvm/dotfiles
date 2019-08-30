@@ -1,0 +1,15 @@
+#!/usr/bin/env -S zsh -i
+if command -v xdg-open > /dev/null; then
+    if [ -z "$XAUTHORITY" ]; then
+        export XAUTHORITY=~/.Xauthority
+        export DISPLAY=$(
+            ps e -u $USERNAME | \
+            sed -rn 's/.* DISPLAY=(:[0-9]*).*/\1/p' | \
+            head -n 1)
+    fi
+    xdg-open "$@" &
+elif command -v termux-open > /dev/null; then
+    termux-open "$@" &
+else
+    exit 1
+fi

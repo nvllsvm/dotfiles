@@ -1,9 +1,0 @@
-#!/usr/bin/env -S zsh -i
-if [ -z "$XAUTHORITY" ]; then
-    export XAUTHORITY=~/.Xauthority
-    export DISPLAY=$(
-        ps e -u $USERNAME | \
-        sed -rn 's/.* DISPLAY=(:[0-9]*).*/\1/p' | \
-        head -n 1)
-fi
-exec xdg-open "$@"
