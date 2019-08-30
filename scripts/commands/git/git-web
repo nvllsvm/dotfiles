@@ -2,8 +2,15 @@
 set -e
 
 get_ssh_hostname() {
-    # this is incredibly fragile
-    sed -n '/^Host\s*'"$1"'$/,/^Host\s*/p' ~/.ssh/config | grep -i ' hostname ' | awk '{print $2}'
+    awk -v target_host="$1" '
+        tolower($1) == "host" {
+            host = $2;
+            next;
+        }
+        tolower($1) == "hostname" && host == target_host {
+            printf "%s", $2;
+        }' \
+        ~/.ssh/config
 }
 
 if [ -n "$1" ]; then
@@ -18,11 +25,16 @@ for remote in upstream origin; do
     fi
 done
 
+if [ -z "$url" ]; then
+    echo error: cannot determine remote 2> /dev/null
+    exit 1
+fi
+
 git_path="${url#*:}"
 git_host="${url%:*}"
 
-ssh_hostname="$(get_ssh_hostname $git_host)"
-case "$url" in
+ssh_hostname="$(get_ssh_hostname "$git_host")"
+case "$(echo "$url" | tr '[:upper:]' '[:lower:]')" in
     https://*|http://*)
         open "${url}"
         ;;
