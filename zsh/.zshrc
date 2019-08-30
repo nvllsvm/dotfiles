@@ -150,6 +150,3 @@ if [ -d "$host_scripts" ]; then
     path=("$host_scripts" "$path[@]")
 fi
 unset host_scripts
-
-# case-insensitive completions
-zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
