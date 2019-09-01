@@ -17,6 +17,8 @@ setxkbmap -option caps:escape
 xset -dpms
 xset s off
 
+setup-outputs
+
 compton &
 /usr/lib/gsd-xsettings &
 xbindkeys &
@@ -28,7 +30,5 @@ fi
 
 nm-applet &
 syncthing-gtk &
-
-setup-outputs
 
 exec i3
