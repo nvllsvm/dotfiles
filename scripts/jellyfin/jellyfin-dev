@@ -8,8 +8,10 @@ cd ~/Code/jellyfin
 rm -rf debug
 
 if [ "$1" = 'podman' ]; then
-    if [ -n "$2" ]; then
-        IMAGE="$2"
+    shift
+    if [ -n "$1" ]; then
+        IMAGE="$1"
+        shift
     else
         IMAGE=jellyfin_dev
         podman build --pull -t jellyfin_dev .
@@ -17,12 +19,14 @@ if [ "$1" = 'podman' ]; then
         #--volume "/dev/dri:/dev/dri" \
     mkdir -p "${JELLYFIN_DATA}/cache"
     mkdir -p "${JELLYFIN_DATA}/config"
-    exec podman-shell \
+    exec podman run \
         -v "$JELLYFIN_DATA/config:/config" \
         -v "$JELLYFIN_DATA/cache:/cache" \
+        --name jellyfin_dev \
         --net host \
         --volume "/storage/Video:/video:ro" \
         --volume "/storage/Audio/MP3:/music:ro" \
+        "$@" \
         "$IMAGE"
 elif [ "$1" = 'dotnet' ]; then
     OUTPUT_DIR="$(pwd)/debug"
