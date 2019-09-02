@@ -7,11 +7,9 @@ if command -v xdg-open > /dev/null; then
             sed -rn 's/.* DISPLAY=(:[0-9]*).*/\1/p' | \
             head -n 1)
     fi
-    xdg-open "$@" &> /dev/null &
-    disown &> /dev/null
+    xdg-open "$@" &> /dev/null &!
 elif command -v termux-open > /dev/null; then
-    termux-open "$@" &> /dev/null &
-    disown &> /dev/null
+    termux-open "$@" &> /dev/null &!
 else
     exit 1
 fi

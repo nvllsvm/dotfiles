@@ -8,20 +8,21 @@ cd ~/Code/jellyfin
 rm -rf debug
 
 if [ "$1" = 'podman' ]; then
-    if [ -z "$2" ]; then
-        IMAGE=jellyfin_dev
-        buildah build-using-dockerfile -t jellyfin_dev --pull .
+    if [ -n "$2" ]; then
+        IMAGE="$2"
     else
-        IMAGE="jellyfin/jellyfin:$2"
+        IMAGE=jellyfin_dev
+        podman build --pull -t jellyfin_dev .
     fi
         #--volume "/dev/dri:/dev/dri" \
-    mkdir -p "$JELLYFIN_DATA"
+    mkdir -p "${JELLYFIN_DATA}/cache"
+    mkdir -p "${JELLYFIN_DATA}/config"
     podman-shell \
         -v "$JELLYFIN_DATA/config:/config" \
         -v "$JELLYFIN_DATA/cache:/cache" \
         --net host \
-        --volume "/storage/Video:/media:ro" \
-        --volume "/storage/Audio/MP3:/audio:ro" \
+        --volume "/storage/Video:/video:ro" \
+        --volume "/storage/Audio/MP3:/music:ro" \
         "$IMAGE"
 elif [ "$1" = 'dotnet' ]; then
     OUTPUT_DIR="$(pwd)/debug"
