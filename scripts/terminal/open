@@ -1,4 +1,5 @@
-#!/usr/bin/env -S zsh -i
+#!/usr/bin/env sh
+set -e
 if command -v xdg-open > /dev/null; then
     if [ -z "$XAUTHORITY" ]; then
         export XAUTHORITY=~/.Xauthority
@@ -7,9 +8,15 @@ if command -v xdg-open > /dev/null; then
             sed -rn 's/.* DISPLAY=(:[0-9]*).*/\1/p' | \
             head -n 1)
     fi
-    xdg-open "$@" &> /dev/null &!
+    nohup xdg-open "$@" > /dev/null 2>&1 &
 elif command -v termux-open > /dev/null; then
-    termux-open "$@" &> /dev/null &!
+    nohup termux-open "$@" > /dev/null 2>&1 &
 else
-    exit 1
+    bin="$(which -a "$(basename "$0")" | grep -v "^$0$" | head -n 1)"
+    if [ -n "$bin" ]; then
+        exec open "$@"
+    else
+        echo error: command not not found >&2
+        exit 1
+    fi
 fi
