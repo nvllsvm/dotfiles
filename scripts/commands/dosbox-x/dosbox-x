@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+bin="$(which -a "$(basename "$0")" | grep -v "^$0$" | head -n 1)"
+if [ -z "$bin" ]; then
+    echo error: command not not found >&2
+    exit 1
+fi
+if [ $# -eq 0 ]; then
+    cd $DOTFILES/dosbox-x
+fi
+exec "$bin" "$@"
