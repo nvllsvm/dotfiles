@@ -17,7 +17,7 @@ if [ "$1" = 'podman' ]; then
         #--volume "/dev/dri:/dev/dri" \
     mkdir -p "${JELLYFIN_DATA}/cache"
     mkdir -p "${JELLYFIN_DATA}/config"
-    podman-shell \
+    exec podman-shell \
         -v "$JELLYFIN_DATA/config:/config" \
         -v "$JELLYFIN_DATA/cache:/cache" \
         --net host \
@@ -31,7 +31,7 @@ elif [ "$1" = 'dotnet' ]; then
         --output "${OUTPUT_DIR}" \
         Jellyfin.Server
 
-    dotnet "${OUTPUT_DIR}/jellyfin.dll" --datadir ~/.jellyfin_dev "$@"
+    exec dotnet "${OUTPUT_DIR}/jellyfin.dll" --datadir ~/.jellyfin_dev "$@"
 else
     echo "usage: jellyfin-dev {dotnet,podman}" >&2
     exit 1
