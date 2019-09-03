@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -e
 if command -v xdg-open > /dev/null; then
-    if [ -z "$XAUTHORITY" ]; then
+    if pidof Xorg > /dev/null && [ -z "$XAUTHORITY" ]; then
         export XAUTHORITY=~/.Xauthority
         export DISPLAY=$(
             ps e -u $USERNAME | \
