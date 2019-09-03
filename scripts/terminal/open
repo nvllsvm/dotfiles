@@ -14,7 +14,7 @@ elif command -v termux-open > /dev/null; then
 else
     bin="$(which -a "$(basename "$0")" | grep -v "^$0$" | head -n 1)"
     if [ -n "$bin" ]; then
-        exec open "$@"
+        exec "$bin" "$@"
     else
         echo error: command not not found >&2
         exit 1
