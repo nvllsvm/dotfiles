@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 if command -v firefox > /dev/null; then
-    nohup firefox --private-window "https://duckduckgo.com/?q=$*" &
+    nohup firefox --private-window "https://duckduckgo.com/?q=$*" > /dev/null 2>&1 &
 else
     exec open "https://duckduckgo.com/?q=$*"
 fi

@@ -38,7 +38,7 @@ bindsym $mod+Return exec termite
 # kill focused window
 bindsym $mod+Shift+q kill
 
-bindsym $mod+space exec rofi -modi run#ddg:rofi-ddg -show run
+bindsym $mod+space exec rofi-filter-history -show run
 bindsym ctrl+$mod+space exec rofimoji --use-clipboard --skin-tone neutral
 
 bindsym $mod+x [class="^.*"] border toggle
