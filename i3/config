@@ -33,6 +33,8 @@ font pango:$font $fontSize
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
 
+bindsym $mod+Return exec termite
+
 # kill focused window
 bindsym $mod+Shift+q kill
 
