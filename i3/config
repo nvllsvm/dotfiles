@@ -33,17 +33,10 @@ font pango:$font $fontSize
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
 
-# start a terminal
-bindsym $mod+Return exec termite-cwd
-bindsym $mod+Shift+Return exec termite
-
 # kill focused window
 bindsym $mod+Shift+q kill
 
-# start dmenu (a program launcher)
-#bindsym $mod+space exec dmenu_run -fn '$font-$fontSize'
-bindsym $mod+space exec rofi -show run
-bindsym $mod+o exec rofi -lines 0 -dmenu -p ddg | xargs ddg
+bindsym $mod+space exec rofi -modi run#ddg:rofi-ddg -show run
 bindsym ctrl+$mod+space exec rofimoji --use-clipboard --skin-tone neutral
 
 bindsym $mod+x [class="^.*"] border toggle
