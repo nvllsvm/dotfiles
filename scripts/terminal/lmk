@@ -34,7 +34,7 @@ while true; do
 done
 
 if [ $# -eq 0 ]; then
-    publish_message "$PWD"
+    publish_message
     exit
 fi
 
