@@ -54,6 +54,7 @@ if [ -n "$LMK" ]; then
     (get_message && tmux respawn-pane -k -t "$TMUX_PANE" lmk "$@") > /dev/null 2>&1 &
     trap interrupt INT
     "$@"
+    trap - INT
     wait
 else
     unset TMUX
