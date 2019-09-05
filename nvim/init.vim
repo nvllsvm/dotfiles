@@ -139,7 +139,10 @@ augroup my_neomake_highlights
 augroup END
 
 autocmd! BufWritePost * Neomake
-autocmd BufWritePost * call system("lmk --path '" . expand('%:p') . "\' &")
+
+" readd support for --path to lmk
+"autocmd BufWritePost * call system("lmk --path '" . expand('%:p') . "\' &")
+autocmd BufWritePost * call system("lmk")
 
 let base16colorspace=256
 if !empty(glob("~/.base16_theme"))
