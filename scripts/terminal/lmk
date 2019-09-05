@@ -38,9 +38,21 @@ if [ $# -eq 0 ]; then
     exit
 fi
 
+interrupted=
+interrupt() {
+    if [ -z "$interrupted" ]; then
+        interrupted=1
+        cat
+    else
+        exit
+    fi
+}
+
+
 if [ -n "$LMK" ]; then
     set +e
     (get_message && tmux respawn-pane -k -t "$TMUX_PANE" lmk "$@") > /dev/null 2>&1 &
+    trap interrupt INT
     "$@"
     wait
 else
