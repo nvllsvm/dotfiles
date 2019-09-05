@@ -14,8 +14,7 @@ get_message() {
 show_help() {
     cat << EOF
 usage: lmk [--help] [COMMAND [ARGUMENT ...]]
-    -q, --quiet     Suppress the exit status line
-        --help      Display this help and exit
+    --help      Display this help and exit
 EOF
 }
 
