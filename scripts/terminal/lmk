@@ -40,6 +40,7 @@ if [ $# -eq 0 ]; then
 fi
 
 if [ -n "$TMUX" ]; then
+    clear
     (get_message && tmux respawn-pane -k -t "$TMUX_PANE" lmk "$@") > /dev/null 2>&1 &
     "$@"
     wait
