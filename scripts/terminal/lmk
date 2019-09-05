@@ -1,21 +1,10 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 set -e
 
 FANPIPE_TOPIC='lmk-fs-event'
-LINK_PWD="$(readlink -f "$PWD")"
-
-GREEN='\033[1;32m'
-RED='\033[1;31m'
-RESET_COLOR='\033[0m'
-#REVERSE_COLOR='\033[7m'
-
-kill_all() {
-    jobs -rp | xargs -L 1 pkill -P &> /dev/null || true
-    pkill -P $$ &> /dev/null || true
-}
 
 publish_message() {
-    fanpipe --publish --topic "$FANPIPE_TOPIC" "$1"
+    fanpipe --publish --topic "$FANPIPE_TOPIC"
 }
 
 get_message() {
@@ -24,37 +13,11 @@ get_message() {
 
 show_help() {
     cat << EOF
-usage: lmk [-a] [-w] [--help] [COMMAND [ARGUMENT ...]]
-    -a, --all       Listen for all lmk events
+usage: lmk [--help] [COMMAND [ARGUMENT ...]]
     -q, --quiet     Suppress the exit status line
-    -w, --wait      Wait for first event before executing
         --help      Display this help and exit
 EOF
 }
-
-
-while true; do
-    case "$1" in
-        -a|--all)
-            LMK_ANY=1
-            shift
-            ;;
-        -q|--quiet)
-            LMK_SHOW_EXIT_STATUS=
-            shift
-            ;;
-        -w|--wait)
-            LMK_WAIT_FIRST=1
-            shift
-            ;;
-        --help)
-            show_help
-            exit
-            ;;
-        *)
-            break
-    esac
-done
 
 if [ -z "$1" ]; then
     publish_message "$PWD"
@@ -65,63 +28,26 @@ elif [ "$1" = '--path' ]; then
 fi
 
 
-trap "exit 1" INT
-trap "kill_all" EXIT
-
-exec_command() {
-    set +e
-    "$@"
-    ret=$?
-    if [ "$ret" != '0' ]; then
-        color="$RED"
-    else
-        color="$GREEN"
-    fi
-    if [ "$(column_num 2> /dev/null)" != '0' ]; then
-        # printf '%b%%%b\n' "$REVERSE_COLOR" "$RESET_COLOR"
-        printf '\n'
-    fi
-    if [ -n "$LMK_SHOW_EXIT_STATUS" ]; then
-        printf '%bExit %s - %s%b' "$color" "$ret" "$(date -u +"%Y-%m-%d %H:%M:%S")" "$RESET_COLOR"
-    fi
-}
-
-
-column_num() {
-    exec < /dev/tty
-    oldstty=$(stty -g)
-    stty raw -echo min 0
-    # on my system, the following line can be replaced by the line below it
-    echo -en "\033[6n" > /dev/tty
-    # tput u7 > /dev/tty    # when TERM=xterm (and relatives)
-    IFS=';' read -r -d R -a pos
-    stty $oldstty
-    # change from one-based to zero based so they work with: tput cup $row $col
-    row=$((${pos[0]:2} - 1))    # strip off the esc-[
-    col=$((${pos[1]} - 1))
-    echo $col
-}
-
-while true; do
-    if [ -n "$LMK_WAIT_FIRST" ]; then
-        unset LMK_WAIT_FIRST
-    else
-        # exit tmux copy-mode
-        if [ -n "$TMUX" ]; then
-            tmux if -F -t "$TMUX_PANE" "#{pane_in_mode}" "send-keys -t $TMUX_PANE -X cancel"
-        fi
-
-        kill_all
-        clear
-        exec_command "$@" &
-
-        disown
-    fi
-
+if [ -n "$LMK_INSIDE" ]; then
+    tmux unbind -a
+    tmux set-option destroy-unattached on
+    tmux set-option detach-on-destroy on
+    tmux set-option status off
+    "$@" &
+    get_message
+    tmux new-window -k -t 0 lmk "$@"
+else
     while true; do
-        EVENT_PATH=$(get_message)
-        if [ -n "$LMK_ANY" ] || [[ "$EVENT_PATH"/ = "$PWD"/* ]] || [[ "$EVENT_PATH"/ = "$LINK_PWD"/* ]]; then
-            break
-        fi
+        case "$1" in
+            --help)
+                show_help
+                exit
+                ;;
+            *)
+                break
+        esac
     done
-done
+
+    unset TMUX
+    LMK_INSIDE=1 tmux -L test -f /dev/null new-session -A lmk "$@"
+fi
