@@ -50,5 +50,5 @@ else
         set-option status off ';' \
         set-option destroy-unattached on ';' \
         set-option detach-on-destroy on ';' \
-        attach
+        attach -r
 fi
