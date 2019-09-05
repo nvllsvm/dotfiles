@@ -19,14 +19,6 @@ usage: lmk [--help] [COMMAND [ARGUMENT ...]]
 EOF
 }
 
-if [ -z "$1" ]; then
-    publish_message "$PWD"
-    exit
-elif [ "$1" = '--path' ]; then
-    publish_message "$(readlink -f "$2")"
-    exit
-fi
-
 while true; do
     case "$1" in
         --help)
@@ -38,6 +30,10 @@ while true; do
     esac
 done
 
+if [ $# -eq 0 ]; then
+    publish_message "$PWD"
+    exit
+fi
 
 if [ -n "$TMUX" ]; then
     "$@" &
