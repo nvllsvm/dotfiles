@@ -9,7 +9,7 @@ User=kodi
 Group=kodi
 PAMName=login
 TTYPath=/dev/tty1
-ExecStart=/usr/bin/xinit sh -c 'xset s off -dpms && exec kodi-standalone' -- :0 -nolisten tcp vt1
+ExecStart=/usr/bin/xinit -- :0 -nolisten tcp vt1
 Restart=on-abort
 StandardInput=tty
 
