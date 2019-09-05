@@ -29,13 +29,9 @@ fi
 
 
 if [ -n "$LMK_INSIDE" ]; then
-    tmux unbind -a
-    tmux set-option destroy-unattached on
-    tmux set-option detach-on-destroy on
-    tmux set-option status off
     "$@" &
     get_message
-    tmux new-window -k -t 0 lmk "$@"
+    tmux respawn-pane -k -t "$TMUX_PANE" lmk "$@"
 else
     while true; do
         case "$1" in
@@ -48,6 +44,14 @@ else
         esac
     done
 
-    unset TMUX
-    LMK_INSIDE=1 tmux -L test -f /dev/null new-session -A lmk "$@"
+    if [ -z "$TMUX" ]; then
+        LMK_INSIDE=1 tmux -L lmk-$$ -f /dev/null \
+            new-session lmk "$@" ';' \
+            set-option status off ';' \
+            set-option destroy-unattached on ';' \
+            set-option detach-on-destroy on ';' \
+            attach
+    else
+        LMK_INSIDE=1 lmk "$@"
+    fi
 fi
