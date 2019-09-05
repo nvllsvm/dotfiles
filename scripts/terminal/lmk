@@ -46,6 +46,7 @@ if [ -n "$TMUX" ]; then
 else
     tmux -L lmk-$$ -f /dev/null \
         new-session lmk "$@" ';' \
+        unbind -a ';' \
         set-option status off ';' \
         set-option destroy-unattached on ';' \
         set-option detach-on-destroy on ';' \
