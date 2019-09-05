@@ -39,17 +39,19 @@ if [ $# -eq 0 ]; then
     exit
 fi
 
-if [ -n "$TMUX" ]; then
-    clear
+if [ -n "$LMK" ]; then
+    set +e
     (get_message && tmux respawn-pane -k -t "$TMUX_PANE" lmk "$@") > /dev/null 2>&1 &
     "$@"
     wait
 else
-    tmux -L lmk-$$ -f /dev/null \
-        new-session lmk "$@" ';' \
+    unset TMUX
+    LMK=1 tmux -L lmk-$$ -f /dev/null \
         unbind -a ';' \
-        set-option status off ';' \
-        set-option destroy-unattached on ';' \
-        set-option detach-on-destroy on ';' \
+        set-option -g terminal-overrides '*:smcup@:rmcup@' ';' \
+        set-option -g status off ';' \
+        set-option -g destroy-unattached on ';' \
+        set-option -g detach-on-destroy on ';' \
+        new-session lmk "$@" ';' \
         attach -r
 fi
