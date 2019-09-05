@@ -21,6 +21,10 @@ EOF
 
 while true; do
     case "$1" in
+        --)
+            shift
+            break
+            ;;
         --help)
             show_help
             exit
