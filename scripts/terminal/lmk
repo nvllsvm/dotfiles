@@ -27,31 +27,27 @@ elif [ "$1" = '--path' ]; then
     exit
 fi
 
+while true; do
+    case "$1" in
+        --help)
+            show_help
+            exit
+            ;;
+        *)
+            break
+    esac
+done
 
-if [ -n "$LMK_INSIDE" ]; then
+
+if [ -n "$TMUX" ]; then
     "$@" &
     get_message
     tmux respawn-pane -k -t "$TMUX_PANE" lmk "$@"
 else
-    while true; do
-        case "$1" in
-            --help)
-                show_help
-                exit
-                ;;
-            *)
-                break
-        esac
-    done
-
-    if [ -z "$TMUX" ]; then
-        LMK_INSIDE=1 tmux -L lmk-$$ -f /dev/null \
-            new-session lmk "$@" ';' \
-            set-option status off ';' \
-            set-option destroy-unattached on ';' \
-            set-option detach-on-destroy on ';' \
-            attach
-    else
-        LMK_INSIDE=1 lmk "$@"
-    fi
+    tmux -L lmk-$$ -f /dev/null \
+        new-session lmk "$@" ';' \
+        set-option status off ';' \
+        set-option destroy-unattached on ';' \
+        set-option detach-on-destroy on ';' \
+        attach
 fi
