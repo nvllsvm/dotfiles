@@ -1,2 +1,0 @@
-#compdef wtchr
-_arguments : '*::command arguments:_normal'

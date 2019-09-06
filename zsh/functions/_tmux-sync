@@ -1,2 +1,0 @@
-#compdef tmux-sync
-_arguments : '*::command arguments:_normal'
