@@ -10,6 +10,7 @@ application/xhtml+xml=firefox.desktop
 audio/flac=mpv.desktop
 audio/mpeg=mpv.desktop
 audio/x-opus+ogg=mpv.desktop
+image/gif=nomacs.desktop
 image/jpeg=nomacs.desktop
 image/png=nomacs.desktop
 text/html=firefox.desktop
