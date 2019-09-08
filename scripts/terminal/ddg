@@ -9,7 +9,7 @@ show_help() {
     cat << EOF
 usage: ddg QUERY [QUERY]
 
-    --bangs     search for bangs and exit
+    --bangs     show bang list and exit
     --help      show help and exit
 EOF
 }
@@ -18,7 +18,7 @@ EOF
 while true; do
     case "$1" in
         --bangs)
-            download_bang_list | fzf | awk '{print $1}'
+            download_bang_list
             exit
             ;;
         --help)
