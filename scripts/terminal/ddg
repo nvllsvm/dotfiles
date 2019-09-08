@@ -33,7 +33,7 @@ while true; do
     case "$1" in
         --bangs)
             update_bang_cache
-            fzf < "$BANG_CACHE"
+            fzf < "$BANG_CACHE" | awk '{print $1}'
             exit
             ;;
         --help)
