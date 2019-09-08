@@ -1,17 +1,23 @@
 #!/usr/bin/env sh
-fzf_bangs() {
-    BANG_CACHE=~/.cache/ddg_bang.cache
-    MAX_AGE="$((60 * 60 * 24 * 14))"
+set -e
 
-    mod="$(stat --format=%Y "$BANG_CACHE" 2>/dev/null)"
-    now="$(date +%s)"
-    elapsed="$((now - mod))"
-    if ! [ -e "$BANG_CACHE" ] || [ "$elapsed" -gt "$MAX_AGE" ]; then 
-        curl -s https://duckduckgo.com/bang.js | jq -r '.[] | ["!" + .t, .s, .d] | @tsv' > "$BANG_CACHE" 
+BANG_CACHE=~/.cache/ddg_bang.cache
+
+update_bang_cache() {
+    if [ -e "$BANG_CACHE" ]; then
+        mod="$(stat --format=%Y "$BANG_CACHE" 2>/dev/null)"
+        if [ "$mod" -lt "$(date --date '14 days ago' +%s)" ]; then 
+            download_bang_cache
+        fi
+    else
+        download_bang_cache
     fi
-    fzf < "$BANG_CACHE"
 }
 
+download_bang_cache() {
+    echo Downloading bang list >&2
+    curl -s https://duckduckgo.com/bang.js | jq -r '.[] | ["!" + .t, .s, .d] | @tsv' > "$BANG_CACHE" 
+}
 
 show_help() {
     cat << EOF
@@ -26,7 +32,8 @@ EOF
 while true; do
     case "$1" in
         --bangs)
-            fzf_bangs
+            update_bang_cache
+            fzf < "$BANG_CACHE"
             exit
             ;;
         --help)
