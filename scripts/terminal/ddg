@@ -16,7 +16,7 @@ update_bang_cache() {
 
 download_bang_cache() {
     echo Downloading bang list >&2
-    curl -s https://duckduckgo.com/bang.js | jq -r '.[] | ["!" + .t, .s, .d] | @tsv' > "$BANG_CACHE" 
+    curl -s --compressed https://duckduckgo.com/bang.js | jq -r '.[] | ["!" + .t, .s, .d] | @tsv' > "$BANG_CACHE" 
 }
 
 show_help() {
