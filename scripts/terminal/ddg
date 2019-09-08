@@ -1,22 +1,8 @@
 #!/usr/bin/env sh
 set -e
 
-BANG_CACHE=~/.cache/ddg_bang.cache
-
-update_bang_cache() {
-    if [ -e "$BANG_CACHE" ]; then
-        mod="$(stat --format=%Y "$BANG_CACHE" 2>/dev/null)"
-        if [ "$mod" -lt "$(date --date '14 days ago' +%s)" ]; then 
-            download_bang_cache
-        fi
-    else
-        download_bang_cache
-    fi
-}
-
-download_bang_cache() {
-    echo Downloading bang list >&2
-    curl -s --compressed https://duckduckgo.com/bang.js | jq -r '.[] | ["!" + .t, .s, .d] | @tsv' > "$BANG_CACHE" 
+download_bang_list() {
+    curl -s --compressed https://duckduckgo.com/bang.js | jq -r '.[] | ["!" + .t, .s, .d] | @tsv'
 }
 
 show_help() {
@@ -32,8 +18,7 @@ EOF
 while true; do
     case "$1" in
         --bangs)
-            update_bang_cache
-            fzf < "$BANG_CACHE" | awk '{print $1}'
+            download_bang_list | fzf | awk '{print $1}'
             exit
             ;;
         --help)
