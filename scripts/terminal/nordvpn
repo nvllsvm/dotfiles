@@ -21,14 +21,22 @@ connect to the recommended NordVPN server
 EOF
 }
 
+extract_etag() {
+    awk '{ if (tolower($1) == "etag:") print $2 }'
+}
+
 update_config() {
-    echo "Updating OpenVPN configuration ..."
-    rm -rf "$NORDVPN_BASE"
-    mkdir -p "$NORDVPN_BASE"
     target="$NORDVPN_BASE/ovpn.zip"
-    curl -sSf "$CONFIG_URL" -o "$target"
-    7z x "$target" "-o$NORDVPN_BASE" > /dev/null
-    rm "$target"
+    etag="$NORDVPN_BASE/etag"
+    remote_etag="$(curl -s --head "$CONFIG_URL" | extract_etag)"
+    if [ "$(cat "$etag" 2> /dev/null)" != "$remote_etag" ]; then
+        echo "Downloading OpenVPN configuration ..."
+        rm -rf "$NORDVPN_BASE"
+        mkdir -p "$NORDVPN_BASE"
+        curl -sS -D - "$CONFIG_URL" -o "$target" | extract_etag > "$etag"
+        7z x "$target" "-o$NORDVPN_BASE" > /dev/null
+        rm "$target"
+    fi
 }
 
 list_servers() {
