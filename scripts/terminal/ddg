@@ -1,4 +1,51 @@
 #!/usr/bin/env sh
+fzf_bangs() {
+    BANG_CACHE=~/.cache/ddg_bang.cache
+    MAX_AGE="$((60 * 60 * 24 * 14))"
+
+    mod="$(stat --format=%Y "$BANG_CACHE" 2>/dev/null)"
+    now="$(date +%s)"
+    elapsed="$((now - mod))"
+    if ! [ -e "$BANG_CACHE" ] || [ "$elapsed" -gt "$MAX_AGE" ]; then 
+        curl -s https://duckduckgo.com/bang.js | jq -r '.[] | ["!" + .t, .s, .d] | @tsv' > "$BANG_CACHE" 
+    fi
+    fzf < "$BANG_CACHE"
+}
+
+
+show_help() {
+    cat << EOF
+usage: ddg QUERY [QUERY]
+
+    --bangs     search for bangs and exit
+    --help      show help and exit
+EOF
+}
+
+
+while true; do
+    case "$1" in
+        --bangs)
+            fzf_bangs
+            exit
+            ;;
+        --help)
+            show_help
+            exit
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            if [ $# -eq 0 ]; then
+                echo error: no argument provided >&2
+                exit 1
+            fi
+            break
+    esac
+done
+
 if command -v firefox > /dev/null; then
     nohup firefox --private-window "https://duckduckgo.com/?q=$*" > /dev/null 2>&1 &
 else
