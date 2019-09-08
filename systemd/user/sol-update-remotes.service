@@ -1,0 +1,6 @@
+[Unit]
+Description=Run sol-update-remotes
+
+[Service]
+ExecStart=zsh -ic sol-update-remotes
+SyslogIdentifier=sol-update-remotes
