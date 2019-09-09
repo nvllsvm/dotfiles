@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+extract_prebang() {
+    echo "$@" | grep -Po '^<b>\K![0-9a-z]+(?=.*)'
+}
+
+extracted="$(extract_prebang "$@")"
+if [ -n "$extracted" ]; then
+    echo "$extracted"
+elif [ "$*" = 'bangs' ]; then
+    echo -en "\0markup-rows\x1ftrue\n"
+    ddg --bangs | awk '{printf "<b>"$1"</b>"; $1 = ""; print "<sub><i>"$0"</i></sub>"}'
+elif [ $# -eq 0 ]; then
+    echo bangs
+else
+    echo "$*" | tee ~/out
+    ddg "$@"
+fi
