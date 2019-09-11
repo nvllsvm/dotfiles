@@ -1,0 +1,26 @@
+#!/usr/bin/env sh
+set -e
+app_container_name="docker-dind-$$-app"
+dind_container_name="docker-dind-$$-dind"
+
+cleanup() {
+    set +e
+    for container in "${app_container_name}" "${dind_container_name}"; do
+        docker kill "${container}" > /dev/null 2>&1
+    done
+}
+
+trap cleanup HUP EXIT
+
+docker run --rm --privileged --name "${dind_container_name}" -d docker:dind > /dev/null
+
+if [ -t 0 -a -t 1 -a -t 2 ]; then
+    tty_flag="-t"
+fi
+docker run \
+    --rm \
+    -i $tty_flag \
+    --name "${app_container_name}" \
+    --link "${dind_container_name}" \
+    -e DOCKER_HOST="tcp://${dind_container_name}:2375" \
+    "$@"
