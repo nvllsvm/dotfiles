@@ -33,6 +33,7 @@ EOF
 }
 
 run_args=()
+dind_args=()
 
 COMPOSE=
 DEFAULTS=1
@@ -63,12 +64,25 @@ while true; do
             ;;
         --here)
             PWD="$(pwd)"
+            dind_args+=('--volume' "${PWD}:${PWD}")
             run_args+=('--volume' "${PWD}:${PWD}" '--workdir' "$PWD")
             shift
             ;;
         --me)
             run_args+=('--user' "$(id -u):$(id -g)")
             shift
+            ;;
+        -v|--volume)
+            if [[ "$1" == "--volume"* ]]; then
+                run_args+=("$1")
+                dind_args+=("$1")
+                shift
+            else
+                dind_args+=("$1" "$2")
+                run_args+=("$1" "$2")
+                shift
+                shift
+            fi
             ;;
         -*=)
             run_args+=("$1")
@@ -134,7 +148,7 @@ if [ -n "$DIND" ]; then
         docker pull -q "$DIND_IMAGE" > /dev/null
     fi
 
-    docker run --rm --privileged -e DOCKER_TLS_CERTDIR= --name "${dind_container_name}" -d "$DIND_IMAGE" > /dev/null
+    docker run --rm --privileged -e DOCKER_TLS_CERTDIR= --name "${dind_container_name}" -d "${dind_args[@]}" "$DIND_IMAGE"
     run_args+=('--link' "${dind_container_name}:docker")
     run_args+=('--env' "DOCKER_HOST=tcp://docker:2375")
 fi
