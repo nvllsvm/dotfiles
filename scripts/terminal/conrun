@@ -1,0 +1,144 @@
+#!/usr/bin/env bash
+set -e
+value_args="$(docker run --help | cut '-c7-39' | grep '^--' | awk '{if ($2 != "") print $1}')"
+value_args="$value_args $(docker run --help | cut '-c3-39' | grep '^-' | awk '{if ($3 != "") print $1}')"
+
+
+is_value_arg () {
+    for i in $value_args; do
+        if [ "$i" = "$1" ] ; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+show_help() {
+    cat << EOF
+usage: [OPTIONS] IMAGE [COMMAND] [ARG]
+
+    --compose   run the container on a default Docker Compose network
+    --defaults  do not automatically add conveninence args
+    --dind      run with Docker-in-Docker
+    --help      show help and exit
+    --here      mount the current working directory as a volume and set the workdir to it
+    --me        run as the host user's UID and GID
+    --no-pull   do not pull image before run
+    --shell     set the entrypoint to /bin/sh
+
+See 'docker run --help' for more
+EOF
+}
+
+run_args=()
+
+COMPOSE=
+DEFAULTS=1
+DIND=
+ENTRYPOINT=
+PULL=1
+while true; do
+    case "$1" in
+        --dind)
+            DIND=1
+            shift
+            ;;
+        --shell)
+            ENTRYPOINT='/bin/sh'
+            shift
+            ;;
+        --compose)
+            COMPOSE=1
+            shift
+            ;;
+        --defaults)
+            DEFAULTS=
+            shift
+            ;;
+        --help)
+            show_help
+            exit
+            ;;
+        --no-pull)
+            PULL=
+            shift
+            ;;
+        --here)
+            PWD="$(pwd)"
+            run_args+=('--volume' "${PWD}:${PWD}" '--workdir' "$PWD")
+            shift
+            ;;
+        --me)
+            run_args+=('--user' "$(id -u):$(id -g)")
+            shift
+            ;;
+        -*=)
+            run_args+=("$1")
+            shift
+            ;;
+        -*)
+            if is_value_arg "$1"; then
+                run_args+=("$1" "$2")
+                shift
+                shift
+            else
+                run_args+=("$1")
+                shift
+            fi
+            ;;
+        *)
+            image="$1"
+            shift
+            break
+    esac
+done
+
+if [ -n "$ENTRYPOINT" ]; then
+    run_args+=('--entrypoint' '/bin/sh')
+fi
+
+if [ -n "$DEFAULTS" ]; then
+    run_args+=("--rm" '--interactive')
+    if [ -t 0 ] && [ -t 1 ] && [ -t 2 ]; then
+        run_args+=('--tty')
+    fi
+fi
+
+if [ -n "$COMPOSE" ]; then
+    NETWORK="$(basename "$(pwd)")"_default
+    if [ -z "$(docker network ls -q -f "name=$NETWORK")" ]; then
+        echo error: cannot determine compose network >&2
+        exit
+    fi
+    run_args+=('--network' "$NETWORK")
+fi
+
+if [ -n "$PULL" ]; then
+    docker pull -q "$image" > /dev/null
+fi
+
+app_container_name="conrun-$$-app"
+dind_container_name="conrun-$$-dind"
+
+cleanup() {
+    set +e
+    for container in "${app_container_name}" "${dind_container_name}"; do
+        docker kill "${container}" > /dev/null 2>&1
+    done
+}
+
+trap cleanup HUP EXIT
+run_args+=('--name' "$app_container_name")
+
+if [ -n "$DIND" ]; then
+    DIND_IMAGE='docker:dind'
+    if [ -n "$PULL" ]; then
+        docker pull -q "$DIND_IMAGE" > /dev/null
+    fi
+
+    docker run --rm --privileged -e DOCKER_TLS_CERTDIR= --name "${dind_container_name}" -d "$DIND_IMAGE" > /dev/null
+    run_args+=('--link' "$dind_container_name")
+    run_args+=('--env' "DOCKER_HOST=${dind_container_name}")
+fi
+
+docker run "${run_args[@]}" "$image" "$@"
