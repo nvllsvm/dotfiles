@@ -32,6 +32,9 @@ See 'docker run --help' for more
 EOF
 }
 
+app_container_name="conrun-$$-app"
+dind_container_name="conrun-$$-dind"
+
 run_args=()
 dind_args=()
 
@@ -57,6 +60,15 @@ while true; do
         --help)
             show_help
             exit
+            ;;
+        --name=*)
+            app_container_name="$(echo "$1" | cut -d= -f2)"
+            shift
+            ;;
+        --name)
+            app_container_name="$2"
+            shift
+            shift
             ;;
         --no-pull)
             PULL=
@@ -128,9 +140,6 @@ fi
 if [ -n "$PULL" ]; then
     docker pull -q "$image" > /dev/null
 fi
-
-app_container_name="conrun-$$-app"
-dind_container_name="conrun-$$-dind"
 
 cleanup() {
     set +e
