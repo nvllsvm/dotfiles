@@ -135,8 +135,8 @@ if [ -n "$DIND" ]; then
     fi
 
     docker run --rm --privileged -e DOCKER_TLS_CERTDIR= --name "${dind_container_name}" -d "$DIND_IMAGE" > /dev/null
-    run_args+=('--link' "$dind_container_name")
-    run_args+=('--env' "DOCKER_HOST=${dind_container_name}:2375")
+    run_args+=('--link' "${dind_container_name}:docker")
+    run_args+=('--env' "DOCKER_HOST=tcp://docker:2375")
 fi
 
 docker run "${run_args[@]}" "$image" "$@"
