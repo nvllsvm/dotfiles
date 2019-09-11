@@ -84,17 +84,16 @@ while true; do
             run_args+=('--user' "$(id -u):$(id -g)")
             shift
             ;;
+        --volume=*)
+            run_args+=("$1")
+            dind_args+=("$1")
+            shift
+            ;;
         -v|--volume)
-            if [[ "$1" == "--volume"* ]]; then
-                run_args+=("$1")
-                dind_args+=("$1")
-                shift
-            else
-                dind_args+=("$1" "$2")
-                run_args+=("$1" "$2")
-                shift
-                shift
-            fi
+            dind_args+=("$1" "$2")
+            run_args+=("$1" "$2")
+            shift
+            shift
             ;;
         -*=)
             run_args+=("$1")
