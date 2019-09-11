@@ -1,11 +1,5 @@
 #!/usr/bin/env bash
 set -e
-docker_run_help="$(docker run --help)"
-value_args="$(echo "$docker_run_help" | cut '-c7-39' | grep '^--' | awk '{if ($2 != "") print $1}')"
-value_args="$value_args $(echo "$docker_run_help" | cut '-c3-39' | grep '^-' | awk '{if ($3 != "") print $1}' | tr ',' ' ')"
-value_args="$value_args --net"
-
-
 is_value_arg () {
     for i in $value_args; do
         if [ "$i" = "$1" ] ; then
@@ -23,10 +17,12 @@ A better 'docker run'
 
     --compose   run the container on a default Docker Compose network
     --dind      run with Docker-in-Docker
+    --docker    use docker
     --help      show help and exit
     --here      mount the current working directory as a volume and set the workdir to it
     --me        run as the host user's UID and GID
     --no-pull   do not pull image before run
+    --podman    use podman
     --shell     set the entrypoint to /bin/sh
 
 See 'docker run --help' for more
@@ -39,6 +35,20 @@ dind_container_name="conrun-$$-dind"
 run_args=()
 dind_args=()
 
+if command -v podman > /dev/null; then
+    CONTAINER_CMD='podman'
+elif command -v docker > /dev/null; then
+    CONTAINER_CMD='docker'
+else
+    echo 'error: podman or docker not found' >&2
+    exit
+fi
+
+run_help="$("$CONTAINER_CMD" run --help)"
+value_args="$(echo "$run_help" | cut '-c7-39' | grep '^--' | awk '{if ($2 != "") print $1}')"
+value_args="$value_args $(echo "$run_help" | cut '-c3-39' | grep '^-' | awk '{if ($3 != "") print $1}' | tr ',' ' ')"
+value_args="$value_args --net"
+
 COMPOSE=
 DEFAULTS=1
 DIND=
@@ -46,6 +56,14 @@ ENTRYPOINT=
 PULL=1
 while true; do
     case "$1" in
+        --podman)
+            CONTAINER_CMD='podman'
+            shift
+            ;;
+        --docker)
+            CONTAINER_CMD='docker'
+            shift
+            ;;
         --dind)
             DIND=1
             shift
@@ -133,7 +151,7 @@ if [ -n "$DEFAULTS" ]; then
     fi
 fi
 
-if [ -n "$COMPOSE" ]; then
+if [ "$CONTAINER_CMD" = 'docker' ] && [ -n "$COMPOSE" ]; then
     NETWORK="$(basename "$(pwd)")"_default
     if [ -z "$(docker network ls -q -f "name=$NETWORK")" ]; then
         echo error: cannot determine compose network >&2
@@ -143,13 +161,13 @@ if [ -n "$COMPOSE" ]; then
 fi
 
 if [ -n "$PULL" ]; then
-    docker pull -q "$image" > /dev/null
+    "$CONTAINER_CMD" pull -q "$image" > /dev/null
 fi
 
 cleanup() {
     set +e
     for container in "${app_container_name}" "${dind_container_name}"; do
-        docker kill "${container}" > /dev/null 2>&1
+        "$CONTAINER_CMD" kill "${container}" > /dev/null 2>&1
     done
 }
 
@@ -159,10 +177,10 @@ run_args+=('--name' "$app_container_name")
 if [ -n "$DIND" ]; then
     DIND_IMAGE='docker:dind'
     if [ -n "$PULL" ]; then
-        docker pull -q "$DIND_IMAGE" > /dev/null
+        "$CONTAINER_CMD" pull -q "$DIND_IMAGE" > /dev/null
     fi
 
-    docker run \
+    "$CONTAINER_CMD" run \
         --rm \
         --privileged \
         --env DOCKER_TLS_CERTDIR= \
@@ -174,4 +192,4 @@ if [ -n "$DIND" ]; then
     run_args+=('--env' "DOCKER_HOST=tcp://docker:2375")
 fi
 
-docker run "${run_args[@]}" "$image" "$@"
+"$CONTAINER_CMD" run "${run_args[@]}" "$image" "$@"
