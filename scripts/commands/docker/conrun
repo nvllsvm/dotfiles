@@ -157,7 +157,14 @@ if [ -n "$DIND" ]; then
         docker pull -q "$DIND_IMAGE" > /dev/null
     fi
 
-    docker run --rm --privileged -e DOCKER_TLS_CERTDIR= --name "${dind_container_name}" -d "${dind_args[@]}" "$DIND_IMAGE" > /dev/null
+    docker run \
+        --rm \
+        --privileged \
+        --env DOCKER_TLS_CERTDIR= \
+        --name "${dind_container_name}" \
+        --detach \
+        "${dind_args[@]}" \
+        "$DIND_IMAGE" > /dev/null
     run_args+=('--link' "${dind_container_name}:docker")
     run_args+=('--env' "DOCKER_HOST=tcp://docker:2375")
 fi
