@@ -111,6 +111,11 @@ while true; do
             fi
             ;;
         *)
+            if [ $# -eq 0 ]; then
+                show_help >&2
+                echo 'error: missing required argument' >&2
+                exit 1
+            fi
             image="$1"
             shift
             break
