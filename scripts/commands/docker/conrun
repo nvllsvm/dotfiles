@@ -2,7 +2,8 @@
 set -e
 docker_run_help="$(docker run --help)"
 value_args="$(echo "$docker_run_help" | cut '-c7-39' | grep '^--' | awk '{if ($2 != "") print $1}')"
-value_args="$value_args $(echo "$docker_run_help" | cut '-c3-39' | grep '^-' | awk '{if ($3 != "") print $1}')"
+value_args="$value_args $(echo "$docker_run_help" | cut '-c3-39' | grep '^-' | awk '{if ($3 != "") print $1}' | tr ',' ' ')"
+value_args="$value_args --net"
 
 
 is_value_arg () {
