@@ -15,10 +15,11 @@ is_value_arg () {
 
 show_help() {
     cat << EOF
-usage: [OPTIONS] IMAGE [COMMAND] [ARG]
+usage: conrun [OPTIONS] IMAGE [COMMAND] [ARG]
+
+A better 'docker run'
 
     --compose   run the container on a default Docker Compose network
-    --defaults  do not automatically add conveninence args
     --dind      run with Docker-in-Docker
     --help      show help and exit
     --here      mount the current working directory as a volume and set the workdir to it
@@ -49,10 +50,6 @@ while true; do
             ;;
         --compose)
             COMPOSE=1
-            shift
-            ;;
-        --defaults)
-            DEFAULTS=
             shift
             ;;
         --help)
