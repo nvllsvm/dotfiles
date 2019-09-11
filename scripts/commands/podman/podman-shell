@@ -1,7 +1,0 @@
-#!/usr/bin/env sh
-container_name="podman-shell-$$"
-trap "podman kill "${container_name}" > /dev/null 2>&1; exit" HUP EXIT
-if [ -t 0 -a -t 1 -a -t 2 ]; then
-    tty_flag="-t"
-fi
-podman run --rm -i $tty_flag --name "${container_name}" "$@"
