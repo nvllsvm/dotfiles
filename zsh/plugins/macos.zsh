@@ -17,5 +17,9 @@ if [[ $OSTYPE == darwin* ]]; then
         "$path[@]"
     )
 
+    man() {
+        /usr/bin/man "$@" 2> /dev/null
+    }
+
     full-update add brew-update
 fi
