@@ -222,4 +222,5 @@ augroup GOLANG
     aut FileType go set list& listchars&
 augroup END
 
-let g:clipboard = {'copy': {'+': 'cbcopy'}, 'paste': {'+': 'cbpaste'}}
+" need to set both + and * else netrw barfs
+let g:clipboard = {'copy': {'*': 'cbcopy', '+': 'cbcopy'}, 'paste': {'*': 'cbpaste', '+': 'cbpaste'}}
