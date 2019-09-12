@@ -43,6 +43,7 @@ RPROMPT="$prompt_current_dir"
 setopt TRANSIENT_RPROMPT
 
 typeset -U path
+typeset -U manpath
 
 bindkey -v
 
@@ -141,7 +142,6 @@ popd > /dev/null
 
 path=(
     "${DOTFILES}"/scripts/terminal
-    "${DOTFILES}"/scripts/bullshit
     "$path[@]"
 )
 
