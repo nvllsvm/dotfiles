@@ -16,9 +16,9 @@ if [[ $OSTYPE == darwin* ]]; then
     man() {
         MANPATH=$MANPATH /usr/bin/man $@ 1>/dev/null 2>&1
         if [ "$?" -eq 0 ]; then
-            MANPATH=$MANPATH /usr/bin/man $@
+            MANPATH=$MANPATH /usr/bin/man $@ 2> /dev/null
         else
-            /usr/bin/man $@
+            /usr/bin/man $@ 2> /dev/null
         fi
     }
 
