@@ -73,6 +73,7 @@ if [[ $osname == Linux* ]]; then
 
     if command -v pacman > /dev/null; then
         link_file pacman ~/.config/pacman
+            #lf \
         yay -Syu --needed --noconfirm \
             aria2 \
             aspell-en \
@@ -87,7 +88,6 @@ if [[ $osname == Linux* ]]; then
             htop \
             intel-ucode \
             jq \
-            lf \
             moreutils \
             neovim \
             openssh \
