@@ -6,7 +6,7 @@ After=suspend.target
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/bin/sh -c 'powertop --auto-tune && pstate-frequency -S -m 100 && echo on > /sys/devices/pci0000\:00/0000\:00\:15.1/i2c_designware.1/power/control'
+ExecStart=/bin/sh -c 'pstate-frequency -S -m 100 && echo on > /sys/devices/pci0000\:00/0000\:00\:15.1/i2c_designware.1/power/control'
 
 [Install]
 WantedBy=multi-user.target
