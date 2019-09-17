@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+export PIP_USER=0
+bin="$(which -a "$(basename "$0")" | grep -v "^$0$" | head -n 1)"
+exec "${bin}" "$@"
