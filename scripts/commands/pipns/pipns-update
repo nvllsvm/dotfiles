@@ -1,7 +1,0 @@
-#!/usr/bin/env sh
-set -e
-if ! command -v pipns > /dev/null; then
-    PIP_REQUIRE_VIRTUALENV=0 pip install pipns
-fi
-pipns --all update > /dev/null 2>&1
-pipns --prune

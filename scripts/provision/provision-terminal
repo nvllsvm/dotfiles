@@ -144,11 +144,11 @@ if [[ $osname == Darwin* ]]; then
     zsh_command 'pyenv global 3.7.3'
 fi
 zsh_command '$DOTFILES/scripts/commands/pip/pip-update'
-zsh_command '$DOTFILES/scripts/commands/pipns/pipns-update'
 
-for name in flake8 speedtest-cli; do
-    zsh_command "pipns -n "$name" install "$name""
-done
+PIP_REQUIRE_VIRTUALENV=0 pip install pipx
+
+pipx install flake8
+pipx install speedtest-cli
 
 zsh_command nvim-update
 

@@ -17,7 +17,9 @@ if [ ! -f ~/.config/nvim/autoload/plug.vim ]; then
 fi
 
 log Updating python environment ...
-virtualenv --quiet "$VENV"
+if ! [ -d "$VENV" ]; then
+    python -m venv "$VENV"
+fi
 PIP_USER=0 "$VENV/bin/pip" install --quiet --upgrade pynvim
 
 log Updating plugins ...
