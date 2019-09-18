@@ -1,3 +1,0 @@
-#!/usr/bin/env sh
-bin="$DOTFILES/scripts/media/mkvextract-languages"
-exec pipns -n enzyme run "$bin" "$@"

@@ -1,3 +1,0 @@
-#!/usr/bin/env sh
-bin="$DOTFILES/scripts/media/mkvinfo-json"
-exec pipns -n enzyme run "$bin" "$@"

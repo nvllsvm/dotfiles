@@ -1,3 +1,0 @@
-#!/usr/bin/env sh
-bin="$DOTFILES/scripts/media/reencode-lossless"
-exec pipns -n harmonize run "$bin" "$@"
