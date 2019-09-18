@@ -1,7 +1,5 @@
 [Unit]
 Description=set power setting for surface go touchscreen
-After=tlp.service
-After=suspend.target
 
 [Service]
 Type=oneshot
