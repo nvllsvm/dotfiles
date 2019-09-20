@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 export STEAM_COMPAT_DATA_PATH="$HOME/.steam/proton"
-export PROTON_USE_D9VK=1
+#export PROTON_USE_D9VK=1
 STEAMAPPS_COMMON=~/.steam/steam/steamapps/common
 PROTON_VERSION="$(ls "$STEAMAPPS_COMMON" | grep '^Proton' | sort --version-sort | tail -n 1)"
 PROTON_BASE="$STEAMAPPS_COMMON/$PROTON_VERSION"
