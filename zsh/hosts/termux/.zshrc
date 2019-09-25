@@ -1,3 +1,3 @@
-. ~/.dotfiles/private/zsh/.zshrc
+. ~/.dotfiles/private/zsh/.zshrc || true
 
 full-update add 'nordvpn --update'

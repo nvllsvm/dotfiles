@@ -123,12 +123,13 @@ if [[ $osname == Linux* ]]; then
             fd \
             findutils \
             fzf \
+            golang \
             jq \
             man \
             neovim \
             openssh \
             p7zip \
-            python-dev \
+            python \
             ripgrep \
             termux-api \
             tmux
