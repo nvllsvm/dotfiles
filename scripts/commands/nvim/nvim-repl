@@ -2,40 +2,65 @@
 set -e
 
 show_help() {
-    cat >&2 << EOF
-usage nvim-repl: COMMAND [FILE]
+    cat << EOF
+usage nvim-repl: [-f FILE] COMMAND
+
+    -f FILE     file to use. defaults to a temporary file.
 EOF
 }
 
+arg_error() {
+    show_help >&2
+    if [ -n "$*" ]; then
+        printf '\nerror: %s\n' "$*" >&2
+    fi
+    exit 1
+}
 
+determine_filetype() {
+    case "$1" in
+        python*)
+            printf '%s' python
+            ;;
+        dash|bash)
+            printf '%s' sh
+            ;;
+        *)
+            printf '%s' "$1"
+            ;;
+    esac
+}
+
+WORKFILE=
 while true; do
     case "$1" in
-        -s)
-            FILETYPE="$2"
+        -f)
             shift
+            if [ $# -eq 0 ]; then
+                arg_error missing FILE argument
+            fi
+            WORKFILE="$2"
             shift
             ;;
         *)
             if [ $# -eq 0 ]; then
-                show_help >&2
-                exit 1
-            fi
-            COMMAND="$1"
-            if [ -n "$2" ]; then
-                WORKFILE="$2"
+                arg_error missing COMMAND
+            elif [ $# -gt 1 ]; then
+                arg_error unknown arguments
             else
-                WORKFILE="$(mktemp)"
-                cleanup() {
-                    rm -f "$WORKFILE"
-                }
-                trap cleanup EXIT
+                COMMAND="$1"
             fi
             break
     esac
 done
 
-if [ -z "$FILETYPE" ]; then
-    FILETYPE="$COMMAND"
+if [ -z "$WORKFILE" ]; then
+    WORKFILE="$(mktemp)"
+    cleanup() {
+        rm -f "$WORKFILE"
+    }
+    trap cleanup EXIT
 fi
 
-nvim "$WORKFILE" -c "set ft=$FILETYPE | REPL '$COMMAND'"
+FILETYPE="$(determine_filetype "$COMMAND")"
+nvim "$WORKFILE" -c "set filetype=$FILETYPE | REPL '$COMMAND'"
