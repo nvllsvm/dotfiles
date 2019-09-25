@@ -62,6 +62,8 @@ function _REPLInit(...)
     AutoSaveToggle
     let g:repl_cmd = a:1
     autocmd BufWritePost * call _REPL()
+    autocmd BufDelete * :qa
+    autocmd QuitPre * :qa
     set splitright
     vnew
     set nonu
