@@ -39,7 +39,7 @@ while true; do
             if [ $# -eq 0 ]; then
                 arg_error missing FILE argument
             fi
-            WORKFILE="$2"
+            WORKFILE="$1"
             shift
             ;;
         *)
