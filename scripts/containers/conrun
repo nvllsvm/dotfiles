@@ -13,7 +13,7 @@ show_help() {
     cat << EOF
 usage: conrun [OPTIONS] IMAGE [COMMAND] [ARG]
 
-A better 'docker run'
+Convenience features for running containers
 
     --compose   run the container on a default Docker Compose network
     --dind      run with Docker-in-Docker
@@ -25,7 +25,7 @@ A better 'docker run'
     --podman    use podman
     --shell     set the entrypoint to /bin/sh
 
-See 'docker run --help' for more
+See 'docker run --help' and 'podman run --help' for more
 EOF
 }
 
