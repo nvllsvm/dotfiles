@@ -1,4 +1,8 @@
 #!/usr/bin/env sh
 if [ $# -gt 0 ]; then
-    exec ddg -- "$@"
+    shift
+    exec ddg -- "$*"
+else
+    echo ddg
+    echo duckduckgo
 fi
