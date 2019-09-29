@@ -1,8 +1,5 @@
 #!/usr/bin/env sh
+set -e
 if [ $# -gt 0 ]; then
-    shift
-    exec ddg -- "$*"
-else
-    echo ddg
-    echo duckduckgo
+    exec open "https://duckduckgo.com/?q=$*"
 fi
