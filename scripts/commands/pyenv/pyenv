@@ -3,8 +3,10 @@ export CFLAGS='-O2'
 if [ "$1" = 'install' ]; then
     if [[ "$OSTYPE" == darwin* ]]; then
         prefix="$(brew --prefix openssl)"
-        export CFLAGS="-I${prefix}/include ${CFLAGS}"
+
         export CONFIGURE_OPTS="--with-openssl=${prefix}"
+
+        export CFLAGS="-I${prefix}/include ${CFLAGS}"
         export CPPFLAGS="-I${prefix}/include ${CPPFLAGS}"
         export LDFLAGS="-L${prefix}/lib ${LDFLAGS}"
     fi
