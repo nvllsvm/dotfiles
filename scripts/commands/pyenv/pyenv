@@ -2,7 +2,11 @@
 export CFLAGS='-O2'
 if [ "$1" = 'install' ]; then
     if [[ "$OSTYPE" == darwin* ]]; then
-        export CONFIGURE_OPTS="--with-openssl=$(brew --prefix openssl)"
+        prefix="$(brew --prefix openssl)"
+        export CFLAGS="-I${prefix}/include ${CFLAGS}"
+        export CONFIGURE_OPTS="--with-openssl=${prefix}"
+        export CPPFLAGS="-I${prefix}/include ${CPPFLAGS}"
+        export LDFLAGS="-L${prefix}/lib ${LDFLAGS}"
     fi
 fi
 "$(which -a pyenv | tail -n +2 | head -n 1)" "$@"
