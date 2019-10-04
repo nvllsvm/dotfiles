@@ -59,6 +59,11 @@ if [ -n "$PRUNE" ]; then
     exit
 fi
 
+if ! command -v direnv > /dev/null; then
+    echo error: requires direnv >&2
+    exit 1
+fi
+
 # Avoids dependency on realpath
 parent="$(pyrealpath "$(pwd)")"
 
@@ -106,9 +111,9 @@ cat > "$env_folder/pip.conf"<<EOF
 user = false
 EOF
 
-(cd "$env_folder" && direnv allow)
 cp "$env_folder/.envrc" .
 "$env_folder/bin/pip" install -q --upgrade pip setuptools wheel
 
+direnv allow "$env_folder"
 direnv allow
 direnv reload
