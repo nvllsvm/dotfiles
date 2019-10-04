@@ -21,7 +21,8 @@ setup-outputs
 compton &
 /usr/lib/gsd-xsettings &
 xbindkeys &
-xss-lock -- lock-screen &
+light-locker &
+xss-lock -- light-locker-command -l &
 
 if command -v xinit-$(hostname) > /dev/null; then
     xinit-$(hostname)
