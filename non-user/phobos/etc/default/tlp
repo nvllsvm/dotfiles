@@ -1,3 +1,5 @@
+# ------------------------------------------------------------------------------
+# tlp - Parameters for power saving
 # See full explanation: https://linrunner.de/en/tlp/docs/tlp-configuration.html
 
 # Notes:
@@ -68,7 +70,7 @@ MAX_LOST_WORK_SECS_ON_BAT=60
 # Note: Intel Skylake or newer CPU and Kernel >= 4.10 required.
 # Default: <none>
 CPU_HWP_ON_AC=balance_performance
-CPU_HWP_ON_BAT=balance_power
+CPU_HWP_ON_BAT=power
 
 # Set Intel P-state performance: 0..100 (%).
 # Limit the max/min P-state to control the power dissipation of the CPU.
@@ -185,7 +187,7 @@ AHCI_RUNTIME_PM_TIMEOUT=15
 #   default(*), performance, powersave.
 # (*) keeps BIOS ASPM defaults (recommended)
 # Default: <none>
-#PCIE_ASPM_ON_AC=default
+PCIE_ASPM_ON_AC=default
 PCIE_ASPM_ON_BAT=powersupersave
 
 # Set the min/max/turbo frequency for the Intel GPU.
@@ -234,8 +236,7 @@ SOUND_POWER_SAVE_ON_BAT=1
 # Disable controller too (HDA only): Y/N.
 # Note: effective only when SOUND_POWER_SAVE_ON_AC/BAT is activated.
 # Default: Y
-# enabling results in audible noise cycling on gpd win 2
-SOUND_POWER_SAVE_CONTROLLER=N
+SOUND_POWER_SAVE_CONTROLLER=Y
 
 # Power off optical drive in UltraBay/MediaBay: 0=disable, 1=enable.
 # Drive can be powered on again by releasing (and reinserting) the eject lever
@@ -339,7 +340,7 @@ DEVICES_TO_DISABLE_ON_STARTUP="bluetooth wwan"
 
 # Radio devices to disable on battery: bluetooth, wifi, wwan.
 # Default: <none>
-DEVICES_TO_DISABLE_ON_BAT="bluetooth wwan"
+#DEVICES_TO_DISABLE_ON_BAT="bluetooth wifi wwan"
 
 # Radio devices to disable on battery when not in use (not connected):
 #   bluetooth, wifi, wwan.
