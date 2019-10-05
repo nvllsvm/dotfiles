@@ -301,6 +301,7 @@ USB_BLACKLIST_WWAN=0
 # by the blacklists above (separate with spaces). Use lsusb to get the ids.
 # Default: <none>
 #USB_WHITELIST="1111:2222 3333:4444"
+USB_WHITELIST="04f3:20d0"
 
 # Set to 1 to disable autosuspend before shutdown, 0 to do nothing
 # (workaround for USB devices that cause shutdown problems).
