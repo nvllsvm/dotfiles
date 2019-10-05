@@ -12,7 +12,6 @@ eval "$(/usr/lib/systemd/user-environment-generators/30-systemd-environment-d-ge
 set +a
 
 setxkbmap -option terminate:ctrl_alt_bksp
-setxkbmap -option caps:escape
 
 xset s off -dpms
 
