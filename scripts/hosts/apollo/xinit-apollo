@@ -1,3 +1,9 @@
 #!/usr/bin/env sh
 apollo-autorotate &
 onboard &
+
+TOUCHPAD_ID='Microsoft Surface Type Cover Touchpad'
+xinput --set-prop "$TOUCHPAD_ID" 'libinput Accel Speed' 0.5
+xinput --set-prop "$TOUCHPAD_ID" 'libinput Tapping Enabled' 1
+xinput --set-prop "$TOUCHPAD_ID" 'libinput Natural Scrolling Enabled' 1
+xinput --set-prop "$TOUCHPAD_ID" 'libinput Middle Emulation Enabled' 1
