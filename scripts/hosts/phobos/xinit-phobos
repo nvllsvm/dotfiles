@@ -1,8 +1,10 @@
 #!/usr/bin/env sh
 set -e
-TOUCHPAD_ID=$(xinput list --id-only 'DLL082A:01 06CB:76AF Touchpad')
+TOUCHPAD_ID='DLL082A:01 06CB:76AF Touchpad'
 
-xinput --set-prop $TOUCHPAD_ID 'libinput Accel Speed' 0.5
-xinput --set-prop $TOUCHPAD_ID 'libinput Tapping Enabled' 1
-xinput --set-prop $TOUCHPAD_ID 'libinput Natural Scrolling Enabled' 1
-xinput --set-prop $TOUCHPAD_ID 'libinput Middle Emulation Enabled' 1
+setxkbmap -device "$(xinput list --id-only 'AT Translated Set 2 keyboard')" -option caps:escape
+
+xinput --set-prop "$TOUCHPAD_ID" 'libinput Accel Speed' 0.5
+xinput --set-prop "$TOUCHPAD_ID" 'libinput Tapping Enabled' 1
+xinput --set-prop "$TOUCHPAD_ID" 'libinput Natural Scrolling Enabled' 1
+xinput --set-prop "$TOUCHPAD_ID" 'libinput Middle Emulation Enabled' 1

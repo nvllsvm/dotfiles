@@ -2,7 +2,7 @@
 apollo-autorotate &
 onboard &
 
-xinput list --id-only 'keyboard:Microsoft Surface Type Cover'
+setxkbmap -device "$(xinput list --id-only 'keyboard:Microsoft Surface Type Cover')" -option caps:escape
 
 TOUCHPAD_ID='Microsoft Surface Type Cover Touchpad'
 xinput --set-prop "$TOUCHPAD_ID" 'libinput Accel Speed' 0.5
