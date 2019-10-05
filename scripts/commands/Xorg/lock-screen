@@ -1,4 +1,8 @@
 #!/usr/bin/env sh
-xset dpms 0 5
-i3lock -n -c 000000
-xset -dpms
+if pidof lightdm; then
+    dm-tool lock
+else
+    xset dpms 0 5
+    i3lock -n -c 000000
+    xset -dpms
+fi
