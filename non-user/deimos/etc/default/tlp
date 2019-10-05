@@ -1,5 +1,3 @@
-# ------------------------------------------------------------------------------
-# tlp - Parameters for power saving
 # See full explanation: https://linrunner.de/en/tlp/docs/tlp-configuration.html
 
 # Notes:
@@ -231,8 +229,7 @@ WOL_DISABLE=Y
 # A value of 0 disables, >=1 enables power saving (recommended: 1).
 # Default: <none>
 SOUND_POWER_SAVE_ON_AC=0
-# enabling results in audible noise cycling on gpd win 2
-SOUND_POWER_SAVE_ON_BAT=0
+SOUND_POWER_SAVE_ON_BAT=1
 
 # Disable controller too (HDA only): Y/N.
 # Note: effective only when SOUND_POWER_SAVE_ON_AC/BAT is activated.
@@ -319,12 +316,12 @@ RESTORE_DEVICE_STATE_ON_STARTUP=0
 # Radio devices to disable on startup: bluetooth, wifi, wwan.
 # Separate multiple devices with spaces.
 # Default: <none>
-#DEVICES_TO_DISABLE_ON_STARTUP="bluetooth wifi wwan"
+DEVICES_TO_DISABLE_ON_STARTUP="bluetooth wwan"
 
 # Radio devices to enable on startup: bluetooth, wifi, wwan.
 # Separate multiple devices with spaces.
 # Default: <none>
-#DEVICES_TO_ENABLE_ON_STARTUP="wifi"
+DEVICES_TO_ENABLE_ON_STARTUP="wifi"
 
 # Radio devices to disable on shutdown: bluetooth, wifi, wwan.
 # (workaround for devices that are blocking shutdown).
@@ -342,7 +339,7 @@ RESTORE_DEVICE_STATE_ON_STARTUP=0
 
 # Radio devices to disable on battery: bluetooth, wifi, wwan.
 # Default: <none>
-#DEVICES_TO_DISABLE_ON_BAT="bluetooth wifi wwan"
+DEVICES_TO_DISABLE_ON_BAT="bluetooth wwan"
 
 # Radio devices to disable on battery when not in use (not connected):
 #   bluetooth, wifi, wwan.
