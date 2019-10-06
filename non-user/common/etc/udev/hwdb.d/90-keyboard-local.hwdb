@@ -12,5 +12,5 @@ evdev:input:b0003v045Ep096F*
  KEYBOARD_KEY_70039=esc       # capslock
 
 # logitech k400 plus
-evdev:input:b0003v046DpC52B*
+evdev:input:b0003v046Dp404D*
  KEYBOARD_KEY_70039=esc       # capslock
