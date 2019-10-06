@@ -6,3 +6,7 @@ evdev:input:b0003v258Ap6A99*
 # xps 13 9360
 evdev:atkbd:dmi:bvnDellInc.:bvr2.11.0:bd03/14/2019:svnDellInc.:pnXPS139360:*
  KEYBOARD_KEY_3a=esc       # capslock
+
+# surface go type cover
+evdev:input:b0003v045Ep096F*
+ KEYBOARD_KEY_70039=esc       # capslock
