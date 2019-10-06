@@ -1,0 +1,4 @@
+# gpdwin 2
+evdev:input:b0003v258Ap6A99*
+ KEYBOARD_KEY_70039=esc       # bind capslock to escape
+ KEYBOARD_KEY_70065=leftmeta  # bind menu to meta
