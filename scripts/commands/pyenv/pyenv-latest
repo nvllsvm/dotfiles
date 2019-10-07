@@ -1,3 +1,3 @@
 #!/usr/bin/env sh
-MAJOR_VER=${1:-3}
-pyenv install -l | awk '{$1=$1};1' | grep -e "^$MAJOR_VER.[0-9]*.[0-9]*$" | sort --version-sort | tail -n 1
+MAJOR_VER=${1:-[0-9]}
+pyenv install --list | awk '{$1=$1};1' | grep -e "^$MAJOR_VER.[0-9]*.[0-9]*$" | sort --version-sort | tail -n 1
