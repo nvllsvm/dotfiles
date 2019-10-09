@@ -13,3 +13,46 @@ else
 fi
 
 "$INSTALL_DIR"/bin/pyenv rehash
+
+python << EOF
+import os
+import pathlib
+import shutil
+
+PYENV_ROOT = pathlib.Path(os.environ['PYENV_ROOT'])
+LINK_DIR = PYENV_ROOT / 'plugins' / 'pyenv-global-links'
+if LINK_DIR.exists():
+    shutil.rmtree(LINK_DIR)
+LINK_DIR.mkdir()
+
+VERSION_FILE = PYENV_ROOT / 'version'
+
+versions = [
+    line
+    for line in VERSION_FILE.read_text().split('\n')
+    if line
+]
+
+
+def create_link(version, linkname):
+    source = PYENV_ROOT / 'versions' / version / 'bin' / linkname
+
+    target = LINK_DIR / linkname
+    target.symlink_to(source)
+
+
+done = set()
+
+for version in versions:
+    major, minor, patch = version.split('.')
+    links = {
+        'python',
+        f'python{major}',
+        f'python{major}.{minor}',
+    }
+
+    for link in sorted(links - done):
+        create_link(version, link)
+
+    done.update(links)
+EOF

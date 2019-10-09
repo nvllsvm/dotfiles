@@ -9,6 +9,7 @@ if [ -d "$PYENV_ROOT" ] || [ -d "$PYTHONUSERBASE" ]; then
 
     if [ -d "$PYENV_ROOT" ]; then
         path=(
+            "${PYENV_ROOT}/plugins/pyenv-global-links"
             "${PYENV_ROOT}/bin"
             "${PYENV_ROOT}/shims"
             "$path[@]"
