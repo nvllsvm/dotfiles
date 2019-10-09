@@ -16,7 +16,7 @@ usage: fanpipe (-p|-s) [-f] [-t TOPIC] [MESSAGE [MESSAGE ...]]
 EOF
 }
 
-while true; do
+while [ $# -gt 0 ]; do
     case "$1" in
         -p|--publish)
             PUBLISH=1
