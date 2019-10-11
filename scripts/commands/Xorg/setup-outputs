@@ -158,6 +158,19 @@ EOF
     esac
 }
 
+apollo() {
+    xrandr \
+        --output DP1 --off \
+        --output DP2 --off \
+        --output HDMI1 --off \
+        --output HDMI2 --off \
+        --output VIRTUAL1 --off \
+        --output eDP1 --primary --mode 1800x1200
+    set-desktop-themes --dpi 96 --large
+    apply-display-calibration
+}
+
+
 hostname="$(uname -n)"
 case "$hostname" in
     "deimos")
@@ -168,6 +181,9 @@ case "$hostname" in
         ;;
     "phobos")
         phobos
+        ;;
+    apollo)
+        apollo
         ;;
     *)
         echo "WARN: Host '$hostname' undefined" >&2
