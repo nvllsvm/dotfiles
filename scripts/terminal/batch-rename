@@ -1,60 +1,43 @@
-#!/usr/bin/env sh
-set -e
-
-show_help() {
-    cat << EOF
-usage: batch-rename [OPTIONS] PATH [PATH...]
-
-    --help              show help then exit
-    --append TEXT       append text to paths
-    --prepend TEXT      prepend text to paths
-EOF
-}
+#!/usr/bin/env python3
+import argparse
+import pathlib
 
 
-PREPEND=''
-APPEND=''
-while true; do
-    case "$1" in
-        --help)
-            show_help
-            exit
-            ;;
-        --append)
-            APPEND="$2"
-            shift
-            shift
-            ;;
-        --prepend)
-            PREPEND="$2"
-            shift
-            shift
-            ;;
-        *)
-            if [ $# -eq 0 ]; then
-                show_help >&2
-                echo error: no paths specified >&2
-                exit 1
-            fi
-            break
-    esac
-done
+def strip(path, start, end):
+    pass
 
 
-append_prepend_path() {
-    new_path="$(dirname "$1")/${PREPEND}$(basename "$1")${APPEND}"
-    if [ -e "$new_path" ]; then
-        echo error: tried moving "$1" to existing "$new_path" >&2
-        exit 1
-    fi
-    mv "$1" "$new_path"
-    echo "$new_path"
-}
+def pend(path, start, end):
+    pass
 
 
-for f in "$@"; do
-    if [ -n "$PREPEND" ]; then
-        f="$(append_prepend_path "$f")"
-        echo "$f"
-    fi
-done
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--lstrip', default='')
+    parser.add_argument('--rstrip', default='')
+    parser.add_argument('--append', default='')
+    parser.add_argument('--prepend', default='')
+    parser.add_argument('path', nargs='*', type=pathlib.Path)
+    args = parser.parse_args()
+
+    path_targets = {}
+    for path in args.path:
+        name = path.name.lstrip(args.lstrip).rstrip(args.rstrip)
+        target = path.with_name(''.join([
+            args.append,
+            name,
+            args.prepend
+        ]))
+        if target == path:
+            continue
+        if target.exists():
+            parser.error('already exists {}')
+            parser.exit(1)
+        path_targets[path] = target
+
+    for source, target in path_targets.items():
+        source.rename(target)
+
+
+if __name__ == '__main__':
+    main()
