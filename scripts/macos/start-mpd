@@ -5,7 +5,7 @@ log() {
 
 while true; do
     log 'Starting MPD'
-    /usr/local/bin/mpd --no-daemon ~/.config/mpd/mpd.conf.macos
+    /usr/local/bin/mpd --no-daemon ~/.config/mpd/mpd.conf
     ret=$?
     log "MPD Exit Code $ret"
     sleep 1
