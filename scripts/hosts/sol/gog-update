@@ -4,9 +4,10 @@ set -e
 IMAGE=nvllsvm/lgogdownloader
 GOG_DIR=/storage/Games/PC/GOG.com
 
-podman pull -q $IMAGE > /dev/null
 podman run \
     --rm \
+    --pull always \
+    --quiet \
     -e HOME \
     -v $GOG_DIR:/downloads \
     -v ~/.cache/lgogdownloader:/cache \

@@ -23,7 +23,7 @@ def main():
         if target == path:
             continue
         if target.exists():
-            parser.error('already exists {}')
+            parser.error(f'already exists {target}')
             parser.exit(1)
         path_targets[path] = target
 

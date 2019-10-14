@@ -5,11 +5,11 @@ IMAGE=nvllsvm/harmonize:dev
 SOURCE=/storage/Audio/Library
 TARGET=/storage/Audio/MP3
 
-podman pull -q "$IMAGE" > /dev/null
-
 harmonize() {
     podman run \
         --rm \
+        --pull always \
+        --quiet \
         --userns= \
         -v "$SOURCE:$SOURCE" \
         -v "$TARGET:$TARGET" \
