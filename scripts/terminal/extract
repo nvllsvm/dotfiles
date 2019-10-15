@@ -61,8 +61,7 @@ done
 
 for filename in "$@"; do
     target="$(gen_target "$filename")"
-    tarext=".tar."
-    if [ "${filename#*$tarext}" != "$filename" ]; then
+    if [ "${filename%%.tar.*}" != "$filename" ] || [ "${filename%%.tgz}" != "$filename"  ] ; then
         target="$(gen_target "$target")"
         7z x "${filename}" -so | 7z x -aoa -si -ttar -o"${target}"
     else
