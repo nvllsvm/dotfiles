@@ -1,6 +1,7 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 set -e
 
+PYTHON_BIN=python
 ENV_ROOT="$HOME/.local/share/virtualenvs"
 
 show_help() {
@@ -82,7 +83,11 @@ elif [ -n "$1" ]; then
         version="$found"
     fi
     echo "Using '$version' from pyenv"
-    eval "$(pyenv init -)"
+    if [ -z "$PYENV_ROOT" ]; then
+        echo error: unable to determine pyenv location
+        exit 1
+    fi
+    PYTHON_BIN="$PYENV_ROOT/shims/python"
     eval "$(pyenv sh-shell "$version")"
 fi
 
@@ -93,9 +98,9 @@ if [ -e Pipfile ]; then
     pipenv install
     env_folder=$(pipenv --venv)
 elif command -v virtualenv > /dev/null 2>&1; then
-    virtualenv -q -p python "$env_folder" > /dev/null
+    virtualenv -q -p "$PYTHON_BIN" "$env_folder" > /dev/null
 else
-    python -m venv "$env_folder"
+    "$PYTHON_BIN" -m venv "$env_folder"
 fi
 
 ln -s "$parent" "$env_folder/.parent"
