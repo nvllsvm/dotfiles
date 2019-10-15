@@ -1,73 +1,77 @@
-#!/usr/bin/env bash
-set -e
-
-show_help() {
-    cat << EOF
-usage: extract [-i] [-r] [-d] FILE [FILE ...]
-    -c      create a child directory for each archive and extract there
-    -p      parent directory to extract to. defaults to directory where archive resides
-    -r      remove archive after successful extraction
-EOF
-}
+#!/usr/bin/env python3
+import argparse
+import pathlib
+import subprocess
 
 
-gen_target() {
-    target="${1%.*}"
-    if [ -n "$EXTRACT_BASE" ]; then
-        target="$EXTRACT_BASE/$(basename "$target")"
-    fi
-    if [ -z "$EXTRACT_IN_CHILD" ]; then
-        target="$(dirname "$target")"
-    fi
-    echo "$target"
-}
+def extract(path, parent=None, child=False):
+    path = path.absolute()
+    parent = path.parent if parent is None else parent.absolute()
+
+    suffixes = [s.lower() for s in path.suffixes]
+    if child:
+        if len(suffixes) > 1 and suffixes[-2] == '.tar':
+            dest = parent / pathlib.Path(path.stem).stem
+        else:
+            dest = parent / path.with_name(path.stem)
+
+        while dest.exists():
+            dest = dest.with_name(f'{dest.name}_')
+    else:
+        dest = parent
+
+    if len(suffixes) > 1 and suffixes[-2] == '.tar':
+        _extract_nested_tar(path, dest)
+    elif suffixes[-1] == '.tgz':
+        _extract_nested_tar(path, dest)
+    else:
+        _extract_file(path, dest)
 
 
-if [ $# -eq 0 ]; then
-    show_help >&2
-    exit 1
-fi
+def _extract_nested_tar(path, dest):
+    extract_1 = subprocess.Popen(
+        ['7z', 'x', '-so', '--', str(path)],
+        stdout=subprocess.PIPE,
+    )
+    subprocess.run(
+        ['7z', 'x', '-aoa', '-si', '-ttar', f'-o{dest}'],
+        stdin=extract_1.stdout,
+        check=True
+    )
+    extract_1.wait()
+    if extract_1.returncode:
+        raise subprocess.CalledProcessError(
+            extract_1.returncode,
+            extract_1.args
+        )
 
-while true; do
-    case "$1" in
-        -c)
-            EXTRACT_IN_CHILD=1
-            shift
-            ;;
-        -r)
-            EXTRACT_RM=1
-            shift
-            ;;
-        -p)
-            EXTRACT_BASE="$(realpath "$2")"
-            shift
-            shift
-            ;;
-        --help)
-            show_help
-            exit
-            ;;
-        *)
-            break
-    esac
-done
 
-for filename in "$@"; do
-    if ! [ -e "$filename" ]; then
-        echo "error: file not found \"$filename\"" >&2
-        exit 1
-    fi
-done
+def _extract_file(path, dest):
+    subprocess.run(
+        ['7z', 'x', '-spe', f'-o{dest}', '--', str(path)],
+        check=True
+    )
 
-for filename in "$@"; do
-    target="$(gen_target "$filename")"
-    if [ "${filename%%.tar.*}" != "$filename" ] || [ "${filename%%.tgz}" != "$filename"  ] ; then
-        target="$(gen_target "$target")"
-        7z x "${filename}" -so | 7z x -aoa -si -ttar -o"${target}"
-    else
-        7z x -spe -o"${target}" "${filename}"
-    fi
-    if [ -n "$EXTRACT_RM" ]; then
-        rm "$filename"
-    fi
-done
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-p', dest='parent', metavar='DIR', type=pathlib.Path,
+        help='parent directory to extract to')
+    parser.add_argument(
+        '-c', dest='child', action='store_true',
+        help='extract each archive to a unique child directory')
+    parser.add_argument(
+        '--rm', action='store_true',
+        help='remove archive after successful extraction')
+    parser.add_argument('archive', nargs='+', type=pathlib.Path)
+    args = parser.parse_args()
+
+    for path in args.archive:
+        extract(path, args.parent, args.child)
+        if args.rm:
+            path.unlink()
+
+
+if __name__ == '__main__':
+    main()
