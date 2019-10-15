@@ -5,12 +5,20 @@ import subprocess
 
 
 def extract(path, parent=None, child=False):
-    path = path.absolute()
-    parent = path.parent if parent is None else parent.absolute()
+    dest = _build_dest(path, parent, child)
+    if _is_nested_tar(path):
+        _extract_nested_tar(path, dest)
+    else:
+        _extract_file(path, dest)
 
-    suffixes = [s.lower() for s in path.suffixes]
+
+def _build_dest(path, parent, child):
+    if parent is None:
+        parent = path.parent
+    parent = parent.absolute()
+
     if child:
-        if len(suffixes) > 1 and suffixes[-2] == '.tar':
+        if len(path.suffixes) > 1 and path.suffixes[-2].lower() == '.tar':
             dest = parent / pathlib.Path(path.stem).stem
         else:
             dest = parent / path.with_name(path.stem)
@@ -19,13 +27,16 @@ def extract(path, parent=None, child=False):
             dest = dest.with_name(f'{dest.name}_')
     else:
         dest = parent
+    return dest
 
-    if len(suffixes) > 1 and suffixes[-2] == '.tar':
-        _extract_nested_tar(path, dest)
-    elif suffixes[-1] == '.tgz':
-        _extract_nested_tar(path, dest)
+
+def _is_nested_tar(path):
+    if len(path.suffixes) > 1 and path.suffixes[-2].lower() == '.tar':
+        return True
+    elif path.suffix.lower() == '.tgz':
+        return True
     else:
-        _extract_file(path, dest)
+        return False
 
 
 def _extract_nested_tar(path, dest):
