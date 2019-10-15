@@ -9,28 +9,31 @@ phobos() {
         MODE=internal
     fi
 
+    xrandr-custom-resolution eDP1 1600 900 60
+    xrandr-custom-resolution eDP1 1280 720 60
+
     case "$MODE" in
         internal)
             xrandr \
-                --output DP-1 --off \
-                --output DP-2 --off \
-                --output eDP-1 --primary --mode 3200x1800 --pos 0x0 --rotate normal
+                --output DP1 --off \
+                --output DP2 --off \
+                --output eDP1 --primary --mode 3200x1800 --pos 0x0 --rotate normal
             set-desktop-themes --dpi 192
             apply-display-calibration
             ;;
         internal-half)
             xrandr \
-                --output DP-1 --off \
-                --output DP-2 --off \
-                --output eDP-1 --primary --mode 1600x900 --pos 0x0 --rotate normal
+                --output DP1 --off \
+                --output DP2 --off \
+                --output eDP1 --primary --mode 1600x900 --pos 0x0 --rotate normal
             set-desktop-themes --dpi 138
             apply-display-calibration
             ;;
         internal-720)
             xrandr \
-                --output DP-1 --off \
-                --output DP-2 --off \
-                --output eDP-1 --primary --mode 1280x720 --pos 0x0 --rotate normal
+                --output DP1 --off \
+                --output DP2 --off \
+                --output eDP1 --primary --mode 1280x720 --pos 0x0 --rotate normal
             set-desktop-themes --dpi 96
             apply-display-calibration
             ;;
@@ -125,20 +128,30 @@ deimos() {
     case "$MODE" in
         internal)
             xrandr \
-                --output DP-1 --off \
-                --output HDMI-1 --off \
-                --output HDMI-2 --off \
-                --output eDP-1 --primary --mode 720x1280 --pos 0x0 --rotate right
+                --output DP1 --off \
+                --output HDMI1 --off \
+                --output HDMI2 --off \
+                --output eDP1 --primary --mode 720x1280 --pos 0x0 --rotate right
             set-desktop-themes --dpi 96 --large
             apply-display-calibration
             xinput set-prop \
                 "$(xinput | grep Goodix | grep pointer | awk '{print $6}' | cut -d= -f2)" \
                 'Coordinate Transformation Matrix' 0 1 0 -1 0 1 0 0 1
             ;;
+        external)
+            xrandr \
+                --output DP1 --primary --mode 1920x1200 --pos 0x0 \
+                --output HDMI1 --off \
+                --output HDMI2 --off \
+                --output eDP1 --off
+            set-desktop-themes --dpi 96
+            apply-display-calibration --reset
+            ;;
         *)
             cat << EOF
 Options:
 - internal
+- external
 EOF
             exit 1
             ;;
