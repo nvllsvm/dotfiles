@@ -8,10 +8,10 @@ if ! [ -x "$(command -v pip)" ]; then
 fi
 
 if [ "$(pip list | grep -e '^pip ' -e '^setuptools ' -e '^wheel ' | wc -l)" != '3' ]; then
-    pip install -U --force-reinstall pip setuptools wheel
+    pip install --user --upgrade --force-reinstall pip setuptools wheel
 fi
 
 ood_packages="$(pip list --outdated --format=freeze)"
 if [ -n "${ood_packages}" ]; then
-    pip install --upgrade $(echo "${ood_packages}" | cut -d = -f 1)
+    pip install --user --upgrade $(echo "${ood_packages}" | cut -d = -f 1)
 fi

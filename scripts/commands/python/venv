@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 set -e
 
 ENV_ROOT="$HOME/.local/share/virtualenvs"
@@ -82,6 +82,7 @@ elif [ -n "$1" ]; then
         version="$found"
     fi
     echo "Using '$version' from pyenv"
+    eval "$(pyenv init -)"
     eval "$(pyenv sh-shell "$version")"
 fi
 

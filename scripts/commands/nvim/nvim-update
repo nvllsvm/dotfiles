@@ -4,7 +4,8 @@ set -e
 update_venv() {
     VENV=~/.config/nvim/python3_env
     export PIP_USER=0
-    if ! [ -d "$VENV" ]; then
+    if ! [ -f "$(readlink -f "$VENV/bin/python")" ]; then
+        rm -rf "$VENV"
         python -m venv "$VENV"
     fi
     . "$VENV/bin/activate"
