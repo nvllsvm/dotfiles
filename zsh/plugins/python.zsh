@@ -2,11 +2,6 @@ export PYTHONUSERBASE=~/.local/share/pythonuser
 export PYENV_ROOT=~/.local/share/pyenv
 
 if [ -d "$PYENV_ROOT" ] || [ -d "$PYTHONUSERBASE" ]; then
-    path=(
-        "${PYTHONUSERBASE}/bin"
-        "$path[@]"
-    )
-
     if [ -d "$PYENV_ROOT" ]; then
         path=(
             "${PYENV_ROOT}/plugins/pyenv-global-links"
@@ -18,6 +13,11 @@ if [ -d "$PYENV_ROOT" ] || [ -d "$PYTHONUSERBASE" ]; then
     else
         unset PYENV_ROOT
     fi
+
+    path=(
+        "${PYTHONUSERBASE}/bin"
+        "$path[@]"
+    )
 
     full-update add pip-update
     full-update add 'pipx upgrade-all'
