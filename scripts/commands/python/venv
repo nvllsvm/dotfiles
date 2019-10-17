@@ -16,10 +16,6 @@ simplified virtualenvs with direnv
 EOF
 }
 
-pyrealpath() {
-    printf "%s" "$1" | python -c 'import os; import sys; print(os.path.realpath(sys.stdin.read()))'
-}
-
 PRUNE=''
 DELETE=''
 while true; do
@@ -49,10 +45,9 @@ fi
 if [ -n "$PRUNE" ]; then
     for p in "$ENV_ROOT/"*/.parent; do
         if [ -L "$p" ]; then
-            real="$(pyrealpath "$p")"
-            if ! [ -e "$real/.envrc" ]; then
+            if ! [ -e "$p/.envrc" ]; then
                 venvdir="$(dirname "$p")"
-                echo Removing venv for "$real"
+                echo Removing venv for "$p"
                 rm -rf "$venvdir"
             fi
         fi
@@ -65,8 +60,7 @@ if ! command -v direnv > /dev/null; then
     exit 1
 fi
 
-# Avoids dependency on realpath
-parent="$(pyrealpath "$(pwd)")"
+parent="$(pwd)"
 
 env_folder="$ENV_ROOT/$(printf "%s" "$parent" | sha256sum | awk '{print $1}')"
 
