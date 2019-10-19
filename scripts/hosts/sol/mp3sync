@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 set -e
-IMAGE=nvllsvm/harmonize:dev
+IMAGE=nvllsvm/harmonize
 
 SOURCE=/storage/Audio/Library
 TARGET=/storage/Audio/MP3

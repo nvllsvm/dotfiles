@@ -16,9 +16,9 @@ def main():
     for path in args.path:
         name = path.name.lstrip(args.lstrip).rstrip(args.rstrip)
         target = path.with_name(''.join([
-            args.append,
+            args.prepend,
             name,
-            args.prepend
+            args.append
         ]))
         if target == path:
             continue
