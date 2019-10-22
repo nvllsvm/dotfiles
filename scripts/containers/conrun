@@ -199,7 +199,6 @@ if [ -n "$DIND" ]; then
         --detach \
         "${dind_args[@]}" \
         "$DIND_IMAGE" > /dev/null
-    run_args+=('--link' "${dind_container_name}:docker")
     run_args+=('--env' "DOCKER_HOST=tcp://docker:2375")
 fi
 

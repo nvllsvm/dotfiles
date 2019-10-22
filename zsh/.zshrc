@@ -150,3 +150,4 @@ if [ -d "$host_scripts" ]; then
     path=("$host_scripts" "$path[@]")
 fi
 unset host_scripts
+export PATH="/usr/local/opt/postgresql@9.4/bin:$PATH"
