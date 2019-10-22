@@ -6,9 +6,9 @@
     <string>mpd</string>
     <key>Program</key>
     <string>/Users/andrewr/.dotfiles/public/scripts/macos/start-mpd</string>
-    <key>StandardOutLog</key>
+    <key>StandardOutPath</key>
     <string>/tmp/mpd.out.log</string>
-    <key>StandardErrorLog</key>
+    <key>StandardErrorPath</key>
     <string>/tmp/mpd.err.log</string>
     <key>RunAtLoad</key>
     <true/>
