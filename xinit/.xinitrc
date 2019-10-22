@@ -13,10 +13,10 @@ set +a
 
 xset s off -dpms
 
+/usr/lib/gsd-xsettings &
 setup-outputs
 
 compton &
-/usr/lib/gsd-xsettings &
 xbindkeys &
 xss-lock -- lock-screen &
 
