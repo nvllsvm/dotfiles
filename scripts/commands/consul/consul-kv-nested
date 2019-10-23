@@ -3,7 +3,6 @@ import argparse
 import base64
 import json
 import os
-
 import urllib.error
 import urllib.parse
 import urllib.request
