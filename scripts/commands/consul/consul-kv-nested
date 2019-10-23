@@ -64,9 +64,13 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--url', default=os.environ.get('CONSUL_HTTP_ADDR'),
-        help='[envvar CONSUL_HTTP_ADDR]')
-    parser.add_argument('--keys', action='store_true')
-    parser.add_argument('path', nargs='?', default='')
+        help='Consul HTTP address [envvar CONSUL_HTTP_ADDR]')
+    parser.add_argument(
+        '--keys', action='store_true',
+        help='output only key names')
+    parser.add_argument(
+        'path', nargs='?', default='/',
+        help='optional path to navigate to. (default %(default)s)')
     args = parser.parse_args()
 
     if not args.url:
