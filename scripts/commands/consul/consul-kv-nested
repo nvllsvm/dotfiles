@@ -62,7 +62,7 @@ def explode(data, delimiter):
 
 
 def main():
-    parser = argparse.ArgumentParser('consul-kv-nested', __doc__)
+    parser = argparse.ArgumentParser('consul-kv-nested', description=__doc__)
     parser.add_argument(
         '--keys', action='store_true',
         help='output only key names')
