@@ -1,51 +1,100 @@
-#!/usr/bin/env sh
-format_json() {
-    jq -S 'reduce (.[] | select(.key | endswith("/") | not)) as $item ({}; setpath($item.key | split("/"); ($item.value | @base64d)))'
-}
+#!/usr/bin/env python3
+import argparse
+import base64
+import json
+import os
 
-remove_prefix() {
-    key="$(echo "$1" | sed 's/\//"\."/g')"
-    key='."'"$key"'"'
-    jq -r "$key"
-}
+import urllib.error
+import urllib.parse
+import urllib.request
 
-show_usage() {
-    cat << EOF
-usage: consul-kv-nested [KEY]
 
-Format Consul keys into a nested JSON structure.
+class Consul:
 
-    -h, --help      show help and exit
-EOF
-}
+    def __init__(self, url):
+        self.url = url
 
-while true; do
-    case "$1" in
-        -h|--help)
-            show_usage
-            exit
-            ;;
-        --)
-            shift
-            break
-            ;;
-        *)
-            break
-            ;;
-    esac
-done
+    def export_kv(self):
+        status_code, body = self._request(
+            'GET', '/v1/kv/', query={'recurse': 'true'})
+        if status_code != 200:
+            raise RuntimeError(f'HTTP {status_code}')
+        return json.loads(body)
 
-if [ -t 0 ]; then
-    if [ "$#" -eq 0 ]; then
-        consul kv export | format_json
-    elif [ "$#" -eq 1 ]; then
-        key="$(echo "$1" | sed 's/\/$//')"
-        consul kv export -- "$key" | format_json | remove_prefix "$key"
-    else
-        show_usage >&2
-        echo 'error: too many arguments' >&2
-        exit 1
-    fi
-else
-    format_json
-fi
+    def _request(self, method, path, data=None, query=None, timeout=30):
+        url = urllib.parse.urlunsplit(
+            urllib.parse.urlsplit(self.url)._replace(path=path)
+        )
+        if query is not None:
+            query = urllib.parse.urlencode(query)
+            url = urllib.parse.urlunsplit(
+                urllib.parse.urlsplit(url)._replace(query=query)
+            )
+
+        r = urllib.request.Request(url, data=data, method=method)
+        try:
+            response = urllib.request.urlopen(r, timeout=timeout)
+        except urllib.error.HTTPError as error:
+            response = error.fp
+        return response.getcode(), response.read()
+
+
+def explode(data, delimiter):
+    nested = {}
+
+    for okey, value in sorted(data.items()):
+        d = nested
+        parts = okey.split(delimiter)
+        key = parts.pop(-1)
+        if key == '':
+            continue
+
+        for part in (p for p in parts if p != ''):
+            if part not in d:
+                d[part] = {}
+            elif part in d and not isinstance(d[part], dict):
+                d[part] = {}
+            d = d[part]
+
+        d[key] = value
+
+    return nested
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--url', default=os.environ.get('CONSUL_HTTP_ADDR'),
+        help='[envvar CONSUL_HTTP_ADDR]')
+    parser.add_argument('--keys', action='store_true')
+    parser.add_argument('path', nargs='?', default='')
+    args = parser.parse_args()
+
+    if not args.url:
+        parser.error('consul url not specified')
+        parser.exit(1)
+
+    consul = Consul(args.url)
+
+    data = {}
+    for item in consul.export_kv():
+        value = item['Value']
+        if value is not None:
+            try:
+                value = base64.b64decode(value).decode()
+            except UnicodeDecodeError:
+                continue
+        data[item['Key']] = value
+
+    data = explode(data, '/')
+    path = args.path.strip('/').strip()
+    if path:
+        for part in path.split('/'):
+            data = data[part]
+    if args.keys:
+        data = sorted(data.keys())
+    print(json.dumps(data, indent=2, sort_keys=True))
+
+
+if __name__ == '__main__':
+    main()
