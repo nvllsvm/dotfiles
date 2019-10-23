@@ -61,6 +61,27 @@ def explode(data, delimiter):
     return nested
 
 
+def flatten(root, separator='/'):
+    stack = [([], root)]
+    flat = {}
+    while stack:
+        prefixes, data = stack.pop()
+        for key, value in data.items():
+            prefix = prefixes.copy()
+            prefix.append(key)
+
+            if isinstance(value, dict):
+                stack.append((prefix, value))
+            else:
+                if any(separator in part for part in prefix):
+                    raise ValueError('separator found in prefix')
+                flat_key = separator.join(prefix)
+                if flat_key in flat:
+                    raise KeyError(f'duplicate key "{flat_key}"')
+                flat[flat_key] = value
+    return flat
+
+
 def transform_export_to_nested(data):
     transformed = {}
     for item in data:
@@ -76,6 +97,9 @@ def transform_export_to_nested(data):
 
 def main():
     parser = argparse.ArgumentParser('consul-kv-nested', description=__doc__)
+    parser.add_argument(
+        '--flat', action='store_true',
+        help='flatten output')
     parser.add_argument(
         '--keys', action='store_true',
         help='output only key names')
@@ -98,6 +122,8 @@ def main():
     if path:
         for part in path.split('/'):
             data = data[part]
+    if args.flat:
+        data = flatten(data)
     if args.keys:
         data = sorted(data.keys())
 
