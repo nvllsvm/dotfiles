@@ -61,6 +61,19 @@ def explode(data, delimiter):
     return nested
 
 
+def transform_export_to_nested(data):
+    transformed = {}
+    for item in data:
+        value = item['Value']
+        if value is not None:
+            try:
+                value = base64.b64decode(value).decode()
+            except UnicodeDecodeError:
+                continue
+        transformed[item['Key']] = value
+    return explode(transformed, '/')
+
+
 def main():
     parser = argparse.ArgumentParser('consul-kv-nested', description=__doc__)
     parser.add_argument(
@@ -79,24 +92,15 @@ def main():
         parser.exit(1)
 
     consul = Consul(args.url)
+    data = transform_export_to_nested(consul.export_kv())
 
-    data = {}
-    for item in consul.export_kv():
-        value = item['Value']
-        if value is not None:
-            try:
-                value = base64.b64decode(value).decode()
-            except UnicodeDecodeError:
-                continue
-        data[item['Key']] = value
-
-    data = explode(data, '/')
     path = args.path.strip('/').strip()
     if path:
         for part in path.split('/'):
             data = data[part]
     if args.keys:
         data = sorted(data.keys())
+
     print(json.dumps(data, indent=2, sort_keys=True))
 
 
