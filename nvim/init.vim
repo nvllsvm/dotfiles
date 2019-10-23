@@ -104,6 +104,7 @@ Plug 'chrisbra/csv.vim'
 Plug '907th/vim-auto-save'
 
 Plug 'udalov/kotlin-vim'
+Plug 'keith/swift.vim'
 call plug#end()
 
 " deoplete
