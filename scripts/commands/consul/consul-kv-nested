@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Output Consul KV values in a nested JSON format"""
+"""Retrieve Consul KV values in a nested JSON format"""
 import argparse
 import base64
 import json
