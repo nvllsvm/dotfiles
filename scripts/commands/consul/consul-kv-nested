@@ -90,6 +90,7 @@ def transform_export_to_nested(data):
             try:
                 value = base64.b64decode(value).decode()
             except UnicodeDecodeError:
+                # binary data?
                 continue
         transformed[item['Key']] = value
     return explode(transformed, '/')
