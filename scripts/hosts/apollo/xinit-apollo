@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 apollo-autorotate &
 onboard &
-apollo-xinput &
+apollo-xinput
