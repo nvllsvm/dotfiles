@@ -21,7 +21,7 @@ Convenience features for running containers
     --help      show help and exit
     --here      mount the current working directory as a volume and set the workdir to it
     --me        run as the host user's UID and GID
-    --no-pull   do not pull image before run
+    --pull      pull image before run
     --podman    use podman
     --shell     set the entrypoint to /bin/sh
 
@@ -64,7 +64,7 @@ COMPOSE=
 DEFAULTS=1
 DIND=
 ENTRYPOINT=
-PULL=1
+PULL=
 while true; do
     case "$1" in
         --podman)
@@ -100,8 +100,8 @@ while true; do
             shift
             shift
             ;;
-        --no-pull)
-            PULL=
+        --pull)
+            PULL=1
             shift
             ;;
         --here)
