@@ -45,21 +45,29 @@ else
     if [ "$DPI" -le 138 ]; then
         BORDER_WIDTH=1
         CURSOR_SIZE=16
-        DUNST_GEOMETRY=300x5-0+20
         DUNST_MAX_ICON_SIZE=64
-        FONT_SIZE=9
         SCALING_FACTOR=1
+
+        if [ -n "$LARGE" ]; then
+            DUNST_GEOMETRY=300x5-0+28
+            FONT_SIZE=14
+        else
+            DUNST_GEOMETRY=300x5-0+20
+            FONT_SIZE=9
+        fi
     else
         BORDER_WIDTH=3
         CURSOR_SIZE=48
-        DUNST_GEOMETRY=800x5-0+44
         DUNST_MAX_ICON_SIZE=128
-        FONT_SIZE=10
         SCALING_FACTOR=2
-    fi
 
-    if [ -n "$LARGE" ]; then
-        FONT_SIZE=14
+        if [ -n "$LARGE" ]; then
+            DUNST_GEOMETRY=800x5-0+28
+            FONT_SIZE=14
+        else
+            DUNST_GEOMETRY=800x5-0+44
+            FONT_SIZE=10
+        fi
     fi
 
     # save settings
