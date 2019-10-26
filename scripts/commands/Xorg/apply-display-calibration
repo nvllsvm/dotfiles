@@ -40,9 +40,9 @@ done
 
 clear_existing_calibration 2> /dev/null
 
-case "$HOSTNAME" in
+case "$(hostname)" in
     "phobos")
-        dispwin -d1 $DOTFILES/icc/xps13_phobos.icc
+        dispwin -d1 "$DOTFILES/icc/xps13_phobos.icc"
         ;;
     *)
 esac
