@@ -44,5 +44,8 @@ case "$(hostname)" in
     "phobos")
         dispwin -d1 "$DOTFILES/icc/xps13_phobos.icc"
         ;;
+    "apollo")
+        dispwin -d1 "$DOTFILES/icc/surface_go.icc"
+        ;;
     *)
 esac
