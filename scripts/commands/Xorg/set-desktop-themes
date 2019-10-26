@@ -62,7 +62,7 @@ else
         SCALING_FACTOR=2
 
         if [ -n "$LARGE" ]; then
-            DUNST_GEOMETRY=800x5-0+28
+            DUNST_GEOMETRY=800x5-0+56
             FONT_SIZE=14
         else
             DUNST_GEOMETRY=800x5-0+44
