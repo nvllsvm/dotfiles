@@ -52,7 +52,7 @@ else
     else
         BORDER_WIDTH=3
         CURSOR_SIZE=48
-        DUNST_GEOMETRY=800x5-0+200
+        DUNST_GEOMETRY=800x5-0+44
         DUNST_MAX_ICON_SIZE=128
         FONT_SIZE=10
         SCALING_FACTOR=2
