@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
 set -e
 if [ $# -gt 0 ]; then
-    exec open "https://duckduckgo.com/?q=$*"
+    exec firefox --private-window "https://duckduckgo.com/?q=$*"
 fi
