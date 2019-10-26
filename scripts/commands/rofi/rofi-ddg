@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
 set -e
 if [ $# -gt 0 ]; then
-    exec firefox --private-window "https://duckduckgo.com/?q=$*"
+    nohup firefox --private-window "https://duckduckgo.com/?q=$*" > /dev/null 2>&1 &
 fi
