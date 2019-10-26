@@ -1,7 +1,7 @@
 rofi.width: -50
 rofi.fixed-num-lines: true
 rofi.sidebar-mode: true
-rofi.no-click-to-exit: true
+rofi.click-to-exit: false
 rofi.yoffset: -200
 rofi.lines: 10
 rofi.hide-scrollbar: true
