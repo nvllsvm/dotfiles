@@ -6,7 +6,7 @@ import logging
 import pathlib
 import subprocess
 
-import harmonize.app as harmonize
+import harmonize.__main__ as harmonize
 import mutagen
 
 LOGGER = logging.getLogger('reencode-lossless')
