@@ -9,4 +9,3 @@ rofi.color-window: #000000, #e4e4e4, #000000
 rofi.color-normal: #000000, #e4e4e4, argb:00000000, #555555, #eeeeee
 rofi.color-active: #fdf6e3, #268bd2, #eee8d5, #268bd2, #fdf6e3
 rofi.color-urgent: #fdf6e3, #dc322f, #eee8d5, #dc322f, #fdf6e3
-rofi.kb-mode-next: Control+Tab
