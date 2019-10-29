@@ -5,6 +5,9 @@ KEYS_PID=$!
 start-mpd > /dev/null 2>&1 &
 MPD_PID=$!
 
-ncmpcpp
+cleanup() {
+    kill -9 $MPD_PID $KEYS_PID
+}
+trap cleanup EXIT INT TERM
 
-kill -9 $MPD_PID $KEYS_PID
+ncmpcpp
