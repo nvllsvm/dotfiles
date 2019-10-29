@@ -77,8 +77,7 @@ def main():
         '--url', default=os.environ.get('CONSUL_HTTP_ADDR'),
         help='Consul HTTP address [envvar CONSUL_HTTP_ADDR]')
 
-    subparsers = parser.add_subparsers(
-        metavar='COMMAND', dest='command', required=True)
+    subparsers = parser.add_subparsers(dest='command', required=True)
 
     get_parser = subparsers.add_parser('get')
     get_parser.add_argument(
