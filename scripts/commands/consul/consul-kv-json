@@ -58,7 +58,9 @@ class ConsulKV:
             if key.endswith('/'):
                 continue
             value = item['Value']
-            if value is not None:
+            if value is None:
+                value = ''
+            else:
                 try:
                     value = base64.b64decode(value).decode()
                 except UnicodeDecodeError:
