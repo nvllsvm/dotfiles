@@ -27,7 +27,7 @@ def flatten(root, delimiter):
 
 def main():
     parser = argparse.ArgumentParser('json-flat')
-    parser.add_argument('-d', '--delimiter', required=True)
+    parser.add_argument('delimiter')
     parser.add_argument(
         'data',
         nargs='?',
