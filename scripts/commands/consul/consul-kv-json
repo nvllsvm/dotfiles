@@ -158,7 +158,7 @@ def main():
 
         print(json.dumps(data, indent=2, sort_keys=True))
     elif args.command == 'put':
-        data = json.load(args.file)
+        data = json.load(args.data)
 
         assert isinstance(data, dict)
         for key, value in data.items():
