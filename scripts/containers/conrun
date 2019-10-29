@@ -112,6 +112,9 @@ while true; do
             ;;
         --me)
             run_args+=('--user' "$(id -u):$(id -g)")
+            for gid in $(id -G "$(whoami)"); do
+                run_args+=('--group-add' "$gid")
+            done
             shift
             ;;
         --volume=*)
