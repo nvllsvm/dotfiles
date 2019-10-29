@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+macos-media-keys --handler play_pause 'mpc toggle' --handler next_track 'mpc next' --handler prev_track 'mpc prev' > /dev/null 2>&1 &
+KEYS_PID=$!
+
+start-mpd > /dev/null 2>&1 &
+MPD_PID=$!
+
+ncmpcpp
+
+kill -9 $MPD_PID $KEYS_PID
