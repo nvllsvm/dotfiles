@@ -71,28 +71,6 @@ class ConsulKV:
         return transformed
 
 
-def _nest(data, delimiter='/'):
-    nested = {}
-
-    for okey, value in sorted(data.items()):
-        d = nested
-        parts = okey.split(delimiter)
-        key = parts.pop(-1)
-        if key == '':
-            continue
-
-        for part in (p for p in parts if p != ''):
-            if part not in d:
-                d[part] = {}
-            elif part in d and not isinstance(d[part], dict):
-                d[part] = {}
-            d = d[part]
-
-        d[key] = value
-
-    return nested
-
-
 def main():
     parser = argparse.ArgumentParser('consul-kv-json', description=__doc__)
     parser.add_argument(
@@ -111,7 +89,6 @@ def main():
         help='ignore case')
     get_parser.add_argument(
         '-v', dest='invert', action='store_true', help='invert match')
-    get_parser.add_argument('--nest', action='store_true')
 
     put_parser = subparsers.add_parser('put')
     put_parser.add_argument(
@@ -152,9 +129,6 @@ def main():
                     continue
 
             data[key] = value
-
-        if args.nest:
-            data = _nest(data)
 
         print(json.dumps(data, indent=2, sort_keys=True))
     elif args.command == 'put':
