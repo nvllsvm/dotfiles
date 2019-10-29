@@ -4,6 +4,7 @@ import argparse
 import base64
 import json
 import os
+import re
 import sys
 import urllib.error
 import urllib.parse
@@ -79,7 +80,16 @@ def main():
     subparsers = parser.add_subparsers(
         metavar='COMMAND', dest='command', required=True)
 
-    subparsers.add_parser('get')
+    get_parser = subparsers.add_parser('get')
+    get_parser.add_argument(
+        '--key-regex', metavar='PATTERN', help='key pattern')
+    get_parser.add_argument(
+        '--value-regex', metavar='PATTERN', help='value pattern')
+    get_parser.add_argument(
+        '-i', dest='ignorecase', action='store_true',
+        help='ignore case')
+    get_parser.add_argument(
+        '-v', dest='invert', action='store_true', help='invert match')
 
     put_parser = subparsers.add_parser('put')
     put_parser.add_argument(
@@ -98,8 +108,30 @@ def main():
     consul = ConsulKV(args.url)
 
     if args.command == 'get':
-        data = consul.get()
-        print(json.dumps(data, indent=2, sort_keys=True))
+        flags = re.IGNORECASE if args.ignorecase else 0
+        key_re = re.compile(
+            args.key_regex, flags=flags) if args.key_regex else None
+        value_re = re.compile(
+            args.value_regex, flags=flags) if args.value_regex else None
+
+        filtered = {}
+        for key, value in consul.get().items():
+            if key_re:
+                if key_re.search(key):
+                    if args.invert:
+                        continue
+                elif not args.invert:
+                    continue
+            if value_re:
+                if value_re.search(value):
+                    if args.invert:
+                        continue
+                elif not args.invert:
+                    continue
+
+            filtered[key] = value
+
+        print(json.dumps(filtered, indent=2, sort_keys=True))
     elif args.command == 'put':
         data = json.load(args.file)
 
