@@ -5,7 +5,7 @@
     <key>Label</key>
     <string>mpdkeys</string>
     <key>Program</key>
-    <string>/Users/andrewr/.dotfiles/public/scripts/macos/start-mpdkeys</string>
+    <string>/Users/andrewr/.local/bin/mpcmacmediakeys</string>
     <key>StandardOutPath</key>
     <string>/tmp/mpdkeys.out.log</string>
     <key>StandardErrorPath</key>

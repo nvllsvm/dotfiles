@@ -85,5 +85,56 @@ if command -v fzf > /dev/null; then
     zle     -N   fzf-history-widget
     bindkey '^R' fzf-history-widget
 
+    # CTRL-R - Paste the selected command from history into the command line
+    __get_parents() {
+        local d
+        local num=1
+        d="$1"
+        while [ "$d" != '/' ]; do
+            d="$(dirname "$d")"
+            echo $num "$d"
+            let 'num=num+1'
+        done
+    }
+
+    fzf-up() {
+      local selected num
+      setopt localoptions noglobsubst noposixbuiltins pipefail 2> /dev/null
+      selected="$(__get_parents "$PWD" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse $FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS" $(__fzfcmd) +m)"
+      local ret=$?
+      if [ -n "$selected" ]; then
+          local target="$(printf '%s' "$selected" | cut -d' ' -f2-)"
+          if [ -t 1 ]; then
+              cd "$target"
+          else
+              echo -n "$target"
+          fi
+      fi
+      zle && zle reset-prompt || true
+    }
+
+    __up() {
+        local back=""
+        for i in {1.."$1"}; do
+            back+='../'
+        done
+        if [ -t 1 ]; then
+            cd "$back"
+        else
+            echo -n "$back"
+        fi
+    }
+
+    up() {
+        if [ $# -eq 1 ]; then
+            __up $1
+        else
+            fzf-up
+        fi
+
+    }
+    zle -N up
+    bindkey '^b' up
+
     fi
 fi
