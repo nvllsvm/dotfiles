@@ -1,0 +1,38 @@
+#!/usr/bin/env sh
+show_help() {
+    cat << EOF
+usage: syncdir [--help] SOURCE TARGET
+    --help      Display this help and exit
+EOF
+}
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --)
+            shift
+            break
+            ;;
+        --help)
+            show_help
+            exit
+            ;;
+        *)
+            break
+    esac
+done
+
+if [ $# -eq 2 ]; then
+    SOURCE="$1"
+    TARGET="$2"
+else
+    show_help >&2
+    exit 1
+fi
+
+SOURCE="$(realpath "$SOURCE")/"
+TARGET="$(realpath "$TARGET")/"
+
+echo "$SOURCE"
+echo "$TARGET"
+
+exec rsync -av --progress --delete "$SOURCE" "$TARGET"
