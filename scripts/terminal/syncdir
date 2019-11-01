@@ -33,4 +33,4 @@ fi
 
 echo "Syncing \"$SOURCE\" to \"$TARGET\""
 
-exec rsync -av --progress --delete "$SOURCE/" "$TARGET/"
+exec rsync -avP --delete "$SOURCE/" "$TARGET"
