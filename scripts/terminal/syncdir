@@ -1,4 +1,6 @@
 #!/usr/bin/env sh
+set -e
+
 show_help() {
     cat << EOF
 usage: syncdir [--help] SOURCE TARGET
@@ -29,10 +31,7 @@ else
     exit 1
 fi
 
-SOURCE="$(realpath "$SOURCE")/"
-TARGET="$(realpath "$TARGET")/"
-
 echo "$SOURCE"
 echo "$TARGET"
 
-exec rsync -av --progress --delete "$SOURCE" "$TARGET"
+exec rsync -av --progress --delete "$SOURCE/" "$TARGET/"
