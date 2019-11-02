@@ -1,15 +1,18 @@
-if command -v lf > /dev/null; then
+__lf="$(command -v lf)"
+if [ -z "$__lf" ]; then
+    unset __lf
+else
     lf() {
-        if [ -n "$LF_LEVEL" ]; then
-            echo "Nope - already in a lf shell"
-        else
-            $(whence -p lf) $@
+        tmp="$(mktemp)"
+        "$__lf" -last-dir-path="$tmp" "$@"
+        if [ -f "$tmp" ]; then
+            dir="$(cat "$tmp")"
+            rm -f "$tmp"
+            if [ -d "$dir" ]; then
+                if [ "$dir" != "$(pwd)" ]; then
+                    cd "$dir"
+                fi
+            fi
         fi
     }
-
-    prompt_lf_active='(lf)'
-
-    if [ -n "$LF_LEVEL" ]; then prompt_lf=$prompt_lf_active; fi
-
-    PROMPT="$prompt_lf$PROMPT"
 fi
