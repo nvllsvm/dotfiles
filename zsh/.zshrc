@@ -14,6 +14,7 @@ setopt hist_ignore_all_dups
 setopt hist_ignore_space
 setopt inc_append_history
 setopt share_history
+setopt auto_pushd
 
 bindkey "^[[A" history-beginning-search-backward
 bindkey "^[[B" history-beginning-search-forward
