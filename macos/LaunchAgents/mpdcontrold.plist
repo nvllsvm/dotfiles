@@ -3,13 +3,14 @@
 <plist version="1.0">
   <dict>
     <key>Label</key>
-    <string>mpdkeys</string>
+    <string>mpdcontrold</string>
     <key>Program</key>
-    <string>/Users/andrewr/.local/bin/mpcmacmediakeys</string>
-    <key>StandardOutPath</key>
-    <string>/tmp/mpdkeys.out.log</string>
-    <key>StandardErrorPath</key>
-    <string>/tmp/mpdkeys.err.log</string>
+    <string>/Users/andrewr/.local/bin/mpdcontrold</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/Users/andrewr/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin</string>
+    </dict>
     <key>RunAtLoad</key>
     <true/>
     <key>KeepAlive</key>
