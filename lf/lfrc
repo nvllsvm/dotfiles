@@ -1,4 +1,3 @@
 set hidden
 map <c-n> :set relativenumber!
 map w
-map a :cd
