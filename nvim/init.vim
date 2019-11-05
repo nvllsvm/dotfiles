@@ -90,6 +90,7 @@ Plug 'fisadev/vim-isort'
 Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }}
+Plug 'mzlogin/vim-markdown-toc'
 
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
