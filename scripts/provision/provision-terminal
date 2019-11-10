@@ -146,10 +146,8 @@ if [[ $osname == Darwin* ]]; then
 fi
 zsh_command '$DOTFILES/scripts/commands/pip/pip-update'
 
-PIP_REQUIRE_VIRTUALENV=0 pip install pipx
-
-pipx install flake8
-pipx install speedtest-cli
+pip install flake8
+pip install speedtest-cli
 
 zsh_command nvim-update
 

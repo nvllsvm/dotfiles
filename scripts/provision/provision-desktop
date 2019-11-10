@@ -100,4 +100,4 @@ fi
 link_file mpd ~/.config/mpd
 link_file ncmpcpp ~/.config/ncmpcpp
 
-pipx install base16-shell-preview
+pip install base16-shell-preview
