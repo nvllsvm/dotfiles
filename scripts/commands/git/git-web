@@ -38,6 +38,12 @@ case "$(echo "$url" | tr '[:upper:]' '[:lower:]')" in
     https://*|http://*)
         open "${url}"
         ;;
+    *@*:*)
+        url="${url#*@}"
+        git_path="${url#*:}"
+        git_host="${url%:*}"
+        open "http://${git_host}/${git_path}"
+        ;;
     *)
         if [ -n "$ssh_hostname" ]; then
             open "https://${ssh_hostname}/${git_path}"
