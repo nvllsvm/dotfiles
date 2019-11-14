@@ -78,7 +78,8 @@ def main():
 
     subparsers = parser.add_subparsers(dest='command', required=True)
 
-    subparsers.add_parser('get')
+    get_parser = subparsers.add_parser('get')
+    get_parser.add_argument('prefix', nargs='?')
 
     put_parser = subparsers.add_parser('put')
     put_parser.add_argument(
@@ -98,6 +99,12 @@ def main():
 
     if args.command == 'get':
         data = consul.get()
+        if args.prefix is not None:
+            data = {
+                key: value
+                for key, value in data.items()
+                if key.startswith(args.prefix)
+            }
         print(json.dumps(data, indent=2, sort_keys=True))
     elif args.command == 'put':
         data = json.load(args.data)

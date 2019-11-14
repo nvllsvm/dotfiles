@@ -197,7 +197,9 @@ augroup JSON
 augroup END
 
 augroup MARKDOWN
+    autocmd!
     autocmd FileType markdown nnoremap <leader>m :MarkdownPreview<Cr>
+    autocmd FileType markdown set wrap
 augroup END
 
 augroup XML
