@@ -16,7 +16,7 @@ xset s off -dpms
 /usr/lib/gsd-xsettings &
 setup-outputs
 
-compton &
+picom &
 xbindkeys &
 xss-lock -- lock-screen &
 

@@ -22,7 +22,7 @@ zsh_command() {
 
 osname=$(uname)
 if [[ $osname == Linux* ]]; then
-    link_file compton/compton.conf ~/.config/compton.conf
+    link_file picom/picom.conf ~/.config/picom.conf
     link_file dunst ~/.config/dunst
     link_file environment.d ~/.config/environment.d
     link_file fontconfig ~/.config/fontconfig
@@ -42,7 +42,6 @@ if [[ $osname == Linux* ]]; then
             arandr \
             argyllcms \
             blueberry \
-            compton \
             dunst \
             firefox \
             foliate \
@@ -68,6 +67,7 @@ if [[ $osname == Linux* ]]; then
             pamixer \
             paswitch \
             pavucontrol \
+            picom \
             rofi \
             rofimoji \
             syncthing \
