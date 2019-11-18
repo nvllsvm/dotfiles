@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+set -e
+commit="$(git rev-list -n 1 HEAD -- "$1")"
+if [ -z "$commit" ]; then
+    echo not found >&2
+    exit 1
+fi
+git checkout "${commit}^" -- "$1"
