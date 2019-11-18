@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+case $# in
+    0)
+        SEARCH_DIR="."
+        ;;
+    1)
+        SEARCH_DIR="$1"
+        ;;
+    *)
+        echo 'error: unknown arguments' >&2
+        exit 1
+esac
+exec find "$SEARCH_DIR" -type d -name .git -exec dirname {} \;
