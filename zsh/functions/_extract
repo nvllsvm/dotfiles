@@ -17,7 +17,7 @@ _extract() {
     '-p=[parent directory to extract to]:' \
     '-c[extract each archive to a unique child directory]' \
     '--rm[remove archive after successful extraction]' \
-    '*:: :->args'
+    '*:: :_files'
 
 }
 _extract

@@ -18,7 +18,7 @@ _batch-rename() {
     '--rstrip=[None]:' \
     '--append=[None]:' \
     '--prepend=[None]:' \
-    '*:: :->args'
+    '*:: :_files'
 
 }
 _batch-rename
