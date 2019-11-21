@@ -3,7 +3,7 @@ zwatch() {
     local help='usage: zwatch [-n TIMEOUT] command'
 
     if [ "$1" = '-n' ]; then
-        sleeptime="$2"
+        local sleeptime="$2"
         shift
         shift
     elif [ "$1" = '--help' ] || [ "$1" = '-h' ]; then

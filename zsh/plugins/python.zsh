@@ -20,7 +20,6 @@ if [ -d "$PYENV_ROOT" ] || [ -d "$PYTHONUSERBASE" ]; then
     )
 
     full-update add pip-update
-    #full-update add 'pipx upgrade-all'
     full-update add 'venv --prune'
 elif ! command -v python > /dev/null; then
     unset PYTHONUSERBASE

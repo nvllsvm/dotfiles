@@ -3,10 +3,10 @@ if [ -z "$__lf" ]; then
     unset __lf
 else
     lf() {
-        tmp="$(mktemp)"
+        local tmp="$(mktemp)"
         "$__lf" -last-dir-path="$tmp" "$@"
         if [ -f "$tmp" ]; then
-            dir="$(cat "$tmp")"
+            local dir="$(cat "$tmp")"
             rm -f "$tmp"
             if [ -d "$dir" ]; then
                 if [ "$dir" != "$(pwd)" ]; then
