@@ -1,23 +1,21 @@
-#compdef extract
+#compdef whpy
 # ----------------------------------------------------------------------------------------
-# Zsh completion file for extract
+# Zsh completion file for whpy
 #
-# None
+# Show Python module filesystem paths
 #
 # This file was generated with help from Zargparse (https://github.com/ctil/zargparse)
 # ----------------------------------------------------------------------------------------
 
 typeset -A opt_args
 
-_extract() {
+_whpy() {
 
   # Global flags (i.e. ones not associated with a subcommand)
   _arguments \
     '(-h --help)'{-h,--help}'[show this help message and exit]' \
-    '-p=[parent directory to extract to]:' \
-    '-c[extract each archive to a unique child directory]' \
-    '--rm[remove archive after successful extraction]' \
+    '-d[output dir name]' \
     '*:: :->args'
 
 }
-_extract
+_whpy

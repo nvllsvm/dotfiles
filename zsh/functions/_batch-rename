@@ -1,6 +1,6 @@
-#compdef extract
+#compdef batch-rename
 # ----------------------------------------------------------------------------------------
-# Zsh completion file for extract
+# Zsh completion file for batch-rename
 #
 # None
 #
@@ -9,15 +9,16 @@
 
 typeset -A opt_args
 
-_extract() {
+_batch-rename() {
 
   # Global flags (i.e. ones not associated with a subcommand)
   _arguments \
     '(-h --help)'{-h,--help}'[show this help message and exit]' \
-    '-p=[parent directory to extract to]:' \
-    '-c[extract each archive to a unique child directory]' \
-    '--rm[remove archive after successful extraction]' \
+    '--lstrip=[None]:' \
+    '--rstrip=[None]:' \
+    '--append=[None]:' \
+    '--prepend=[None]:' \
     '*:: :->args'
 
 }
-_extract
+_batch-rename
