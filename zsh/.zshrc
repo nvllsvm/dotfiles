@@ -59,7 +59,6 @@ zle -N zle-line-init
 zle -N zle-keymap-select
 
 add-zsh-hook precmd set_cursor_key_to_cursor
-add-zsh-hook precmd exit_status
 
 set_cursor_key_to_cursor () {
     # fixes some misbehaving combinations like dotnet and VTE terminals.
@@ -68,15 +67,6 @@ set_cursor_key_to_cursor () {
     printf '\e[?1l'
 }
 
-
-exit_status () {
-    # when the previous command exits with a code != 0,
-    # show it on a new line
-    exit_status=$?
-    if [[ $exit_status -gt 0 ]]; then
-        echo -e "${fg[red]}${exit_status}${reset_color}"
-    fi
-}
 
 full-update() {
     if [ "$1" = "add" ]; then
