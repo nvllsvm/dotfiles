@@ -1,0 +1,7 @@
+#compdef extract
+_arguments : \
+    '(-h --help)'{-h,--help} \
+    --rm \
+    -c \
+    -p:dir \
+    '*::command arguments:_normal'
