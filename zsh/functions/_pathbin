@@ -1,0 +1,22 @@
+#compdef pathbin
+# ----------------------------------------------------------------------------------------
+# Zsh completion file for pathbin
+#
+# list executables in path
+#
+# This file was generated with help from Zargparse (https://github.com/ctil/zargparse)
+# ----------------------------------------------------------------------------------------
+
+typeset -A opt_args
+
+_pathbin() {
+
+  # Global flags (i.e. ones not associated with a subcommand)
+  _arguments \
+    '(-h --help)'{-h,--help}'[show this help message and exit]' \
+    '-c[group by command. directories are ordered as they appear in the path list]' \
+    '-d[group by directory]' \
+    '*:: :->args'
+
+}
+_pathbin
