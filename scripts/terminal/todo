@@ -13,15 +13,22 @@ show_help() {
     echo 'usage: todo TASK'
 }
 
+DUE=''
 while true; do
     case "$1" in
+        --due)
+            DUE="$(date -I -d "$2")"
+            shift
+            shift
+            ;;
         --help)
             show_help
             exit
             ;;
         *)
             if [ -n "$1" ]; then
-                echo "$(date -I)" "$@" >> "${TODO_FILE}"
+                # xargs to strip multiple spaces
+                echo "$(date -I)" "$@" "$DUE" | xargs >> "${TODO_FILE}"
             else
                 exec "${EDITOR}" -c AutoSaveToggle "${TODO_FILE}"
             fi
