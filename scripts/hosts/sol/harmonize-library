@@ -19,9 +19,9 @@ harmonize() {
 harmonize -n 8 "$SOURCE" "$TARGET" --codec opus --bitrate 192
 
 printf 'Updating Airsonic library .'
-airsonic-cli startScan > /dev/null
+gonic-cli startScan > /dev/null
 
-while [ "$(airsonic-cli getScanStatus | jq '.scanning')" = 'true' ]; do
+while [ "$(gonic-cli getScanStatus | jq '.scanning')" = 'true' ]; do
     printf .
     sleep 1
 done
