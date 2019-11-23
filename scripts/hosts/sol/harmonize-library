@@ -3,7 +3,7 @@ set -e
 IMAGE=nvllsvm/harmonize
 
 SOURCE=/storage/Audio/Library
-TARGET=/storage/Audio/MP3
+TARGET=/storage/Audio/Lossy
 
 harmonize() {
     podman run \
@@ -16,7 +16,7 @@ harmonize() {
         "$IMAGE" "$@"
 }
 
-harmonize -n 8 "$SOURCE" "$TARGET"
+harmonize -n 8 "$SOURCE" "$TARGET" --codec opus --bitrate 192
 
 printf 'Updating Airsonic library .'
 airsonic-cli startScan > /dev/null
