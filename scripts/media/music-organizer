@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 import argparse
 import logging
+import os
 import pathlib
+import stat
 import subprocess
 
 import chardet
@@ -188,7 +190,18 @@ def main():
 
     logging.basicConfig(format='%(levelname)s %(message)s', level=logging.INFO)
 
+    # TODO: autolookup
+    uid = 1000
+    gid = 1000
+
     for root_path in all_dirs(args.directory):
+        os.chown(root_path, uid, gid)
+        os.chmod(
+            root_path,
+            stat.S_IRUSR + stat.S_IRGRP + stat.S_IROTH +
+            stat.S_IXUSR + stat.S_IXGRP + stat.S_IXOTH +
+            stat.S_IWUSR
+        )
         rename_extensions(root_path)
         organize_images(root_path)
         check_cue_files(root_path)
@@ -197,6 +210,12 @@ def main():
             albums = set()
 
             for path in {p for p in root_path.iterdir() if p.is_file()}:
+                os.chown(path, uid, gid)
+                os.chmod(
+                    path,
+                    stat.S_IRUSR + stat.S_IRGRP + stat.S_IROTH +
+                    stat.S_IWUSR
+                )
                 mutagen_class = MUTAGEN_CLASS.get(path.suffix)
                 if mutagen_class:
                     metadata = mutagen_class(path)
