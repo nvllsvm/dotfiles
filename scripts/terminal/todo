@@ -17,7 +17,7 @@ DUE=''
 while true; do
     case "$1" in
         --due)
-            DUE="$(date -I -d "$2")"
+            DUE="due:$(date -I -d "$2")"
             shift
             shift
             ;;
