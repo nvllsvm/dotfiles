@@ -16,7 +16,11 @@ harmonize() {
         "$IMAGE" "$@"
 }
 
+echo 'Harmonizing opus'
 harmonize -n 8 "$SOURCE" "$TARGET" --codec opus --bitrate 192
+
+echo 'Harmonizing mp3'
+harmonize -n 8 "$SOURCE" "$TARGET" --codec mp3 -V 0
 
 printf 'Updating Airsonic library .'
 gonic-cli startScan > /dev/null
