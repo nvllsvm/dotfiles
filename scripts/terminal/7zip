@@ -7,5 +7,5 @@ for f in "$@"; do
         exit 1
     fi
     7z a "$target" "$f"
-    rm "$f"
+    rm -r "$f"
 done
