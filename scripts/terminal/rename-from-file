@@ -30,7 +30,6 @@ def main():
             if path.is_dir():
                 paths.append(path)
 
-
     if len(paths) != len(titles):
         print(
             f'error: found {len(paths)} paths but only {len(titles)} titles',
