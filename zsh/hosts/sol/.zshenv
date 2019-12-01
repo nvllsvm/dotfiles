@@ -1,1 +1,1 @@
-export NOTES_DIR=/storage/Syncthing/Notes
+export NOTES_DIR=/storage/Syncthing/Default/Notes
