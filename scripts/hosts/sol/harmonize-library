@@ -3,7 +3,7 @@ set -e
 IMAGE=nvllsvm/harmonize
 
 SOURCE=/storage/Audio/Library
-TARGET=/storage/Audio/Lossy
+TARGET=/storage/Audio/Lossy_opus_128
 
 harmonize() {
     podman run \
