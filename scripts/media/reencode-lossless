@@ -15,7 +15,10 @@ LOGGER = logging.getLogger('reencode-lossless')
 def copy_tags(source, target):
     metadata_source = mutagen.File(source)
     metadata_target = mutagen.File(target)
-    metadata_target.update(metadata_source)
+    for key, value in metadata_source.items():
+        if isinstance(value, mutagen.apev2.APETextValue):
+            value = str(value)
+        metadata_target[key] = value
     metadata_target.save()
 
 
@@ -136,22 +139,29 @@ def all_files(root):
                 files.append(path)
             elif path.is_dir():
                 stack.append(path)
-    return sorted(files)
+    return files
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('directory', type=pathlib.Path)
+    parser.add_argument('path', type=pathlib.Path, nargs='+')
     args = parser.parse_args()
 
     logging.basicConfig(
         format='%(levelname)s %(message)s',
         level=logging.INFO)
 
+    paths = set()
+    for path in args.path:
+        if path.is_dir():
+            paths.update(all_files(path))
+        else:
+            paths.add(path)
+
     with concurrent.futures.ProcessPoolExecutor() as pool:
         future_to_path = {
             pool.submit(reencode, path): path
-            for path in all_files(args.directory)
+            for path in sorted(paths)
             if path.suffix.lower() in ('.flac', '.ape', '.wav')
         }
         errors = []
