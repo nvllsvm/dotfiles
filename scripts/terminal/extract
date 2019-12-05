@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# TODO: check if archive is password protected (7z l -slt {})
 import argparse
 import pathlib
 import subprocess
