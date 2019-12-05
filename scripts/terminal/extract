@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-# TODO: check if archive is password protected (7z l -slt {})
+# TODO add password specification
 import argparse
 import pathlib
 import subprocess
+import sys
 
 
 def extract(path, parent=None, child=False):
@@ -11,6 +12,15 @@ def extract(path, parent=None, child=False):
         _extract_nested_tar(path, dest)
     else:
         _extract_file(path, dest)
+
+
+def _is_password_protected(path):
+    proc = subprocess.run(
+        ['7z', 'l', '-slt', path],
+        stdout=subprocess.PIPE,
+        check=True
+    )
+    return 'Encrypted = +' in proc.stdout.decode().split('\n')
 
 
 def _build_dest(path, parent, child):
@@ -80,6 +90,9 @@ def main():
     args = parser.parse_args()
 
     for path in args.archive:
+        if _is_password_protected(path):
+            print('password protected archive', file=sys.stderr)
+            parser.exit(1)
         extract(path, args.parent, args.child)
         if args.rm:
             path.unlink()
