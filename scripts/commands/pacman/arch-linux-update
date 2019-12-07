@@ -20,7 +20,7 @@ if ! command -v yay > /dev/null 2>&1; then
     makepkg -s --install --noconfirm
 fi
 log 'Updating packages'
-yay -Syu --noconfirm
+yay -Syu --devel --noconfirm
 
 log 'Updating file cache'
 sudo pkgfile --update > /dev/null
