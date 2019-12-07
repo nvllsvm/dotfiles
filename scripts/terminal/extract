@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # TODO add password specification
+# TODO make --rm remove all parts of multipart archives
 import argparse
 import pathlib
 import subprocess
