@@ -17,7 +17,7 @@ zwatch() {
         clear
         echo "$(date +'%Y-%m-%d %H:%M:%S') sleep ${sleeptime}s: $@" | cut -c1-$COLUMNS
         echo
-        ("$@")
+        (eval $@)
         sleep "$sleeptime"
     done
 }
