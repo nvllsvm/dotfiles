@@ -70,7 +70,7 @@ MAX_LOST_WORK_SECS_ON_BAT=60
 # Note: Intel Skylake or newer CPU and Kernel >= 4.10 required.
 # Default: <none>
 CPU_HWP_ON_AC=balance_performance
-CPU_HWP_ON_BAT=power
+CPU_HWP_ON_BAT=balance_power
 
 # Set Intel P-state performance: 0..100 (%).
 # Limit the max/min P-state to control the power dissipation of the CPU.
