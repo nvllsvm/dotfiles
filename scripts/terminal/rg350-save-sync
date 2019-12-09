@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+set -ex
+MOUNT_POINT="$(mktemp -d)"
+
+cleanup() {
+    fusermount -quz "$MOUNT_POINT" || true
+    rm -rf "$MOUNT_POINT"
+}
+
+trap cleanup EXIT INT
+sshfs rg350:/ "${MOUNT_POINT}"
+"${MOUNT_POINT}"/media/sdcard/sync_saves.sh
+ssh rg350 /media/sdcard/sync_saves.sh
