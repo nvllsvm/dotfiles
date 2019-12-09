@@ -11,7 +11,10 @@ import mutagen.flac
 import mutagen.mp3
 
 FLAC_EXT = '.flac'
-AUDIO_EXT = (FLAC_EXT, '.mp3')
+MP3_EXT = '.mp3'
+OPUS_EXT = '.opus'
+
+AUDIO_EXT = (FLAC_EXT, MP3_EXT, OPUS_EXT)
 
 IMAGE_EXT = ('.jpg', '.png')
 IMAGE_PREFIX = 'cover'
