@@ -9,7 +9,7 @@ def main():
     parser.add_argument('--rstrip', metavar='TEXT', default='')
     parser.add_argument('--append', metavar='TEXT', default='')
     parser.add_argument('--prepend', metavar='TEXT', default='')
-    parser.add_argument('path', nargs='*', type=pathlib.Path)
+    parser.add_argument('path', nargs='+', type=pathlib.Path)
     args = parser.parse_args()
 
     path_targets = {}
