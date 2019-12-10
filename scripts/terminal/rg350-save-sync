@@ -3,11 +3,18 @@ set -ex
 MOUNT_POINT="$(mktemp -d)"
 
 cleanup() {
-    fusermount -quz "$MOUNT_POINT" || true
+    sudo umount "$MOUNT_POINT"
     rm -rf "$MOUNT_POINT"
 }
 
 trap cleanup EXIT INT
-sshfs rg350:/ "${MOUNT_POINT}"
-"${MOUNT_POINT}"/media/sdcard/sync_saves.sh
-ssh rg350 /media/sdcard/sync_saves.sh
+if [ -e /dev/disk/by-label/rg350_external ]; then
+    sudo mount /dev/disk/by-label/rg350_external "$MOUNT_POINT"
+    "${MOUNT_POINT}"/sync_saves.sh
+else
+    sshfs rg350:/ "${MOUNT_POINT}"
+    "${MOUNT_POINT}"/sync_saves.sh
+    ssh rg350 /media/sdcard/sync_saves.sh
+fi
+
+sync
