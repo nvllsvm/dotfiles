@@ -19,3 +19,10 @@ hashtype = results.split('=')[0].strip()
 pkgbuild = re.sub(
     fr'{hashtype}[a-zA-Z0-9\'\s\n=\(]*\)', results, pkgbuild, 1)
 path.write_text(pkgbuild)
+
+proc = subprocess.run(
+    ['makepkg', '--printsrcinfo'],
+    stdout=subprocess.PIPE,
+    check=True)
+
+pathlib.Path('.SRCINFO').write_text(proc.stdout.decode())
