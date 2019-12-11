@@ -11,4 +11,4 @@ if [ "$1" = 'install' ]; then
         export LDFLAGS="-L${prefix}/lib ${LDFLAGS}"
     fi
 fi
-"$(which -a pyenv | tail -n +2 | head -n 1)" "$@"
+exec "$(which -a "${0##*/}" | grep -m 1 -v "^$0$")" "$@"

@@ -12,7 +12,7 @@ if command -v xdg-open > /dev/null; then
 elif command -v termux-open > /dev/null; then
     nohup termux-open "$@" > /dev/null 2>&1 &
 else
-    bin="$(which -a "$(basename "$0")" | grep -v "^$0$" | head -n 1)"
+    bin="$(which -a "${0##*/}" | grep -m 1 -v "^$0$")"
     if [ -n "$bin" ]; then
         exec "$bin" "$@"
     else

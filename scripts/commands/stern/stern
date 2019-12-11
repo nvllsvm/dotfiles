@@ -4,5 +4,4 @@
 #https://github.com/wercker/stern/issues/96
 export GOMAXPROCS=1
 
-bin="$(which -a stern | grep -v "^$0$" | head -n 1)"
-exec "${bin}" "$@"
+exec "$(which -a "${0##*/}" | grep -m 1 -v "^$0$")" "$@"

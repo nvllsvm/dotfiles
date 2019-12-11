@@ -1,4 +1,3 @@
 #!/usr/bin/env sh
 export GTK_THEME=Adwaita:dark
-bin="$(which -a "$(basename "$0")" | grep -v "^$0$" | head -n 1)"
-exec "${bin}" "$@"
+exec "$(which -a "${0##*/}" | grep -m 1 -v "^$0$")" "$@"
