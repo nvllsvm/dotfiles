@@ -174,6 +174,8 @@ nnoremap <leader>D :bd<Cr>
 nnoremap <leader>3 :b#<Cr>
 nnoremap <leader>l :buffers<CR>:buffer<Space>
 
+nnoremap <leader>A :AutoSaveToggle<CR>
+
 let g:netrw_banner = 0
 let g:netrw_dirhistmax = 0
 let g:netrw_list_hide = '^.git/$,.pyc$,^../,^./'
