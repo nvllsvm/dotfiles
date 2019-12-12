@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-set -ex
+set -e
 MOUNT_POINT="$(mktemp -d)"
 
 cleanup() {
@@ -10,10 +10,10 @@ cleanup() {
 trap cleanup EXIT INT
 if [ -e /dev/disk/by-label/rg350_external ]; then
     sudo mount /dev/disk/by-label/rg350_external "$MOUNT_POINT"
-    "${MOUNT_POINT}"/sync_saves.sh
+    sudo "${MOUNT_POINT}"/sync_saves.sh
 else
     sshfs rg350:/ "${MOUNT_POINT}"
-    "${MOUNT_POINT}"/sync_saves.sh
+    sudo "${MOUNT_POINT}"/sync_saves.sh
     ssh rg350 /media/sdcard/sync_saves.sh
 fi
 
