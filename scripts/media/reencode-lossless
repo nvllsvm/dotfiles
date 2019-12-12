@@ -145,7 +145,10 @@ def reencode(source):
             if encode.returncode:
                 raise subprocess.CalledProcessError(
                     encode.returncode, encode.args)
-            copy_tags(source, tmp)
+            try:
+                copy_tags(source, tmp)
+            except Exception:
+                pass
             source.unlink()
             tmp.rename(source.with_suffix('.flac'))
 
