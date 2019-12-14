@@ -1,0 +1,10 @@
+[Unit]
+Description=Program to manage CPU frequencies
+After=basic.target
+
+[Service]
+Type=simple
+ExecStart=/bin/sh -c "pstate-frequency --delay -dd -S -p performance"
+
+[Install]
+WantedBy=multi-user.target
