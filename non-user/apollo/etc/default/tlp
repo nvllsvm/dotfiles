@@ -70,7 +70,7 @@ MAX_LOST_WORK_SECS_ON_BAT=60
 # Note: Intel Skylake or newer CPU and Kernel >= 4.10 required.
 # Default: <none>
 CPU_HWP_ON_AC=balance_performance
-CPU_HWP_ON_BAT=balance_power
+CPU_HWP_ON_BAT=default
 
 # Set Intel P-state performance: 0..100 (%).
 # Limit the max/min P-state to control the power dissipation of the CPU.
@@ -115,7 +115,7 @@ NMI_WATCHDOG=0
 # Requires kernel module msr and x86_energy_perf_policy from linux-tools.
 # Default: <none>
 ENERGY_PERF_POLICY_ON_AC=performance
-ENERGY_PERF_POLICY_ON_BAT=power
+ENERGY_PERF_POLICY_ON_BAT=default
 
 # Disk devices; separate multiple devices with spaces.
 # Devices can be specified by disk ID also (lookup with: tlp diskid).
