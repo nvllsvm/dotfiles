@@ -65,7 +65,6 @@ parent="$(pwd)"
 env_folder="$ENV_ROOT/$(printf "%s" "$parent" | sha256sum | awk '{print $1}')"
 
 rm -rf "$env_folder" .envrc
-pipenv --rm > /dev/null 2>&1 || true
 unset VIRTUAL_ENV
 
 if [ -n "$DELETE" ]; then
@@ -87,11 +86,7 @@ fi
 
 mkdir -p "$ENV_ROOT"
 
-if [ -e Pipfile ]; then
-    pipenv --rm > /dev/null 2>&1 || true
-    pipenv install
-    env_folder=$(pipenv --venv)
-elif command -v virtualenv > /dev/null 2>&1; then
+if command -v virtualenv > /dev/null 2>&1; then
     virtualenv -q -p "$PYTHON_BIN" "$env_folder" > /dev/null
 else
     "$PYTHON_BIN" -m venv "$env_folder"
