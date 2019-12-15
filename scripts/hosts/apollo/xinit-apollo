@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
 apollo-autorotate &
+~/edgeSwipes/run.sh &
 onboard &
 apollo-xinput
