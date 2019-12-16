@@ -30,11 +30,11 @@ cde() {
     if [ "$ret" -ne 0 ]; then
         return "$ret"
     fi
-    if [ -f "$p" ]; then
-        p="${p%/*}/"
+    if [ -f "$loc" ]; then
+        loc="${loc%/*}/"
     fi
-    echo "$p"
-    cd "$p"
+    echo "$loc"
+    cd "$loc"
 }
 
 setopt PROMPT_SUBST
