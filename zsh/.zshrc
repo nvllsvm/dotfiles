@@ -25,7 +25,7 @@ alias diff='diff --color=auto'
 cde() {
     local p="$("$@")"
     if [ -f "$p" ]; then
-        p="$(dirname "$p")"
+        p="${p%/*}/"
     fi
     echo "$p"
     cd "$p"
