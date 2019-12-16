@@ -23,7 +23,13 @@ alias ls='ls --color=auto --group-directories-first'
 alias diff='diff --color=auto'
 
 cde() {
-    local p="$("$@")"
+    local loc
+    local ret
+    loc="$("$@")"
+    ret=$?
+    if [ "$ret" -ne 0 ]; then
+        return "$ret"
+    fi
     if [ -f "$p" ]; then
         p="${p%/*}/"
     fi
