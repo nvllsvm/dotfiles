@@ -8,23 +8,39 @@ if ! [ -d "$NOTES_DIR" ]; then
 fi
 cd "${NOTES_DIR}"
 
-editor() {
-    exec "${EDITOR}" -c AutoSaveToggle "$@"
-}
-
+SHOW_PATH=
 while true; do
     case "$1" in
         --)
             shift
             exec "$@"
             ;;
+        -p)
+            SHOW_PATH=1
+            shift
+            ;;
         *)
-            if [ -n "$1" ]; then
-                mkdir -p "$(dirname -- "$1")"
-                editor -- "$1"
-            else
-                editor -- scratch.md
-            fi
             break
     esac
 done
+
+NOTE_FILE=
+case $# in
+    0)
+        NOTE_FILE=scratch.md
+        ;;
+    1)
+        NOTE_FILE="$1"
+        mkdir -p "$(dirname -- "$NOTE_FILE")"
+        ;;
+    *)
+        echo 'error: unknown arguments' >&2
+        exit 1
+        ;;
+esac
+
+if [ -n "$SHOW_PATH" ]; then
+    echo "$(realpath "$NOTE_FILE")"
+else
+    exec "${EDITOR}" -c AutoSaveToggle -- "$NOTE_FILE"
+fi
