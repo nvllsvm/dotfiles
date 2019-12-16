@@ -24,8 +24,11 @@ alias diff='diff --color=auto'
 
 cde() {
     local p="$("$@")"
+    if [ -f "$p" ]; then
+        p="$(dirname "$p")"
+    fi
     echo "$p"
-    cd "$("$@")"
+    cd "$p"
 }
 
 setopt PROMPT_SUBST
