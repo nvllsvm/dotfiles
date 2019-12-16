@@ -22,6 +22,12 @@ bindkey "^[[B" history-beginning-search-forward
 alias ls='ls --color=auto --group-directories-first'
 alias diff='diff --color=auto'
 
+cde() {
+    local p="$("$@")"
+    echo "$p"
+    cd "$("$@")"
+}
+
 setopt PROMPT_SUBST
 
 insert_mode_color='magenta'
