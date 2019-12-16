@@ -2,7 +2,7 @@
 _notes() {
   local ret=1
 
-  cd "${NOTES_DIR:-$HOME/Notes}"
+  pushd "${NOTES_DIR:-$HOME/Notes}" > /dev/null
 
   _arguments -C \
       '1::file:_files' \
@@ -17,6 +17,8 @@ _notes() {
                 ;;
         esac
    esac
+
+   popd > /dev/null
 }
 
 _notes "$@"
