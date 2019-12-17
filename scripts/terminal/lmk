@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -e
 
-FANPIPE_TOPIC='lmk-fs-event'
+FANPIPE_TOPIC='lmk'
 
 publish_message() {
     fanpipe --publish --topic "$FANPIPE_TOPIC"
