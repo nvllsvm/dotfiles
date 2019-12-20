@@ -4,7 +4,7 @@ After=suspend.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/sbin/rtcwake -m freeze -s 1
+ExecStart=/bin/sh -c 'while True; if rtcwake -m freeze -s 1; then break; fi done'
 
 [Install]
 WantedBy=suspend.target
