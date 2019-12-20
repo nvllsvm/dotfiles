@@ -1,0 +1,10 @@
+[Unit]
+Description=fix surface go keyboard backlight not working after resume from suspend
+After=suspend.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/rtcwake -m freeze -s 1
+
+[Install]
+WantedBy=suspend.target
