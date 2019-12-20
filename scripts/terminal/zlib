@@ -5,12 +5,8 @@ import zlib
 
 
 def _iterfile(handle):
-    while True:
-        data = handle.read(zlib.DEF_BUF_SIZE)
-        if data:
-            yield data
-        else:
-            break
+    while data := handle.read(zlib.DEF_BUF_SIZE):
+        yield data
 
 
 def _zlib_decompress(data):
