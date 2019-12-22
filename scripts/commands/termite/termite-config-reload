@@ -23,6 +23,8 @@ EOF
 reload_zsh() {
     zsh_tty="$(ps hotty "$zsh_pid")"
     if [ "$(echo "$zsh_tty" | cut -c1-3)" = 'pts' ]; then
+        export TERM="$(strings /proc/${zsh_pid}/environ | grep '^TERM=' | cut -d = -f2)"
+        export TMUX="$(strings /proc/${zsh_pid}/environ | grep '^TMUX=' | cut -d = -f2)"
         printf '%s' "$(sh ~/.base16_theme)" > "/dev/$zsh_tty"
     fi
 }
@@ -30,7 +32,7 @@ reload_zsh() {
 reload_termite() {
     /usr/bin/kill -s SIGUSR1 "$termite_pid"
     for zsh_pid in $(pgrep -u "$(whoami)" -x zsh -P "$termite_pid"); do
-        reload_zsh > /dev/null 2>&1 || true
+        (reload_zsh) > /dev/null 2>&1 || true
     done
 }
 
