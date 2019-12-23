@@ -58,10 +58,16 @@ def pyenv_versions():
 
 
 def create_virtualenv(python_bin, path):
-    subprocess.run(
-        ['virtualenv', '-p', str(python_bin), str(path)],
-        stdout=subprocess.DEVNULL,
-        check=True)
+    if shutil.which('virtualenv'):
+        subprocess.run(
+            ['virtualenv', '-p', str(python_bin), str(path)],
+            stdout=subprocess.DEVNULL,
+            check=True)
+    else:
+        subprocess.run(
+            [str(python_bin), '-m', 'venv', str(path)],
+            stdout=subprocess.DEVNULL,
+            check=True)
 
 
 def main():
@@ -70,6 +76,10 @@ def main():
     parser.add_argument('-d', '--delete', action='store_true')
     parser.add_argument('version', nargs='?')
     args = parser.parse_args()
+
+    if not shutil.which('direnv'):
+        parser.error('direnv is not installed')
+        parser.exit(1)
 
     os.environ.pop('PYENV_VERSION', None)
     os.environ.pop('VIRTUAL_ENV', None)
