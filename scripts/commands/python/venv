@@ -12,16 +12,6 @@ import pkg_resources
 ENV_ROOT = pathlib.Path('~/.local/share/virtualenvs').expanduser()
 
 
-def prune():
-    for path in ENV_ROOT.glob('*/'):
-        link = path / '.parent'
-        if link.is_symlink():
-            try:
-                link.resolve(strict=True)
-            except FileNotFoundError:
-                shutil.rmtree(path)
-
-
 class _PruneAction(argparse.Action):
 
     def __init__(self,
@@ -37,12 +27,14 @@ class _PruneAction(argparse.Action):
             help=help)
 
     def __call__(self, parser, *_):
-        prune()
+        for path in ENV_ROOT.glob('*/'):
+            link = path / '.parent'
+            if link.is_symlink():
+                try:
+                    link.resolve(strict=True)
+                except FileNotFoundError:
+                    shutil.rmtree(path)
         parser.exit()
-
-
-def venv_name(path):
-    return hashlib.sha256(str(path.resolve()).encode()).hexdigest()
 
 
 def pyenv_versions():
@@ -106,7 +98,7 @@ def main():
     cwd = pathlib.Path().resolve()
     cwd_envrc = cwd.joinpath('.envrc')
     cwd_envrc.unlink(missing_ok=True)
-    env_folder = ENV_ROOT / venv_name(cwd)
+    env_folder = ENV_ROOT / hashlib.sha256(str(cwd).encode()).hexdigest()
     try:
         shutil.rmtree(env_folder)
     except FileNotFoundError:
