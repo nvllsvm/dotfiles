@@ -1,114 +1,125 @@
-#!/usr/bin/env sh
-set -e
+#!/usr/bin/env python3
+import argparse
+import hashlib
+import os
+import pathlib
+import shlex
+import shutil
+import subprocess
 
-PYTHON_BIN=python
-ENV_ROOT="$HOME/.local/share/virtualenvs"
+import pkg_resources
 
-show_help() {
-    cat << EOF
-usage: venv [--delete|--prune] [PYENV_VERSION]
+ENV_ROOT = pathlib.Path('~/.local/share/virtualenvs').expanduser()
 
-simplified virtualenvs with direnv
 
-    -d, --delete    delete the virtualenv
-        --prune     prune orphan virtualenvs
-        --help      show help and exit
-EOF
-}
+def prune():
+    for path in ENV_ROOT.glob('*/'):
+        link = path / '.parent'
+        if link.is_symlink():
+            try:
+                link.resolve(strict=True)
+            except FileNotFoundError:
+                shutil.rmtree(path)
 
-PRUNE=''
-DELETE=''
-while true; do
-    case "$1" in
-        -d|--delete)
-            DELETE=1
-            shift
-            ;;
-        --prune)
-            PRUNE=1
-            shift
-            ;;
-        --help)
-            show_help
-            exit
-            ;;
-        *)
-            break
-    esac
-done
 
-if [ -n "$PRUNE" ] && [ -n "$DELETE" ]; then
-    echo error: delete and prune many not be used together >&2
-    exit 1
-fi
+class _PruneAction(argparse.Action):
 
-if [ -n "$PRUNE" ]; then
-    for p in "$ENV_ROOT/"*/.parent; do
-        if [ -L "$p" ]; then
-            if ! [ -e "$p/.envrc" ]; then
-                venvdir="$(dirname "$p")"
-                echo Removing venv for "$p"
-                rm -rf "$venvdir"
-            fi
-        fi
-    done
-    exit
-fi
+    def __init__(self,
+                 option_strings,
+                 dest=argparse.SUPPRESS,
+                 default=argparse.SUPPRESS,
+                 help=None):
+        super().__init__(
+            option_strings=option_strings,
+            dest=dest,
+            default=default,
+            nargs=0,
+            help=help)
 
-if ! command -v direnv > /dev/null; then
-    echo error: requires direnv >&2
-    exit 1
-fi
+    def __call__(self, parser, *_):
+        prune()
+        parser.exit()
 
-parent="$(pwd)"
 
-env_folder="$ENV_ROOT/$(printf "%s" "$parent" | sha256sum | awk '{print $1}')"
+def venv_name(path):
+    return hashlib.sha256(str(path.resolve()).encode()).hexdigest()
 
-rm -rf "$env_folder" .envrc
-unset VIRTUAL_ENV
 
-if [ -n "$DELETE" ]; then
-    exit
-elif [ -n "$1" ]; then
-    version="$1"
-    found="$(pyenv versions --bare | grep '[0-9].[0-9]\+.[0-9]\+' | sort -r --version-sort | grep "^$version" | head -n 1)"
-    if [ -n "$found" ]; then
-        version="$found"
-    fi
-    echo "Using '$version' from pyenv"
-    if [ -z "$PYENV_ROOT" ]; then
-        echo error: unable to determine pyenv location
-        exit 1
-    fi
-    PYTHON_BIN="$PYENV_ROOT/shims/python"
-    eval "$(pyenv sh-shell "$version")"
-fi
+def pyenv_versions():
+    proc = subprocess.run(
+        ['pyenv', 'versions', '--bare'],
+        stdout=subprocess.PIPE,
+        check=True)
+    return sorted(
+        (version.strip() for version in proc.stdout.decode().split()),
+        key=lambda v: pkg_resources.parse_version(v),
+        reverse=True
+    )
 
-mkdir -p "$ENV_ROOT"
 
-if command -v virtualenv > /dev/null 2>&1; then
-    virtualenv -q -p "$PYTHON_BIN" "$env_folder" > /dev/null
-else
-    "$PYTHON_BIN" -m venv "$env_folder"
-fi
+def create_virtualenv(python_bin, path):
+    subprocess.run(
+        ['virtualenv', '-p', str(python_bin), str(path)],
+        stdout=subprocess.DEVNULL,
+        check=True)
 
-ln -s "$parent" "$env_folder/.parent"
 
-cat > "$env_folder/.envrc" << EOF
-. "$env_folder/bin/activate"
-# export PIP_USER even though it's disabled in pip.conf
-# tox doesn't seem to respect the venv's pip.conf
-export PIP_USER=0
-EOF
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--prune', action=_PruneAction)
+    parser.add_argument('-d', '--delete', action='store_true')
+    parser.add_argument('version', nargs='?')
+    args = parser.parse_args()
 
-cat > "$env_folder/pip.conf"<<EOF
-[global]
-user = false
-EOF
+    os.environ.pop('PYENV_VERSION', None)
+    os.environ.pop('VIRTUAL_ENV', None)
 
-cp "$env_folder/.envrc" .
-"$env_folder/bin/pip" install -q --upgrade pip setuptools wheel
+    if args.version:
+        try:
+            pyenv_root = pathlib.Path(os.environ['PYENV_ROOT'])
+        except KeyError:
+            parser.error('pyenv not available')
+            parser.exit(1)
+        for pyenv_version in pyenv_versions():
+            if pyenv_version.startswith(args.version):
+                python_bin = pyenv_root / 'shims' / 'python'
+                os.environ['PYENV_VERSION'] = pyenv_version
+                break
+        else:
+            parser.error('no matching pyenv version')
+            parser.exit(1)
+    else:
+        python_bin = 'python'
 
-direnv allow "$env_folder"
-direnv allow
-direnv reload
+    ENV_ROOT.mkdir(parents=True, exist_ok=True)
+
+    cwd = pathlib.Path().resolve()
+    cwd_envrc = cwd.joinpath('.envrc')
+    cwd_envrc.unlink(missing_ok=True)
+    if args.delete:
+        parser.exit()
+    env_folder = ENV_ROOT / venv_name(cwd)
+    try:
+        shutil.rmtree(env_folder)
+    except FileNotFoundError:
+        pass
+    create_virtualenv(python_bin, env_folder)
+
+    env_folder.joinpath('.parent').symlink_to(cwd)
+    activate_path = env_folder.joinpath('bin/activate')
+    cwd_envrc.write_text('\n'.join([
+        f'. {shlex.quote(str(activate_path))}',
+        "# export PIP_USER even though it's disabled in pip.conf",
+        "# tox doesn't seem to respect the venv's pip.conf",
+        "export PIP_USER=0\n"
+    ]))
+    shutil.copyfile(cwd_envrc, env_folder.joinpath('.envrc'))
+    env_folder.joinpath('pip.conf').write_text('[global]\nuser = false')
+
+    for path in cwd, env_folder:
+        subprocess.run(['direnv', 'allow', str(path)], check=True)
+    subprocess.run(['direnv', 'reload'], check=True)
+
+
+if __name__ == '__main__':
+    main()
