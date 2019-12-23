@@ -106,13 +106,15 @@ def main():
     cwd = pathlib.Path().resolve()
     cwd_envrc = cwd.joinpath('.envrc')
     cwd_envrc.unlink(missing_ok=True)
-    if args.delete:
-        parser.exit()
     env_folder = ENV_ROOT / venv_name(cwd)
     try:
         shutil.rmtree(env_folder)
     except FileNotFoundError:
         pass
+
+    if args.delete:
+        parser.exit()
+
     create_virtualenv(python_bin, env_folder)
 
     env_folder.joinpath('.parent').symlink_to(cwd)
