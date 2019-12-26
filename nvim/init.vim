@@ -100,7 +100,8 @@ Plug 'rust-lang/rust.vim'
 
 Plug 'rbgrouleff/bclose.vim'
 
-Plug 'chrisbra/csv.vim'
+"Plug 'chrisbra/csv.vim'
+Plug 'nvllsvm/csv.vim', {'branch': 'fix'}
 
 Plug '907th/vim-auto-save'
 
