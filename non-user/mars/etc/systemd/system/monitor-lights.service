@@ -1,7 +1,6 @@
 [Unit]
 Description=monitor lights
-Wants=network-online.target
-After=network-online.target
+After=NetworkManager-wait-online.service
 
 [Service]
 ExecStart=/home/ar/.dotfiles/private/scripts/hosts/mars/monitor-lights on
