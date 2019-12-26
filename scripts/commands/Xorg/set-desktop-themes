@@ -109,7 +109,20 @@ EOF
 
 xrandr --dpi "$DPI"
 
-termite-config-reload
+if command -v termite-config-reload > /dev/null; then
+    termite-config-reload
+fi
+if command -v alacritty-config-reload > /dev/null; then
+    alacritty-config-reload
+
+    mkdir -p ~/.config/alacritty
+    cat > ~/.config/alacritty/alacritty.yml << EOF
+font:
+  normal:
+    family: ${FONT_NAME}
+  size: ${FONT_SIZE}
+EOF
+fi
 hsetroot -solid "$(xrdb -query | grep '\*background' | awk '{print $2}')"
 
 if pidof i3 > /dev/null; then
