@@ -1,0 +1,8 @@
+[Unit]
+Description=monitor lights off
+DefaultDependencies=no
+Before=shutdown.target reboot.target halt.target
+
+[Service]
+ExecStart=/home/ar/.dotfiles/private/scripts/hosts/mars/monitor-lights off
+Type=oneshot
