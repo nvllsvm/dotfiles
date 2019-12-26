@@ -117,6 +117,8 @@ if command -v alacritty-config-reload > /dev/null; then
 
     mkdir -p ~/.config/alacritty
     cat > ~/.config/alacritty/alacritty.yml << EOF
+env:
+    TERM: screen-256color
 font:
   normal:
     family: ${FONT_NAME}
