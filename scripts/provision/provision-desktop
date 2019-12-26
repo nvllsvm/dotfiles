@@ -39,6 +39,7 @@ if [[ $osname == Linux* ]]; then
     if command -v pacman 2> /dev/null; then
         yay -S --noconfirm \
             adwaita-qt \
+            alacritty \
             arandr \
             argyllcms \
             blueberry \
@@ -72,7 +73,6 @@ if [[ $osname == Linux* ]]; then
             rofimoji \
             syncthing \
             syncthing-gtk \
-            termite \
             transmission-remote-gtk \
             ttf-dejavu \
             xbindkeys \

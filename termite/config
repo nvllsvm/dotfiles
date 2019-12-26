@@ -1,9 +1,0 @@
-[options]
-allow_bold = false
-font = Noto Emoji 10
-font = DejaVu Sans Mono 10
-mouse_autohide = true
-cursor_blink = off
-
-[colors]
-background = #000000
