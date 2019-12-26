@@ -1,6 +1,6 @@
 general {
     colors = true
-    interval = 5
+    interval = 30
     separator = "    "
     output_format = "None"
 }
