@@ -1,3 +1,2 @@
 #!/usr/bin/env sh
 kdeconnect-indicator &
-monitor-lights on &
