@@ -1,0 +1,11 @@
+[Unit]
+Description=monitor lights
+
+[Service]
+ExecStart=/home/ar/.dotfiles/private/scripts/hosts/mars/monitor-lights on
+ExecStop=/home/ar/.dotfiles/private/scripts/hosts/mars/monitor-lights off
+RemainAfterExit=true
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target
