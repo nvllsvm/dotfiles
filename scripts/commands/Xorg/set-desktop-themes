@@ -109,8 +109,6 @@ EOF
 
 xrandr --dpi "$DPI"
 
-kitty-config-reload
-
 alacritty-config-reload
 
 mkdir -p ~/.config/alacritty
