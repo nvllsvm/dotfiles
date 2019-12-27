@@ -73,16 +73,6 @@ function zle-line-init zle-keymap-select {
 zle -N zle-line-init
 zle -N zle-keymap-select
 
-add-zsh-hook precmd set_cursor_key_to_cursor
-
-set_cursor_key_to_cursor () {
-    # fixes some misbehaving combinations like dotnet and VTE terminals.
-    # application mode remaps arrows to ex. ^[OA and
-    # breaks history search.
-    printf '\e[?1l'
-}
-
-
 full-update() {
     if [ "$1" = "add" ]; then
         if [ -z "$2" ]; then
