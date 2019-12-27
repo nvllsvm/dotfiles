@@ -74,7 +74,7 @@ if [[ $osname == Linux* ]]; then
             syncthing \
             syncthing-gtk \
             transmission-remote-gtk \
-            ttf-dejavu \
+            ttf-dejavu-emojiless \
             xbindkeys \
             xclip \
             xorg-server \
