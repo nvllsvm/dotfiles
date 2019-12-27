@@ -40,7 +40,7 @@ done
 if [ -z "$DPI" ]; then
     . "$CURRENT_THEME"
 else
-    FONT_NAME='DejaVu Sans Mono'
+    FONT_NAME='monospace'
 
     if [ "$DPI" -le 138 ]; then
         BORDER_WIDTH=1
