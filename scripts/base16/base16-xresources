@@ -46,8 +46,7 @@ def base16_xresources(path):
 
         if color.startswith('color'):
             color = attributes[color]
-        else:
-            attributes[attribute] = color
+        attributes[attribute] = color
     return attributes
 
 
