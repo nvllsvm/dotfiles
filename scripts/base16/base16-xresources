@@ -44,8 +44,7 @@ def base16_xresources(path):
         for char in ('"', '$', '/'):
             color = color.replace(char, '')
 
-        if color.startswith('color'):
-            color = attributes[color]
+        color = attributes.get(color, color)
         attributes[attribute] = color
     return attributes
 
