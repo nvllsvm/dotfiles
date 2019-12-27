@@ -63,7 +63,7 @@ def main():
     attributes = base16_xresources(args.theme)
     print(
         '\n'.join(
-            f'*{ATTRIBUTE_MAP[attribute]} : #{color}'
+            f'*{ATTRIBUTE_MAP[attribute]}: #{color}'
             for attribute, color in attributes.items()
         )
     )

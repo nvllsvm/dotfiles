@@ -91,6 +91,9 @@ gsettings set org.gnome.settings-daemon.plugins.xsettings overrides \
     "{'Gdk/WindowScalingFactor': <$SCALING_FACTOR>, 'Gtk/CursorThemeSize': <$CURSOR_SIZE>}"
 
 # update xresources
+COLORS="$(base16-xresources)"
+BACKGROUND_COLOR="$(echo "$COLORS" | grep background | awk '{print substr($2, 2, 8)}')"
+
 xrdb << EOF
 *facename: ${FONT_NAME}
 *fontsize: ${FONT_SIZE}
@@ -104,7 +107,7 @@ rofi.bw: ${BORDER_WIDTH}
 Xft.dpi: ${DPI}
 
 Xcursor.size: ${CURSOR_SIZE}
-$(base16-xresources)
+${COLORS}
 EOF
 
 xrandr --dpi "$DPI"
@@ -119,6 +122,9 @@ font:
   normal:
     family: ${FONT_NAME}
   size: ${FONT_SIZE}
+colors:
+  primary:
+    background: '0x${BACKGROUND_COLOR}'
 EOF
 
 hsetroot -solid "$(xrdb -query | grep '\*background' | awk '{print $2}')"
