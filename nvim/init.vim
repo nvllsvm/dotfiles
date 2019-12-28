@@ -87,14 +87,13 @@ Plug 'Vimjas/vim-python-pep8-indent'
 Plug 'davidhalter/jedi-vim'
 Plug 'fisadev/vim-isort'
 
-Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }}
 Plug 'mzlogin/vim-markdown-toc'
+Plug 'dhruvasagar/vim-table-mode'
 
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
-Plug 'dhruvasagar/vim-table-mode'
 
 Plug 'rust-lang/rust.vim'
 
@@ -202,6 +201,10 @@ augroup MARKDOWN
     autocmd!
     autocmd FileType markdown nnoremap <leader>m :MarkdownPreview<Cr>
     autocmd FileType markdown set wrap
+
+    " talbe_mode_always_active breaks highlighting
+    "let g:table_mode_always_active = 1
+    autocmd FileType markdown TableModeEnable
 augroup END
 
 augroup XML
