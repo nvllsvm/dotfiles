@@ -1,6 +1,8 @@
 zstyle ':completion:*' list-colors "${(@s.:.)LS_COLORS}"
 zstyle ':completion:*' menu select
 zstyle ':completion:*' rehash true
+zstyle ':completion:*:matches'         group 'yes'
+zstyle ':completion:*'                 group-name ''
 autoload -U colors && colors
 autoload -U compinit
 autoload -U add-zsh-hook
