@@ -2,7 +2,7 @@
 set -e
 
 clear_existing_calibration() {
-    dispwin -h 2>&1 | grep Output | awk '{print $1}' | xargs -n 1 dispwin -c -d
+    dispwin -h 2>&1 | grep Output | awk '{print $1}' | xargs -n 1 dispwin -c -d > /dev/null 2>&1
 }
 
 show_help() {
@@ -38,7 +38,7 @@ while true; do
 done
 
 
-clear_existing_calibration 2> /dev/null
+clear_existing_calibration
 
 case "$(hostname)" in
     "phobos")
