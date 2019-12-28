@@ -171,13 +171,13 @@ apollo() {
 
 hostname="$(uname -n)"
 case "$hostname" in
-    "deimos")
+    deimos)
         deimos
         ;;
-    "mars")
+    mars)
         mars
         ;;
-    "phobos")
+    phobos)
         phobos
         ;;
     apollo)
