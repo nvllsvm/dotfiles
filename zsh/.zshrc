@@ -3,6 +3,7 @@ zstyle ':completion:*' menu select
 zstyle ':completion:*' rehash true
 zstyle ':completion:*:matches'         group 'yes'
 zstyle ':completion:*'                 group-name ''
+zstyle ':completion:*' list-dirs-first true
 autoload -U colors && colors
 autoload -U compinit
 autoload -U add-zsh-hook
