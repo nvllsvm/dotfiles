@@ -6,11 +6,11 @@ notify() {
 case "$(nmcli networking)" in
     enabled)
         nmcli networking off
-        notify Networking Disabled
+        notify 'Networking Disabled' 🚫
         ;;
     disabled)
         nmcli networking on
-        notify Networking Enabled
+        notify 'Networking Enabled' 📶
         ;;
     *)
         echo 'error: unknown status' >&2
