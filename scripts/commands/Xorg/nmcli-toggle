@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+notify() {
+    dunstify --replace=10022 "$@"
+}
+
+case "$(nmcli networking)" in
+    enabled)
+        nmcli networking off
+        notify Networking Disabled
+        ;;
+    disabled)
+        nmcli networking on
+        notify Networking Enabled
+        ;;
+    *)
+        echo 'error: unknown status' >&2
+        exit 1
+esac

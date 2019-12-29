@@ -171,3 +171,5 @@ bindsym $mod+F1 exec i3-f1
 bindsym $mod+F2 exec i3-f2
 bindsym $mod+F3 exec i3-f3
 bindsym $mod+F4 exec i3-f4
+bindsym $mod+F5 exec i3-f5
+bindsym $mod+F6 exec i3-f6
