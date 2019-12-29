@@ -3,7 +3,7 @@ Description=monitor lights
 After=NetworkManager-wait-online.service
 
 [Service]
-ExecStart=/home/ar/.dotfiles/private/scripts/hosts/mars/monitor-lights on
+ExecStart=sleep 10 && /home/ar/.dotfiles/private/scripts/hosts/mars/monitor-lights on
 ExecStop=/home/ar/.dotfiles/private/scripts/hosts/mars/monitor-lights off
 RemainAfterExit=true
 Type=oneshot
