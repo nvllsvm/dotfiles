@@ -1,8 +1,0 @@
-#compdef set-performance
-subcmds=(
-    'performance:enable performance mode'
-    'powersave:enable powersave mode'
-)
-if (( CURRENT == 2 )); then
-    _describe -t subcmds 'set-performance' subcmds
-fi

@@ -1,2 +1,0 @@
-#!/usr/bin/env sh
-exec set-performance performance
