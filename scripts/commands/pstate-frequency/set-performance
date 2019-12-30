@@ -1,42 +1,20 @@
 #!/usr/bin/env sh
 set -e
 
-show_usage() {
-    cat << EOF
-usage: set_performance [--help] (performance|powersave)
-EOF
+show_dialog() {
+    zenity \
+        --hide-header \
+        --list \
+        --text 'Max CPU %' \
+        --column % \
+        16 45 61 100
 }
 
-TARGET_MODE=''
-while true; do
-    case "$1" in
-        performance|powersave)
-            if [ -n "$TARGET_MODE" ]; then
-                show_usage >&2
-                exit 1
-            fi
-            TARGET_MODE="$1"
-            shift
-            ;;
-        --help)
-            show_usage
-            exit
-            ;;
-        *)
-            if [ -z "$TARGET_MODE" ]; then
-                sudo pstate-frequency -G
-                exit
-            fi
-            break
-    esac
-done
-
-if [ "$TARGET_MODE" = "powersave" ]; then
-    sudo pstate-frequency -S -g powersave -m 100 -t off
-    NOTIFICATION_TEXT="🐌 powersave mode"
-elif [ "$TARGET_MODE" = "performance" ]; then
-    sudo pstate-frequency -S -g performance -m 100 -t on
-    NOTIFICATION_TEXT="🚀 performance mode"
+pct="$(show_dialog)"
+if [ "$pct" -gt 61 ]; then
+    no_turbo=0
+else
+    no_turbo=1
 fi
-
-dunstify --replace 12385 "$NOTIFICATION_TEXT"
+sudo pstate-frequency -q -S -g powersave -m "$pct" -t "$no_turbo"
+dunstify --replace 12385 "Max CPU" "${pct}%"
