@@ -8,6 +8,10 @@ show_dialog() {
         16 45 61 100
 }
 
+current_pct() {
+    sudo pstate-frequency -G -c | grep CPU_MAX | awk '{print $3}'
+}
+
 pct="$(show_dialog)"
 if [ -n "$pct" ]; then
     if [ "$pct" -gt 61 ]; then
@@ -17,5 +21,4 @@ if [ -n "$pct" ]; then
     fi
     sudo pstate-frequency -q -S -g powersave -m "$pct" -t "$no_turbo"
 fi
-current_pct="$(sudo pstate-frequency -G -c | grep CPU_MAX | awk '{print $3}')"
-dunstify --replace 12385 "Max CPU" "${current_pct}"
+dunstify --replace 12385 "Max CPU" "$(current_pct)"
