@@ -1,0 +1,141 @@
+#!/usr/bin/env python3
+import argparse
+import collections
+import datetime
+import subprocess
+
+import jinja2
+
+
+SYSTEM_UNITS = {
+    'fstrim.timer',
+    'linode-dynamic-dns.timer',
+    'logrotate.timer',
+    'man-db.timer',
+    'shadow.timer',
+    'sol-backup.timer',
+    'systemd-tmpfiles-clean.timer',
+    'zfs-scrub@pool1.timer',
+}
+
+USER_UNITS = {
+    'backup-youtube-nullsum.timer',
+    'git-repo-backup.timer',
+    'gog-update.timer',
+    'mbsync.timer',
+    'sol-update-remotes.timer',
+    'wasabi-sync.timer',
+}
+
+
+TEMPLATE = """<html>
+<style>
+table, th, td {
+  border: 1px solid #ccc;
+  border-collapse: collapse;
+  white-space: nowrap;
+}
+table tr:nth-child(even) {
+  background-color: #eee;
+}
+table tr:nth-child(odd) {
+  background-color: #fff;
+}
+table th {
+  background-color: #fff;
+  color: #000;
+  font-weight: bold;
+}
+th, td {
+  padding: 5px;
+  text-align: left;
+}
+</style>
+<table>
+    <tr>
+        {%- for column in headers %}
+        <th>{{- column -}}</th>
+        {%- endfor %}
+    </tr>
+    {% for row in table -%}
+    <tr>
+        {%- for column in row %}
+        <td>
+        {%- if column is string %}
+        {{- column -}}
+        {% else %}
+        {{- column | join('</br>') -}}
+        {% endif -%}
+        </td>
+        {%- endfor %}
+    </tr>
+    {% endfor -%}
+</table>
+</html>"""
+
+
+def send_html_email(content, from_email, to_email):
+    args = [
+        'mailx',
+        '-M', 'text/html',
+        '-A', from_email,
+        '-s', 'Report {}'.format(
+            datetime.datetime.now().strftime('%Y-%m-%d %H:%M')),
+        to_email
+    ]
+    subprocess.run(args, input=content, text=True, check=True)
+
+
+def unit_properties(service, user=False):
+    args = [
+        'systemctl',
+        'show'
+    ]
+    if user:
+        args.append('--user')
+    args.append(service)
+    proc = subprocess.run(args, check=True, stdout=subprocess.PIPE)
+    lines = [
+        line.strip()
+        for line in proc.stdout.decode().split('\n')
+        if line
+    ]
+    properties = collections.defaultdict(list)
+    for line in lines:
+        prop, value = line.split('=', 1)
+        properties[prop].append(value)
+    return dict(properties)
+
+
+def get_table(units, user=False):
+    table = []
+    for unit in units:
+        properties = unit_properties(unit, user=user)
+        table.append([
+            unit,
+            properties['Result'],
+            properties.get('LastTriggerUSec', 'n/a'),
+        ])
+    return table
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--from', dest='from_email', required=True)
+    parser.add_argument('--to', dest='to_email', required=True)
+    args = parser.parse_args()
+
+    table = []
+    template = jinja2.Template(TEMPLATE)
+    headers = ('Unit', 'Result', 'Last')
+
+    table.extend(get_table(USER_UNITS, user=True))
+    table.extend(get_table(SYSTEM_UNITS))
+    output = template.render(
+        headers=headers, table=sorted(table, key=lambda x: x[0]))
+    send_html_email(output, args.from_email, args.to_email)
+    print('Sent')
+
+
+if __name__ == '__main__':
+    main()
