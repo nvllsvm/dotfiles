@@ -1,6 +1,4 @@
 #!/usr/bin/env sh
-set -e
-
 show_dialog() {
     zenity \
         --hide-header \
@@ -11,10 +9,13 @@ show_dialog() {
 }
 
 pct="$(show_dialog)"
-if [ "$pct" -gt 61 ]; then
-    no_turbo=0
-else
-    no_turbo=1
+if [ -n "$pct" ]; then
+    if [ "$pct" -gt 61 ]; then
+        no_turbo=0
+    else
+        no_turbo=1
+    fi
+    sudo pstate-frequency -q -S -g powersave -m "$pct" -t "$no_turbo"
 fi
-sudo pstate-frequency -q -S -g powersave -m "$pct" -t "$no_turbo"
-dunstify --replace 12385 "Max CPU" "${pct}%"
+current_pct="$(sudo pstate-frequency -G -c | grep CPU_MAX | awk '{print $3}')"
+dunstify --replace 12385 "Max CPU" "${current_pct}"
