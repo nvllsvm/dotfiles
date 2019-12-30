@@ -28,7 +28,33 @@ USER_UNITS = {
 }
 
 
-TEMPLATE = """<html>
+TEMPLATE = """
+{%- macro render_table(data, headers=None) -%}
+<table>
+    {% if headers -%}
+    <tr>
+        {%- for column in headers %}
+        <th>{{- column -}}</th>
+        {%- endfor %}
+    </tr>
+    {%- endif -%}
+    {%- for row in data -%}
+    <tr>
+        {%- for column in row %}
+        <td>
+        {%- if column is string %}
+        {{- column -}}
+        {% else %}
+        {{- column | join('</br>') -}}
+        {% endif -%}
+        </td>
+        {%- endfor %}
+    </tr>
+    {% endfor -%}
+</table>
+{%- endmacro -%}
+
+<html>
 <style>
 table, th, td {
   border: 1px solid #ccc;
@@ -51,26 +77,7 @@ th, td {
   text-align: left;
 }
 </style>
-<table>
-    <tr>
-        {%- for column in headers %}
-        <th>{{- column -}}</th>
-        {%- endfor %}
-    </tr>
-    {% for row in table -%}
-    <tr>
-        {%- for column in row %}
-        <td>
-        {%- if column is string %}
-        {{- column -}}
-        {% else %}
-        {{- column | join('</br>') -}}
-        {% endif -%}
-        </td>
-        {%- endfor %}
-    </tr>
-    {% endfor -%}
-</table>
+{{ render_table(table) }}
 </html>"""
 
 
