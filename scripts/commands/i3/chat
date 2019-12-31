@@ -2,7 +2,6 @@
 launch() {
     nohup "$@" > /dev/null 2>&1 &
 }
-launch discord
-launch riot-desktop
+launch riot-desktop --hidden
 launch signal-desktop --use-tray-icon --start-in-tray
-launch slack
+launch slack --startup
