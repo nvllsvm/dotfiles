@@ -2,29 +2,31 @@
 import argparse
 import collections
 import datetime
+import logging
+import shlex
 import subprocess
 
 import jinja2
 
 
 SYSTEM_UNITS = {
-    'fstrim.timer',
-    'linode-dynamic-dns.timer',
-    'logrotate.timer',
-    'man-db.timer',
-    'shadow.timer',
-    'sol-backup.timer',
-    'systemd-tmpfiles-clean.timer',
-    'zfs-scrub@pool1.timer',
+    'fstrim.service',
+    'linode-dynamic-dns.service',
+    'logrotate.service',
+    'man-db.service',
+    'shadow.service',
+    'sol-backup.service',
+    'systemd-tmpfiles-clean.service',
+    'zfs-scrub@pool1.service',
 }
 
 USER_UNITS = {
-    'backup-youtube-nullsum.timer',
-    'git-repo-backup.timer',
-    'gog-update.timer',
-    'mbsync.timer',
-    'sol-update-remotes.timer',
-    'wasabi-sync.timer',
+    'backup-youtube-nullsum.service',
+    'git-repo-backup.service',
+    'gog-update.service',
+    'mbsync.service',
+    'sol-update-remotes.service',
+    'wasabi-sync.service',
 }
 
 
@@ -77,7 +79,7 @@ th, td {
   text-align: left;
 }
 </style>
-{{ render_table(table) }}
+{{ render_table(table, headers=headers) }}
 </html>"""
 
 
@@ -121,7 +123,7 @@ def get_table(units, user=False):
         table.append([
             unit,
             properties['Result'],
-            properties.get('LastTriggerUSec', 'n/a'),
+            properties.get('ExecMainStartTimestamp', 'n/a'),
         ])
     return table
 
