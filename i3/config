@@ -32,6 +32,7 @@ font pango:$font $fontSize
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
+floating_maximum_size 800 x 600
 
 bindsym $mod+Return exec alacritty
 
