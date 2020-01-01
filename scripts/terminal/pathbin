@@ -6,16 +6,17 @@ import os
 import pathlib
 
 
-def list_executables(directory):
-    executables = []
-    root = pathlib.Path(directory)
-    if root.is_dir():
-        for path in pathlib.Path(directory).iterdir():
-            try:
-                if path.is_file() and os.access(path, os.X_OK):
-                    executables.append(path)
-            except PermissionError:
-                pass
+def executables_in_path():
+    executables = set()
+    for directory in os.get_exec_path():
+        root = pathlib.Path(directory)
+        if root.is_dir():
+            for path in root.iterdir():
+                try:
+                    if path.is_file() and os.access(path, os.X_OK):
+                        executables.add(path.name)
+                except PermissionError:
+                    pass
     return executables
 
 
