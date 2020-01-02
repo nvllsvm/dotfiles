@@ -1,0 +1,7 @@
+[Unit]
+Description=Run sol-status-email
+
+[Service]
+ExecStart=zsh -ic 'sol-status-email --from "$FROM_EMAIL" --to "$TO_EMAIL"'
+EnvironmentFile=/home/ar/.dotfiles/private/sol-status-email.env
+SyslogIdentifier=sol-status-email
