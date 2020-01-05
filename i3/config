@@ -32,7 +32,6 @@ font pango:$font $fontSize
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
-floating_maximum_size 640 x 480
 
 bindsym $mod+Return exec alacritty
 
@@ -156,6 +155,7 @@ client.background       $background
 
 hide_edge_borders vertical
 for_window [class="^.*"] border pixel 2
+for_window [window_role="GtkFileChooserDialog"] resize set 60 ppt 60 ppt, move position center
 
 for_window [class="dosbox"] border none, floating enable, move position center
 
