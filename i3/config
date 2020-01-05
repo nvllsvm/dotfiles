@@ -155,9 +155,8 @@ client.background       $background
 
 hide_edge_borders vertical
 for_window [class="^.*"] border pixel 2
-for_window [window_role="GtkFileChooserDialog"] resize set 60 ppt 80 ppt, move position center
-
-for_window [class="dosbox"] border none, floating enable, move position center
+for_window [floating] resize set 60 ppt 80 ppt, move position center
+for_window [class="dosbox"] resize set 100 ppt 100 ppt, border none, floating enable, move position center
 
 bindsym $mod+b bar mode toggle
 
