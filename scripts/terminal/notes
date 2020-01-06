@@ -19,6 +19,14 @@ while true; do
             SHOW_PATH=1
             shift
             ;;
+        -f)
+            NOTE_FILE="$(fd -t f | fzf)"
+            if [ -z "$NOTE_FILE" ]; then
+                exit
+            else
+                exec notes "$NOTE_FILE"
+            fi 
+            ;;
         *)
             break
     esac
