@@ -40,23 +40,6 @@ cde() {
     cd "$loc"
 }
 
-nvime() {
-    local loc
-    local ret
-    loc="$("$@")"
-    ret=$?
-    if [ "$ret" -ne 0 ]; then
-        return "$ret"
-    fi
-    if [ -f "$loc" ]; then
-        echo "$loc"
-        nvim "$loc"
-    else
-        echo 'error: not found' >&2
-        return 1
-    fi
-}
-
 setopt PROMPT_SUBST
 
 insert_mode_color='magenta'
