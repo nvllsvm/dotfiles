@@ -105,6 +105,8 @@ Plug 'udalov/kotlin-vim'
 Plug 'keith/swift.vim'
 call plug#end()
 
+let $FZF_DEFAULT_COMMAND = "fd --ignore-file ~/.config/nvim/fzf_fd_ignore"
+
 " deoplete
 let g:deoplete#enable_at_startup = 1
 let g:deoplete#file#enable_buffer_path = 1
