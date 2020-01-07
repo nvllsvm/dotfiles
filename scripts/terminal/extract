@@ -9,19 +9,22 @@ import sys
 
 def extract(path, parent=None, child=False):
     dest = _build_dest(path, parent, child)
-    if _is_nested_tar(path):
-        _extract_nested_tar(path, dest)
+    if path.suffix.lower() == '.zst':
+        _extract_zstd(path, dest)
+    elif _is_nested_tar(path):
+        _extract_7z_nested_tar(path, dest)
     else:
-        _extract_file(path, dest)
+        _extract_7z(path, dest)
 
 
 def _is_password_protected(path):
-    proc = subprocess.run(
-        ['7z', 'l', '-slt', path],
-        stdout=subprocess.PIPE,
-        check=True
-    )
-    return 'Encrypted = +' in proc.stdout.decode().split('\n')
+    if path.suffix.lower() != '.zst':
+        proc = subprocess.run(
+            ['7z', 'l', '-slt', path],
+            stdout=subprocess.PIPE,
+            check=True
+        )
+        return 'Encrypted = +' in proc.stdout.decode().split('\n')
 
 
 def _build_dest(path, parent, child):
@@ -39,6 +42,7 @@ def _build_dest(path, parent, child):
             dest = dest.with_name(f'{dest.name}_')
     else:
         dest = parent
+    dest.mkdir(parents=True, exist_ok=True)
     return dest
 
 
@@ -51,7 +55,7 @@ def _is_nested_tar(path):
         return False
 
 
-def _extract_nested_tar(path, dest):
+def _extract_7z_nested_tar(path, dest):
     extract_1 = subprocess.Popen(
         ['7z', 'x', '-so', '--', str(path)],
         stdout=subprocess.PIPE,
@@ -69,9 +73,16 @@ def _extract_nested_tar(path, dest):
         )
 
 
-def _extract_file(path, dest):
+def _extract_7z(path, dest):
     subprocess.run(
         ['7z', 'x', '-spe', f'-o{dest}', '--', str(path)],
+        check=True
+    )
+
+
+def _extract_zstd(path, dest):
+    subprocess.run(
+        ['zstd', '-d', '--output-dir-flat', dest, '--', str(path)],
         check=True
     )
 
