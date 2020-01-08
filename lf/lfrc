@@ -1,3 +1,5 @@
 set hidden
 map <c-n> :set relativenumber!
 map w
+set previewer ~/.config/lf/preview.sh
+map i $~/.config/lf/preview.sh $f | less -R
