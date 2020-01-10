@@ -9,7 +9,7 @@ case "$1" in
     *.zst)
         exec zstd -l -- "$1"
         ;;
-    *.7z)
+    *.7z|*.zip)
         exec 7z l -- "$1"
         ;;
     *)
