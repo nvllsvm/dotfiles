@@ -1,8 +1,8 @@
 export NVM_DIR=~/.local/share/nvm
 
 if [ -d "$NVM_DIR" ]; then
-    # holy fuck nvm.sh nearly triples shell startup time
-    # lazy load that piece of shit
+    # holy fuck - nvm.sh nearly triples shell startup time
+    # lazy load it!
     _nvm_load=(
         node
         npm
