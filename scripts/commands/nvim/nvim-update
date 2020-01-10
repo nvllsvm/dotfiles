@@ -1,15 +1,23 @@
 #!/usr/bin/env sh
 set -e
 
+VENV=~/.config/nvim/python3_env
+export PIP_USER=0
+
+create_venv() {
+    rm -rf "$VENV"
+    python -m venv "$VENV"
+}
+
 update_venv() {
-    VENV=~/.config/nvim/python3_env
-    export PIP_USER=0
     if ! [ -f "$(readlink -f "$VENV/bin/python")" ]; then
-        rm -rf "$VENV"
-        python -m venv "$VENV"
+        create_venv
+    fi
+    if ! python -c ''; then
+        create_venv
     fi
     . "$VENV/bin/activate"
-    pip install --quiet --upgrade pynvim $(pip freeze --all | cut -d = -f 1)
+    python -m pip install --quiet --upgrade pynvim $(pip freeze --all | cut -d = -f 1)
 }
 
 if [ ! -f ~/.config/nvim/autoload/plug.vim ]; then
