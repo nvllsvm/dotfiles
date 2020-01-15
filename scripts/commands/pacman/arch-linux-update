@@ -26,7 +26,7 @@ log 'Updating file cache'
 sudo pkgfile --update > /dev/null
 
 log 'Pruning package cache'
-yay -Sc --noconfirm > /dev/null
+sudo pacman -Sc --noconfirm > /dev/null
 
 log 'Removing orphans'
 if pacman -Qdtq > /dev/null; then 
