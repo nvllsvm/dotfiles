@@ -4,7 +4,7 @@ Description=set power setting for surface go touchscreen
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/bin/sh -c 'echo deep > /sys/power/mem_sleep ; echo on > /sys/devices/pci0000\:00/0000\:00\:15.1/i2c_designware.1/power/control; echo EHC1 > /proc/acpi/wakeup; echo EHC2 > /proc/acpi/wakeup; echo XHC > /proc/acpi/wakeup'
+ExecStart=/bin/sh -c 'echo deep > /sys/power/mem_sleep ; echo on > /sys/devices/pci0000:00/0000:00:15.1/i2c_designware.1/power/control'
 
 [Install]
 WantedBy=multi-user.target
