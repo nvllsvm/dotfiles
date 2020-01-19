@@ -3,12 +3,9 @@ set -e
 
 export PIP_REQUIRE_VIRTUALENV=0
 
-if ! [ -x "$(command -v pip)" ]; then
+if ! [ -x "$(command -v pip)" ] || [ "$(pip list | grep -c -e '^pip ' -e '^setuptools ' -e '^wheel ')" != '3' ]; then
     python -m ensurepip --user --default-pip
-fi
-
-if [ "$(pip list | grep -e '^pip ' -e '^setuptools ' -e '^wheel ' | wc -l)" != '3' ]; then
-    pip install --user --upgrade --force-reinstall pip setuptools wheel
+    python -m pip install --user --upgrade --force-reinstall pip setuptools wheel
 fi
 
 ood_packages="$(pip list --outdated --format=freeze)"
