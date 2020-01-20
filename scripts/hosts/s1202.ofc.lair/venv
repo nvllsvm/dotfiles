@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-exec /Users/andrewr/.local/share/pyenv/plugins/pyenv-global-links/python "$DOTFILES/scripts/commands/python/venv"
+exec /Users/andrewr/.local/share/pyenv/plugins/pyenv-global-links/python "$DOTFILES/scripts/commands/python/venv" "$@"
