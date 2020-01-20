@@ -45,7 +45,10 @@ class _PruneAction(argparse.Action):
 
 def python_bin_exists(python_bin):
     try:
-        subprocess.run([python_bin, '--version'])
+        subprocess.run(
+            [python_bin, '--version'],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL)
     except FileNotFoundError:
         return False
     return True

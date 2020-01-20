@@ -101,9 +101,6 @@ for plugin in $DOTFILES/zsh/plugins/*; do
     . "$plugin"
 done
 
-# set last to make local take precedence
-path=(~/.local/bin "$path[@]")
-
 compinit -C
 
 zsh_reload_comp() {
@@ -130,4 +127,8 @@ host_scripts="${DOTFILES}/scripts/hosts/$HOST"
 if [ -d "$host_scripts" ]; then
     path=("$host_scripts" "$path[@]")
 fi
+#
+# set last to make local take precedence
+path=(~/.local/bin "$path[@]")
+
 unset host_scripts
