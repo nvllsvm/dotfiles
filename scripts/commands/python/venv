@@ -37,6 +37,14 @@ class _PruneAction(argparse.Action):
         parser.exit()
 
 
+def python_bin_exists(python_bin):
+    try:
+        subprocess.run([python_bin, '--version'])
+    except FileNotFoundError:
+        return False
+    return True
+
+
 def pyenv_versions():
     proc = subprocess.run(
         ['pyenv', 'versions', '--bare'],
@@ -88,10 +96,13 @@ def main():
                 os.environ['PYENV_VERSION'] = pyenv_version
                 break
         else:
-            parser.error('no matching pyenv version')
-            parser.exit(1)
+            python_bin = f'python{args.version}'
     else:
         python_bin = 'python'
+
+    if not python_bin_exists(python_bin):
+        parser.error('version not available')
+        parser.exit(1)
 
     ENV_ROOT.mkdir(parents=True, exist_ok=True)
 
