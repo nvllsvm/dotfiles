@@ -3,7 +3,7 @@ set -e
 
 show_usage() {
     cat << EOF
-usage: disk-benchmark [-s SIZE] FILE
+usage: disk-benchmark [-s SIZE] [DIR]
     -s, --size      size in megabytes. defaults to 1024M
         --help      show help and exit
 EOF
@@ -21,26 +21,18 @@ while true; do
             exit
             ;;
         *)
-            if [ $# -eq 0 ]; then
-                show_usage >&2
-                echo 'error: missing file' >&2
-                exit 1
-            fi
             break
     esac
 done
 
-TEMP_FILE="$1"
-if [ -e "$TEMP_FILE" ]; then
-    echo 'error: file already exists' >&2
-    exit 1
-fi
+TEMP_DIR="${1:-./}"
 
 cleanup() {
     rm -f "${TEMP_FILE}"
 }
 
 trap cleanup EXIT
+TEMP_FILE="$(mktemp -p "$TEMP_DIR")"
 
 dd if=/dev/zero "of=$TEMP_FILE" bs=1M count="$FILESIZE" conv=fdatasync,notrunc status=progress
 case "$(uname)" in
