@@ -2,12 +2,17 @@
 """Retrieve and manipulate Consul KV in JSON format"""
 import argparse
 import base64
+import logging
 import json
 import os
 import sys
 import urllib.error
 import urllib.parse
 import urllib.request
+
+
+NAME = 'consul-kv-json'
+LOGGER = logging.getLogger(NAME)
 
 
 class ConsulKV:
@@ -64,14 +69,13 @@ class ConsulKV:
                 try:
                     value = base64.b64decode(value).decode()
                 except UnicodeDecodeError:
-                    # binary data?
-                    continue
+                    LOGGER.warning('Cannot decode "%s"', key)
             transformed[key] = value
         return transformed
 
 
 def main():
-    parser = argparse.ArgumentParser('consul-kv-json', description=__doc__)
+    parser = argparse.ArgumentParser(NAME, description=__doc__)
     parser.add_argument(
         '--url', default=os.environ.get('CONSUL_HTTP_ADDR'),
         help='Consul HTTP address [envvar CONSUL_HTTP_ADDR]')
@@ -90,6 +94,8 @@ def main():
         'data', nargs='?', default=sys.stdin, type=argparse.FileType('r'))
 
     args = parser.parse_args()
+
+    logging.basicConfig(format='%(message)s', level=logging.WARNING)
 
     if not args.url:
         parser.error('consul url not specified')
