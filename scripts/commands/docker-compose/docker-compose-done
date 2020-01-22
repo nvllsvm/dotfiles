@@ -1,0 +1,31 @@
+#!/usr/bin/env sh
+show_help() {
+    cat << EOF
+usage: docker-compose-done [--help] [PATH]
+
+remove all compose containers, networks, and volumes
+
+    --help          show help and exit
+EOF
+}
+
+
+while true; do
+    case "$1" in
+        --help)
+            show_help
+            exit
+            ;;
+        *)
+            if [ $# -eq 1 ]; then
+                cd "$1" || exit 1
+            elif [ $# -ne 0 ]; then
+                show_help >&2
+                echo error: unexpected arguments >&2
+                exit 1
+            fi
+            break
+    esac
+done
+
+docker-compose down --timeout 0 --remove-orphans --volumes
