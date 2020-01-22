@@ -39,7 +39,7 @@ def main():
 
     data = json.load(args.data)
     data = nest(data, args.delimiter)
-    print(json.dumps(data, indent=2, sort_keys=True))
+    print(json.dumps(data, indent=2, sort_keys=True, ensure_ascii=False))
 
 
 if __name__ == '__main__':
