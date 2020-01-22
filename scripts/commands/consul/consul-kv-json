@@ -95,7 +95,7 @@ def main():
 
     args = parser.parse_args()
 
-    logging.basicConfig(format='%(message)s', level=logging.WARNING)
+    logging.basicConfig(format='%(message)s', level=logging.INFO)
 
     if not args.url:
         parser.error('consul url not specified')
