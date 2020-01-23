@@ -51,6 +51,9 @@ th, td {
   padding: 5px;
   text-align: left;
 }
+table tr.failure {
+    background-color: #e56559;
+}
 </style>
 <table>
     <tr>
@@ -58,8 +61,12 @@ th, td {
         <th>{{- column -}}</th>
         {%- endfor %}
     </tr>
-    {%- for row in table -%}
+    {%- for (success, row) in table -%}
+    {%- if not success -%}
+    <tr class="failure">
+    {%- else -%}
     <tr>
+    {%- endif -%}
         {%- for column in row %}
         <td>
         {%- if column is string %}
@@ -112,11 +119,12 @@ def get_table(units, user=False):
     table = []
     for unit in units:
         properties = unit_properties(unit, user=user)
-        table.append([
+        row = [
             unit,
             properties['Result'],
             properties.get('ExecMainStartTimestamp', 'n/a'),
-        ])
+        ]
+        table.append([properties['Result'] != 'success', row])
     return table
 
 
