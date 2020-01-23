@@ -13,5 +13,5 @@ case "$1" in
         exec 7z l -- "$1"
         ;;
     *)
-        exec bat --color=always --theme=base16 --plain -- "$1"
+        exec bat --color=always --plain -- "$1"
 esac
