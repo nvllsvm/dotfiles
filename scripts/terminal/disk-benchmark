@@ -34,7 +34,7 @@ cleanup() {
 trap cleanup EXIT
 TEMP_FILE="$(mktemp -p "$TEMP_DIR")"
 
-dd if=/dev/zero "of=$TEMP_FILE" bs=1M count="$FILESIZE" conv=fdatasync,notrunc status=progress
+dd if=/dev/zero of="$TEMP_FILE" bs=1M count="$FILESIZE" conv=fdatasync,notrunc status=progress
 case "$(uname)" in
     Linux)
         sudo sh -c 'echo 3 > /proc/sys/vm/drop_caches'
@@ -47,4 +47,4 @@ case "$(uname)" in
         echo error: unhandled OS >&2
         exit 1
 esac
-dd "if=$TEMP_FILE" of=/dev/null bs=1M count="$FILESIZE" status=progress
+dd if="$TEMP_FILE" of=/dev/null bs=1M count="$FILESIZE" status=progress
