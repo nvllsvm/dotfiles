@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+rsync -av --progress --delete /storage/Games/GB/ /storage/Syncthing/Default/RetroArch/rom/GB
+rsync -av --progress --delete /storage/Games/GBA/ /storage/Syncthing/Default/RetroArch/rom/GBA
+rsync -av --progress --delete /storage/Games/GBC/ /storage/Syncthing/Default/RetroArch/rom/GBC
+rsync -av --progress --delete /storage/Games/NES/ /storage/Syncthing/Default/RetroArch/rom/NES
+rsync -av --progress --delete /storage/Games/SNES/ /storage/Syncthing/Default/RetroArch/rom/SNES

@@ -1,0 +1,9 @@
+[Unit]
+Description=Run retroarch-rom-sync every day
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+
+[Install]
+WantedBy=timers.target
