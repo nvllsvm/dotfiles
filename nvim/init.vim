@@ -88,7 +88,6 @@ Plug 'davidhalter/jedi-vim'
 Plug 'fisadev/vim-isort'
 
 Plug 'plasticboy/vim-markdown'
-Plug 'reedes/vim-pencil'
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }}
 Plug 'mzlogin/vim-markdown-toc'
 Plug 'dhruvasagar/vim-table-mode'
