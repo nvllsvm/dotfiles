@@ -59,7 +59,7 @@ function _REPL()
 endfunction
 
 function _REPLInit(...)
-    AutoSaveToggle
+    let g:auto_save = 1
     let g:repl_cmd = a:1
     autocmd BufWritePost * call _REPL()
     autocmd BufDelete * :qa
@@ -174,8 +174,6 @@ nnoremap <leader>D :bd<Cr>
 nnoremap <leader>3 :b#<Cr>
 nnoremap <leader>l :buffers<CR>:buffer<Space>
 
-nnoremap <leader>A :AutoSaveToggle<CR>
-
 let g:netrw_banner = 0
 let g:netrw_dirhistmax = 0
 let g:netrw_list_hide = '^.git/$,.pyc$,^../,^./'
@@ -202,10 +200,19 @@ augroup MARKDOWN
     autocmd!
     autocmd FileType markdown nnoremap <leader>m :MarkdownPreview<Cr>
     autocmd FileType markdown set wrap
+    autocmd FileType markdown let g:auto_save = 1
 
     " talbe_mode_always_active breaks highlighting
-    "let g:table_mode_always_active = 1
     autocmd FileType markdown TableModeEnable
+augroup END
+
+augroup ORG
+    autocmd FileType org TableModeEnable
+    autocmd FileType org let g:auto_save = 1
+augroup END
+
+augroup TODO
+    autocmd FileType todo let g:auto_save = 1
 augroup END
 
 augroup XML

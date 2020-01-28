@@ -48,7 +48,7 @@ case $# in
 esac
 
 if [ -n "$SHOW_PATH" ]; then
-    echo "$(realpath "$NOTE_FILE")"
+    realpath "$NOTE_FILE"
 else
-    exec "${EDITOR}" -c AutoSaveToggle -- "$NOTE_FILE"
+    exec "${EDITOR}" -- "$NOTE_FILE"
 fi
