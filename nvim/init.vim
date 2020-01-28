@@ -103,6 +103,7 @@ Plug '907th/vim-auto-save'
 
 Plug 'udalov/kotlin-vim'
 Plug 'keith/swift.vim'
+Plug 'jceb/vim-orgmode'
 call plug#end()
 
 let $FZF_DEFAULT_COMMAND = "fd --type file --ignore-file ~/.config/nvim/fzf_fd_ignore"
