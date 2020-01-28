@@ -88,6 +88,7 @@ Plug 'davidhalter/jedi-vim'
 Plug 'fisadev/vim-isort'
 
 Plug 'plasticboy/vim-markdown'
+Plug 'reedes/vim-pencil'
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }}
 Plug 'mzlogin/vim-markdown-toc'
 Plug 'dhruvasagar/vim-table-mode'
@@ -203,6 +204,13 @@ augroup MARKDOWN
 
     " talbe_mode_always_active breaks highlighting
     autocmd FileType markdown TableModeEnable
+
+    let g:vim_markdown_auto_insert_bullets=0
+    let g:vim_markdown_new_list_item_indent=0
+    autocmd FileType markdown setlocal formatlistpat=^\\s*\\d\\+[.\)]\\s\\+\\\|^\\s*[*+~-]\\s\\+\\\|^\\(\\\|[*#]\\)\\[^[^\\]]\\+\\]:\\s 
+    autocmd FileType markdown setlocal comments=n:>
+    autocmd FileType markdown setlocal formatoptions+=cn
+    set linebreak
 augroup END
 
 augroup TODO
