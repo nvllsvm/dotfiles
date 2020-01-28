@@ -103,7 +103,6 @@ Plug '907th/vim-auto-save'
 
 Plug 'udalov/kotlin-vim'
 Plug 'keith/swift.vim'
-Plug 'jceb/vim-orgmode'
 call plug#end()
 
 let $FZF_DEFAULT_COMMAND = "fd --type file --ignore-file ~/.config/nvim/fzf_fd_ignore"
@@ -204,11 +203,6 @@ augroup MARKDOWN
 
     " talbe_mode_always_active breaks highlighting
     autocmd FileType markdown TableModeEnable
-augroup END
-
-augroup ORG
-    autocmd FileType org TableModeEnable
-    autocmd FileType org let g:auto_save = 1
 augroup END
 
 augroup TODO
