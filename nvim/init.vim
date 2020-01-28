@@ -198,7 +198,6 @@ augroup END
 augroup MARKDOWN
     autocmd!
     autocmd FileType markdown nnoremap <leader>m :MarkdownPreview<Cr>
-    autocmd FileType markdown set wrap
     autocmd FileType markdown let g:auto_save = 1
 
     " talbe_mode_always_active breaks highlighting
