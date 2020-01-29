@@ -85,7 +85,10 @@ def main():
 
     def _exit_handler(signum, *_):
         for channel in channels.values():
-            channel.close()
+            try:
+                channel.close()
+            except Exception:
+                pass
         sys.exit(130 if signum == signal.SIGINT else 1)
 
     signal.signal(signal.SIGINT, _exit_handler)
