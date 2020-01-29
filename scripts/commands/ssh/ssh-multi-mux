@@ -1,54 +1,75 @@
 #!/usr/bin/env python3
 import argparse
+import signal
 import socket
 import sys
 
+import colorama
 import paramiko
 
 BUFFER_SIZE = 64
-
-
-def ssh_command(host, command):
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(host)
-    _, stdout, __ = ssh.exec_command(command)
-    channel = stdout.channel
-    channel.setblocking(0)
-    return channel
 
 
 class _OutputMuxer:
     def __enter__(self):
         self._stdout_pending = {}
         self._stderr_pending = {}
+        self._colors = None
+        self._key_colors = {}
         return self
+
+    def _key_color(self, key):
+        if not self._colors:
+            self._colors = [
+                colorama.Fore.CYAN,
+                colorama.Fore.RED,
+                colorama.Fore.MAGENTA,
+                colorama.Fore.GREEN,
+                colorama.Fore.BLUE,
+                colorama.Fore.YELLOW,
+            ]
+        if key not in self._key_colors:
+            self._key_colors[key] = self._colors.pop()
+        return self._key_colors[key]
 
     def __exit__(self, *_):
         self._write_pending(sys.stdout.buffer, self._stdout_pending)
         self._write_pending(sys.stderr.buffer, self._stderr_pending)
 
     def write_stdout(self, key, data):
-        self._write(sys.stdout.buffer, self._stdout_pending, key, data)
+        self._maybe_write(sys.stdout.buffer, self._stdout_pending, key, data)
 
     def write_stderr(self, key, data):
-        self._write(sys.stderr.buffer, self._stderr_pending, key, data)
+        self._maybe_write(sys.stderr.buffer, self._stderr_pending, key, data)
 
-    def _write(self, output_buffer, pending, key, data):
+    def _maybe_write(self, output_buffer, pending, key, data):
         data = pending.pop(key, b'') + data
         lines = data.splitlines(True)
         if not lines[-1].endswith(b'\n'):
             pending[key] = lines.pop()
         data = b''.join(lines)
-        output_buffer.write(data)
-        output_buffer.flush()
+        self._write(output_buffer, data, key)
 
     def _write_pending(self, output_buffer, pending):
-        for data in pending.values():
+        for key, data in pending.items():
             if not data.endswith(b'\n'):
                 data = data + b'\n'
-            output_buffer.write(data)
-            output_buffer.flush()
+            self._write(output_buffer, data, key)
+
+    def _write(self, output_buffer, data, key):
+        if output_buffer.isatty():
+            prefix = ''.join([
+                self._key_color(key),
+                key,
+                colorama.Fore.RESET,
+                ' '
+            ]).encode()
+            data = b''.join([
+                prefix + d
+                for d in data.splitlines(True)
+            ])
+        output_buffer.write(data)
+        output_buffer.flush()
 
 
 def main():
@@ -59,8 +80,22 @@ def main():
 
     channels = {}
 
+    def _exit_handler(signum, *_):
+        for channel in channels.values():
+            channel.close()
+        sys.exit(130 if signum == signal.SIGINT else 1)
+
+    signal.signal(signal.SIGINT, _exit_handler)
+    signal.signal(signal.SIGTERM, _exit_handler)
+
     for host in args.host:
-        channels[host] = ssh_command(host, args.command)
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(host)
+        _, stdout, __ = ssh.exec_command(args.command)
+        channel = stdout.channel
+        channel.setblocking(0)
+        channels[host] = channel
 
     with _OutputMuxer() as muxer:
         while channels:
