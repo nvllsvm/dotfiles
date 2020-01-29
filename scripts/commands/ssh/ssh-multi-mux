@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+import argparse
+import socket
+import sys
+
+import paramiko
+
+
+def ssh_command(host, command):
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh.connect(host)
+    _, stdout, __ = ssh.exec_command(command)
+    return stdout.channel
+
+
+class _OutputMuxer:
+    def __enter__(self):
+        self._stdout_pending = {}
+        self._stderr_pending = {}
+        return self
+
+    def __exit__(self, *_):
+        self._write_pending(sys.stdout.buffer, self._stdout_pending)
+        self._write_pending(sys.stderr.buffer, self._stderr_pending)
+
+    def write_stdout(self, key, data):
+        self._write(sys.stdout.buffer, self._stdout_pending, key, data)
+
+    def write_stderr(self, key, data):
+        self._write(sys.stderr.buffer, self._stderr_pending, key, data)
+
+    def _write(self, output_buffer, pending, key, data):
+        data = pending.pop(key, b'') + data
+        lines = data.splitlines(True)
+        if not lines[-1].endswith(b'\n'):
+            pending[key] = lines.pop()
+        data = b''.join(lines)
+        output_buffer.write(data)
+        output_buffer.flush()
+
+    def _write_pending(self, output_buffer, pending):
+        for data in pending.values():
+            if not data.endswith(b'\n'):
+                data = data + b'\n'
+            output_buffer.write(data)
+            output_buffer.flush()
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('command')
+    parser.add_argument('host', nargs='*')
+    args = parser.parse_args()
+
+    channels = {}
+
+    for host in args.host:
+        channels[host] = ssh_command(host, args.command)
+
+    with _OutputMuxer() as muxer:
+        while channels:
+            for host, channel in list(channels.items()):
+                stdout_data = ''
+                stderr_data = ''
+                try:
+                    stdout_data = channel.recv(1024)
+                except socket.timeout:
+                    pass
+                if len(stdout_data) != 0:
+                    muxer.write_stdout(host, stdout_data)
+
+                try:
+                    stderr_data = channel.recv_stderr(1024)
+                except socket.timeout:
+                    pass
+                if len(stderr_data):
+                    muxer.write_stderr(host, stderr_data)
+
+                if len(stdout_data) == len(stderr_data) == 0:
+                    channels.pop(host)
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,44 @@
+#!/usr/bin/env sh
+set -e
+
+NOTES_DIR="${NOTES_DIR:-$HOME/Notes}"
+TODO_FILE="${NOTES_DIR}/todo.txt"
+
+case "$(find "$NOTES_DIR" -maxdepth 1 -type f -name 'todo.txt*' | wc -l)" in
+    0)
+        echo 'error: file not found' >&2
+        exit 1
+        ;;
+    1)
+        ;;
+    *)
+        echo 'error: sync conflict detected' >&2
+        exit 1
+esac
+
+show_help() {
+    echo 'usage: todo TASK'
+}
+
+DUE=''
+while true; do
+    case "$1" in
+        --due)
+            DUE="due:$(date -I -d "$2")"
+            shift
+            shift
+            ;;
+        --help)
+            show_help
+            exit
+            ;;
+        *)
+            if [ -n "$1" ]; then
+                # xargs to strip multiple spaces
+                echo "$(date -I)" "$@" "$DUE" | xargs >> "${TODO_FILE}"
+            else
+                exec "${EDITOR}" "${TODO_FILE}"
+            fi
+            break
+    esac
+done

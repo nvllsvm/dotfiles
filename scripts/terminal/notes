@@ -11,10 +11,6 @@ cd "${NOTES_DIR}"
 SHOW_PATH=
 while true; do
     case "$1" in
-        --)
-            shift
-            exec "$@"
-            ;;
         -p)
             SHOW_PATH=1
             shift
