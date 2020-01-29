@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+"""
+Execute command on multiple SSH hosts
+"""
 import argparse
 import signal
 import socket
@@ -73,7 +76,7 @@ class _OutputMuxer:
 
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(prog='ssh-multi-mux', description=__doc__)
     parser.add_argument('command')
     parser.add_argument('host', nargs='*')
     args = parser.parse_args()
