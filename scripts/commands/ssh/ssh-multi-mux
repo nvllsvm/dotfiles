@@ -5,13 +5,17 @@ import sys
 
 import paramiko
 
+BUFFER_SIZE = 64
+
 
 def ssh_command(host, command):
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh.connect(host)
     _, stdout, __ = ssh.exec_command(command)
-    return stdout.channel
+    channel = stdout.channel
+    channel.setblocking(0)
+    return channel
 
 
 class _OutputMuxer:
@@ -61,24 +65,29 @@ def main():
     with _OutputMuxer() as muxer:
         while channels:
             for host, channel in list(channels.items()):
+                if channel.exit_status_ready():
+                    channels.pop(host)
+                    while stdout_data := channel.recv(BUFFER_SIZE):
+                        muxer.write_stdout(host, stdout_data)
+                    while stderr_data := channel.recv_stderr(BUFFER_SIZE):
+                        muxer.write_stderr(host, stderr_data)
+                    continue
+
                 stdout_data = ''
                 stderr_data = ''
                 try:
-                    stdout_data = channel.recv(1024)
+                    stdout_data = channel.recv(BUFFER_SIZE)
                 except socket.timeout:
                     pass
-                if len(stdout_data) != 0:
+                if stdout_data:
                     muxer.write_stdout(host, stdout_data)
 
                 try:
-                    stderr_data = channel.recv_stderr(1024)
+                    stderr_data = channel.recv_stderr(BUFFER_SIZE)
                 except socket.timeout:
                     pass
-                if len(stderr_data):
+                if stderr_data:
                     muxer.write_stderr(host, stderr_data)
-
-                if len(stdout_data) == len(stderr_data) == 0:
-                    channels.pop(host)
 
 
 if __name__ == '__main__':
