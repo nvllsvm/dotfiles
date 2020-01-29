@@ -22,16 +22,16 @@ class _OutputMuxer:
         return self
 
     def _key_color(self, key):
-        if not self._colors:
-            self._colors = [
-                colorama.Fore.CYAN,
-                colorama.Fore.RED,
-                colorama.Fore.MAGENTA,
-                colorama.Fore.GREEN,
-                colorama.Fore.BLUE,
-                colorama.Fore.YELLOW,
-            ]
         if key not in self._key_colors:
+            if not self._colors:
+                self._colors = [
+                    colorama.Fore.CYAN,
+                    colorama.Fore.RED,
+                    colorama.Fore.MAGENTA,
+                    colorama.Fore.GREEN,
+                    colorama.Fore.BLUE,
+                    colorama.Fore.YELLOW,
+                ]
             self._key_colors[key] = self._colors.pop()
         return self._key_colors[key]
 
