@@ -1,0 +1,96 @@
+#!/usr/bin/env python3
+from concurrent.futures import ProcessPoolExecutor as Pool 
+import code
+import collections
+import contextlib
+import datetime
+import io
+import json
+import os
+import pathlib
+import pprint
+import shutil
+import subprocess
+import sys
+
+try:
+    import arrow
+except ImportError:
+    pass
+
+try:
+    import requests
+except ImportError:
+    pass
+
+try:
+    import tabulate
+except ImportError:
+    pass
+
+try:
+    import yaml
+except ImportError:
+    pass
+
+
+def pp(*args, **kwargs):
+    kwargs.setdefault('sort_dicts', True)
+    return pprint.pp(*args, **kwargs)
+
+
+def walk(root):
+    stack = [pathlib.Path(root)]
+    paths = []
+    while stack:
+        for path in stack.pop().iterdir():
+            if path.is_dir():
+                stack.append(path)
+            paths.add(path)
+    return paths
+
+
+def glob(pattern):
+    return list(pathlib.Path().glob(pattern))
+
+
+def path(pattern):
+    matches = list(pathlib.Path().glob(pattern))
+    if len(matches) == 0:
+        raise FileNotFoundError
+    elif len(matches) != 1:
+        raise ValueError
+    return matches[0]
+
+
+def load_json(data):
+    if isinstance(data, pathlib.Path):
+        data = data.read_text()
+    return json.loads(data)
+
+
+def dump_json(data, path=None):
+    def _default_json(obj):
+        if isinstance(obj, set):
+            return sorted(obj)
+        elif hasattr(obj, 'isoformat'):
+            return obj.isoformat()
+    dumped = json.dumps(
+        data,
+        indent=2,
+        sort_keys=True,
+        default=_default_json,
+        ensure_ascii=False
+    )
+    if path is not None:
+        path.write_text(dumped)
+    else:
+        return dumped
+
+
+def now():
+    return datetime.datetime.now().astimezone()
+
+
+def utcnow():
+    return datetime.datetime.utcnow().astimezone(datetime.timezone.utc)
