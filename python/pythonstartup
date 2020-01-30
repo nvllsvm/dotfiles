@@ -7,7 +7,6 @@ import datetime
 import io
 import json
 import os
-import pathlib
 import pprint
 import shutil
 import subprocess
@@ -33,10 +32,24 @@ try:
 except ImportError:
     pass
 
+try:
+    import pathlib
+except ImportError:
+    import pathlib2 as pathlib
+    class FileNotFoundError(Exception):
+        pass
+
 
 def pp(*args, **kwargs):
-    kwargs.setdefault('sort_dicts', True)
-    return pprint.pp(*args, **kwargs)
+    if sys.version_info.major == 3 and sys.version_info.minro == 8:
+        kwargs.setdefault('sort_dicts', True)
+        return pprint.pp(*args, **kwargs)
+    else:
+        return pprint.pprint(*args, **kwargs)
+
+
+def ppdir(*args, **kwargs):
+    return pp(dir(*args, **kwargs))
 
 
 def walk(root):
@@ -47,11 +60,11 @@ def walk(root):
             if path.is_dir():
                 stack.append(path)
             paths.add(path)
-    return paths
+    return sorted(paths)
 
 
 def glob(pattern):
-    return list(pathlib.Path().glob(pattern))
+    return sorted(pathlib.Path().glob(pattern))
 
 
 def path(pattern):
