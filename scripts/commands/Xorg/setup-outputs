@@ -7,15 +7,15 @@ phobos() {
         MODE=internal
     fi
 
-    xrandr-custom-resolution eDP1 1600 900 60
-    xrandr-custom-resolution eDP1 1280 720 60
+    xrandr-custom-resolution eDP-1 1600 900 60
+    xrandr-custom-resolution eDP-1 1280 720 60
 
     case "$MODE" in
         internal)
             xrandr \
                 --output DP1 --off \
                 --output DP2 --off \
-                --output eDP1 --primary --mode 3200x1800 --pos 0x0 --rotate normal
+                --output eDP-1 --primary --mode 3200x1800 --pos 0x0 --rotate normal
             set-desktop-themes --dpi 192
             apply-display-calibration
             ;;
@@ -23,7 +23,7 @@ phobos() {
             xrandr \
                 --output DP1 --off \
                 --output DP2 --off \
-                --output eDP1 --primary --mode 1600x900 --pos 0x0 --rotate normal
+                --output eDP-1 --primary --mode 1600x900 --pos 0x0 --rotate normal
             set-desktop-themes --dpi 138
             apply-display-calibration
             ;;
@@ -31,7 +31,7 @@ phobos() {
             xrandr \
                 --output DP1 --off \
                 --output DP2 --off \
-                --output eDP1 --primary --mode 1280x720 --pos 0x0 --rotate normal
+                --output eDP-1 --primary --mode 1280x720 --pos 0x0 --rotate normal
             set-desktop-themes --dpi 96
             apply-display-calibration
             ;;
