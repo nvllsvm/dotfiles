@@ -197,7 +197,6 @@ augroup END
 
 augroup MARKDOWN
     autocmd!
-    autocmd FileType markdown nnoremap <leader>m :MarkdownPreview<Cr>
     autocmd FileType markdown let g:auto_save = 1
 
     " talbe_mode_always_active breaks highlighting
@@ -208,6 +207,7 @@ augroup MARKDOWN
     autocmd FileType markdown setlocal formatlistpat=^\\s*\\d\\+[.\)]\\s\\+\\\|^\\s*[*+~-]\\s\\+\\\|^\\(\\\|[*#]\\)\\[^[^\\]]\\+\\]:\\s 
     autocmd FileType markdown setlocal comments=n:>
     autocmd FileType markdown setlocal formatoptions+=cn
+    autocmd FileType markdown nnoremap <leader>m :TableModeRealign<Cr>
     set linebreak
 augroup END
 
