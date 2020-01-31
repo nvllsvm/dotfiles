@@ -5,6 +5,7 @@ import collections
 import contextlib
 import datetime
 import io
+import glob
 import json
 import os
 import pprint
@@ -63,12 +64,35 @@ def walk(root):
     return sorted(paths)
 
 
-def glob(pattern):
-    return sorted(pathlib.Path().glob(pattern))
+def paths(pattern=None):
+    if pattern is None:
+        return sorted(pathlib.Path().iterdir())
+    else:
+        return sorted(
+            pathlib.Path(p)
+            for p in glob.glob(str(pathlib.Path(pattern).expanduser()))
+        )
+
+
+def ls(all=False):
+    if all:
+        pp(paths())
+    else:
+        pp(paths('*'))
+
+
+def files(*args, **kwargs):
+    return sorted(p for p in paths(*args, **kwargs)
+                  if p.is_file())
+
+
+def dirs(*args, **kwargs):
+    return sorted(p for p in paths(*args, **kwargs)
+                  if p.is_dir())
 
 
 def path(pattern):
-    matches = list(pathlib.Path().glob(pattern))
+    matches = list(paths(pattern))
     if len(matches) == 0:
         raise FileNotFoundError
     elif len(matches) != 1:
@@ -99,6 +123,19 @@ def dump_json(data, path=None):
         path.write_text(dumped)
     else:
         return dumped
+
+
+def cat(pattern):
+    return b''.join(p.read_bytes() for p in paths(pattern))
+
+
+def cd(pattern='~'):
+    os.chdir(path(pattern))
+    return pathlib.Path.cwd()
+
+
+def pwd():
+    return pathlib.Path.cwd()
 
 
 def now():
