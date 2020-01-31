@@ -41,7 +41,7 @@ except ImportError:
 
 
 def pp(*args, **kwargs):
-    if sys.version_info.major == 3 and sys.version_info.minro == 8:
+    if sys.version_info.major >= 3 and sys.version_info.minor >= 8:
         kwargs.setdefault('sort_dicts', True)
         return pprint.pp(*args, **kwargs)
     else:
