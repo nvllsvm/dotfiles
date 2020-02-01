@@ -1,3 +1,6 @@
+# reload the rules by running:
+# udevadm hwdb --update
+
 # gpdwin 2
 evdev:input:b0003v258Ap6A99*
  KEYBOARD_KEY_70039=esc       # capslock
