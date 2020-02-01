@@ -207,7 +207,7 @@ augroup MARKDOWN
     autocmd FileType markdown setlocal formatlistpat=^\\s*\\d\\+[.\)]\\s\\+\\\|^\\s*[*+~-]\\s\\+\\\|^\\(\\\|[*#]\\)\\[^[^\\]]\\+\\]:\\s 
     autocmd FileType markdown setlocal comments=n:>
     autocmd FileType markdown setlocal formatoptions+=cn
-    autocmd FileType markdown nnoremap <leader>m :TableModeRealign<Cr>
+    autocmd FileType markdown nnoremap <leader>m :TableModeRealign<Cr>:TableSort<Cr>
     set linebreak
 augroup END
 
