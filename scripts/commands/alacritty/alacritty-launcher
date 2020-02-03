@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+. ~/.base16_theme
+cmd="$(pathbin | fzf)"
+if [ -n "$cmd" ]; then
+    exec "$cmd"
+fi
