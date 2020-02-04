@@ -19,16 +19,18 @@ find_executables() {
     done
 }
 
-if [ $# -eq 0 ]; then
-    . ~/.base16_theme
-    IFS=: find_executables | sort -u | fzf --exact --no-extended -i --layout=reverse --print-query | tail -n 1 | xargs -r alacritty-launcher
-else
-    case "$1" in
-        /*)
-            all="$*"
-            launch "$(shlex open "https://duckduckgo.com/?q=${all#/}")"
-            ;;
-        *)
-            launch "$@"
-    esac
-fi
+. ~/.base16_theme
+command="$(IFS=: find_executables | sort -u | fzf --exact --no-extended -i --layout=reverse --print-query)"
+ret=$?
+command="$(echo "$command" | tail -n 1)"
+case $ret in
+    1)
+        launch "$(shlex open "https://duckduckgo.com/?q=$command")"
+        ;;
+    0)
+        launch "$command"
+        exit
+        ;;
+    *)
+        exit $ret
+esac
