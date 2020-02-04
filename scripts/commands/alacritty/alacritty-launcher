@@ -22,7 +22,7 @@ find_executables() {
 
 if [ $# -eq 0 ]; then
     . ~/.base16_theme
-    IFS=: find_executables | sort -u | fzf --no-extended -i --layout=reverse --print-query | tail -n 1 | xargs -r alacritty-launcher > /dev/null 2>&1
+    IFS=: find_executables | sort -u | fzf --exact --no-extended -i --layout=reverse --print-query | tail -n 1 | xargs -r alacritty-launcher > /dev/null 2>&1
 else
     case "$1" in
         /*)
