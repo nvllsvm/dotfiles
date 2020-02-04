@@ -8,6 +8,7 @@ for p in $PATH; do
             pkill -9 mpd
             "$bin" "$@"
             sudo renice -19 $(pgrep '^mpd$')
+            sudo renice -19 $(pgrep '^mpdcontrold$')
         fi
         exit
     fi
