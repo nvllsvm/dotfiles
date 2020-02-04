@@ -19,6 +19,19 @@ find_executables() {
     done
 }
 
+shlex() {
+    python -c "
+import shlex
+import sys
+
+parts = [
+    shlex.quote(s)
+    for s in sys.argv[1:]
+]
+print(' '.join(parts))
+" "$@"
+}
+
 . ~/.base16_theme
 command="$(IFS=: find_executables | sort -u | fzf --exact --no-extended -i --layout=reverse --print-query)"
 ret=$?
