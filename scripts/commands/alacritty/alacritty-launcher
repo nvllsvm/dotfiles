@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 launch() {
     if [ -n "$I3SOCK" ]; then
-        i3-msg -t command exec -- "$*"
+        i3-msg -q -t command exec -- "$*"
     else
         exit 1
     fi
