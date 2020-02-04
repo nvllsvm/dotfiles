@@ -5,6 +5,7 @@ import email
 import email.message
 import json
 import pathlib
+import sys
 
 
 def _argparse_path_not_exists(path):
@@ -29,6 +30,7 @@ def main():
         'email-parser',
         description='Parse a raw email into separate, decoded files'
     )
+    parser.add_argument('-c', '--content-type')
     parser.add_argument(
         'email', type=argparse.FileType('r'), help='raw email content'
     )
@@ -67,12 +69,28 @@ def main():
                     part.get_payload(decode=True)
                 )
     else:
-        print(json.dumps(
-            parse_headers(message),
-            sort_keys=True,
-            indent=2,
-            ensure_ascii=False
-        ))
+        if args.content_type:
+            found = None
+            for part in message.walk():
+                ct = part.get_content_type()
+                if ct == args.content_type:
+                    if found is not None:
+                        print('error: multiple parts with content type',
+                              file=sys.stderr)
+                        sys.exit(1)
+                    found = part.get_payload(decode=True)
+            if found is None:
+                print('error: content-type not found in message',
+                      file=sys.stderr)
+                sys.exit(1)
+            sys.stdout.buffer.write(found)
+        else:
+            print(json.dumps(
+                parse_headers(message),
+                sort_keys=True,
+                indent=2,
+                ensure_ascii=False
+            ))
 
 
 if __name__ == '__main__':
