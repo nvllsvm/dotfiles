@@ -1,6 +1,35 @@
 #!/usr/bin/env sh
-. ~/.base16_theme
-cmd="$(pathbin | fzf)"
-if [ -n "$cmd" ]; then
-    exec "$cmd"
+launch() {
+    if [ -n "$I3SOCK" ]; then
+        echo "$@"
+        i3-msg -t command exec -- "$@"
+    else
+        exit 1
+    fi
+}
+
+
+find_executables() {
+    IFS=:
+    for dir in $PATH; do
+        for file in "$dir"/*; do
+            if [ -f "$file" ] && [ -x "$file" ]; then
+                echo "${file##*/}"
+            fi
+        done
+    done
+}
+
+if [ $# -eq 0 ]; then
+    . ~/.base16_theme
+    IFS=: find_executables | sort -u | fzf --no-extended -i --layout=reverse --print-query | tail -n 1 | xargs -r alacritty-launcher
+else
+    case "$1" in
+        /*)
+            all="$*"
+            launch open "https://duckduckgo.com/?q=${all#/}"
+            ;;
+        *)
+            launch "$@"
+    esac
 fi
