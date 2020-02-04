@@ -1,8 +1,7 @@
 #!/usr/bin/env sh
 launch() {
     if [ -n "$I3SOCK" ]; then
-        echo "$@"
-        i3-msg -t command exec -- "$@"
+        i3-msg -t command exec -- "$*"
     else
         exit 1
     fi
@@ -22,12 +21,12 @@ find_executables() {
 
 if [ $# -eq 0 ]; then
     . ~/.base16_theme
-    IFS=: find_executables | sort -u | fzf --exact --no-extended -i --layout=reverse --print-query | tail -n 1 | xargs -r alacritty-launcher > /dev/null 2>&1
+    IFS=: find_executables | sort -u | fzf --exact --no-extended -i --layout=reverse --print-query | tail -n 1 | xargs -r alacritty-launcher
 else
     case "$1" in
         /*)
             all="$*"
-            launch open "https://duckduckgo.com/?q=${all#/}"
+            launch "$(shlex open "https://duckduckgo.com/?q=${all#/}")"
             ;;
         *)
             launch "$@"
