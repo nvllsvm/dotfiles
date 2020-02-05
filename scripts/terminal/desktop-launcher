@@ -70,6 +70,7 @@ if HIST.is_file():
         history[cmd] = int(count)
 
 if sys.platform == 'darwin':
+    apps = sorted(find_applications())
     cmds = sorted(find_applications())
 else:
     cmds = sorted(find_executables(), key=lambda x: (history[x] * -1, x))
@@ -77,7 +78,10 @@ else:
 matched, result = fzf(cmds)
 if matched:
     if sys.platform == 'darwin':
-        launch('open', '-a', result)
+        if result in apps:
+            launch('open', '-a', result)
+        else:
+            launch('open', result)
     else:
         parts = result.strip().split()
         cmd = parts[0]
