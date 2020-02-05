@@ -38,7 +38,8 @@ def find_executables():
 
 def fzf(data):
     proc = subprocess.run(
-        ['fzf', '--exact', '--no-extended', '-i', '--layout=reverse', '--print-query'],
+        ['fzf', '--exact', '--no-sort', '--no-extended', '-i',
+         '--layout=reverse', '--print-query'],
         input='\n'.join(data).encode(),
         stdout=subprocess.PIPE,
     )
@@ -53,12 +54,12 @@ if HIST.is_file():
         history[cmd] = int(count)
 
 cmds = sorted(find_executables(), key=lambda x: (history[x.lower()] * -1, x))
-    
+
 matched, result = fzf(cmds)
 if matched:
     parts = result.strip().split()
     cmd = parts[0]
-    history[cmd.lower()] += 1
+    history[cmd] += 1
     HIST.write_text('\n'.join(f'{v} {k}' for k,v in history.items() if v))
     launch(result)
 else:
