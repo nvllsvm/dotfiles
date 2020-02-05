@@ -58,7 +58,7 @@ if HIST.is_file():
         count, cmd = line.split()
         history[cmd] = int(count)
 
-cmds = sorted(find_executables(), key=lambda x: (history[x.lower()] * -1, x))
+cmds = sorted(find_executables(), key=lambda x: (history[x] * -1, x))
 
 matched, result = fzf(cmds)
 if matched:
