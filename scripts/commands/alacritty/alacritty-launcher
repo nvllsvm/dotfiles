@@ -65,7 +65,7 @@ if matched:
     parts = result.strip().split()
     cmd = parts[0]
     history[cmd] += 1
-    HIST.write_text('\n'.join(f'{v} {k}' for k,v in history.items() if v))
+    HIST.write_text('\n'.join(f'{v} {k}' for k, v in history.items() if v))
     launch(result)
 elif result:
     launch('open', f'https://duckduckgo.com/?q={result}')
