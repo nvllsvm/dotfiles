@@ -41,7 +41,7 @@ def find_executables():
 
 def find_applications():
     return {
-        path.name
+        path.name.rstrip('.app')
         for path in pathlib.Path('/Applications').iterdir()
         if not path.name.startswith('.')
     }
