@@ -6,6 +6,7 @@ import contextlib
 import datetime
 import glob
 import io
+import itertools
 import json
 import os
 import pickle
@@ -145,3 +146,9 @@ def now():
 
 def utcnow():
     return datetime.datetime.utcnow().astimezone(datetime.timezone.utc)
+
+
+def chunked(iterable, n):
+    i = iter(iterable)
+    while result := list(itertools.islice(i, n)):
+        yield result
