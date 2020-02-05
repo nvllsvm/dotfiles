@@ -1,49 +1,65 @@
-#!/usr/bin/env sh
-launch() {
-    if [ -n "$I3SOCK" ]; then
-        i3-msg -q -t command exec -- "$*"
-    else
-        exit 1
-    fi
-}
-
-
-find_executables() {
-    IFS=:
-    for dir in $PATH; do
-        for file in "$dir"/*; do
-            if [ -f "$file" ] && [ -x "$file" ]; then
-                echo "${file##*/}"
-            fi
-        done
-    done
-}
-
-shlex() {
-    python -c "
+#!/usr/bin/env python3
+import collections
+import os
+import pathlib
 import shlex
-import sys
+import subprocess
 
-parts = [
-    shlex.quote(s)
-    for s in sys.argv[1:]
-]
-print(' '.join(parts))
-" "$@"
-}
 
-. ~/.base16_theme
-command="$(IFS=: find_executables | sort -u | fzf --exact --no-extended -i --layout=reverse --print-query)"
-ret=$?
-command="$(echo "$command" | tail -n 1)"
-case $ret in
-    1)
-        launch "$(shlex open "https://duckduckgo.com/?q=$command")"
-        ;;
-    0)
-        launch "$command"
-        exit
-        ;;
-    *)
-        exit $ret
-esac
+HIST = pathlib.Path('~/.cache/launcher.hist').expanduser()
+
+
+def launch(*args):
+    if 'I3SOCK' in os.environ:
+        cmd = ' '.join(shlex.quote(arg) for arg in args)
+        subprocess.run(
+            ['i3-msg', '-q', '-t', 'command', 'exec', '--', cmd],
+            check=True
+        )
+    else:
+        raise RuntimeError
+
+
+def find_executables():
+    executables = set()
+    stack = [pathlib.Path(p) for p in os.get_exec_path()]
+    while stack:
+        root = stack.pop()
+        if not root.is_dir():
+            continue
+        for path in root.iterdir():
+            try:
+                if path.is_file() and os.access(path, os.X_OK):
+                    executables.add(path.name)
+            except PermissionError:
+                pass
+    return executables
+
+
+def fzf(data):
+    proc = subprocess.run(
+        ['fzf', '--exact', '--no-extended', '-i', '--layout=reverse', '--print-query'],
+        input='\n'.join(data).encode(),
+        stdout=subprocess.PIPE,
+    )
+    return not bool(proc.returncode), proc.stdout.decode().splitlines()[-1]
+
+
+history = collections.defaultdict(int)
+
+if HIST.is_file():
+    for line in HIST.read_text().splitlines():
+        count, cmd = line.split()
+        history[cmd] = int(count)
+
+cmds = sorted(find_executables(), key=lambda x: (history[x.lower()] * -1, x))
+    
+matched, result = fzf(cmds)
+if matched:
+    parts = result.strip().split()
+    cmd = parts[0]
+    history[cmd.lower()] += 1
+    HIST.write_text('\n'.join(f'{v} {k}' for k,v in history.items() if v))
+    launch(result)
+else:
+    launch('open', f'https://duckduckgo.com/?q={result}')
