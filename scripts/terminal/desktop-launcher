@@ -71,22 +71,26 @@ if HIST.is_file():
 
 if sys.platform == 'darwin':
     apps = sorted(find_applications())
-    cmds = sorted(find_applications())
 else:
-    cmds = sorted(find_executables(), key=lambda x: (history[x] * -1, x))
+    apps = find_executables()
+cmds = sorted(apps, key=lambda x: (history[x] * -1, x))
 
 matched, result = fzf(cmds)
 if matched:
     if sys.platform == 'darwin':
         if result in apps:
+            history[result] += 1
             launch('open', '-a', result)
         else:
+            parts = result.strip().split()
+            cmd = parts[0]
+            history[cmd] += 1
             launch('open', result)
     else:
         parts = result.strip().split()
         cmd = parts[0]
         history[cmd] += 1
-        HIST.write_text('\n'.join(f'{v} {k}' for k, v in history.items() if v))
         launch(result)
+    HIST.write_text('\n'.join(f'{v} {k}' for k, v in history.items() if v))
 elif result:
     launch('open', f'https://duckduckgo.com/?q={result}')
