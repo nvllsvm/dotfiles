@@ -38,7 +38,7 @@ def find_executables():
 
 def fzf(data):
     proc = subprocess.run(
-        ['fzf', '--prompt=', '--no-info', '--exact', '--no-sort',
+        ['fzf', '--black', '--prompt=', '--no-info', '--exact', '--no-sort',
          '--no-extended', '-i', '--layout=reverse', '--print-query'],
         input='\n'.join(data).encode(),
         stdout=subprocess.PIPE,
