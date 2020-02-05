@@ -93,4 +93,4 @@ if matched:
         launch(result)
     HIST.write_text('\n'.join(f'{v} {k}' for k, v in history.items() if v))
 elif result:
-    launch('open', f'https://duckduckgo.com/?q={result}')
+    launch('open', f'https://duckduckgo.com/?q={result.strip()}')
