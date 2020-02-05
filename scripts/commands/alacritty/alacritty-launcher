@@ -43,7 +43,12 @@ def fzf(data):
         input='\n'.join(data).encode(),
         stdout=subprocess.PIPE,
     )
-    return not bool(proc.returncode), proc.stdout.decode().splitlines()[-1]
+    try:
+        result = proc.stdout.decode().splitlines()[-1]
+    except IndexError:
+        result = None
+
+    return not bool(proc.returncode), result
 
 
 history = collections.defaultdict(int)
@@ -62,5 +67,5 @@ if matched:
     history[cmd] += 1
     HIST.write_text('\n'.join(f'{v} {k}' for k,v in history.items() if v))
     launch(result)
-else:
+elif result:
     launch('open', f'https://duckduckgo.com/?q={result}')
