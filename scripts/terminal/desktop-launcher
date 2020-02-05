@@ -4,13 +4,16 @@ import os
 import pathlib
 import shlex
 import subprocess
+import sys
 
 
 HIST = pathlib.Path('~/.cache/launcher.hist').expanduser()
 
 
 def launch(*args):
-    if 'I3SOCK' in os.environ:
+    if sys.platform == 'darwin':
+        subprocess.run(args, check=True)
+    elif 'I3SOCK' in os.environ:
         cmd = ' '.join(shlex.quote(arg) for arg in args)
         subprocess.run(
             ['i3-msg', '-q', '-t', 'command', 'exec', '--', cmd],
@@ -36,6 +39,14 @@ def find_executables():
     return executables
 
 
+def find_applications():
+    return {
+        path.name
+        for path in pathlib.Path('/Applications').iterdir()
+        if not path.name.startswith('.')
+    }
+
+
 def fzf(data):
     proc = subprocess.run(
         ['fzf', '--black', '--prompt=', '--no-info', '--exact', '--no-sort',
@@ -55,17 +66,23 @@ history = collections.defaultdict(int)
 
 if HIST.is_file():
     for line in HIST.read_text().splitlines():
-        count, cmd = line.split()
+        count, cmd = line.split(' ', 1)
         history[cmd] = int(count)
 
-cmds = sorted(find_executables(), key=lambda x: (history[x] * -1, x))
+if sys.platform == 'darwin':
+    cmds = sorted(find_applications())
+else:
+    cmds = sorted(find_executables(), key=lambda x: (history[x] * -1, x))
 
 matched, result = fzf(cmds)
 if matched:
-    parts = result.strip().split()
-    cmd = parts[0]
-    history[cmd] += 1
-    HIST.write_text('\n'.join(f'{v} {k}' for k, v in history.items() if v))
-    launch(result)
+    if sys.platform == 'darwin':
+        launch('open', '-a', result)
+    else:
+        parts = result.strip().split()
+        cmd = parts[0]
+        history[cmd] += 1
+        HIST.write_text('\n'.join(f'{v} {k}' for k, v in history.items() if v))
+        launch(result)
 elif result:
     launch('open', f'https://duckduckgo.com/?q={result}')

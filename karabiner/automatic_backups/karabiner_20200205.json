@@ -121,27 +121,6 @@
                                 "type": "basic"
                             }
                         ]
-                    },
-                    {
-                        "description": "left command + ` (backtick) - launches a new iTerm2 window with the default profile",
-                        "manipulators": [
-                            {
-                                "from": {
-                                    "key_code": "spacebar",
-                                    "modifiers": {
-                                        "mandatory": [
-                                            "left_command"
-                                        ]
-                                    }
-                                },
-                                "to": [
-                                    {
-                                        "shell_command": "osascript -e 'tell app \"iTerm2\"' -e 'create window with profile \"fzf\"' -e activate -e end"
-                                    }
-                                ],
-                                "type": "basic"
-                            }
-                        ]
                     }
                 ]
             },
@@ -198,7 +177,7 @@
                         "product_id": 24672,
                         "vendor_id": 65261
                     },
-                    "ignore": false,
+                    "ignore": true,
                     "manipulate_caps_lock_led": false,
                     "simple_modifications": []
                 },

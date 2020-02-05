@@ -1,0 +1,26 @@
+{
+  "title": "Launch fzf-launcher",
+  "rules": [
+    {
+      "description": "left command + spacebar - launches a new iTerm2 window with the fzf profile",
+      "manipulators": [
+        {
+          "from": {
+            "key_code": "spacebar",
+            "modifiers": {
+              "mandatory": [
+                "left_command"
+              ]
+            }
+          },
+          "to": [
+            {
+              "shell_command": "osascript -e 'tell app \"iTerm2\"' -e 'create window with profile \"fzf\"' -e activate -e end"
+            }
+          ],
+          "type": "basic"
+        }
+      ]
+    }
+  ]
+}
