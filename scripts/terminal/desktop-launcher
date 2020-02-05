@@ -5,6 +5,7 @@ import pathlib
 import shlex
 import subprocess
 import sys
+import urllib.parse
 
 
 HIST = pathlib.Path('~/.cache/launcher.hist').expanduser()
@@ -93,4 +94,13 @@ if matched:
         launch(result)
     HIST.write_text('\n'.join(f'{v} {k}' for k, v in history.items() if v))
 elif result:
-    launch('open', f'https://duckduckgo.com/?q={result.strip()}')
+    result = result.strip()
+    if len(result.split()) == 1 and '.' in result:
+        parsed = urllib.parse.urlparse(result)
+        if not parsed.scheme:
+            url = f'https://{result}'
+        else:
+            url = result
+    else:
+        url = f'https://duckduckgo.com/?q={result}'
+    launch('open', url)
