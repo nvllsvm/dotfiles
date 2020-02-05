@@ -39,7 +39,7 @@ bindsym $mod+Return exec alacritty
 # kill focused window
 bindsym $mod+Shift+q kill
 
-bindsym $mod+space exec alacritty --title $launcher_title --command alacritty-launcher
+bindsym $mod+space exec alacritty --title $launcher_title --dimensions 80 20 --command alacritty-launcher
 #bindsym ctrl+$mod+space exec rofimoji --use-clipboard --skin-tone neutral
 
 bindsym $mod+x [class="^.*"] border toggle
@@ -157,7 +157,7 @@ client.background       $background
 hide_edge_borders vertical
 for_window [class="^.*"] border pixel 2
 #for_window [floating] resize set 60 ppt 80 ppt, move position center
-for_window [title="$launcher_title"] floating enable, resize set 40 ppt 60 ppt, move position center, focus
+for_window [title="$launcher_title"] floating enable, move position center, focus
 for_window [class="dosbox"] floating enable, resize set 100 ppt 100 ppt, border none, move position center
 
 bindsym $mod+b bar mode toggle
