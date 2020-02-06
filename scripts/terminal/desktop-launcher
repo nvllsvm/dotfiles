@@ -41,11 +41,15 @@ def find_executables():
 
 
 def find_applications():
-    return {
-        path.name.rstrip('.app')
-        for path in pathlib.Path('/Applications').iterdir()
-        if not path.name.startswith('.')
-    }
+    applications = set()
+    stack = [pathlib.Path('/Applications')]
+    while stack:
+        for path in stack.pop().iterdir():
+            if path.suffix == '.app':
+                applications.add(path.stem)
+            elif path.is_dir():
+                stack.append(path)
+    return applications
 
 
 def fzf(data):
