@@ -1,44 +1,178 @@
-#!/usr/bin/env sh
-set -e
+#!/usr/bin/env python3
+import argparse
+import datetime
+import os
+import pathlib
+import re
+import subprocess
 
-NOTES_DIR="${NOTES_DIR:-$HOME/Notes}"
-TODO_FILE="${NOTES_DIR}/todo.txt"
 
-case "$(find "$NOTES_DIR" -maxdepth 1 -type f -name 'todo.txt*' | wc -l)" in
-    0)
-        echo 'error: file not found' >&2
-        exit 1
-        ;;
-    1)
-        ;;
-    *)
-        echo 'error: sync conflict detected' >&2
-        exit 1
-esac
+class TodoItem:
 
-show_help() {
-    echo 'usage: todo TASK'
-}
+    _PRIORITY_REGEX = re.compile(r'^\(([A-Z])\)$')
 
-DUE=''
-while true; do
-    case "$1" in
-        --due)
-            DUE="due:$(date -I -d "$2")"
-            shift
-            shift
-            ;;
-        --help)
-            show_help
-            exit
-            ;;
-        *)
-            if [ -n "$1" ]; then
-                # xargs to strip multiple spaces
-                echo "$(date -I)" "$@" "$DUE" | xargs >> "${TODO_FILE}"
-            else
-                exec "${EDITOR}" "${TODO_FILE}"
-            fi
-            break
-    esac
-done
+    def __init__(self, line):
+        self.priority = None
+        self.completed = False
+        self.created_date = None
+        self.due_date = None
+        self.contexts = set()
+        self.projects = set()
+        self.message = None
+
+        parts = line.split()
+        if not parts:
+            return
+
+        if result := self._PRIORITY_REGEX.match(parts[0]):
+            self.priority = result.groups()[0]
+            parts.pop(0)
+
+        if not parts:
+            return
+
+        if parts[0] == 'x':
+            parts.pop(0)
+            self.completed = True
+
+        if not parts:
+            return
+
+        first_date = self.parse_date(parts[0]) if parts else None
+        second_date = self.parse_date(parts[1]) if len(parts) > 1 else None
+
+        if first_date and second_date:
+            parts.pop(0)
+            parts.pop(1)
+            self.completed_date = first_date
+            self.created_date = second_date
+        elif first_date:
+            self.created_date = first_date
+            parts.pop(0)
+
+        message_parts = []
+        for part in parts:
+            if part.startswith('@'):
+                self.contexts.add(part)
+            elif part.startswith('+'):
+                self.projects.add(part)
+            elif part.startswith('due:'):
+                self.due_date = part.replace('due:', '', 1)
+            elif part:
+                message_parts.append(part)
+        self.message = ' '.join(message_parts)
+
+    @staticmethod
+    def parse_date(value):
+        try:
+            return datetime.datetime.strptime(value, '%Y-%m-%d').date()
+        except ValueError:
+            pass
+
+    def __str__(self):
+        parts = [
+            f'({self.priority})' if self.priority else None,
+            'x' if self.completed else None,
+            str(self.created_date) if self.created_date else None,
+            f'due:{self.due_date}' if self.due_date else None,
+            self.message,
+            *sorted(self.contexts),
+            *sorted(self.projects),
+        ]
+        return ' '.join(
+            part
+            for part in parts
+            if part
+        )
+
+    def __lt__(self, other):
+        return str(self) < str(other)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f', dest='path', default=os.environ.get('TODO_TXT'))
+
+    subparsers = parser.add_subparsers(
+        dest='command', metavar='COMMAND', required=True)
+
+    add_parser = subparsers.add_parser('add', help='add stuff')
+    add_parser.set_defaults(cmd='add')
+
+    info_parser = subparsers.add_parser('info', help='add stuff')
+    info_parser.set_defaults(cmd='info')
+
+    info_parser = subparsers.add_parser('list', help='add stuff')
+    info_parser.set_defaults(cmd='list')
+
+    info_parser = subparsers.add_parser('edit', help='add stuff')
+    info_parser.set_defaults(cmd='edit')
+
+    info_parser = subparsers.add_parser('contexts', help='add stuff')
+    info_parser.set_defaults(cmd='contexts')
+
+    info_parser = subparsers.add_parser('projects', help='add stuff')
+    info_parser.set_defaults(cmd='projects')
+
+    args = parser.parse_args()
+
+    if args.path is None:
+        parser.error('path must be specified')
+        parser.exit(1)
+
+    items = []
+
+    path = pathlib.Path(args.path)
+
+    if args.cmd == 'edit':
+        subprocess.run(['nvim', str(path)])
+
+    for line in path.read_text().splitlines():
+        items.append(TodoItem(line))
+
+    if args.cmd == 'add':
+        item = TodoItem(input('Task: '))
+        if not item.created_date:
+            item.created_date = datetime.date.today()
+        items.append(item)
+        path.write_text('\n'.join(sorted(str(item) for item in items if str(item))))
+    elif args.cmd == 'edit':
+        path.write_text('\n'.join(sorted(str(item) for item in items if str(item))))
+    elif args.cmd == 'list':
+        for item in sorted(items):
+            print(item)
+    elif args.cmd == 'projects':
+        projects = set()
+        for item in items:
+            projects.update(item.projects)
+        for project in sorted(projects):
+            print(project)
+    elif args.cmd == 'contexts':
+        contexts = set()
+        for item in items:
+            contexts.update(item.contexts)
+        for context in sorted(contexts):
+            print(context)
+    elif args.cmd == 'info':
+        contexts = set()
+        projects = set()
+        for item in items:
+            contexts.update(item.contexts)
+            projects.update(item.projects)
+        print('Contexts:')
+        print('\n'.join(f'  {v}' for v in contexts))
+        print()
+        print('Projects:')
+        print('\n'.join(f'  {v}' for v in projects))
+        print()
+
+        due_items = sorted(
+            (item for item in items if item.due_date),
+            key=lambda x: (item.due_date, str(item))
+        )
+        for item in due_items:
+            print(item)
+
+
+if __name__ == '__main__':
+    main()
