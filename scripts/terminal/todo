@@ -6,6 +6,9 @@ import pathlib
 import re
 import subprocess
 
+NOTES_DIR = pathlib.Path(os.environ.get('NOTES_DIR', '~/Notes')).expanduser()
+TODO_FILE = NOTES_DIR / 'todo.txt'
+
 
 class TodoItem:
 
@@ -91,7 +94,8 @@ class TodoItem:
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-f', dest='path', default=os.environ.get('TODO_TXT'))
+    parser.add_argument(
+        '-f', dest='path', type=pathlib.Path, default=TODO_FILE)
 
     subparsers = parser.add_subparsers(
         dest='command', metavar='COMMAND', required=True)
@@ -116,13 +120,23 @@ def main():
 
     args = parser.parse_args()
 
-    if args.path is None:
+    if not args.path.is_file():
         parser.error('path must be specified')
         parser.exit(1)
 
     items = []
 
-    path = pathlib.Path(args.path)
+    path = args.path
+    for p in path.parent.iterdir():
+        if not p.is_file():
+            continue
+        if p.suffix != path.suffix:
+            continue
+        if not p.stem.startswith(path.stem):
+            continue
+        if 'sync-conflict-' in path.name:
+            parser.error('sync conflict detected')
+            parser.exit(1)
 
     if args.cmd == 'edit':
         subprocess.run(['nvim', str(path)])
