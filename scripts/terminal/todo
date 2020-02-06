@@ -99,8 +99,8 @@ def main():
     add_parser = subparsers.add_parser('add', help='add stuff')
     add_parser.set_defaults(cmd='add')
 
-    info_parser = subparsers.add_parser('info', help='add stuff')
-    info_parser.set_defaults(cmd='info')
+    info_parser = subparsers.add_parser('due', help='add stuff')
+    info_parser.set_defaults(cmd='due')
 
     info_parser = subparsers.add_parser('list', help='add stuff')
     info_parser.set_defaults(cmd='list')
@@ -153,22 +153,10 @@ def main():
             contexts.update(item.contexts)
         for context in sorted(contexts):
             print(context)
-    elif args.cmd == 'info':
-        contexts = set()
-        projects = set()
-        for item in items:
-            contexts.update(item.contexts)
-            projects.update(item.projects)
-        print('Contexts:')
-        print('\n'.join(f'  {v}' for v in contexts))
-        print()
-        print('Projects:')
-        print('\n'.join(f'  {v}' for v in projects))
-        print()
-
+    elif args.cmd == 'due':
         due_items = sorted(
             (item for item in items if item.due_date),
-            key=lambda x: (item.due_date, str(item))
+            key=lambda x: (x.due_date, str(x))
         )
         for item in due_items:
             print(item)
