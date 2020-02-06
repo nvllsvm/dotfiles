@@ -39,7 +39,7 @@ bindsym $mod+Return exec alacritty
 # kill focused window
 bindsym $mod+Shift+q kill
 
-bindsym $mod+space exec alacritty --title $launcher_title --dimensions 80 20 --command desktop-launcher
+bindsym $mod+space exec alacritty --title $launcher_title --dimensions 80 20 --command i3-desktop-launcher
 #bindsym ctrl+$mod+space exec rofimoji --use-clipboard --skin-tone neutral
 
 bindsym $mod+x [class="^.*"] border toggle
