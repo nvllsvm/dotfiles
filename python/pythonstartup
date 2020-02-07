@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from concurrent.futures import ProcessPoolExecutor as Pool 
+from concurrent.futures import ProcessPoolExecutor as Pool
 import code
 import collections
 import contextlib
@@ -9,6 +9,7 @@ import io
 import itertools
 import json
 import os
+import pathlib
 import pickle
 import pprint
 import re
@@ -37,11 +38,9 @@ except ImportError:
     pass
 
 try:
-    import pathlib
+    import psutil
 except ImportError:
-    import pathlib2 as pathlib
-    class FileNotFoundError(Exception):
-        pass
+    pass
 
 
 def pp(*args, **kwargs):
