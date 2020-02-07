@@ -21,7 +21,7 @@ def extract(path, parent=None, child=False):
 def _is_password_protected(path):
     if path.suffix.lower() != '.zst':
         proc = subprocess.run(
-            ['7z', 'l', '-slt', path],
+            ['7z', 'l', '-slt', '--', str(path)],
             stdout=subprocess.PIPE,
             check=True
         )
@@ -101,7 +101,7 @@ def _list_contents(path):
                 stdout=subprocess.PIPE,
             )
         subprocess.run(
-            ['tar', 't'],
+            ['7z', '-ba', '-si', '-ttar', 'l'],
             stdin=extract.stdout,
             check=True
         )
