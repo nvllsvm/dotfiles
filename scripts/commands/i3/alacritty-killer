@@ -1,4 +1,0 @@
-#!/usr/bin/env sh
-i3-msg -t subscribe -m '[ "window" ]' | grep -m 1 'alacritty-launcher' | while read line ; do 
-    kill -9 "$1"
-done
