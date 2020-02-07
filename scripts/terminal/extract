@@ -76,7 +76,7 @@ def _extract_7z_nested_tar(path, dest):
 
 def _extract_7z(path, dest):
     subprocess.run(
-        ['7z', 'x', '-spe', f'-o{dest}', '--', str(path)],
+        ['7z', 'x', '-ba', '-spe', f'-o{dest}', '--', str(path)],
         check=True
     )
 
@@ -97,7 +97,7 @@ def _list_contents(path):
             )
         else:
             extract = subprocess.Popen(
-                ['7z', 'x', '-so', '--', str(path)],
+                ['7z', 'x', '-ba', '-so', '--', str(path)],
                 stdout=subprocess.PIPE,
             )
         subprocess.run(
@@ -110,7 +110,7 @@ def _list_contents(path):
             print(path.stem or path)
         else:
             subprocess.run(
-                ['7z', 'l', '--', str(path)],
+                ['7z', '-ba', 'l', '--', str(path)],
                 check=True
             )
 
