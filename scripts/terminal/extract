@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # TODO add password specification
 # TODO make --rm remove all parts of multipart archives
+# TODO add compression
 import argparse
 import pathlib
 import subprocess
@@ -87,6 +88,33 @@ def _extract_zstd(path, dest):
     )
 
 
+def _list_contents(path):
+    if _is_nested_tar(path):
+        if path.suffix == '.zst':
+            extract = subprocess.Popen(
+                ['zstd', '-dcf', '--', str(path)],
+                stdout=subprocess.PIPE,
+            )
+        else:
+            extract = subprocess.Popen(
+                ['7z', 'x', '-so', '--', str(path)],
+                stdout=subprocess.PIPE,
+            )
+        subprocess.run(
+            ['tar', 't'],
+            stdin=extract.stdout,
+            check=True
+        )
+    else:
+        if path.suffix == '.zst':
+            print(path.stem or path)
+        else:
+            subprocess.run(
+                ['7z', 'l', '--', str(path)],
+                check=True
+            )
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -95,6 +123,9 @@ def main():
     parser.add_argument(
         '-c', dest='child', action='store_true',
         help='extract each archive to a unique child directory')
+    parser.add_argument(
+        '-l', dest='list', action='store_true',
+        help='list contents')
     parser.add_argument(
         '--rm', action='store_true',
         help='remove archive after successful extraction')
@@ -105,9 +136,12 @@ def main():
         if _is_password_protected(path):
             print('password protected archive', file=sys.stderr)
             parser.exit(1)
-        extract(path, args.parent, args.child)
-        if args.rm:
-            path.unlink()
+        if args.list:
+            _list_contents(path)
+        else:
+            extract(path, args.parent, args.child)
+            if args.rm:
+                path.unlink()
 
 
 if __name__ == '__main__':
