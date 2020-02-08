@@ -16,6 +16,7 @@ _extract() {
     '(-h --help)'{-h,--help}'[show this help message and exit]' \
     '-p=[parent directory to extract to]:' \
     '-c[extract each archive to a unique child directory]' \
+    '-l[list contents]' \
     '--rm[remove archive after successful extraction]' \
     '*:: :_files'
 
