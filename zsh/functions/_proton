@@ -2,4 +2,4 @@
 _arguments : \
     --help \
     --show-prefix \
-    '*::command arguments:_normal'
+    '*:: :_files'
