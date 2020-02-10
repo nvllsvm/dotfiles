@@ -296,14 +296,20 @@ def main():
         projects = set()
         for item in items:
             projects.update(item.projects)
-        for project in sorted(projects):
-            print(project)
+        projects = '\n'.join(sorted(projects))
+        if sys.stdout.isatty():
+            print(Style.FG_BLUE + projects + Style.RESET)
+        else:
+            print(projects)
     elif args.cmd == 'contexts':
         contexts = set()
         for item in items:
             contexts.update(item.contexts)
-        for context in sorted(contexts):
-            print(context)
+        contexts = '\n'.join(sorted(contexts))
+        if sys.stdout.isatty():
+            print(Style.FG_GREEN + contexts + Style.RESET)
+        else:
+            print(contexts)
     elif args.cmd == 'due':
         due_items = sorted(
             (item for item in items if item.due_date),
