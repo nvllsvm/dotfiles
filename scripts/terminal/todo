@@ -96,10 +96,7 @@ class TodoItem:
             elif part.startswith('+'):
                 self.projects.add(part)
             elif part.startswith('due:'):
-                self.due_date = datetime.date(*(
-                    int(i)
-                    for i in part.replace('due:', '', 1).split('-')
-                ))
+                self.due_date = self.parse_date(part.replace('due:', '', 1))
             elif part:
                 message_parts.append(part)
         self.message = ' '.join(message_parts)
