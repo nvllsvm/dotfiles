@@ -28,6 +28,11 @@ except ImportError:
     pass
 
 try:
+    import jinja2
+except ImportError:
+    pass
+
+try:
     import tabulate
 except ImportError:
     pass
