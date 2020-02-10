@@ -5,9 +5,44 @@ import os
 import pathlib
 import re
 import subprocess
+import sys
 
 NOTES_DIR = pathlib.Path(os.environ.get('NOTES_DIR', '~/Notes')).expanduser()
 TODO_FILE = NOTES_DIR / 'todo.txt'
+
+
+class Style:
+    FG_BLACK = '\u001b[30m'
+    FG_RED = '\u001b[31m'
+    FG_GREEN = '\u001b[32m'
+    FG_YELLOW = '\u001b[33m'
+    FG_BLUE = '\u001b[34m'
+    FG_MAGENTA = '\u001b[35m'
+    FG_CYAN = '\u001b[36m'
+    FG_WHITE = '\u001b[37m'
+
+    BG_BLACK = '\u001b[40m'
+    BG_RED = '\u001b[41m'
+    BG_GREEN = '\u001b[42m'
+    BG_YELLOW = '\u001b[43m'
+    BG_BLUE = '\u001b[44m'
+    BG_MAGENTA = '\u001b[45m'
+    BG_CYAN = '\u001b[46m'
+    BG_WHITE = '\u001b[47m'
+
+    RESET = '\u001b[0m'
+    BRIGHT = '\u001b[1m'
+    DIM = '\u001b[2m'
+    ITALIC = '\u001b[3m'
+    REVERSE = '\u001b[7m'
+    UNDERLINE = '\u001b[4m'
+
+    @classmethod
+    def strip(cls, text):
+        for key, value in cls.__dict__.items():
+            if isinstance(value, str):
+                text = text.replace(value, '')
+        return text
 
 
 class TodoItem:
@@ -17,6 +52,7 @@ class TodoItem:
     def __init__(self, line):
         self.priority = None
         self.completed = False
+        self.completed_date = None
         self.created_date = None
         self.due_date = None
         self.contexts = set()
@@ -60,7 +96,10 @@ class TodoItem:
             elif part.startswith('+'):
                 self.projects.add(part)
             elif part.startswith('due:'):
-                self.due_date = part.replace('due:', '', 1)
+                self.due_date = datetime.date(*(
+                    int(i)
+                    for i in part.replace('due:', '', 1).split('-')
+                ))
             elif part:
                 message_parts.append(part)
         self.message = ' '.join(message_parts)
@@ -92,6 +131,75 @@ class TodoItem:
         return str(self) < str(other)
 
 
+def _render_item(item, details=False):
+    parts = []
+    if item.priority:
+        parts.append('{}({}){}'.format(
+            Style.FG_RED,
+            item.priority,
+            Style.RESET
+        ))
+
+    if item.completed:
+        message_color = Style.DIM + Style.FG_WHITE
+        parts.append(message_color + 'x' + Style.RESET)
+    else:
+        message_color = Style.FG_WHITE
+
+    if details and item.created_date:
+        parts.append('{}{}{}'.format(
+            Style.FG_YELLOW,
+            item.created_date,
+            Style.RESET,
+        ))
+
+    if item.due_date:
+        if datetime.date.today() > item.due_date:
+            parts.append('{}{}due:{}{}'.format(
+                Style.FG_BLACK,
+                Style.BG_RED,
+                item.due_date,
+                Style.RESET,
+            ))
+        else:
+            parts.append('{}due:{}{}{}'.format(
+                Style.FG_CYAN,
+                Style.FG_YELLOW,
+                item.due_date,
+                Style.RESET,
+            ))
+
+    if item.message:
+        message_parts = []
+        for part in item.message.split():
+            if part.startswith(('https://', 'http://')):
+                part = '\u001b[4m' + Style.DIM + part
+            part = '{}{}{}'.format(
+                message_color,
+                part,
+                Style.RESET
+            )
+            message_parts.append(part)
+
+        parts.append(' '.join(message_parts))
+
+    if item.contexts:
+        parts.append('{}{}{}'.format(
+            Style.FG_GREEN,
+            ' '.join(sorted(item.contexts)),
+            Style.RESET,
+        ))
+
+    if item.projects:
+        parts.append('{}{}{}'.format(
+            Style.FG_BLUE,
+            ' '.join(sorted(item.projects)),
+            Style.RESET,
+        ))
+
+    return ' '.join(parts)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -106,8 +214,11 @@ def main():
     info_parser = subparsers.add_parser('due', help='add stuff')
     info_parser.set_defaults(cmd='due')
 
-    info_parser = subparsers.add_parser('list', help='add stuff')
-    info_parser.set_defaults(cmd='list')
+    list_parser = subparsers.add_parser('ls', help='add stuff')
+    list_parser.set_defaults(cmd='list')
+    list_parser.add_argument('-a', dest='all', action='store_true')
+    list_parser.add_argument('-l', dest='details', action='store_true')
+    list_parser.add_argument('query', nargs='*')
 
     info_parser = subparsers.add_parser('edit', help='add stuff')
     info_parser.set_defaults(cmd='edit')
@@ -153,8 +264,34 @@ def main():
     elif args.cmd == 'edit':
         path.write_text('\n'.join(sorted(str(item) for item in items if str(item))))
     elif args.cmd == 'list':
+        lines = []
         for item in sorted(items):
-            print(item)
+            if item.completed and not args.all:
+                continue
+            show = False
+            if args.query:
+                for query in args.query:
+                    if query in str(item).split():
+                        show = True
+                        break
+            else:
+                show = True
+            if show:
+                lines.append(_render_item(item, args.details))
+
+        lines = sorted(
+            lines,
+            key=lambda x: Style.strip(x)
+        )
+
+        if not sys.stdout.isatty():
+            lines = [
+                Style.strip(line)
+                for line in lines
+            ]
+        for line in lines:
+            print(line)
+
     elif args.cmd == 'projects':
         projects = set()
         for item in items:
