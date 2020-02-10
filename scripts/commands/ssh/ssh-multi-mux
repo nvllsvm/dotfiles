@@ -7,10 +7,19 @@ import signal
 import socket
 import sys
 
-import colorama
 import paramiko
 
 BUFFER_SIZE = 64
+
+
+class Style:
+    FG_RED = '\u001b[31m'
+    FG_GREEN = '\u001b[32m'
+    FG_YELLOW = '\u001b[33m'
+    FG_BLUE = '\u001b[34m'
+    FG_MAGENTA = '\u001b[35m'
+    FG_CYAN = '\u001b[36m'
+    RESET = '\u001b[0m'
 
 
 class _OutputMuxer:
@@ -25,12 +34,12 @@ class _OutputMuxer:
         if key not in self._key_colors:
             if not self._colors:
                 self._colors = [
-                    colorama.Fore.CYAN,
-                    colorama.Fore.RED,
-                    colorama.Fore.MAGENTA,
-                    colorama.Fore.GREEN,
-                    colorama.Fore.BLUE,
-                    colorama.Fore.YELLOW,
+                    Style.FG_CYAN,
+                    Style.FG_RED,
+                    Style.FG_MAGENTA,
+                    Style.FG_GREEN,
+                    Style.FG_BLUE,
+                    Style.FG_YELLOW,
                 ]
             self._key_colors[key] = self._colors.pop()
         return self._key_colors[key]
@@ -64,7 +73,7 @@ class _OutputMuxer:
             prefix = ''.join([
                 self._key_color(key),
                 key,
-                colorama.Fore.RESET,
+                Style.RESET,
                 ' '
             ]).encode()
             data = b''.join([
