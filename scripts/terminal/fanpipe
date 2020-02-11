@@ -60,7 +60,7 @@ if [ -n "$PUBLISH" ]; then
         if [ -t 0 ]; then
             printf '%s' "$data" | tee "$@" > /dev/null
         else
-            cat - | tee "$@" > /dev/null
+            tee "$@" > /dev/null
         fi
     fi
 elif [ -n "$SUBSCRIBE" ]; then
