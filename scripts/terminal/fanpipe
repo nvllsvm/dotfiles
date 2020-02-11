@@ -7,7 +7,7 @@ TOPIC=''
 
 show_usage() {
     printf '%s' \
-'usage: fanpipe (-p|-s) [-f] [-t TOPIC] [MESSAGE [MESSAGE ...]]
+'usage: fanpipe (-p|-s) [-f] [-t TOPIC] [MESSAGE]
     -p, --publish       publish to a pipe
     -s, --subscribe     subscribe to a pipe until one message is received
     -f, --follow        subscribe indefinitely
@@ -40,6 +40,10 @@ while [ $# -gt 0 ]; do
             exit
             ;;
         *)
+            if [ $# -gt 1 ]; then
+                echo 'error: unexpected arguments' >&2
+                exit 1
+            fi
             break
     esac
 done
