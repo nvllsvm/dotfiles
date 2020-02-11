@@ -108,6 +108,13 @@ def main():
         channels[host] = channel
 
     with _OutputMuxer() as muxer:
+        for host in channels:
+            print('{}+ {}{}{}'.format(
+                Style.FG_GREEN,
+                muxer._key_color(host),
+                host,
+                Style.RESET))
+
         while channels:
             for host, channel in list(channels.items()):
                 if channel.exit_status_ready():
