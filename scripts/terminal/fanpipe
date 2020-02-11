@@ -46,7 +46,7 @@ done
 
 for pipe in "${PIPEDIR}/${PIPEPREFIX}-"*; do
     if [ -e "$pipe" ]; then
-        pid="$(echo "$pipe" | cut -d- -f2)"
+        pid="${pipe##*-}"
         if ! kill -0 "$pid" > /dev/null 2>&1; then
             rm -f "$pipe"
         fi
@@ -55,8 +55,8 @@ done
 
 if [ -n "$PUBLISH" ]; then
     data="$*"
-    set "${PIPEDIR}/${PIPEPREFIX}-"*"-${TOPIC}"
-    if [ "$1" != "${PIPEDIR}/${PIPEPREFIX}-*-${TOPIC}" ]; then
+    set "${PIPEDIR}/${PIPEPREFIX}-${TOPIC}-"*
+    if [ "$1" != "${PIPEDIR}/${PIPEPREFIX}-${TOPIC}-*" ]; then
         if [ -t 0 ]; then
             printf '%s' "$data" | tee "$@" > /dev/null
         else
@@ -64,7 +64,7 @@ if [ -n "$PUBLISH" ]; then
         fi
     fi
 elif [ -n "$SUBSCRIBE" ]; then
-    pipe="${PIPEDIR}/${PIPEPREFIX}-$$-${TOPIC}"
+    pipe="${PIPEDIR}/${PIPEPREFIX}-${TOPIC}-$$"
     exit_trap() {
         rm -f "$pipe"
     }
