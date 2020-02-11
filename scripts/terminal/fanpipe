@@ -58,7 +58,7 @@ for pipe in "${PIPEDIR}/${PIPEPREFIX}-"*; do
 done
 
 if [ -n "$PUBLISH" ]; then
-    data="$*"
+    data="$1"
     set "${PIPEDIR}/${PIPEPREFIX}-${TOPIC}-"*
     if [ "$1" != "${PIPEDIR}/${PIPEPREFIX}-${TOPIC}-*" ]; then
         if [ -t 0 ]; then
