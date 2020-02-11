@@ -12,10 +12,10 @@ get_message() {
 }
 
 show_help() {
-    cat << EOF
-usage: lmk [--help] [COMMAND [ARGUMENT ...]]
+    printf '%s' \
+'usage: lmk [--help] [COMMAND [ARGUMENT ...]]
     --help      Display this help and exit
-EOF
+'
 }
 
 while [ $# -gt 0 ]; do
