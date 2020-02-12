@@ -197,6 +197,13 @@ def _render_item(item, details=False):
     return ' '.join(parts)
 
 
+def _parse_due(value):
+    if value == 'today':
+        return datetime.date.today()
+    else:
+        return datetime.datetime.strptime(value, '%Y-%m-%d').date()
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -207,6 +214,7 @@ def main():
 
     add_parser = subparsers.add_parser('add', help='add stuff')
     add_parser.set_defaults(cmd='add')
+    add_parser.add_argument('-d', '--due', type=_parse_due)
 
     info_parser = subparsers.add_parser('due', help='add stuff')
     info_parser.set_defaults(cmd='due')
@@ -256,6 +264,7 @@ def main():
         item = TodoItem(input('Task: '))
         if not item.created_date:
             item.created_date = datetime.date.today()
+        item.due_date = args.due
         items.append(item)
         path.write_text('\n'.join(sorted(str(item) for item in items if str(item))))
     elif args.cmd == 'edit':

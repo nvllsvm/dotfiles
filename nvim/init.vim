@@ -105,6 +105,8 @@ Plug 'udalov/kotlin-vim'
 Plug 'keith/swift.vim'
 
 Plug 'chrisbra/csv.vim'
+
+Plug 'Glench/Vim-Jinja2-Syntax'
 call plug#end()
 
 let $FZF_DEFAULT_COMMAND = "fd --type file --ignore-file ~/.config/nvim/fzf_fd_ignore"
