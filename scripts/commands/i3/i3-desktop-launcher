@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 alacritty --title "alacritty-launcher-$$" "$@" &
 child=$!
-i3-msg -t subscribe -m '[ "window" ]' | while read line ; do 
+i3-msg -t subscribe -m '[ "window" ]' | while read line ; do
     case "$line" in
         *"\"alacritty-launcher-$$\""*)
             ;;
