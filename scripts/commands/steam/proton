@@ -1,15 +1,15 @@
 #!/usr/bin/env sh
 export STEAM_COMPAT_DATA_PATH="$HOME/.steam/proton"
 STEAMAPPS_COMMON=~/.steam/steam/steamapps/common
-PROTON_VERSION="$(ls "$STEAMAPPS_COMMON" | grep '^Proton' | sort --version-sort | tail -n 1)"
-PROTON_BASE="$STEAMAPPS_COMMON/$PROTON_VERSION"
+PROTON_BASE="$STEAMAPPS_COMMON/$(ls "$STEAMAPPS_COMMON" | grep '^Proton' | sort --version-sort | tail -n 1)"
 PROTON_PREFIX="$STEAM_COMPAT_DATA_PATH/pfx"
 mkdir -p "$STEAM_COMPAT_DATA_PATH"
 show_help() {
         cat << EOF
 usage: proton [--show-prefix] PROGRAM [ARG ...]
-    --show-prefix   show proton prefix path and exit
     --help          show help and exit
+    --show-prefix   show proton prefix path and exit
+    --version       show program's version and exit
 EOF
 }
 
@@ -23,8 +23,12 @@ case "$1" in
         echo "$PROTON_PREFIX"
         exit
         ;;
+    --version)
+        sed 's/.*\sproton-//' "$PROTON_BASE"/version
+        exit
+        ;;
     *)
-        break
+        ;;
 esac
 
 if [ $# -eq 0 ]; then
@@ -32,5 +36,4 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
-echo Using "$PROTON_VERSION"
 exec "$PROTON_BASE"/proton run "$@"

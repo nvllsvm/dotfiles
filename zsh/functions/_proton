@@ -2,4 +2,5 @@
 _arguments : \
     --help \
     --show-prefix \
+    --version \
     '*:: :_files'
