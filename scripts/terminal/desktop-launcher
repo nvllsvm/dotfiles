@@ -102,12 +102,16 @@ elif result:
     if len(result.split()) == 1 and '.' in result:
         parsed = urllib.parse.urlparse(result)
         if not parsed.scheme:
+            print(result)
+            history[result] += 1
+            HIST.write_text('\n'.join(f'{v} {k}' for k, v in history.items() if v))
             url = f'https://{result}'
         else:
             url = result
-    else:
-        url = f'https://duckduckgo.com/?q={result}'
-    if sys.platform == 'darwin':
         launch('open', url)
     else:
-        launch('firefox', '--private-window', url)
+        url = f'https://duckduckgo.com/?q={result}'
+        if sys.platform == 'darwin':
+            launch('open', url)
+        else:
+            launch('firefox', '--private-window', url)
