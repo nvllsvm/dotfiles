@@ -107,4 +107,4 @@ elif result:
             url = result
     else:
         url = f'https://duckduckgo.com/?q={result}'
-    launch('open', url)
+    launch('firefox', '--private-window', url)
