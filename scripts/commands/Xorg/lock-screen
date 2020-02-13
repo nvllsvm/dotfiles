@@ -5,4 +5,5 @@ else
     xset dpms 0 5
     i3lock -n -c 000000
     xset -dpms
+    killall -USR1 i3status
 fi
