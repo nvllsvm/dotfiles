@@ -198,6 +198,11 @@ def _render_item(item, details=False):
 
 
 def _parse_due(value):
+    try:
+        d = datetime.datetime.now() + datetime.timedelta(days=int(value))
+        return d.date()
+    except ValueError:
+        pass
     if value == 'today':
         return datetime.date.today()
     else:
