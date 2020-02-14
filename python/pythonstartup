@@ -21,6 +21,7 @@ import psutil
 import requests
 import tabulate
 import yaml
+import yarl
 
 
 def pp(*args, **kwargs):
