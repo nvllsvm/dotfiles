@@ -58,14 +58,11 @@ for pipe in "${PIPEDIR}/${PIPEPREFIX}-"*; do
 done
 
 if [ -n "$PUBLISH" ]; then
-    data="$1"
     set "${PIPEDIR}/${PIPEPREFIX}-${TOPIC}-"*
-    if [ "$1" != "${PIPEDIR}/${PIPEPREFIX}-${TOPIC}-*" ]; then
-        if [ -t 0 ]; then
-            printf '%s' "$data" | tee "$@" > /dev/null
-        else
-            tee "$@" > /dev/null
-        fi
+    if [ -t 0 ]; then
+        printf '%s' "$1" | tee "$@" > /dev/null
+    else
+        tee "$@" > /dev/null
     fi
 elif [ -n "$SUBSCRIBE" ]; then
     pipe="${PIPEDIR}/${PIPEPREFIX}-${TOPIC}-$$"
