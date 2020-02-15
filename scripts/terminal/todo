@@ -151,20 +151,19 @@ def _render_item(item, details=False):
         ))
 
     if item.due_date:
-        if datetime.date.today() > item.due_date:
-            parts.append('{}{}due:{}{}'.format(
-                Style.FG_BLACK,
-                Style.BG_RED,
-                item.due_date,
-                Style.RESET,
-            ))
+        today = datetime.date.today()
+        if today > item.due_date:
+            color = Style.FG_RED
+        elif today == item.due_date:
+            color = Style.FG_YELLOW
         else:
-            parts.append('{}due:{}{}{}'.format(
-                Style.FG_CYAN,
-                Style.FG_YELLOW,
-                item.due_date,
-                Style.RESET,
-            ))
+            color = Style.FG_BLUE
+        parts.append('{}{}due:{}{}'.format(
+            Style.REVERSE,
+            color,
+            item.due_date,
+            Style.RESET,
+        ))
 
     if item.message:
         message_parts = []
