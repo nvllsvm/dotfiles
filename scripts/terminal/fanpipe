@@ -59,10 +59,13 @@ done
 
 if [ -n "$PUBLISH" ]; then
     set "${PIPEDIR}/${PIPEPREFIX}-${TOPIC}-"*
-    if [ -t 0 ]; then
-        printf '%s' "$1" | tee "$@" > /dev/null
-    else
-        tee "$@" > /dev/null
+    # basically a no-glob check
+    if [ "$1" != "${PIPEDIR}/${PIPEPREFIX}-${TOPIC}-*" ]; then
+        if [ -t 0 ]; then
+            printf '%s' "$1" | tee "$@" > /dev/null
+        else
+            tee "$@" > /dev/null
+        fi
     fi
 elif [ -n "$SUBSCRIBE" ]; then
     pipe="${PIPEDIR}/${PIPEPREFIX}-${TOPIC}-$$"
