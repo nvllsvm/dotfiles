@@ -201,8 +201,8 @@ def _parse_due(value):
     try:
         date = datetime.datetime.now() + datetime.timedelta(days=int(value))
     except ValueError:
-        date = datetime.datetime.strptime(value, '%Y-%m-%d').date()
-    return date
+        date = datetime.datetime.strptime(value, '%Y-%m-%d')
+    return date.date()
 
 
 def main():
