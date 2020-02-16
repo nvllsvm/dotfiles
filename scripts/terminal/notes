@@ -23,6 +23,10 @@ while true; do
                 exec notes "$NOTE_FILE"
             fi 
             ;;
+        -r)
+            shift
+            exec rg -i --hidden -- "$@"
+            ;;
         *)
             break
     esac
