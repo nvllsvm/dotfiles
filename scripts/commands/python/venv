@@ -95,6 +95,7 @@ def main():
     os.environ.pop('VIRTUAL_ENV', None)
 
     if args.list:
+        # TODO: include non-pyenv versions
         for version in sorted(pyenv_versions()):
             print(version)
         parser.exit()
