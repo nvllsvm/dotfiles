@@ -83,6 +83,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--prune', action=_PruneAction)
     parser.add_argument('-d', '--delete', action='store_true')
+    parser.add_argument('-l', '--list', action='store_true')
     parser.add_argument('version', nargs='?')
     args = parser.parse_args()
 
@@ -93,7 +94,11 @@ def main():
     os.environ.pop('PYENV_VERSION', None)
     os.environ.pop('VIRTUAL_ENV', None)
 
-    if args.version:
+    if args.list:
+        for version in sorted(pyenv_versions()):
+            print(version)
+        parser.exit()
+    elif args.version:
         try:
             pyenv_root = pathlib.Path(os.environ['PYENV_ROOT'])
         except KeyError:
