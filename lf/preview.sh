@@ -13,5 +13,7 @@ case "$1" in
         exec 7z l -- "$1"
         ;;
     *)
-        exec bat -r :$(tput lines) --color=always --plain -- "$1"
+        # 1024 is overkill, but using $(tput lines) doesn't seem to work consistently.
+        # results are cutoff.
+        exec bat -r :1024 --color=always --plain -- "$1"
 esac
