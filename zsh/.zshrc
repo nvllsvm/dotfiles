@@ -132,3 +132,9 @@ fi
 path=(~/.local/bin "$path[@]")
 
 unset host_scripts
+
+all_commands() {
+    autoload -Uz bashcompinit
+    bashcompinit
+    compgen -c
+}
