@@ -15,6 +15,10 @@ while true; do
             SHOW_PATH=1
             shift
             ;;
+        -d)
+            echo "$NOTES_DIR"
+            exit
+            ;;
         -f)
             NOTE_FILE="$(fd -t f | fzf)"
             if [ -z "$NOTE_FILE" ]; then
