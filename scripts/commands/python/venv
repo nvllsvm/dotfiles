@@ -79,6 +79,18 @@ def create_virtualenv(python_bin, path):
             check=True)
 
 
+def pyenv_bin(version):
+    env = os.environ.copy()
+    env['PYENV_VERSION'] = version
+    proc = subprocess.run(
+        ['pyenv', 'which', 'python'],
+        env=env,
+        stdout=subprocess.PIPE,
+        check=True
+    )
+    return proc.stdout.decode().strip()
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--prune', action=_PruneAction)
@@ -100,15 +112,12 @@ def main():
             print(version)
         parser.exit()
     elif args.version:
-        try:
-            pyenv_root = pathlib.Path(os.environ['PYENV_ROOT'])
-        except KeyError:
+        if 'PYENV_ROOT' not in os.environ:
             parser.error('pyenv not available')
             parser.exit(1)
         for pyenv_version in pyenv_versions():
             if pyenv_version.startswith(args.version):
-                python_bin = pyenv_root / 'shims' / 'python'
-                os.environ['PYENV_VERSION'] = pyenv_version
+                python_bin = pyenv_bin(pyenv_version)
                 break
         else:
             python_bin = f'python{args.version}'
