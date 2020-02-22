@@ -277,7 +277,7 @@ def main():
             show = False
             if args.query:
                 for query in args.query:
-                    if query in str(item).split():
+                    if query in str(item):
                         show = True
                         break
             else:
