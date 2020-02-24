@@ -215,6 +215,7 @@ def main():
     add_parser = subparsers.add_parser('add', help='add stuff')
     add_parser.set_defaults(cmd='add')
     add_parser.add_argument('-d', '--due', type=_parse_due)
+    add_parser.add_argument('common', nargs='*')
 
     info_parser = subparsers.add_parser('due', help='add stuff')
     info_parser.set_defaults(cmd='due')
@@ -261,12 +262,13 @@ def main():
         items.append(TodoItem(line))
 
     if args.cmd == 'add':
-        item = TodoItem(input('Task: '))
-        if not item.created_date:
-            item.created_date = datetime.date.today()
-        item.due_date = args.due
-        items.append(item)
-        path.write_text('\n'.join(sorted(str(item) for item in items if str(item))))
+        while task := input('Task: ').strip():
+            item = TodoItem(' '.join([task, *args.common]))
+            if not item.created_date:
+                item.created_date = datetime.date.today()
+            item.due_date = args.due
+            items.append(item)
+            path.write_text('\n'.join(sorted(str(item) for item in items if str(item))))
     elif args.cmd == 'edit':
         path.write_text('\n'.join(sorted(str(item) for item in items if str(item))))
     elif args.cmd == 'list':
