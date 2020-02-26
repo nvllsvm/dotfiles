@@ -5,8 +5,6 @@ import datetime
 import os
 import pathlib
 
-import tabulate
-
 NOTES_DIR = pathlib.Path(os.environ.get('NOTES_DIR', '~/Notes')).expanduser()
 TRACKIT_DIR = NOTES_DIR / 'trackit'
 
@@ -37,6 +35,8 @@ def write_csv(path, headers, rows):
 
 
 def print_table(headers, rows):
+    import tabulate
+
     new_rows = []
     for row in rows:
         timestamp = row.pop(0).astimezone()
