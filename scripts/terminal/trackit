@@ -5,38 +5,10 @@ import datetime
 import os
 import pathlib
 
+import tabulate
 
 NOTES_DIR = pathlib.Path(os.environ.get('NOTES_DIR', '~/Notes')).expanduser()
 TRACKIT_DIR = NOTES_DIR / 'trackit'
-
-
-def render_table(rows, delimiter=' | '):
-    # find the maximum column lengths
-    column_len_max = {}
-    for row in rows:
-        column_len_max.update({
-            index: max(len(column), column_len_max.get(index) or 0)
-            for index, column in enumerate(row)
-        })
-
-    # add column padding
-    new_rows = []
-    for row in rows:
-        new_row = [
-            column + (column_len_max[index]-len(column)) * ' '
-            for index, column in enumerate(row)
-        ]
-
-        # add missing columns to row
-        new_row.extend([
-            column_len_max[index] * ' '
-            for index in range(len(new_row), len(column_len_max))
-        ])
-
-        # concatenate columns
-        new_rows.append(delimiter.join(new_row))
-
-    return '\n'.join(new_rows)
 
 
 def now():
@@ -44,14 +16,34 @@ def now():
 
 
 def read_csv(path):
+    headers = None
+    rows = []
     with open(path) as f:
-        return list(csv.reader(f))
+        reader = csv.reader(f)
+        headers = next(reader)
+        for row in reader:
+            timestamp = datetime.datetime.fromisoformat(row.pop(0))
+            rows.append([timestamp, *row])
+    return headers, rows
 
 
-def write_csv(path, rows):
+def write_csv(path, headers, rows):
     with open(path, 'w') as f:
+        writer = csv.writer(f)
+        writer.writerow(headers)
         for row in rows:
-            csv.writer(f).writerow(row)
+            row[0] = row[0].isoformat()
+            writer.writerow(row)
+
+
+def print_table(headers, rows):
+    new_rows = []
+    for row in rows:
+        timestamp = row.pop(0).astimezone()
+        if timestamp.date() == datetime.date.today():
+            new_rows.append([timestamp.strftime('%Y-%m-%d %H:%M'), *row])
+
+    print(tabulate.tabulate(sorted(new_rows), headers=headers))
 
 
 def main():
@@ -66,28 +58,24 @@ def main():
 
     rows = []
     if path.exists():
-        rows.extend(read_csv(path))
+        headers, rows = read_csv(path)
     else:
-        row = ['timestamp']
+        headers = ['timestamp']
         headers = input('Headers: ')
-        row.extend(h.strip() for h in headers.split(','))
-        rows.append(row)
+        headers.extend(h.strip() for h in headers.split(','))
 
     if args.list:
-        headers = rows.pop(0)
-        rows = sorted(rows)
-        rows = [headers, *rows]
-        print(render_table(rows))
+        print_table(headers, rows)
         parser.exit()
 
-    print('Headers:', ', '.join(rows[0]))
+    print('Headers:', ', '.join(headers[1:]))
     data = input('Item: ')
     row = [now(), *[d.strip() for d in data.split(',')]]
     if len(row) != len(rows[0]):
         parser.error('missing data')
         parser.exit(1)
     rows.append(row)
-    write_csv(path, rows)
+    write_csv(path, headers, rows)
 
 
 if __name__ == '__main__':
