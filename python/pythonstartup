@@ -18,15 +18,8 @@ import sys
 
 
 def pp(*args, **kwargs):
-    if sys.version_info.major >= 3 and sys.version_info.minor >= 8:
-        kwargs.setdefault('sort_dicts', True)
-        return pprint.pp(*args, **kwargs)
-    else:
-        return pprint.pprint(*args, **kwargs)
-
-
-def ppdir(*args, **kwargs):
-    return pp(dir(*args, **kwargs))
+    kwargs.setdefault('sort_dicts', True)
+    return pprint.pp(*args, **kwargs)
 
 
 def walk(root):
