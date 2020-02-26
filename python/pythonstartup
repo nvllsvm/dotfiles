@@ -16,11 +16,6 @@ import shutil
 import subprocess
 import sys
 
-import arrow
-import jinja2
-import requests
-import tabulate
-
 
 def pp(*args, **kwargs):
     if sys.version_info.major >= 3 and sys.version_info.minor >= 8:
@@ -123,3 +118,11 @@ def chunked(iterable, n):
     i = iter(iterable)
     while result := list(itertools.islice(i, n)):
         yield result
+
+
+def now():
+    return datetime.datetime.now().astimezone()
+
+
+def utcnow():
+    return datetime.datetime.now().astimezone(datetime.timezone.utc)
