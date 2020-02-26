@@ -48,6 +48,7 @@ def print_table(headers, rows):
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('-p', '--show-path', action='store_true')
     parser.add_argument('-l', '--list', action='store_true')
     parser.add_argument('name')
     args = parser.parse_args()
@@ -63,6 +64,10 @@ def main():
         headers = ['timestamp']
         headers = input('Headers: ')
         headers.extend(h.strip() for h in headers.split(','))
+
+    if args.show_path:
+        print(path)
+        parser.exit()
 
     if args.list:
         print_table(headers, rows)
