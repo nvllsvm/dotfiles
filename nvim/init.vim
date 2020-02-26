@@ -104,8 +104,6 @@ Plug '907th/vim-auto-save'
 Plug 'udalov/kotlin-vim'
 Plug 'keith/swift.vim'
 
-Plug 'chrisbra/csv.vim'
-
 Plug 'Glench/Vim-Jinja2-Syntax'
 call plug#end()
 
@@ -233,13 +231,6 @@ augroup PYTHON
     let g:jedi#completions_enabled = 0
     let g:jedi#usages_command = "<leader>N"
 augroup END
-
-aug CSV_Editing
-    let g:csv_autocmd_arrange = 1
-    au InsertLeave *.csv :%ArrangeColumn!
-    let b:csv_arrange_align = 'l*'
-    aut FileType csv set list& listchars&
-aug end
 
 augroup GOLANG
     aut FileType go set list& listchars&

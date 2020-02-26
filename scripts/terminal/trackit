@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+import argparse
+import csv
+import datetime
+import os
+import pathlib
+
+
+NOTES_DIR = pathlib.Path(os.environ.get('NOTES_DIR', '~/Notes')).expanduser()
+TRACKIT_DIR = NOTES_DIR / 'trackit'
+
+
+def render_table(rows, delimiter=' | '):
+    # find the maximum column lengths
+    column_len_max = {}
+    for row in rows:
+        column_len_max.update({
+            index: max(len(column), column_len_max.get(index) or 0)
+            for index, column in enumerate(row)
+        })
+
+    # add column padding
+    new_rows = []
+    for row in rows:
+        new_row = [
+            column + (column_len_max[index]-len(column)) * ' '
+            for index, column in enumerate(row)
+        ]
+
+        # add missing columns to row
+        new_row.extend([
+            column_len_max[index] * ' '
+            for index in range(len(new_row), len(column_len_max))
+        ])
+
+        # concatenate columns
+        new_rows.append(delimiter.join(new_row))
+
+    return '\n'.join(new_rows)
+
+
+def now():
+    return datetime.datetime.now(datetime.timezone.utc)
+
+
+def read_csv(path):
+    with open(path) as f:
+        return list(csv.reader(f))
+
+
+def write_csv(path, rows):
+    with open(path, 'w') as f:
+        for row in rows:
+            csv.writer(f).writerow(row)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-l', '--list', action='store_true')
+    parser.add_argument('name')
+    args = parser.parse_args()
+
+    path = TRACKIT_DIR.joinpath(args.name).with_suffix('.csv')
+
+    rows = []
+    if path.exists():
+        rows.extend(read_csv(path))
+    else:
+        row = ['timestamp']
+        headers = input('Headers: ')
+        row.extend(h.strip() for h in headers.split(','))
+        rows.append(row)
+
+    if args.list:
+        headers = rows.pop(0)
+        rows = sorted(rows)
+        rows = [headers, *rows]
+        print(render_table(rows))
+        parser.exit()
+
+    print('Headers:', ', '.join(rows[0]))
+    data = input('Item: ')
+    row = [now(), *[d.strip() for d in data.split(',')]]
+    if len(row) != len(rows[0]):
+        parser.error('missing data')
+        parser.exit(1)
+    rows.append(row)
+    write_csv(path, rows)
+
+
+if __name__ == '__main__':
+    main()
