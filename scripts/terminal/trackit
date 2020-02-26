@@ -34,22 +34,28 @@ def write_csv(path, headers, rows):
             writer.writerow(row)
 
 
-def print_table(headers, rows):
+def print_table(headers, rows, date):
     import tabulate
 
     new_rows = []
     for row in rows:
         timestamp = row.pop(0).astimezone()
-        if timestamp.date() == datetime.date.today():
+        if timestamp.date() == date:
             new_rows.append([timestamp.strftime('%Y-%m-%d %H:%M'), *row])
 
     print(tabulate.tabulate(sorted(new_rows), headers=headers))
+
+
+def _date_arg(value):
+    return datetime.datetime.strptime(value, '%Y-%m-%d').date()
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--show-path', action='store_true')
     parser.add_argument('-l', '--list', action='store_true')
+    parser.add_argument('--date', type=_date_arg,
+                        default=datetime.date.today())
     parser.add_argument('name')
     args = parser.parse_args()
 
@@ -70,7 +76,7 @@ def main():
         parser.exit()
 
     if args.list:
-        print_table(headers, rows)
+        print_table(headers, rows, date=args.date)
         parser.exit()
 
     print('Headers:', ', '.join(headers[1:]))
