@@ -60,7 +60,9 @@ def main():
     parser.add_argument('name')
     args = parser.parse_args()
 
-    path = TRACKIT_DIR.joinpath(args.name).with_suffix('.csv')
+    path = TRACKIT_DIR.joinpath(args.name)
+    if not args.name.endswith('.csv'):
+        path = path.with_suffix('.csv')
 
     rows = []
     if path.exists():
