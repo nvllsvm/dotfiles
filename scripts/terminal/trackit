@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 import argparse
+import collections
 import csv
 import datetime
 import os
 import pathlib
+import re
 
 NOTES_DIR = pathlib.Path(os.environ.get('NOTES_DIR', '~/Notes')).expanduser()
 TRACKIT_DIR = NOTES_DIR / 'trackit'
+
+_NUM_RE = re.compile(r'(\d+)')
 
 
 def now():
@@ -34,7 +38,7 @@ def write_csv(path, headers, rows):
             writer.writerow(row)
 
 
-def print_table(headers, rows, date):
+def print_table(headers, rows, date, summed=False):
     import tabulate
 
     new_rows = []
@@ -42,6 +46,21 @@ def print_table(headers, rows, date):
         timestamp = row.pop(0).astimezone()
         if timestamp.date() == date:
             new_rows.append([timestamp.strftime('%Y-%m-%d %H:%M'), *row])
+
+    if summed:
+        # TODO: allow specification of sum column
+        groups = collections.defaultdict(int)
+        for row in new_rows:
+            matches = _NUM_RE.findall(row[2])
+            if len(matches) == 1:
+                groups[row[1]] += int(matches[0])
+            else:
+                raise RuntimeError('cannot sum')
+
+        new_rows = [
+            [date.strftime('%Y-%m-%d'), k, v]
+            for k, v in groups.items()
+        ]
 
     print(tabulate.tabulate(sorted(new_rows), headers=headers))
 
@@ -56,6 +75,7 @@ def main():
     parser.add_argument('-l', '--list', action='store_true')
     parser.add_argument('--date', type=_date_arg,
                         default=datetime.date.today())
+    parser.add_argument('--sum', action='store_true')
     parser.add_argument('name')
     args = parser.parse_args()
 
@@ -76,7 +96,7 @@ def main():
         parser.exit()
 
     if args.list:
-        print_table(headers, rows, date=args.date)
+        print_table(headers, rows, date=args.date, summed=args.sum)
         parser.exit()
 
     print('Headers:', ', '.join(headers[1:]))
