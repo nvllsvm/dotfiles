@@ -17,7 +17,8 @@ _NUM_RE = re.compile(r'(\d+)')
 
 def fzf(options, prompt=''):
     proc = subprocess.run(
-        ['fzf', f'--prompt={prompt}', '--exact', '-i', '--print-query'],
+        ['fzf', f'--prompt={prompt}', '--exact', '-i', '--print-query',
+         '--layout=reverse'],
         input=b'\n'.join(str(o).encode() for o in options),
         stdout=subprocess.PIPE,
     )
