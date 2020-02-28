@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-exec sudo nmap -oG - -sn "$@"
+exec sudo nmap -oG - -sn "$@" | grep -v '^#'
