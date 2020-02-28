@@ -118,7 +118,7 @@ def main():
         parser.exit()
 
     if args.list:
-        print_table(rows, date=args.date, summed=args.sum)
+        print_table(headers, rows, date=args.date, summed=args.sum)
         parser.exit()
 
     previous = collections.defaultdict(set)
