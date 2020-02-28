@@ -6,11 +6,26 @@ import datetime
 import os
 import pathlib
 import re
+import subprocess
+import sys
 
 NOTES_DIR = pathlib.Path(os.environ.get('NOTES_DIR', '~/Notes')).expanduser()
 TRACKIT_DIR = NOTES_DIR / 'trackit'
 
 _NUM_RE = re.compile(r'(\d+)')
+
+
+def fzf(options, prompt=''):
+    proc = subprocess.run(
+        ['fzf', f'--prompt={prompt}', '--exact', '-i', '--print-query'],
+        input=b'\n'.join(str(o).encode() for o in options),
+        stdout=subprocess.PIPE,
+    )
+    try:
+        result = proc.stdout.decode().splitlines()[-1]
+    except IndexError:
+        result = None
+    return result
 
 
 def now():
@@ -76,20 +91,27 @@ def main():
     parser.add_argument('--date', type=_date_arg,
                         default=datetime.date.today())
     parser.add_argument('--sum', action='store_true')
-    parser.add_argument('name')
+    parser.add_argument('name', nargs='?')
     args = parser.parse_args()
 
-    path = TRACKIT_DIR.joinpath(args.name)
-    if not args.name.endswith('.csv'):
+    if args.name is None:
+        name = fzf(
+            (path.stem for path in TRACKIT_DIR.iterdir()),
+            prompt='name: ')
+        if not name:
+            sys.exit(1)
+    else:
+        name = args.name
+
+    path = TRACKIT_DIR.joinpath(name)
+    if not name.endswith('.csv'):
         path = path.with_suffix('.csv')
 
-    rows = []
     if path.exists():
         headers, rows = read_csv(path)
     else:
-        headers = ['timestamp']
-        headers = input('Headers: ')
-        headers.extend(h.strip() for h in headers.split(','))
+        headers = ['timestamp', 'item', 'value']
+        rows = []
 
     if args.show_path:
         print(path)
@@ -99,13 +121,18 @@ def main():
         print_table(headers, rows, date=args.date, summed=args.sum)
         parser.exit()
 
-    print('Headers:', ', '.join(headers[1:]))
-    data = input('Item: ')
-    row = [now(), *[d.strip() for d in data.split(',')]]
-    if len(row) != len(rows[0]):
-        parser.error('missing data')
-        parser.exit(1)
-    rows.append(row)
+    previous = collections.defaultdict(set)
+    for _, item, value in rows:
+        previous[item].add(value)
+
+    item = fzf(previous.keys(), prompt=f'{headers[1]}: ')
+    if not item:
+        sys.exit(1)
+    value = fzf(previous[item], prompt=f'{headers[2]}: ')
+    if not value:
+        sys.exit(1)
+    rows.append([now(), item, value])
+
     write_csv(path, headers, rows)
 
 
