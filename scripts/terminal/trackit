@@ -134,6 +134,7 @@ def main():
     rows.append([now(), item, value])
 
     write_csv(path, headers, rows)
+    print(f'Added "{item}" - "{value}"')
 
 
 if __name__ == '__main__':
