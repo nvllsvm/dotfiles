@@ -1,6 +1,6 @@
-if [ -d ~/go ]; then
+if [ -d ~/go/bin ]; then
     path=(
-        "$HOME/go"
+        "$HOME/go/bin"
         "$path[@]"
     )
 fi
