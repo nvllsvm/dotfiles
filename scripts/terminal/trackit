@@ -78,7 +78,9 @@ def print_table(headers, rows, date, summed=False):
             for k, v in groups.items()
         ]
 
-    print(tabulate.tabulate(sorted(new_rows), headers=headers))
+    print(tabulate.tabulate(
+        sorted(new_rows, key=lambda x: x[1].lower()),
+        headers=headers))
 
 
 def _date_arg(value):
