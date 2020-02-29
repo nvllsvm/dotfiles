@@ -122,16 +122,38 @@ def main():
         print_table(headers, rows, date=args.date, summed=args.sum)
         parser.exit()
 
-    previous = collections.defaultdict(set)
+    previous = collections.defaultdict(list)
+    previous_counts = collections.defaultdict(int)
     for _, item, value in rows:
-        previous[item].add(value)
+        previous[item].append(value)
+        previous_counts[item] += 1
 
-    item = fzf(previous.keys(), prompt=f'{headers[1]}: ')
+    item = fzf(
+        sorted(
+            previous.keys(),
+            key=lambda x: (previous_counts[x], x.lower()),
+            reverse=True
+        ),
+        prompt=f'{headers[1]}: ')
     if not item:
         sys.exit(1)
-    value = fzf(previous[item], prompt=f'{headers[2]}: ')
+
+    values = set()
+    value_counts = collections.defaultdict(int)
+    for value in previous[item]:
+        values.add(value)
+        value_counts[value] += 1
+
+    value = fzf(
+        sorted(
+            set(previous[item]),
+            key=lambda x: (value_counts[x], x.lower()),
+            reverse=True
+        ),
+        prompt=f'{headers[2]}: ')
     if not value:
         sys.exit(1)
+
     rows.append([now(), item, value])
 
     write_csv(path, headers, rows)
