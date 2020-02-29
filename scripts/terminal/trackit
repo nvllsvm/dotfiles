@@ -79,7 +79,7 @@ def print_table(headers, rows, date, summed=False):
         ]
 
     print(tabulate.tabulate(
-        sorted(new_rows, key=lambda x: x[1].lower()),
+        sorted(new_rows, key=lambda x: (x[0], x[1].lower())),
         headers=headers))
 
 
