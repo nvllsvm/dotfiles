@@ -6,7 +6,7 @@ import subprocess
 
 def nmap_scan(address):
     proc = subprocess.run(
-        ['sudo', 'nmap', '-oG', '-', '-sn', address],
+        ['nmap', '-oG', '-', '-sn', address],
         stdout=subprocess.PIPE
     )
     parts = [
