@@ -23,7 +23,7 @@ def fzf(options, prompt=''):
         stdout=subprocess.PIPE,
     )
     try:
-        result = proc.stdout.decode().splitlines()[-1]
+        result = proc.stdout.decode().splitlines()[-1].strip()
     except IndexError:
         result = None
     return result
