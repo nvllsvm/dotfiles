@@ -1,24 +1,2 @@
 #compdef notes
-_notes() {
-  local ret=1
-
-  pushd "${NOTES_DIR:-$HOME/Notes}" > /dev/null
-
-  _arguments -C \
-      '1::file:_files' \
-      '*::arg:->args' \
-      && ret=0
-
-  case $state in
-    (args)
-        case $line[1] in
-            (--)
-                _arguments '*:: :_normal' && ret=0
-                ;;
-        esac
-   esac
-
-   popd > /dev/null
-}
-
-_notes "$@"
+_arguments -s -S '1:files:_files -W "${NOTES_DIR:-$HOME/Notes}"'
