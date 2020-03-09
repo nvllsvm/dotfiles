@@ -148,6 +148,8 @@ def main():
     activate_path = env_folder.joinpath('bin/activate')
     cwd_envrc.write_text('\n'.join([
         f'. {shlex.quote(str(activate_path))}',
+        "# prevent direnv from warning about prompt export failure",
+        "unset PS1",
         "# export PIP_USER even though it's disabled in pip.conf",
         "# tox doesn't seem to respect the venv's pip.conf",
         "export PIP_USER=0\n"
