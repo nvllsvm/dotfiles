@@ -1,2 +1,2 @@
 #compdef notes
-_arguments -s -S '1:files:_files -W "${NOTES_DIR:-$HOME/Notes}"'
+_arguments '1:files:_files -W "${NOTES_DIR:-$HOME/Notes}"'
