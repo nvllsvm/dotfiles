@@ -23,6 +23,7 @@ set relativenumber
 set ignorecase
 
 filetype plugin indent on
+
 set grepprg=grep\ -nH\ $*
 let g:tex_flavor = "latex"
 
@@ -191,49 +192,7 @@ augroup JSON
 
     command JSON call _JSONify()
 
-    au FileType json set shiftwidth=2
-    au FileType json set tabstop=2
-
     au BufNewFile,BufRead *.avsc set filetype=json
-augroup END
-
-augroup MARKDOWN
-    autocmd!
-    autocmd FileType markdown let g:auto_save = 1
-
-    " talbe_mode_always_active breaks highlighting
-    autocmd FileType markdown TableModeEnable
-
-    let g:vim_markdown_auto_insert_bullets=0
-    let g:vim_markdown_new_list_item_indent=0
-    autocmd FileType markdown setlocal formatlistpat=^\\s*\\d\\+[.\)]\\s\\+\\\|^\\s*[*+~-]\\s\\+\\\|^\\(\\\|[*#]\\)\\[^[^\\]]\\+\\]:\\s 
-    autocmd FileType markdown setlocal comments=n:>
-    autocmd FileType markdown setlocal formatoptions+=cn
-    autocmd FileType markdown nnoremap <leader>m :TableModeRealign<Cr>:TableSort<Cr>
-    set linebreak
-augroup END
-
-augroup TODO
-    autocmd FileType todo let g:auto_save = 1
-augroup END
-
-augroup XML
-    autocmd!
-    autocmd FileType xml let g:xml_syntax_folding=1
-    autocmd FileType xml setlocal foldmethod=syntax
-    autocmd FileType xml :syntax on
-    autocmd FileType xml :%foldopen!
-augroup END
-
-augroup PYTHON
-    au FileType python set foldmethod=indent
-    au FileType python nnoremap <leader>y :0,$!yapf<Cr><C-o>
-    let g:jedi#completions_enabled = 0
-    let g:jedi#usages_command = "<leader>N"
-augroup END
-
-augroup GOLANG
-    aut FileType go set list& listchars&
 augroup END
 
 " need to set both + and * else netrw barfs
