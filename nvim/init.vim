@@ -128,7 +128,7 @@ nnoremap <silent> <C-l> :nohl<CR>:NeomakeClean<CR><C-l>
 autocmd BufWinEnter * normal! zR
 
 " show trailing spaces and tabs
-autocmd FileType * set list listchars=tab:»·,trail:·
+"autocmd FileType * set list listchars=tab:»·,trail:·
 
 let g:neomake_python_enabled_makers = ['flake8']
 
