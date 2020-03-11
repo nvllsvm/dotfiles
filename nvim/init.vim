@@ -128,7 +128,7 @@ nnoremap <silent> <C-l> :nohl<CR>:NeomakeClean<CR><C-l>
 autocmd BufWinEnter * normal! zR
 
 " show trailing spaces and tabs
-autocmd FileType * set list listchars=tab:»·,trail:·
+"autocmd FileType * set list listchars=tab:»·,trail:·
 
 let g:neomake_python_enabled_makers = ['flake8']
 
@@ -161,8 +161,6 @@ inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
 function! s:my_cr_function() abort
     return deoplete#close_popup() . "\<CR>"
 endfunction
-
-autocmd FileType yaml setlocal shiftwidth=2 tabstop=2
 
 let g:markdown_enable_spell_checking = 0
 
