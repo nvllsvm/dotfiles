@@ -26,33 +26,32 @@ if LINK_DIR.exists():
 LINK_DIR.mkdir()
 
 VERSION_FILE = PYENV_ROOT / 'version'
+if VERSION_FILE.exists():
+    versions = [
+        line
+        for line in VERSION_FILE.read_text().split('\n')
+        if line
+    ]
 
-versions = [
-    line
-    for line in VERSION_FILE.read_text().split('\n')
-    if line
-]
+    def create_link(version, linkname):
+        source = PYENV_ROOT / 'versions' / version / 'bin' / linkname
+
+        target = LINK_DIR / linkname
+        target.symlink_to(source)
 
 
-def create_link(version, linkname):
-    source = PYENV_ROOT / 'versions' / version / 'bin' / linkname
+    done = set()
 
-    target = LINK_DIR / linkname
-    target.symlink_to(source)
+    for version in versions:
+        major, minor, patch = version.split('.')
+        links = {
+            'python',
+            f'python{major}',
+            f'python{major}.{minor}',
+        }
 
+        for link in sorted(links - done):
+            create_link(version, link)
 
-done = set()
-
-for version in versions:
-    major, minor, patch = version.split('.')
-    links = {
-        'python',
-        f'python{major}',
-        f'python{major}.{minor}',
-    }
-
-    for link in sorted(links - done):
-        create_link(version, link)
-
-    done.update(links)
+        done.update(links)
 EOF
