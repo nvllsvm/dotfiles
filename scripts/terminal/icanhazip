@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
-ipv4="$(curl https://ipv4.icanhazip.com 2> /dev/null)"
-ipv6="$(curl https://ipv6.icanhazip.com 2> /dev/null)"
+ipv4="$(curl --connect-timeout 5 https://ipv4.icanhazip.com 2> /dev/null)"
+ipv6="$(curl --connect-timeout 5 https://ipv6.icanhazip.com 2> /dev/null)"
 for addr in $ipv4 $ipv6; do
     echo "$addr"
 done
