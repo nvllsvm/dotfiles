@@ -5,7 +5,7 @@ PROTON_BASE="$STEAMAPPS_COMMON/$(ls "$STEAMAPPS_COMMON" | grep '^Proton' | sort 
 PROTON_PREFIX="$STEAM_COMPAT_DATA_PATH/pfx"
 mkdir -p "$STEAM_COMPAT_DATA_PATH"
 show_help() {
-        cat << EOF
+    cat << EOF
 usage: proton [--show-prefix] PROGRAM [ARG ...]
     --help          show help and exit
     --show-prefix   show proton prefix path and exit
