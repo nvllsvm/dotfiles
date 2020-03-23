@@ -100,6 +100,10 @@ xrdb << EOF
 *font: xft:${FONT_NAME}:size=${FONT_SIZE}:antialias=true:dpi=${DPI}
 *boldFont:
 
+rofi.font:	${FONT_NAME} ${FONT_SIZE}
+rofi.dpi:	${DPI}
+rofi.bw:	${BORDER_WIDTH}
+
 Xft.dpi: ${DPI}
 
 Xcursor.size: ${CURSOR_SIZE}
