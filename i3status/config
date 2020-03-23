@@ -19,6 +19,7 @@ battery all {
     format = "%status %percentage"
     integer_battery_capacity = true
     format_down = ""
+    last_full_capacity = true
 }
 
 tztime local {
