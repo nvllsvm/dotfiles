@@ -69,7 +69,7 @@ def fzf(data):
 
 def rofi(data):
     proc = subprocess.run(
-        ['rofi', '-dmenu', '-p', ''],
+        ['rofi', '-dmenu', '-p', '', '-no-tokenize'],
         input='\n'.join(data).encode(),
         stdout=subprocess.PIPE,
     )
