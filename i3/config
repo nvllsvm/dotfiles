@@ -1,5 +1,4 @@
 set $mod Mod4
-set $launcher_title alacritty-launcher
 
 set_from_resource $background background #000000
 set_from_resource $foreground foreground #000000
@@ -39,7 +38,7 @@ bindsym $mod+Return exec alacritty
 # kill focused window
 bindsym $mod+Shift+q kill
 
-bindsym $mod+space exec i3-desktop-launcher --class $launcher_title --dimensions 80 20 --command desktop-launcher
+bindsym $mod+space exec desktop-launcher
 #bindsym ctrl+$mod+space exec rofimoji --use-clipboard --skin-tone neutral
 
 bindsym $mod+x [class="^.*"] border toggle
@@ -157,7 +156,6 @@ client.background       $background
 hide_edge_borders vertical
 for_window [class="^.*"] border pixel 2
 #for_window [floating] resize set 60 ppt 80 ppt, move position center
-for_window [instance="$launcher_title"] floating enable, move position center, focus
 for_window [class="dosbox"] floating enable, resize set 100 ppt 100 ppt, border none, move position center
 
 bindsym $mod+b bar mode toggle

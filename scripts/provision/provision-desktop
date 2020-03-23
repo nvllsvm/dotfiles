@@ -31,6 +31,7 @@ if [[ $osname == Linux* ]]; then
     link_file mimeapps/mimeapps.list ~/.config/mimeapps.list
     link_file mpv ~/.config/mpv
     link_file qt5ct ~/.config/qt5ct
+    link_file rofi ~/.config/rofi
     link_file xbindkeys/.xbindkeysrc ~/.xbindkeysrc
     link_file xinit/.xinitrc ~/.xinitrc
     link_file zsh/.zlogin ~/.zlogin
@@ -68,6 +69,8 @@ if [[ $osname == Linux* ]]; then
             paswitch \
             pavucontrol \
             picom \
+            rofi \
+            rofimoji \
             syncthing \
             syncthing-gtk \
             transmission-remote-gtk \

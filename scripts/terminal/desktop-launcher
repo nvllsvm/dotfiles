@@ -64,7 +64,21 @@ def fzf(data):
     except IndexError:
         result = None
 
-    return not bool(proc.returncode), result
+    return result
+
+
+def rofi(data):
+    proc = subprocess.run(
+        ['rofi', '-dmenu', '-p', ''],
+        input='\n'.join(data).encode(),
+        stdout=subprocess.PIPE,
+    )
+    try:
+        result = proc.stdout.decode().splitlines()[-1]
+    except IndexError:
+        result = None
+
+    return result
 
 
 history = collections.defaultdict(int)
@@ -80,8 +94,12 @@ else:
     apps = find_executables()
 cmds = sorted(apps, key=lambda x: (history[x] * -1, x))
 
-matched, result = fzf(cmds)
-if matched:
+if sys.platform == 'darwin':
+    result = fzf(cmds)
+else:
+    result = rofi(cmds)
+
+if result in cmds:
     if sys.platform == 'darwin':
         if result in apps:
             history[result] += 1
