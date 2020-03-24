@@ -39,7 +39,7 @@ bindsym $mod+Return exec alacritty
 bindsym $mod+Shift+q kill
 
 bindsym $mod+space exec desktop-launcher
-#bindsym ctrl+$mod+space exec rofimoji --use-clipboard --skin-tone neutral
+bindsym ctrl+$mod+space exec rofimoji --skin-tone neutral
 
 bindsym $mod+x [class="^.*"] border toggle
 
