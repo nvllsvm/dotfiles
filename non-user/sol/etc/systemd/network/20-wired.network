@@ -1,5 +1,5 @@
 [Match]
-Name=eno1
+Name=enp1s0
 
 [Network]
 DHCP=ipv4
