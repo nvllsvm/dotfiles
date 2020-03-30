@@ -153,6 +153,10 @@ client.placeholder      $color19 $background $foreground $color8 $color18
 
 client.background       $background
 
+assign [class="Riot"] riot
+assign [class="Signal"] signal
+assign [class="Slack"] slack
+
 hide_edge_borders vertical
 for_window [class="^.*"] border pixel 2
 #for_window [floating] resize set 60 ppt 80 ppt, move position center

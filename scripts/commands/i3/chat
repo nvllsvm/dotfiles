@@ -2,6 +2,6 @@
 launch() {
     nohup "$@" > /dev/null 2>&1 &
 }
-launch riot-desktop --hidden
-launch signal-desktop --use-tray-icon --start-in-tray
-launch slack --startup
+launch riot-desktop
+launch signal-desktop
+launch slack
