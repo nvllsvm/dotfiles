@@ -12,7 +12,9 @@ def _get_events(subdomain, token, query, start, end, order):
             'q': query,
             'from': start,
             'until': end,
-            'order': order}))
+            'order': order,
+            'size': 1000,  # API max
+        }))
 
     while url:
         req = urllib.request.Request(
