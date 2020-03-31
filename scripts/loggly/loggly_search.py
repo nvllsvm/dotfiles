@@ -32,7 +32,7 @@ def main():
 
     parser.add_argument('--from', default='-24h', dest='start')
     parser.add_argument('--to', default='now', dest='end')
-    parser.add_argument('--order', choices=('asc', 'desc'), default='desc')
+    parser.add_argument('--order', choices=('asc', 'desc'), default='asc')
     parser.add_argument('-n', type=int, dest='limit')
     parser.add_argument('query')
 
