@@ -35,7 +35,7 @@ def main():
 
     parser.add_argument(
         '--from', help='%(default)s',
-        default='-1h', dest='start')
+        default='-24h', dest='start')
     parser.add_argument(
         '--to', help='%(default)s', default='now', dest='end')
     parser.add_argument(
