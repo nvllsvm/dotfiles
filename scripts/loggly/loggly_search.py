@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import argparse
 import json
+import signal
+import sys
 import urllib.parse
 import urllib.request
 
@@ -25,6 +27,10 @@ def _get_events(subdomain, token, query, start, end, order):
         yield from body.get('events', [])
 
 
+def _signal_handler(*_):
+    sys.exit(1)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--token', required=True)
@@ -35,6 +41,9 @@ def main():
     parser.add_argument('--order', choices=('asc', 'desc'), default='asc')
     parser.add_argument('-n', type=int, dest='limit')
     parser.add_argument('query')
+
+    signal.signal(signal.SIGINT, _signal_handler)
+    signal.signal(signal.SIGTERM, _signal_handler)
 
     args = parser.parse_args()
 
