@@ -75,7 +75,7 @@ mars() {
         basement)
             paswitch "$DESKTOP_SINK" || true
             xrandr \
-                --output DP-0 --off \
+                --output HDMI-0 --off \
                 --output DP-1 --off \
                 --output DP-2 --off \
                 --output DP-3 --off \
@@ -83,7 +83,7 @@ mars() {
                 --output DP-5 --off \
                 --output DVI-I-0 --off \
                 --output DVI-I-1 --off \
-                --output HDMI-0 --primary --panning 1920x1200 --mode 1920x1200 --pos 0x0 --rotate normal
+                --output DP-0 --primary --panning 1920x1200 --mode 1920x1200 --pos 0x0 --rotate normal
             set-desktop-themes --dpi 96
             apply-display-calibration --reset
             ;;
