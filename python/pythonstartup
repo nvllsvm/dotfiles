@@ -71,29 +71,19 @@ def path(pattern):
     return matches[0]
 
 
-def load_json(data):
-    if isinstance(data, pathlib.Path):
-        data = data.read_text()
-    return json.loads(data)
-
-
-def dump_json(data, path=None):
+def pretty_json(data):
     def _default_json(obj):
         if isinstance(obj, set):
             return sorted(obj)
         elif hasattr(obj, 'isoformat'):
             return obj.isoformat()
-    dumped = json.dumps(
+    return json.dumps(
         data,
         indent=2,
         sort_keys=True,
         default=_default_json,
         ensure_ascii=False
     )
-    if path is not None:
-        path.write_text(dumped)
-    else:
-        return dumped
 
 
 def cat(pattern):

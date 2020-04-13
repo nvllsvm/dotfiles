@@ -195,3 +195,5 @@ augroup END
 
 " need to set both + and * else netrw barfs
 let g:clipboard = {'copy': {'*': 'cbcopy', '+': 'cbcopy'}, 'paste': {'*': 'cbpaste', '+': 'cbpaste'}}
+
+let g:mkdp_echo_preview_url = 1
