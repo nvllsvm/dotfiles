@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Retrieve and manipulate Consul KV in JSON format"""
 import argparse
+import ssl
 import base64
 import logging
 import json
@@ -17,12 +18,19 @@ LOGGER = logging.getLogger(NAME)
 
 class ConsulKV:
 
-    def __init__(self, url):
+    def __init__(self, url, verify=True):
         self.url = url
+        self.context = None
+        if verify:
+            self.context = None
+        else:
+            self.context = ssl.create_default_context()
+            self.context.check_hostname = False
+            self.context.verify_mode = ssl.CERT_NONE
 
     def get(self):
         status_code, body = self._request(
-            'GET', f'/v1/kv/', query={'recurse': 'true'})
+            'GET', '/v1/kv/', query={'recurse': 'true'})
         if status_code != 200:
             raise RuntimeError(f'HTTP {status_code}')
         return self._decode_kv_export(json.loads(body))
@@ -50,7 +58,8 @@ class ConsulKV:
 
         r = urllib.request.Request(url, data=data, method=method)
         try:
-            response = urllib.request.urlopen(r, timeout=timeout)
+            response = urllib.request.urlopen(
+                r, timeout=timeout, context=self.context)
         except urllib.error.HTTPError as error:
             response = error.fp
         return response.getcode(), response.read()
@@ -79,6 +88,9 @@ def main():
     parser.add_argument(
         '--url', default=os.environ.get('CONSUL_HTTP_ADDR'),
         help='Consul HTTP address [envvar CONSUL_HTTP_ADDR]')
+    parser.add_argument(
+        '--insecure', action='store_true',
+        help='Allow insecure server connections when using SSL')
 
     subparsers = parser.add_subparsers(dest='command', required=True)
 
@@ -101,7 +113,7 @@ def main():
         parser.error('consul url not specified')
         parser.exit(1)
 
-    consul = ConsulKV(args.url)
+    consul = ConsulKV(args.url, verify=not(args.insecure))
 
     if args.command == 'get':
         data = consul.get()
