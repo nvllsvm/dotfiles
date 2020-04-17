@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+import argparse
+import collections
+import json
+import pathlib
+import subprocess
+
+
+def all_files(root):
+    stack = [pathlib.Path(root)]
+    files = []
+    while stack:
+        for path in stack.pop().iterdir():
+            if path.is_file():
+                files.append(path)
+            elif path.is_dir():
+                stack.append(path)
+    return files
+
+
+def sha256sum(path):
+    result = subprocess.run(
+        ['sha256sum', str(path)],
+        check=True,
+        stdout=subprocess.PIPE)
+    return result.stdout.decode().split()[0]
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('path', type=pathlib.Path)
+    args = parser.parse_args()
+
+    hashes = collections.defaultdict(set)
+    for path in all_files(args.path):
+        hashes[sha256sum(path)].add(path)
+
+    duplicates = {
+        k: sorted(str(p) for p in v)
+        for k, v in hashes.items()
+        if len(v) > 1
+    }
+
+    print(json.dumps(duplicates, indent=2, sort_keys=True))
+
+
+if __name__ == '__main__':
+    main()
