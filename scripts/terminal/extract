@@ -1,31 +1,20 @@
 #!/usr/bin/env python3
-# TODO add password specification
 # TODO make --rm remove all parts of multipart archives
 # TODO add compression
 import argparse
+import getpass
 import pathlib
 import subprocess
-import sys
 
 
-def extract(path, parent=None, child=False):
+def extract(path, parent=None, child=False, password=None):
     dest = _build_dest(path, parent, child)
     if path.suffix.lower() == '.zst':
         _extract_zstd(path, dest)
     elif _is_nested_tar(path):
-        _extract_7z_nested_tar(path, dest)
+        _extract_7z_nested_tar(path, dest, password)
     else:
-        _extract_7z(path, dest)
-
-
-def _is_password_protected(path):
-    if path.suffix.lower() != '.zst':
-        proc = subprocess.run(
-            ['7z', 'l', '-slt', '--', str(path)],
-            stdout=subprocess.PIPE,
-            check=True
-        )
-        return 'Encrypted = +' in proc.stdout.decode().split('\n')
+        _extract_7z(path, dest, password)
 
 
 def _build_dest(path, parent, child):
@@ -56,13 +45,13 @@ def _is_nested_tar(path):
         return False
 
 
-def _extract_7z_nested_tar(path, dest):
+def _extract_7z_nested_tar(path, dest, password=''):
     extract_1 = subprocess.Popen(
-        ['7z', 'x', '-so', '--', str(path)],
+        ['7z', 'x', f'-p{password}', '-so', '--', str(path)],
         stdout=subprocess.PIPE,
     )
     subprocess.run(
-        ['7z', 'x', '-aoa', '-si', '-ttar', f'-o{dest}'],
+        ['7z', 'x', f'-p{password}', '-aoa', '-si', '-ttar', f'-o{dest}'],
         stdin=extract_1.stdout,
         check=True
     )
@@ -74,9 +63,10 @@ def _extract_7z_nested_tar(path, dest):
         )
 
 
-def _extract_7z(path, dest):
+def _extract_7z(path, dest, password=''):
     subprocess.run(
-        ['7z', 'x', '-ba', '-spe', f'-o{dest}', '--', str(path)],
+        ['7z', 'x', f'-p{password}', '-ba', '-spe', f'-o{dest}', '--',
+         str(path)],
         check=True
     )
 
@@ -97,7 +87,7 @@ def _list_contents(path):
             )
         else:
             extract = subprocess.Popen(
-                ['7z', 'x', '-ba', '-so', '--', str(path)],
+                ['7z', 'x', '-p', '-ba', '-so', '--', str(path)],
                 stdout=subprocess.PIPE,
             )
         subprocess.run(
@@ -129,17 +119,19 @@ def main():
     parser.add_argument(
         '--rm', action='store_true',
         help='remove archive after successful extraction')
+    parser.add_argument(
+        '--password', action='store_true',
+        help='prompt for password')
     parser.add_argument('archive', nargs='+', type=pathlib.Path)
     args = parser.parse_args()
 
+    password = getpass.getpass('Password: ') if args.password else None
+
     for path in args.archive:
-        if _is_password_protected(path):
-            print('password protected archive', file=sys.stderr)
-            parser.exit(1)
         if args.list:
             _list_contents(path)
         else:
-            extract(path, args.parent, args.child)
+            extract(path, args.parent, args.child, password)
             if args.rm:
                 path.unlink()
 
