@@ -28,7 +28,8 @@ def sha256sum(path):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('path', type=pathlib.Path)
+    parser.add_argument('path', default=pathlib.Path(), type=pathlib.Path,
+                        nargs='?')
     args = parser.parse_args()
 
     hashes = collections.defaultdict(set)
@@ -36,7 +37,7 @@ def main():
         hashes[sha256sum(path)].add(path)
 
     duplicates = {
-        k: sorted(str(p) for p in v)
+        k: sorted(str(p.absolute()) for p in v)
         for k, v in hashes.items()
         if len(v) > 1
     }
