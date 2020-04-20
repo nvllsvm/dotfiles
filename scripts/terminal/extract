@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
-# TODO make --rm remove all parts of multipart archives
 # TODO add compression
 import argparse
 import getpass
 import pathlib
+import re
 import subprocess
+
+
+_PART_RE = re.compile(r'(.*)\.part(\d+)\.rar$')
 
 
 def extract(path, parent=None, child=False, password=None):
@@ -78,6 +81,17 @@ def _extract_zstd(path, dest):
     )
 
 
+def _get_num_volumes(path, password=''):
+    result = subprocess.run(
+        ['7z', 'l', f'-p{password}', '--', str(path)],
+        stdout=subprocess.PIPE,
+        check=True)
+    for line in reversed(result.stdout.decode().splitlines()):
+        if line.startswith('Volumes = '):
+            return int(line.split(' = ')[1])
+    return 1
+
+
 def _list_contents(path):
     if _is_nested_tar(path):
         if path.suffix == '.zst':
@@ -127,13 +141,35 @@ def main():
 
     password = getpass.getpass('Password: ') if args.password else None
 
+    extracted = set()
     for path in args.archive:
+        if path in extracted:
+            continue
+        volumes = [path]
+
+        if path.suffix == '.rar':
+            num_volumes = _get_num_volumes(path, password)
+
+            if num_volumes > 1:
+                prefix, vol_num = _PART_RE.search(str(path)).groups()
+
+                volumes = [
+                    pathlib.Path('{}.part{}.rar'.format(
+                        prefix, str(i).rjust(len(vol_num), '0')))
+                    for i in range(1, num_volumes + 1)
+                ]
+                for v in volumes:
+                    if not v.is_file():
+                        raise RuntimeError(f'missing volume {v}')
+
         if args.list:
             _list_contents(path)
         else:
             extract(path, args.parent, args.child, password)
             if args.rm:
-                path.unlink()
+                for path in volumes:
+                    path.unlink()
+        extracted.update(volumes)
 
 
 if __name__ == '__main__':
