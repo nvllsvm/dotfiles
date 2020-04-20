@@ -11,7 +11,7 @@ def all_files(root):
     files = []
     while stack:
         for path in stack.pop().iterdir():
-            if path.is_file():
+            if path.is_file() and not path.is_symlink():
                 files.append(path)
             elif path.is_dir():
                 stack.append(path)
@@ -32,10 +32,18 @@ def main():
                         nargs='?')
     args = parser.parse_args()
 
-    hashes = collections.defaultdict(set)
+    by_size = collections.defaultdict(set)
     for path in all_files(args.path):
-        hashes[sha256sum(path)].add(path)
+        by_size[path.stat().st_size].add(path)
 
+    print('done size')
+    hashes = collections.defaultdict(set)
+    for paths in by_size.values():
+        if len(paths) > 1:
+            for path in paths:
+                hashes[sha256sum(path)].add(path)
+
+    print('done paths')
     duplicates = {
         k: sorted(str(p.absolute()) for p in v)
         for k, v in hashes.items()
