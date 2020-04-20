@@ -36,14 +36,12 @@ def main():
     for path in all_files(args.path):
         by_size[path.stat().st_size].add(path)
 
-    print('done size')
     hashes = collections.defaultdict(set)
     for paths in by_size.values():
         if len(paths) > 1:
             for path in paths:
                 hashes[sha256sum(path)].add(path)
 
-    print('done paths')
     duplicates = {
         k: sorted(str(p.absolute()) for p in v)
         for k, v in hashes.items()
