@@ -53,7 +53,7 @@ case "$(echo "$url" | tr '[:upper:]' '[:lower:]')" in
         fi
 esac
 
-if [ -t 1 ]; then
+if [ -t 1 ] && [ -z "$SSH_TTY" ]; then
     open "$url"
 else
     echo "$url"
