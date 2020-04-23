@@ -1,6 +1,6 @@
 ## arch linux
 UUID=56359fa1-b90c-48e3-b7a2-18fc25528082	/         	ext4      	rw,noatime,data=ordered	0 1
-UUID=F4D1-C99D /boot/efi vfat rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro 0 2
+UUID=F4D1-C99D /boot vfat rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro 0 2
 
 /home/ar /srv/nfs4/ar none  bind  0 0
 /storage /srv/nfs4/storage none bind 0 0
