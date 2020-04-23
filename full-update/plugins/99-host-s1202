@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+if [ "$(hostname)" != 's1202.ofc.lair' ]; then
+    exit
+fi
+aweber-dns --update
