@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+set -e 
+if [ "$(hostname)" != 'sol' ]; then
+    exit
+fi
+
+git-auto-update ~/Code/sol-docker
+sol-docker pull

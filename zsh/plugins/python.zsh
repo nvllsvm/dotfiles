@@ -9,7 +9,6 @@ if [ -d "$PYENV_ROOT" ] || [ -d "$PYTHONUSERBASE" ]; then
             "${PYENV_ROOT}/shims"
             "$path[@]"
         )
-        full-update add pyenv-update
     else
         unset PYENV_ROOT
     fi
@@ -18,9 +17,6 @@ if [ -d "$PYENV_ROOT" ] || [ -d "$PYTHONUSERBASE" ]; then
         "${PYTHONUSERBASE}/bin"
         "$path[@]"
     )
-
-    full-update add pip-update
-    full-update add 'venv --prune'
 elif ! command -v python > /dev/null; then
     unset PYTHONUSERBASE
 fi

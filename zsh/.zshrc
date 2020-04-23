@@ -69,23 +69,6 @@ set_cursor_key_to_cursor () {
     printf '\e[?1l'
 }
 
-full-update() {
-    if [ "$1" = "add" ]; then
-        if [ -z "$2" ]; then
-            echo ERROR: No command specified
-        else
-            update_commands=("$update_commands[@]" "$2")
-        fi
-    else
-        for command in "${update_commands[@]}"; do
-            if [ ! -z "$command" ]; then
-                echo "${fg[yellow]}Now running $command ${reset_color}..."
-                eval "$command"
-            fi
-        done
-    fi
-}
-
 fpath=("$DOTFILES/zsh/functions" "$fpath[@]")
 
 host_dir="$DOTFILES/zsh/hosts/$HOST"
@@ -107,8 +90,6 @@ zsh_reload_comp() {
     rm -f ~/.zcompdump
     zsh -ic "echo -n"
 }
-
-full-update add 'zsh -ic zsh_reload_comp'
 
 pushd "$DOTFILES/scripts/commands" > /dev/null
 for c in *; do

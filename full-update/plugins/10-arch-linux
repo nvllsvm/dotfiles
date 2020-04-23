@@ -1,5 +1,10 @@
 #!/usr/bin/env sh
 set -e
+
+if ! command -v pacman > /dev/null; then
+    exit
+fi
+
 MAGENTA='\033[1;35m'
 RESET='\033[0m'
 

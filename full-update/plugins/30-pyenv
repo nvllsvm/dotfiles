@@ -4,6 +4,7 @@ XDG_DATA_DIR="${XDG_DATA_DIR:-$HOME/.local/share}"
 INSTALL_DIR="${XDG_DATA_DIR}/pyenv"
 
 if ! [ -d "$INSTALL_DIR" ]; then
+    exit
     mkdir -p "$XDG_DATA_DIR"
     git clone https://github.com/pyenv/pyenv "$INSTALL_DIR" > /dev/null
 else

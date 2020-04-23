@@ -3,6 +3,10 @@ set -e
 
 export PIP_REQUIRE_VIRTUALENV=0
 
+if ! command -v pip > /dev/null; then
+    exit
+fi
+
 if ! [ -x "$(command -v pip)" ] || [ "$(pip list | grep -c -e '^pip ' -e '^setuptools ' -e '^wheel ')" != '3' ]; then
     python -m ensurepip --user --default-pip
     python -m pip install --user --upgrade --force-reinstall pip setuptools wheel

@@ -24,7 +24,6 @@ if [ -d "$NVM_DIR" ]; then
     done
 
     path=("${DOTFILES}/scripts/nodejs" "$path[@]")
-    full-update add nvm-update
 else
     unset NVM_DIR
 fi

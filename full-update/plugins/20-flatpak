@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+if ! command -v flatpak > /dev/null; then
+    exit
+fi
+
+flatpak update --user --assumeyes
+flatpak uninstall --unused --user --assumeyes

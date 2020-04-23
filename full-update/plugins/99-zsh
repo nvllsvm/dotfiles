@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+if ! command -v zsh > /dev/null; then
+    exit
+fi
+
+rm -f ~/.zcompdump
+zsh -ic 'echo -n'

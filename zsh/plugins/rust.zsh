@@ -3,5 +3,4 @@ if [ -d "$HOME/.cargo/bin" ]; then
         "$HOME/.cargo/bin"
         "$path[@]"
     )
-    full-update add 'rustup update'
 fi
