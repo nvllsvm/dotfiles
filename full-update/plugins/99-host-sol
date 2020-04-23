@@ -6,3 +6,4 @@ fi
 
 git-auto-update ~/Code/sol-docker
 sol-docker pull
+sol-repotool update
