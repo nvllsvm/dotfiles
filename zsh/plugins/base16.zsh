@@ -8,8 +8,6 @@ if [ -d "$BASE16_SHELL" ]; then
     fi
 
     path=("$DOTFILES"/scripts/base16 "$path[@]")
-
-    full-update add base16-update
 else
     unset BASE16_SHELL
 fi

@@ -14,6 +14,4 @@ if command -v direnv > /dev/null; then
     add-zsh-hook precmd direnv_indicator
 
     PROMPT='$prompt_direnv'"$PROMPT"
-
-    full-update add 'direnv prune'
 fi
