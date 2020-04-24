@@ -2,7 +2,7 @@
 YELLOW='\033[1;33m'
 RESET_COLOR='\033[0m'
 
-for cmd in "$DOTFILES/full-update/plugins/"*; do
+for cmd in "$DOTFILES/full-update/"*; do
     echo "${YELLOW}Now running $cmd ...${RESET_COLOR}"
     "$cmd"
 done
