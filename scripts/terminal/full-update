@@ -9,7 +9,6 @@ full_update() {
         printf '%bNow running %s ...%b\n' "$YELLOW" "$cmd" "$RESET_COLOR"
         "$cmd"
     done
-    printf '%bDoneb\n' "$YELLOW" "$RESET_COLOR"
     printf '%bfull-update - done %s%b\n' "$YELLOW" "$(date)" "$RESET_COLOR"
 }
 
