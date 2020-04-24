@@ -20,4 +20,4 @@ full_update() {
     printf '%bfull-update - done %s%b\n' "$YELLOW" "$(date)" "$RESET_COLOR"
 }
 
-full_update 2>&1 | tee "$LOGFILE"
+full_update | tee "$LOGFILE"
