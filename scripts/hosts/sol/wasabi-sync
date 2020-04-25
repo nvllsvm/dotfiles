@@ -1,0 +1,19 @@
+#!/usr/bin/env sh
+PREFIX='wasabi:nullsum-sol'
+
+RET=0
+
+rclone_sync() {
+    rclone sync -v "$@"
+    NEW_RET=$?
+    [ $NEW_RET -gt $RET ] && RET=$NEW_RET
+}
+
+rclone_sync --exclude /PC/GOG.com/ /storage/Games "${PREFIX}"/storage1/Games
+rclone_sync --exclude /Lossy*/ /storage/Audio "${PREFIX}"/storage1/Audio
+rclone_sync /storage/Syncthing/Bitwig\ Studio "${PREFIX}"/storage1/Bigwig\ Studio
+rclone_sync /storage/Books "${PREFIX}"/storage1/Books
+rclone_sync /storage/Pictures "${PREFIX}"/storage1/Pictures
+
+rclone size "${PREFIX}"
+exit $RET
