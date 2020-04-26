@@ -6,7 +6,7 @@ PROTON_PREFIX="$STEAM_COMPAT_DATA_PATH/pfx"
 mkdir -p "$STEAM_COMPAT_DATA_PATH"
 show_help() {
     cat << EOF
-usage: proton [--show-prefix] PROGRAM [ARG ...]
+usage: proton-steam [--show-prefix] PROGRAM [ARG ...]
     --help          show help and exit
     --show-prefix   show proton prefix path and exit
     --version       show program's version and exit
