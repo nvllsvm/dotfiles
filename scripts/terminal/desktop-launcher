@@ -126,10 +126,10 @@ elif result:
             url = f'https://{result}'
         else:
             url = result
-        launch('open', url)
     else:
         url = f'https://duckduckgo.com/?q={result}'
-        if sys.platform == 'darwin':
-            launch('open', url)
-        else:
-            launch('firefox', '--private-window', url)
+
+    if sys.platform != 'darwin' and result.lstrip() != result:
+        launch('firefox', '--private-window', url)
+    else:
+        launch('open', url)
