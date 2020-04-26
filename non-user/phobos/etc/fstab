@@ -4,3 +4,4 @@
 # <file system> <dir> <type> <options> <dump> <pass>
 UUID=8a3f8fb1-876d-48b9-b1c3-17c414883d07 	/ 	ext4	rw,relatime 0 1
 UUID=2E02-6C73 /boot vfat rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro 0 2
+/swap none swap defaults 0 0
