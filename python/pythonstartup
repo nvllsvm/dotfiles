@@ -5,6 +5,7 @@ import concurrent.futures
 import contextlib
 import datetime
 import glob
+import hashlib
 import io
 import itertools
 import json
