@@ -17,6 +17,10 @@ def find_executables(directory):
     return executables
 
 
+def _pretty_json(data):
+    return json.dumps(data, indent=2, sort_keys=True)
+
+
 def main():
     parser = argparse.ArgumentParser(description='list executables in path')
     mutex_group = parser.add_mutually_exclusive_group()
@@ -41,14 +45,16 @@ def main():
         result = collections.defaultdict(list)
         for path in executables:
             result[path.name].append(str(path.parent))
-        print(json.dumps(result, indent=2, sort_keys=True))
+        print(_pretty_json(result))
+
     elif args.group_directory:
         result = collections.defaultdict(list)
         for path in executables:
             result[str(path.parent)].append(str(path.name))
         for contents in result.values():
             contents.sort()
-        print(json.dumps(result, indent=2, sort_keys=True))
+        print(_pretty_json(result))
+
     else:
         if executables:
             print('\n'.join(
