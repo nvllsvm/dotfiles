@@ -1,15 +1,2 @@
 #!/usr/bin/env sh
-if [ -n "$WAYLAND_DISPLAY" ]; then
-    exec wl-paste
-elif [ -n "$XAUTHORITY" ]; then
-    exec xclip -selection c -o
-elif command -v termux-clipboard-get > /dev/null; then
-    exec termux-clipboard-get
-elif command -v pbcopy > /dev/null; then
-    exec pbpaste
-elif command -v tmux > /dev/null; then
-    exec tmux save-buffer -
-else
-    echo error: no suitable clipboard command detected >&2
-    exit 1
-fi
+exec "$DOTFILES/scripts/clipboard" 'paste'

@@ -1,0 +1,60 @@
+#!/usr/bin/env sh
+set -e
+case "$1" in
+    copy|paste)
+        MODE="$1"
+        ;;
+    *)
+        echo 'usage: clipboard (copy|paste)'
+        exit 1
+esac
+
+if [ -n "$WAYLAND_DISPLAY" ]; then
+    case "$MODE" in
+        copy)
+            exec wl-copy
+            ;;
+        paste)
+            exec wl-paste
+            ;;
+    esac
+elif [ -n "$XAUTHORITY" ]; then
+    case "$MODE" in
+        copy)
+            exec xclip -selection c
+            ;;
+        paste)
+            exec xclip -selection c -o
+            ;;
+    esac
+elif command -v termux-clipboard-get > /dev/null; then
+    case "$MODE" in
+        copy)
+            exec termux-clipboard-set
+            ;;
+        paste)
+            exec termux-clipboard-get
+            ;;
+    esac
+elif [ "$(uname)" = 'Dawrin' ]; then
+    case "$MODE" in
+        copy)
+            exec pbcopy
+            ;;
+        paste)
+            exec pbpaste
+            ;;
+    esac
+elif command -v tmux > /dev/null; then
+    case "$MODE" in
+        copy)
+            exec tmux load-buffer -
+            ;;
+        paste)
+            exec tmux save-buffer -
+            ;;
+    esac
+else
+    echo error: no suitable clipboard command detected >&2
+    exit 1
+fi
