@@ -6,7 +6,8 @@ import re
 import subprocess
 
 
-_PART_RE = re.compile(r'(.*)\.part(\d+)\.rar$')
+_PART_RE = re.compile(r'(.*\.part)(\d+)(\.rar)$')
+_ALT_PART_RE = re.compile(r'(.*\.)(\d+)$')
 
 
 def extract(path, parent=None, child=False, password=None):
@@ -146,20 +147,25 @@ def main():
             continue
         volumes = [path]
 
-        if path.suffix == '.rar':
-            num_volumes = _get_num_volumes(path, password)
+        num_volumes = _get_num_volumes(path, password)
 
-            if num_volumes > 1:
-                prefix, vol_num = _PART_RE.search(str(path)).groups()
+        if num_volumes > 1:
+            if found := _PART_RE.search(str(path)):
+                prefix, vol_num, suffix = found.groups()
+            elif found := _ALT_PART_RE.search(str(path)):
+                prefix, vol_num = found.groups()
+                suffix = ''
+            else:
+                raise NotImplementedError
 
-                volumes = [
-                    pathlib.Path('{}.part{}.rar'.format(
-                        prefix, str(i).rjust(len(vol_num), '0')))
-                    for i in range(1, num_volumes + 1)
-                ]
-                for v in volumes:
-                    if not v.is_file():
-                        raise RuntimeError(f'missing volume {v}')
+            volumes = [
+                pathlib.Path('{}{}{}'.format(
+                    prefix, str(i).rjust(len(vol_num), '0'), suffix))
+                for i in range(1, num_volumes + 1)
+            ]
+            for v in volumes:
+                if not v.is_file():
+                    raise RuntimeError(f'missing volume {v}')
 
         if args.list:
             _list_contents(path)
