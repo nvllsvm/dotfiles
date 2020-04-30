@@ -3,4 +3,6 @@ if ! command -v direnv > /dev/null; then
     exit
 fi
 
-direnv prune
+if [ -d ~/.local/share/direnv/allow ]; then
+    direnv prune
+fi
