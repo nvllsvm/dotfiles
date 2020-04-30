@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
 set -e
-mkvmerge -o "$1".mkv "$1"
-rm "$1"
+for f in "$@"; do
+    mkvmerge -o "$f".mkv "$f" && rm "$f"
+done
