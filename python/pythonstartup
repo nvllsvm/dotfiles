@@ -30,6 +30,7 @@ for name in [
         'psycopg2',
         'redis',
         'tabulate',
+        'yaml',
         'yarl',
 ]:
     try:
