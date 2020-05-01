@@ -78,19 +78,6 @@ class MKVFile:
             temp.rename(target)
 
 
-def delete_if_exists(path):
-    """Delete a file or directory if it exists
-    :param pathlib.Path path:
-    """
-    try:
-        if path.is_file():
-            path.unlink()
-        else:
-            shutil.rmtree(path)
-    except FileNotFoundError:
-        pass
-
-
 @contextlib.contextmanager
 def TempPath(**kwargs):
     """Wrapper around tempfile.NamedTemporaryFile which returns a path object
@@ -102,10 +89,14 @@ def TempPath(**kwargs):
         temp_path = pathlib.Path(tmp.name)
         try:
             yield temp_path
-        except Exception:
-            delete_if_exists(temp_path)
-            raise
-    delete_if_exists(temp_path)
+        finally:
+            try:
+                if temp_path.is_file():
+                    temp_path.unlink()
+                else:
+                    shutil.rmtree(temp_path)
+            except FileNotFoundError:
+                pass
 
 
 def mkv_files(root):
