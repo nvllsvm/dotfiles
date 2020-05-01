@@ -22,6 +22,21 @@ import sys
 import urllib.parse
 import uuid
 
+for name in [
+        'arrow',
+        'enzyme',
+        'httpx',
+        'mutagen',
+        'psycopg2',
+        'redis',
+        'tabulate',
+        'yarl',
+]:
+    try:
+        exec(f'import {name}')
+    except ModuleNotFoundError:
+        pass
+
 
 def pp(*args, **kwargs):
     kwargs.setdefault('sort_dicts', True)
