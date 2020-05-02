@@ -172,3 +172,14 @@ bindsym $mod+F3 exec i3-f3
 bindsym $mod+F4 exec i3-f4
 bindsym $mod+F5 exec i3-f5
 bindsym $mod+F6 exec i3-f6
+
+bindsym XF86AudioMute exec --no-startup-id set-volume mute
+bindsym XF86AudioLowerVolume exec --no-startup-id set-volume decrease
+bindsym XF86AudioRaiseVolume exec --no-startup-id set-volume increase
+
+bindsym XF86AudioPlay exec --no-startup-id mpc toggle
+bindsym XF86AudioPrev exec --no-startup-id mpc prev
+bindsym XF86AudioNext exec --no-startup-id mpc next
+
+bindsym XF86MonBrightnessDown exec --no-startup-id set-backlight dec
+bindsym XF86MonBrightnessUp exec --no-startup-id set-backlight inc

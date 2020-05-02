@@ -17,7 +17,6 @@ xset s off -dpms
 setup-outputs
 
 picom &
-systemctl restart --user sxhkd
 xss-lock -- lock-screen &
 
 if command -v xinit-$(hostname) > /dev/null; then
