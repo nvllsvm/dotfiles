@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+launch() {
+    nohup "$@" > /dev/null 2>&1 &
+}
+launch riot-desktop --hidden
+launch signal-desktop --use-tray-icon --start-in-tray
+launch slack --startup
