@@ -24,6 +24,7 @@ if command -v xinit-$(hostname) > /dev/null; then
     xinit-$(hostname)
 fi
 
+snixembed --fork
 nm-applet &
 syncthing-gtk &
 
