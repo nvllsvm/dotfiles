@@ -2,7 +2,6 @@ set $mod Mod4
 
 set_from_resource $background background #000000
 set_from_resource $foreground foreground #000000
-
 set_from_resource $color0 color0 #000000
 set_from_resource $color1 color1 #000000
 set_from_resource $color2 color2 #000000
@@ -33,15 +32,9 @@ font pango:$font $fontSize
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
 
-bindsym $mod+Return exec alacritty
 
 # kill focused window
 bindsym $mod+Shift+q kill
-
-bindsym $mod+space exec desktop-launcher
-bindsym ctrl+$mod+space exec rofimoji --skin-tone neutral
-
-bindsym $mod+x [class="^.*"] border toggle
 
 # change focus
 bindsym $mod+h focus left
@@ -159,12 +152,15 @@ for_window [class="^.*"] border pixel 2
 for_window [class="dosbox"] floating enable, resize set 100 ppt 100 ppt, border none, move position center
 
 bindsym $mod+b bar mode toggle
+bindsym $mod+m move position center
+
+bindsym $mod+Return exec alacritty
+bindsym $mod+space exec desktop-launcher
+bindsym ctrl+$mod+space exec rofimoji --skin-tone neutral
+bindsym $mod+Escape exec lock-screen
 
 bindsym $mod+Shift+s exec maim-clipboard
 bindsym $mod+Shift+f exec maim-file
-bindsym $mod+Escape exec lock-screen
-
-bindsym $mod+m move position center
 
 bindsym $mod+F1 exec i3-f1
 bindsym $mod+F2 exec i3-f2
