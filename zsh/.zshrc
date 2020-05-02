@@ -8,8 +8,8 @@ autoload -U colors && colors
 autoload -U compinit
 autoload -U add-zsh-hook
 
-HISTSIZE=1000
-SAVEHIST=1000
+HISTSIZE=100000
+SAVEHIST=100000
 HISTFILE=~/.zhistory
 
 setopt hist_no_store
