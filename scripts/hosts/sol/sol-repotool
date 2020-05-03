@@ -11,13 +11,9 @@ if ! [ -f "$DATABASE_FILE" ]; then
     repo-add "$DATABASE_FILE"
 fi
 
-aurto_sync() {
-    sudo pacsync "$DATABASE" > /dev/null
-}
-
 repotool_update() {
     rm -rf ~/.cache/aurutils/sync/
-    aurto_sync
+    sudo pacsync "$DATABASE" > /dev/null
 
     aur sync --no-view --no-confirm --database="$DATABASE" --no-ver --upgrades
 
@@ -33,27 +29,22 @@ repotool_update() {
         fi
     fi
 
-    aurto_sync
+    sudo pacsync "$DATABASE" > /dev/null
     paccache --remove --keep 1 --cachedir "$DATABASE_DIR"
     rm -rf ~/.cache/aurutils/sync/
 }
 
 repotool_add() {
+    sudo pacsync "$DATABASE" > /dev/null
     for i in "${@}"; do
-        packages_and_deps="$packages_and_deps $(echo "$i" | aur depends 2>/dev/null | cut -f2 | sort | comm -12 - <(aur pkglist | sort))"
+        if [ -f "$i" ]; then
+            repo-add "$DATABASE_FILE" "${@}"
+        else
+            packages_and_deps="$packages_and_deps $(echo "$i" | aur depends 2>/dev/null | cut -f2 | sort | comm -12 - <(aur pkglist | sort))"
+            aur sync --no-view --no-confirm --no-ver --database="$DATABASE" -- "${packages_and_deps}"
+        fi
     done
-
-    aurto_sync
-    aur sync --no-view --no-confirm --no-ver --database="$DATABASE" -- "${@}"
-    aurto_sync
-}
-
-repotool_addpkg() {
-    repo-add "$DATABASE_FILE" "${@}"
-    for pkg in "${@}"; do
-        cp "$pkg" "$DATABASE_DIR"
-    done
-    aurto_sync
+    sudo pacsync "$DATABASE" > /dev/null
 }
 
 repotool_remove() {
@@ -61,7 +52,7 @@ repotool_remove() {
     for pkg in "${@}"; do
         rm -rf "$DATABASE_DIR"/"$pkg"*.pkg.*
     done
-    aurto_sync
+    sudo pacsync "$DATABASE" > /dev/null
 }
 
 usage() {

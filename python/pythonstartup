@@ -5,11 +5,13 @@ import concurrent.futures
 import contextlib
 import datetime
 import glob
+import gzip
 import hashlib
 import io
 import itertools
 import json
 import logging
+import lzma
 import os
 import pathlib
 import pickle
@@ -19,9 +21,11 @@ import shutil
 import socket
 import subprocess
 import sys
+import tarfile
 import time
 import urllib.parse
 import uuid
+import zipfile
 
 for name in [
         'arrow',
