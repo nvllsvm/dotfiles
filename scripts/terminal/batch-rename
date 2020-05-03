@@ -1,25 +1,19 @@
 #!/usr/bin/env python3
 import argparse
 import pathlib
+import re
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--lstrip', metavar='TEXT', default='')
-    parser.add_argument('--rstrip', metavar='TEXT', default='')
-    parser.add_argument('--append', metavar='TEXT', default='')
-    parser.add_argument('--prepend', metavar='TEXT', default='')
+    parser.add_argument('regex', type=re.compile)
+    parser.add_argument('replacement')
     parser.add_argument('path', nargs='+', type=pathlib.Path)
     args = parser.parse_args()
 
     path_targets = {}
     for path in args.path:
-        name = path.name.lstrip(args.lstrip).rstrip(args.rstrip)
-        target = path.with_name(''.join([
-            args.prepend,
-            name,
-            args.append
-        ]))
+        target = path.with_name(args.regex.sub(args.replacement, path.name))
         if target == path:
             continue
         if target.exists():
