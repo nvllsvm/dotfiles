@@ -38,7 +38,8 @@ repotool_add() {
     sudo pacsync "$DATABASE" > /dev/null
     for i in "${@}"; do
         if [ -f "$i" ]; then
-            repo-add "$DATABASE_FILE" "${@}"
+            sudo cp "$i" "$DATABASE_DIR"
+            repo-add "$DATABASE_FILE" "$i"
         else
             packages_and_deps="$packages_and_deps $(echo "$i" | aur depends 2>/dev/null | cut -f2 | sort | comm -12 - <(aur pkglist | sort))"
         fi
