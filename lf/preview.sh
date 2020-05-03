@@ -15,5 +15,5 @@ case "$1" in
     *)
         # 1024 is overkill, but using $(tput lines) doesn't seem to work consistently.
         # results are cutoff.
-        exec bat -r :1024 --color=always --plain -- "$1"
+        exec highlight --out-format=ansi -- "$1"
 esac
