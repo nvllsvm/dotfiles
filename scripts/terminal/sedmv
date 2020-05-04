@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+pattern="$1"
+shift
+for f in "$@"; do
+    new="$(printf %s "$f" | sed "$pattern")"
+    if [ "$new" != "$f" ]; then
+        mv "$f" "$new"
+    fi
+done
