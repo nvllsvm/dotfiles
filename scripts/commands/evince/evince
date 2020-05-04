@@ -1,3 +1,0 @@
-#!/usr/bin/env sh
-export GTK_THEME=Adwaita:dark
-exec "$(which -a "${0##*/}" | grep -m 1 -v "^$0$")" "$@"
