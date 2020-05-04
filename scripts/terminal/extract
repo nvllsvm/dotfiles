@@ -10,14 +10,78 @@ _PART_RE = re.compile(r'(.*\.part)(\d+)(\.rar)$')
 _ALT_PART_RE = re.compile(r'(.*\.)(\d+)$')
 
 
+class p7zip:
+
+    @staticmethod
+    def extract(path, dest, password=''):
+        subprocess.run(
+            ['7z', 'x', f'-p{password}', '-ba', '-spe', f'-o{dest}', '--',
+             str(path)],
+            check=True
+        )
+
+    @staticmethod
+    def volumes(path, password=''):
+        result = subprocess.run(
+            ['7z', 'l', f'-p{password}', '--', str(path)],
+            stdout=subprocess.PIPE,
+            check=True)
+
+        num_volumes = 1
+        for line in reversed(result.stdout.decode().splitlines()):
+            if line.startswith('Volumes = '):
+                num_volumes = int(line.split(' = ')[1])
+                break
+
+        if num_volumes > 1:
+            if found := _PART_RE.search(str(path)):
+                prefix, vol_num, suffix = found.groups()
+            elif found := _ALT_PART_RE.search(str(path)):
+                prefix, vol_num = found.groups()
+                suffix = ''
+            else:
+                raise NotImplementedError
+
+            volumes = [
+                pathlib.Path('{}{}{}'.format(
+                    prefix, str(i).rjust(len(vol_num), '0'), suffix))
+                for i in range(1, num_volumes + 1)
+            ]
+            for v in volumes:
+                if not v.is_file():
+                    raise RuntimeError(f'missing volume {v}')
+        else:
+            volumes = [path]
+        return volumes
+
+
+class tar:
+
+    @staticmethod
+    def contents(path):
+        proc = subprocess.run(
+            ['tar', 'tvf', str(path)],
+            stdout=subprocess.PIPE,
+            check=True)
+        return proc.stdout.decode().splitlines()
+
+
+class zstd:
+
+    @staticmethod
+    def extract(path, dest):
+        subprocess.run(
+            ['zstd', '-d', '--output-dir-flat', dest, '--', str(path)],
+            check=True
+        )
+
+
 def extract(path, parent=None, child=False, password=None):
     dest = _build_dest(path, parent, child)
     if path.suffix.lower() == '.zst':
-        _extract_zstd(path, dest)
-    elif _is_nested_tar(path):
-        _extract_7z_nested_tar(path, dest, password)
+        zstd.extract(path, dest)
     else:
-        _extract_7z(path, dest, password)
+        p7zip.extract(path, dest, password)
 
 
 def _build_dest(path, parent, child):
@@ -48,67 +112,9 @@ def _is_nested_tar(path):
         return False
 
 
-def _extract_7z_nested_tar(path, dest, password=''):
-    extract_1 = subprocess.Popen(
-        ['7z', 'x', f'-p{password}', '-so', '--', str(path)],
-        stdout=subprocess.PIPE,
-    )
-    subprocess.run(
-        ['7z', 'x', f'-p{password}', '-aoa', '-si', '-ttar', f'-o{dest}'],
-        stdin=extract_1.stdout,
-        check=True
-    )
-    extract_1.wait()
-    if extract_1.returncode:
-        raise subprocess.CalledProcessError(
-            extract_1.returncode,
-            extract_1.args
-        )
-
-
-def _extract_7z(path, dest, password=''):
-    subprocess.run(
-        ['7z', 'x', f'-p{password}', '-ba', '-spe', f'-o{dest}', '--',
-         str(path)],
-        check=True
-    )
-
-
-def _extract_zstd(path, dest):
-    subprocess.run(
-        ['zstd', '-d', '--output-dir-flat', dest, '--', str(path)],
-        check=True
-    )
-
-
-def _get_num_volumes(path, password=''):
-    result = subprocess.run(
-        ['7z', 'l', f'-p{password}', '--', str(path)],
-        stdout=subprocess.PIPE,
-        check=True)
-    for line in reversed(result.stdout.decode().splitlines()):
-        if line.startswith('Volumes = '):
-            return int(line.split(' = ')[1])
-    return 1
-
-
 def _list_contents(path):
     if _is_nested_tar(path):
-        if path.suffix == '.zst':
-            extract = subprocess.Popen(
-                ['zstd', '-dcf', '--', str(path)],
-                stdout=subprocess.PIPE,
-            )
-        else:
-            extract = subprocess.Popen(
-                ['7z', 'x', '-p', '-ba', '-so', '--', str(path)],
-                stdout=subprocess.PIPE,
-            )
-        subprocess.run(
-            ['7z', '-ba', '-si', '-ttar', 'l'],
-            stdin=extract.stdout,
-            check=True
-        )
+        print('\n'.join(tar.contents(path)))
     else:
         if path.suffix == '.zst':
             print(path.stem or path)
@@ -143,38 +149,19 @@ def main():
 
     extracted = set()
     for path in args.archive:
-        if path in extracted:
-            continue
-        volumes = [path]
-
-        num_volumes = _get_num_volumes(path, password)
-
-        if num_volumes > 1:
-            if found := _PART_RE.search(str(path)):
-                prefix, vol_num, suffix = found.groups()
-            elif found := _ALT_PART_RE.search(str(path)):
-                prefix, vol_num = found.groups()
-                suffix = ''
-            else:
-                raise NotImplementedError
-
-            volumes = [
-                pathlib.Path('{}{}{}'.format(
-                    prefix, str(i).rjust(len(vol_num), '0'), suffix))
-                for i in range(1, num_volumes + 1)
-            ]
-            for v in volumes:
-                if not v.is_file():
-                    raise RuntimeError(f'missing volume {v}')
-
         if args.list:
             _list_contents(path)
         else:
-            extract(path, args.parent, args.child, password)
+            if path in extracted:
+                continue
+
+            volumes = p7zip.volumes(path, password)
+
+            extract([volumes[0]], args.parent, args.child, password)
             if args.rm:
                 for path in volumes:
                     path.unlink()
-        extracted.update(volumes)
+            extracted.update(volumes)
 
 
 if __name__ == '__main__':
