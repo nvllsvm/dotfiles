@@ -157,7 +157,7 @@ def main():
 
             volumes = p7zip.volumes(path, password)
 
-            extract([volumes[0]], args.parent, args.child, password)
+            extract(volumes[0], args.parent, args.child, password)
             if args.rm:
                 for path in volumes:
                     path.unlink()
