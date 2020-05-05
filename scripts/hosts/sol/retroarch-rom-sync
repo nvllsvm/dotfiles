@@ -1,6 +1,69 @@
-#!/usr/bin/env sh
-rsync -av --progress --delete /storage/Games/GB/ /storage/Syncthing/Default/RetroArch/rom/GB
-rsync -av --progress --delete /storage/Games/GBA/ /storage/Syncthing/Default/RetroArch/rom/GBA
-rsync -av --progress --delete /storage/Games/GBC/ /storage/Syncthing/Default/RetroArch/rom/GBC
-rsync -av --progress --delete /storage/Games/NES/ /storage/Syncthing/Default/RetroArch/rom/NES
-rsync -av --progress --delete /storage/Games/SNES/ /storage/Syncthing/Default/RetroArch/rom/SNES
+#!/usr/bin/env python
+import pathlib
+import shutil
+import subprocess
+
+
+class zstd:
+
+    @staticmethod
+    def decompress(path, dest, overwrite=False):
+        args = ['zstd', '-d', '-o', dest]
+        if overwrite:
+            args.append('-f')
+
+        args.extend(['--', path])
+        subprocess.run(args, check=True)
+
+
+def _all_files(root):
+    stack = [pathlib.Path(root)]
+    paths = []
+    while stack:
+        for path in stack.pop().iterdir():
+            if path.is_file():
+                paths.append(path)
+            elif path.is_dir():
+                stack.append(path)
+    return paths
+
+
+def _sync(source_dir, target_dir):
+    mapping = {}
+    for source in _all_files(source_dir):
+        basename = source.relative_to(source_dir)
+        if source.suffix == '.zst':
+            basename = basename.with_suffix('')
+            if source_dir.joinpath(basename).exists():
+                raise RuntimeError(f'{source} and {basename} exist.')
+            target = target_dir / basename
+        else:
+            target = target_dir / basename
+
+        mapping[source] = target
+
+    for source, target in mapping.items():
+        if target.exists():
+            if target.stat().st_mtime == source.stat().st_mtime:
+                continue
+        if source.suffix == '.zst':
+            zstd.decompress(source, target, overwrite=True)
+        else:
+            shutil.copy(source, target)
+        shutil.copystat(source, target)
+
+    targets = set(mapping.values())
+    for path in set(_all_files(target_dir)) - targets:
+        path.unlink()
+
+
+def main():
+    source_dir = pathlib.Path('/storage/Games')
+    target_dir = pathlib.Path('/storage/Syncthing/Default/RetroArch/rom')
+
+    for d in ('GB', 'GBC', 'GBA', 'NES', 'SNES'):
+        _sync(source_dir / d, target_dir / d)
+
+
+if __name__ == '__main__':
+    main()

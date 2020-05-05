@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+if [ $# != 2 ]; then
+    exit 1
+fi
+DEST="$(realpath "$1")"
+SOURCE="$2"
+cd "$SOURCE" || exit 1
+tar cf - . | zstd -T0 --ultra -22 -o "$DEST"
