@@ -1,13 +1,20 @@
 #!/usr/bin/env sh
-PWD="$(pwd)"
+set -e
+
+REMOVE=''
+if [ "$1" = '--rm' ]; then
+    REMOVE=1
+    shift
+fi
+
+ORIG_PWD="$(pwd)"
+
 for f in "$@"; do
-    DEST="$PWD/$(basename "$f").tar.zst"
+    DEST="$ORIG_PWD/$(basename "$f").tar.zst"
     cd "$f" || exit 1
-    if [ -d "$f" ]; then
-        s='.'
-    else
-        s="$f"
+    tar cf - . | zstd -T0 --ultra -22 -o "$DEST"
+    cd "$ORIG_PWD" || exit 1
+    if [ -n "$REMOVE" ]; then
+        rm -rf "$f"
     fi
-    tar cf - "$s" | zstd -T0 --ultra -22 -o "$DEST"
-    cd "$PWD" || exit 1
 done
