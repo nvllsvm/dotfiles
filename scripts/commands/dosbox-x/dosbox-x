@@ -1,5 +1,0 @@
-#!/usr/bin/env sh
-if [ $# -eq 0 ]; then
-    cd "$DOTFILES/dosbox-x"
-fi
-exec "$(which -a "${0##*/}" | grep -m 1 -v "^$0$")" "$@"
