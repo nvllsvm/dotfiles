@@ -6,11 +6,10 @@ import re
 import subprocess
 
 
-_PART_RE = re.compile(r'(.*\.part)(\d+)(\.rar)$')
-_ALT_PART_RE = re.compile(r'(.*\.)(\d+)$')
-
-
 class p7zip:
+
+    _PART_RE = re.compile(r'(.*\.part)(\d+)(\.rar)$')
+    _ALT_PART_RE = re.compile(r'(.*\.)(\d+)$')
 
     @staticmethod
     def extract(path, dest, password=''):
@@ -20,8 +19,8 @@ class p7zip:
             check=True
         )
 
-    @staticmethod
-    def volumes(path, password=''):
+    @classmethod
+    def volumes(cls, path, password=''):
         result = subprocess.run(
             ['7z', 'l', f'-p{password}', '--', str(path)],
             stdout=subprocess.PIPE,
@@ -34,9 +33,9 @@ class p7zip:
                 break
 
         if num_volumes > 1:
-            if found := _PART_RE.search(str(path)):
+            if found := cls._PART_RE.search(str(path)):
                 prefix, vol_num, suffix = found.groups()
-            elif found := _ALT_PART_RE.search(str(path)):
+            elif found := cls._ALT_PART_RE.search(str(path)):
                 prefix, vol_num = found.groups()
                 suffix = ''
             else:
@@ -74,6 +73,17 @@ class zstd:
             ['zstd', '-d', '--output-dir-flat', dest, '--', str(path)],
             check=True
         )
+
+
+class unzip:
+
+    @staticmethod
+    def contents(path):
+        proc = subprocess.run(
+            ['unzip', '-lqq', str(path)],
+            stdout=subprocess.PIPE,
+            check=True)
+        return proc.stdout.decode().splitlines()
 
 
 def extract(path, parent=None, child=False, password=None):
@@ -114,15 +124,17 @@ def _is_nested_tar(path):
 
 def _list_contents(path):
     if _is_nested_tar(path):
-        print('\n'.join(tar.contents(path)))
+        contents = tar.contents(path)
+    elif path.suffix == '.zip':
+        contents = unzip.contents(path)
+    elif path.suffix == '.zst':
+        contents = [path.stem]
     else:
-        if path.suffix == '.zst':
-            print(path.stem or path)
-        else:
-            subprocess.run(
-                ['7z', '-ba', 'l', '--', str(path)],
-                check=True
-            )
+        subprocess.run(
+            ['7z', '-ba', 'l', '--', str(path)],
+            check=True
+        )
+    print('\n'.join(contents))
 
 
 def main():
