@@ -137,6 +137,13 @@ def _list_contents(path):
     print('\n'.join(contents))
 
 
+def _volumes(path, password=''):
+    if path.suffix == '.zst':
+        return [path]
+    else:
+        return p7zip.volumes(path, password)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -167,7 +174,7 @@ def main():
             if path in extracted:
                 continue
 
-            volumes = p7zip.volumes(path, password)
+            volumes = _volumes(path, password)
 
             extract(volumes[0], args.parent, args.child, password)
             if args.rm:
