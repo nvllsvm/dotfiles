@@ -11,8 +11,9 @@ ORIG_PWD="$(pwd)"
 
 for f in "$@"; do
     DEST="$ORIG_PWD/$(basename "$f").tar.zst"
+    SRC="$(basename "$f")"
     cd "$(dirname "$f")" || exit 1
-    tar cf - . | zstd -T0 --ultra -22 -o "$DEST"
+    tar cf - "$SRC" | zstd -T0 --ultra -22 -o "$DEST"
     cd "$ORIG_PWD" || exit 1
     if [ -n "$REMOVE" ]; then
         rm -rf "$f"
