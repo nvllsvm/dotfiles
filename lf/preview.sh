@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 case "$1" in
-    *.tar.*|*.xz|*.zst|*.7z|*.zip|*.iso)
+    *.tar.*|*.rar|*.7z|*.zip|*.iso)
         exec extract -l "$1"
         ;;
     *)
