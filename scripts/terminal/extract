@@ -123,7 +123,7 @@ def _list_contents(path):
         contents = tar.contents(path)
     else:
         contents = p7zip.contents(path)
-    print('\n'.join(contents))
+    print('\n'.join(sorted(contents)))
 
 
 def _volumes(path, password=''):
