@@ -64,32 +64,17 @@ class tar:
             check=True)
         return proc.stdout.decode().splitlines()
 
-
-class zstd:
-
     @staticmethod
     def extract(path, dest):
         subprocess.run(
-            ['zstd', '-d', '--output-dir-flat', dest, '--', str(path)],
-            check=True
-        )
-
-
-class unzip:
-
-    @staticmethod
-    def contents(path):
-        proc = subprocess.run(
-            ['unzip', '-lqq', str(path)],
-            stdout=subprocess.PIPE,
+            ['tar', 'xvf', path, '-C', dest],
             check=True)
-        return proc.stdout.decode().splitlines()
 
 
 def extract(path, parent=None, child=False, password=None):
     dest = _build_dest(path, parent, child)
-    if path.suffix.lower() == '.zst':
-        zstd.extract(path, dest)
+    if _is_tar(path):
+        tar.extract(path, dest)
     else:
         p7zip.extract(path, dest, password)
 
@@ -113,22 +98,17 @@ def _build_dest(path, parent, child):
     return dest
 
 
-def _is_nested_tar(path):
+def _is_tar(path):
     if len(path.suffixes) > 1 and path.suffixes[-2].lower() == '.tar':
         return True
     elif path.suffix.lower() == '.tgz':
         return True
-    else:
-        return False
+    return False
 
 
 def _list_contents(path):
-    if _is_nested_tar(path):
+    if _is_tar(path):
         contents = tar.contents(path)
-    elif path.suffix == '.zip':
-        contents = unzip.contents(path)
-    elif path.suffix == '.zst':
-        contents = [path.stem]
     else:
         subprocess.run(
             ['7z', '-ba', 'l', '--', str(path)],
