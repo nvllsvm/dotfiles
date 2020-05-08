@@ -1,60 +1,63 @@
 #!/usr/bin/env python
+import os
 import pathlib
 import shutil
 import subprocess
 
 
-class zstd:
-
-    @staticmethod
-    def decompress(path, dest, overwrite=False):
-        args = ['zstd', '-d', '-o', dest]
-        if overwrite:
-            args.append('-f')
-
-        args.extend(['--', path])
-        subprocess.run(args, check=True)
+def tar_extract(path, dest):
+    proc = subprocess.run(
+        ['tar', 'xvf', path, '-C', dest],
+        check=True,
+        stdout=subprocess.PIPE)
+    return proc.stdout.decode().splitlines()
 
 
-def _all_files(root):
+def _all_paths(root):
     stack = [pathlib.Path(root)]
     paths = []
     while stack:
         for path in stack.pop().iterdir():
-            if path.is_file():
-                paths.append(path)
-            elif path.is_dir():
+            paths.append(path)
+            if path.is_dir():
                 stack.append(path)
     return paths
 
 
+def _is_tar(path):
+    if path.suffix.lower() == '.tar':
+        return True
+    if len(path.suffixes) > 1 and path.suffixes[-2].lower() == '.tar':
+        return True
+    return False
+
+
 def _sync(source_dir, target_dir):
-    mapping = {}
-    for source in _all_files(source_dir):
-        basename = source.relative_to(source_dir)
-        if source.suffix == '.zst':
-            basename = basename.with_suffix('')
-            if source_dir.joinpath(basename).exists():
-                raise RuntimeError(f'{source} and {basename} exist.')
-            target = target_dir / basename
+    expected = set()
+    for source in _all_paths(source_dir):
+        if not source.is_file():
+            continue
+        target = target_dir / source.relative_to(source_dir).parent
+        target.mkdir(parents=True, exist_ok=True)
+        mtime = source.stat().st_mtime_ns
+        if _is_tar(source):
+            for extracted in tar_extract(source, target):
+                extracted = target / extracted
+                os.utime(extracted, ns=(mtime, mtime))
+                expected.add(extracted)
         else:
-            target = target_dir / basename
+            os.utime(target / source.name, ns=(mtime, mtime))
+            shutil.copy(source, target / source.name)
 
-        mapping[source] = target
-
-    for source, target in mapping.items():
-        if target.exists():
-            if target.stat().st_mtime == source.stat().st_mtime:
-                continue
-        if source.suffix == '.zst':
-            zstd.decompress(source, target, overwrite=True)
-        else:
-            shutil.copy(source, target)
-        shutil.copystat(source, target)
-
-    targets = set(mapping.values())
-    for path in set(_all_files(target_dir)) - targets:
-        path.unlink()
+    for path in _all_paths(target_dir):
+        if path not in expected:
+            try:
+                if path.is_dir():
+                    shutil.rmtree(path)
+                else:
+                    path.unlink()
+            except FileNotFoundError:
+                pass
 
 
 def main():
