@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+set -eu
+SOURCE="$1"
+DEST="$(realpath "$SOURCE").tar.zst"
+
+find "$SOURCE" -printf "%P\n" | tar cf - -C "$SOURCE" -T - | zstd -T0 --ultra -22 -o "$DEST"

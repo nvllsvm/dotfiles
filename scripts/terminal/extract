@@ -79,7 +79,7 @@ class tar:
     @staticmethod
     def extract(path, dest):
         subprocess.run(
-            ['tar', 'xf', path, '-C', dest],
+            ['tar', 'xf', path, f'--one-top-level={dest}', '--keep-old-files'],
             check=True)
 
 
