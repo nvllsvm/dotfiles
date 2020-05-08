@@ -19,6 +19,18 @@ class p7zip:
             check=True
         )
 
+    @staticmethod
+    def contents(path):
+        proc = subprocess.run(
+            ['7z', '-ba', 'l', '--', str(path)],
+            stdout=subprocess.PIPE,
+            check=True
+        )
+        return [
+            line.split(maxsplit=5)[-1]
+            for line in proc.stdout.decode().splitlines()
+        ]
+
     @classmethod
     def volumes(cls, path, password=''):
         result = subprocess.run(
@@ -59,7 +71,7 @@ class tar:
     @staticmethod
     def contents(path):
         proc = subprocess.run(
-            ['tar', 'tvf', str(path)],
+            ['tar', 'tf', str(path)],
             stdout=subprocess.PIPE,
             check=True)
         return proc.stdout.decode().splitlines()
@@ -67,7 +79,7 @@ class tar:
     @staticmethod
     def extract(path, dest):
         subprocess.run(
-            ['tar', 'xvf', path, '-C', dest],
+            ['tar', 'xf', path, '-C', dest],
             check=True)
 
 
@@ -110,10 +122,7 @@ def _list_contents(path):
     if _is_tar(path):
         contents = tar.contents(path)
     else:
-        subprocess.run(
-            ['7z', '-ba', 'l', '--', str(path)],
-            check=True
-        )
+        contents = p7zip.contents(path)
     print('\n'.join(contents))
 
 
