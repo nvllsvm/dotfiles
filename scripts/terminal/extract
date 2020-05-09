@@ -83,10 +83,25 @@ class tar:
             check=True)
 
 
+class zstd:
+
+    @staticmethod
+    def contents(path):
+        return [path.with_suffix('').name]
+
+    @staticmethod
+    def extract(path, dest):
+        subprocess.run(
+            ['zstd', '-d', '--output-dir-flat', dest, '--', path],
+            check=True)
+
+
 def extract(path, parent=None, child=False, password=None):
     dest = _build_dest(path, parent, child)
     if _is_tar(path):
         tar.extract(path, dest)
+    elif path.suffix.lower() == '.zst':
+        zstd.extract(path, dest)
     else:
         p7zip.extract(path, dest, password)
 
@@ -121,6 +136,8 @@ def _is_tar(path):
 def _list_contents(path):
     if _is_tar(path):
         contents = tar.contents(path)
+    elif path.suffix.lower() == '.zst':
+        contents = zstd.contents(path)
     else:
         contents = p7zip.contents(path)
     print('\n'.join(sorted(contents)))
