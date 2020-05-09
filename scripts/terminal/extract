@@ -128,7 +128,7 @@ def _build_dest(path, parent, child):
 def _is_tar(path):
     if len(path.suffixes) > 1 and path.suffixes[-2].lower() == '.tar':
         return True
-    elif path.suffix.lower() == '.tgz':
+    elif path.suffix.lower() in ('.tar', '.tgz'):
         return True
     return False
 
