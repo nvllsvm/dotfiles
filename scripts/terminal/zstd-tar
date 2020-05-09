@@ -6,7 +6,7 @@ if [ "$1" = '--rm' ]; then
     shift
 fi
 SOURCE="$(realpath "$1")"
-DEST="${SOURCE}.tar.zst"
+DEST="$(basename "$SOURCE").tar.zst"
 
 if [ -f "$SOURCE" ]; then
     tar cf - -C "$(dirname "$SOURCE")" "$(basename "$SOURCE")" | zstd -T0 --ultra -22 -o "$DEST"
