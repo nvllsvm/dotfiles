@@ -1,5 +1,10 @@
 #!/usr/bin/env sh
 set -eu
+RM=
+if [ "$1" = '--rm' ]; then
+    RM=1
+    shift
+fi
 SOURCE="$(realpath "$1")"
 DEST="${SOURCE}.tar.zst"
 
@@ -7,4 +12,9 @@ if [ -f "$SOURCE" ]; then
     tar cf - -C "$(dirname "$SOURCE")" "$(basename "$SOURCE")" | zstd -T0 --ultra -22 -o "$DEST"
 elif [ -d "$SOURCE" ]; then
     find "$SOURCE" -printf "%P\n" | tar cf - -C "$SOURCE" -T - | zstd -T0 --ultra -22 -o "$DEST"
+else
+    exit 1
+fi
+if [ -n "$RM" ]; then
+    rm -rf "$SOURCE"
 fi
