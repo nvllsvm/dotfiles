@@ -162,7 +162,6 @@ bindsym $mod+Escape exec lock-screen
 bindsym $mod+Shift+s exec maim-clipboard
 bindsym $mod+Shift+f exec maim-file
 
-bindsym $mod+Shift+x --release exec xkill
 bindsym $mod+F1 exec i3-f1
 bindsym $mod+F2 exec i3-f2
 bindsym $mod+F3 exec i3-f3
