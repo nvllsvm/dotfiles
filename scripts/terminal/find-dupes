@@ -26,29 +26,44 @@ def sha256sum(path):
     return result.stdout.decode().split()[0]
 
 
+def _pretty_json(data):
+    return json.dumps(data, indent=2, sort_keys=True)
+
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('path', default=pathlib.Path(), type=pathlib.Path,
-                        nargs='?')
+    parser.add_argument('-u', '--unique', action='store_true')
+    parser.add_argument('path', default=[''], nargs='*')
     args = parser.parse_args()
 
+    files = set()
+    for path in args.path:
+        files.update(all_files(path))
+
     by_size = collections.defaultdict(set)
-    for path in all_files(args.path):
+    for path in files:
         by_size[path.stat().st_size].add(path)
 
     hashes = collections.defaultdict(set)
     for paths in by_size.values():
-        if len(paths) > 1:
+        if len(paths) > 1 or args.unique:
             for path in paths:
                 hashes[sha256sum(path)].add(path)
 
-    duplicates = {
-        k: sorted(str(p.absolute()) for p in v)
-        for k, v in hashes.items()
-        if len(v) > 1
-    }
-
-    print(json.dumps(duplicates, indent=2, sort_keys=True))
+    if args.unique:
+        unique = sorted(
+            str(list(v)[0].absolute())
+            for k, v in hashes.items()
+            if len(v) == 1
+        )
+        print(_pretty_json(unique))
+    else:
+        duplicates = {
+            k: sorted(str(p.absolute()) for p in v)
+            for k, v in hashes.items()
+            if len(v) > 1
+        }
+        print(_pretty_json(duplicates))
 
 
 if __name__ == '__main__':
