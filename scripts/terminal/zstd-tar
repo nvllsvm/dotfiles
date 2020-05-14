@@ -5,6 +5,11 @@ if [ "$1" = '--rm' ]; then
     RM=1
     shift
 fi
+
+if [ $# -nq 1 ]; then
+    exit 1
+fi
+
 SOURCE="$(realpath "$1")"
 DEST="$(basename "$SOURCE").tar.zst"
 
