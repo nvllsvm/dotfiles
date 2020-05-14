@@ -6,7 +6,7 @@ if [ "$1" = '--rm' ]; then
     shift
 fi
 
-if [ $# -nq 1 ]; then
+if [ $# -ne 1 ]; then
     exit 1
 fi
 
