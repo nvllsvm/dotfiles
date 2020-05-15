@@ -66,6 +66,60 @@ class p7zip:
         return volumes
 
 
+class unzip:
+    @staticmethod
+    def contents(path):
+        proc = subprocess.run(
+            ['unzip', '-qq', '-l', path],
+            stdout=subprocess.PIPE,
+            check=True)
+        return [
+            line.split(maxsplit=3)[-1]
+            for line in proc.stdout.decode().splitlines()
+        ]
+
+    @staticmethod
+    def extract(path, dest, password=None):
+        subprocess.run(
+            ['unzip', '-d', dest, path],
+            check=True)
+
+    @staticmethod
+    def volumes(path, password=''):
+        return [path]
+
+
+class unrar:
+    @staticmethod
+    def contents(path):
+        proc = subprocess.run(
+            ['unrar', 'vb', '-v', path],
+            stdout=subprocess.PIPE,
+            check=True)
+        return list(set(
+            line.split(maxsplit=3)[-1]
+            for line in proc.stdout.decode().splitlines()
+        ))
+
+    @staticmethod
+    def extract(path, dest, password=None):
+        subprocess.run(
+            ['unrar', 'x', path, dest],
+            check=True)
+
+    @staticmethod
+    def volumes(path, password=''):
+        proc = subprocess.run(
+            ['unrar', 'vt', '-v', path],
+            stdout=subprocess.PIPE,
+            check=True)
+        return [
+            path.parent / line.split(maxsplit=1)[-1]
+            for line in proc.stdout.decode().splitlines()
+            if line.startswith('Archive: ')
+        ]
+
+
 class innoextract:
 
     @staticmethod
@@ -156,9 +210,14 @@ def _get_class(path):
         return tar
     elif path.suffix.lower() == '.zst':
         return zstd
+    elif path.suffix.lower() == '.zip':
+        return unzip
+    elif path.suffix.lower() == '.rar':
+        return unrar
     elif path.suffix.lower() == '.exe':
         return innoextract
     else:
+        raise ValueError
         return p7zip
 
 
@@ -188,7 +247,7 @@ def main():
     for path in args.archive:
         cls = _get_class(path)
         if args.list:
-            print('\n'.join(sorted(cls.contents)))
+            print('\n'.join(sorted(cls.contents(path))))
         else:
             if path in extracted:
                 continue
