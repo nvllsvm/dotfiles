@@ -66,6 +66,32 @@ class p7zip:
         return volumes
 
 
+class innoextract:
+
+    @staticmethod
+    def contents(path):
+        proc = subprocess.run(
+            ['innoextract', '--quiet', '--list', str(path)],
+            stdout=subprocess.PIPE,
+            check=True)
+
+        contents = []
+        for line in proc.stdout.decode().splitlines():
+            _, name, _ = line.split('"', 2)
+            contents.append(name)
+        return contents
+
+    @staticmethod
+    def extract(path, dest, password=None):
+        subprocess.run(
+            ['innoextract', '--extract', '--output-dir', dest, path],
+            check=True)
+
+    @staticmethod
+    def volumes(path, password=''):
+        return [path]
+
+
 class tar:
 
     @staticmethod
@@ -77,10 +103,14 @@ class tar:
         return proc.stdout.decode().splitlines()
 
     @staticmethod
-    def extract(path, dest):
+    def extract(path, dest, password=None):
         subprocess.run(
             ['tar', 'xf', path, f'--one-top-level={dest}', '--keep-old-files'],
             check=True)
+
+    @staticmethod
+    def volumes(path, password=''):
+        return [path]
 
 
 class zstd:
@@ -90,20 +120,14 @@ class zstd:
         return [path.with_suffix('').name]
 
     @staticmethod
-    def extract(path, dest):
+    def extract(path, dest, password=None):
         subprocess.run(
             ['zstd', '-d', '--output-dir-flat', dest, '--', path],
             check=True)
 
-
-def extract(path, parent=None, child=False, password=None):
-    dest = _build_dest(path, parent, child)
-    if _is_tar(path):
-        tar.extract(path, dest)
-    elif path.suffix.lower() == '.zst':
-        zstd.extract(path, dest)
-    else:
-        p7zip.extract(path, dest, password)
+    @staticmethod
+    def volumes(path, password=''):
+        return [path]
 
 
 def _build_dest(path, parent, child):
@@ -125,29 +149,17 @@ def _build_dest(path, parent, child):
     return dest
 
 
-def _is_tar(path):
+def _get_class(path):
     if len(path.suffixes) > 1 and path.suffixes[-2].lower() == '.tar':
-        return True
+        return tar
     elif path.suffix.lower() in ('.tar', '.tgz'):
-        return True
-    return False
-
-
-def _list_contents(path):
-    if _is_tar(path):
-        contents = tar.contents(path)
+        return tar
     elif path.suffix.lower() == '.zst':
-        contents = zstd.contents(path)
+        return zstd
+    elif path.suffix.lower() == '.exe':
+        return innoextract
     else:
-        contents = p7zip.contents(path)
-    print('\n'.join(sorted(contents)))
-
-
-def _volumes(path, password=''):
-    if path.suffix == '.zst':
-        return [path]
-    else:
-        return p7zip.volumes(path, password)
+        return p7zip
 
 
 def main():
@@ -174,15 +186,20 @@ def main():
 
     extracted = set()
     for path in args.archive:
+        cls = _get_class(path)
         if args.list:
-            _list_contents(path)
+            print('\n'.join(sorted(cls.contents)))
         else:
             if path in extracted:
                 continue
 
-            volumes = _volumes(path, password)
+            volumes = cls.volumes(path, password)
 
-            extract(volumes[0], args.parent, args.child, password)
+            cls.extract(
+                volumes[0],
+                _build_dest(path, args.parent, args.child),
+                password)
+
             if args.rm:
                 for path in volumes:
                     path.unlink()
