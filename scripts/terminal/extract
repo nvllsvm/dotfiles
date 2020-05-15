@@ -217,7 +217,6 @@ def _get_class(path):
     elif path.suffix.lower() == '.exe':
         return innoextract
     else:
-        raise ValueError
         return p7zip
 
 
