@@ -60,7 +60,7 @@ def print_table(headers, rows, date, summed=False):
     new_rows = []
     for row in rows:
         timestamp = row.pop(0).astimezone()
-        if timestamp.date() == date:
+        if timestamp.date() >= date:
             new_rows.append([timestamp.strftime('%Y-%m-%d %H:%M'), *row])
 
     if summed:
