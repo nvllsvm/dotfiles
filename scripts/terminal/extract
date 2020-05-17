@@ -248,7 +248,11 @@ def main():
     for path in args.archive:
         cls = _get_class(path)
         if args.list:
-            print('\n'.join(sorted(cls.contents(path))))
+            contents = sorted(
+                cls.contents(path),
+                key=lambda x: (x.lower(), x)
+            )
+            print('\n'.join(contents))
         else:
             if path in extracted:
                 continue
