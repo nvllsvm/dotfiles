@@ -204,7 +204,7 @@ def _build_dest(path, parent, child):
 
 
 def _get_class(path):
-    suffixes = [suffix.lower() for suffix in path.suffixes()]
+    suffixes = [suffix.lower() for suffix in path.suffixes]
     suffix = suffixes[-1]
     if len(suffixes) > 1 and suffixes[-2] == '.tar':
         return tar
