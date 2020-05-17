@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 case "$1" in
-    *.tar.*|*.rar|*.7z|*.zip|*.iso|*.zst|*.exe)
+    *.tar.*|*.rar|*.7z|*.zip|*.iso|*.zst|*.exe|*.pk3)
         if extract -l "$1"; then
             exit
         fi

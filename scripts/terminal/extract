@@ -204,17 +204,19 @@ def _build_dest(path, parent, child):
 
 
 def _get_class(path):
-    if len(path.suffixes) > 1 and path.suffixes[-2].lower() == '.tar':
+    suffixes = [suffix.lower() for suffix in path.suffixes()]
+    suffix = suffixes[-1]
+    if len(suffixes) > 1 and suffixes[-2] == '.tar':
         return tar
-    elif path.suffix.lower() in ('.tar', '.tgz'):
+    elif suffix in ('.tar', '.tgz'):
         return tar
-    elif path.suffix.lower() == '.zst':
+    elif suffix == '.zst':
         return zstd
-    elif path.suffix.lower() == '.zip':
+    elif suffix in ('.zip', '.pk3'):
         return unzip
-    elif path.suffix.lower() == '.rar':
+    elif suffix == '.rar':
         return unrar
-    elif path.suffix.lower() == '.exe':
+    elif suffix == '.exe':
         return innoextract
     else:
         return p7zip
