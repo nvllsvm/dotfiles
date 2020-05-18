@@ -4,9 +4,11 @@ notify() {
 }
 
 MUTED="$(pamixer --get-mute --toggle --default-source)"
-if [ "$MUTED" = 'true' ]; then
-    notify 🚫
-else
-    notify Recording
-fi
-
+case "$MUTED" in
+    true)
+        notify 🚫
+        ;;
+    *)
+        notify Recording
+        ;;
+esac

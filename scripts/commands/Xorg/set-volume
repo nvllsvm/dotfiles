@@ -8,8 +8,11 @@ set -- $res
 MUTED="$1"
 VOLUME="$2"
 
-if [ "$MUTED" = 'true' ]; then
-    notify 🔇
-else
-    notify -h "int:value:${VOLUME}"
-fi
+case "$MUTED" in
+    true)
+        notify 🔇
+        ;;
+    *)
+        notify -h "int:value:${VOLUME}"
+        ;;
+esac
