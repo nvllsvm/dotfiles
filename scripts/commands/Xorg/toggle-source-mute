@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+set -e
+
+pamixer --toggle --default-source
+if pamixer --get-mute --default-source; then
+    ARGS="Mute"
+else
+    ARGS="Recording"
+fi
+
+dunstify --replace=10003 Volume $ARGS
