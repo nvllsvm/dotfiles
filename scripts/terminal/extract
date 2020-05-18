@@ -143,16 +143,22 @@ class unrar:
 
 class innoextract:
 
+    # TODO: add GOG installer detection
+
     @staticmethod
     @functools.lru_cache()
     def check():
         if not shutil.which('innoextract'):
             raise KeyError
 
+        # needed for GOG only (*.bin files)
+        if not shutil.which('unrar'):
+            raise KeyError
+
     @staticmethod
     def contents(path):
         proc = subprocess.run(
-            ['innoextract', '--quiet', '--list', str(path)],
+            ['innoextract', '--gog', '--quiet', '--list', str(path)],
             stdout=subprocess.PIPE,
             check=True)
 
@@ -165,7 +171,7 @@ class innoextract:
     @staticmethod
     def extract(path, dest, password=None):
         subprocess.run(
-            ['innoextract', '--extract', '--output-dir', dest, path],
+            ['innoextract', '--gog', '--extract', '--output-dir', dest, path],
             check=True)
 
     @staticmethod
