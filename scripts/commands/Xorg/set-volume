@@ -1,26 +1,15 @@
 #!/usr/bin/env sh
-set -e
+notify() {
+    dunstify --replace=10002 '🔊 Volume' "$@"
+}
 
-STEP=5
+res="$(pamixer --get-mute --get-volume "$@")"
+set -- $res
+MUTED="$1"
+VOLUME="$2"
 
-if [ -z "$1" ]; then
-    if [ "$(pamixer --get-mute)" = "true" ]; then
-        echo Mute
-    else
-        pamixer --get-volume || true
-    fi
+if [ "$MUTED" = 'true' ]; then
+    notify 🔇
 else
-    if [ "$1" = "mute" ]; then
-        pamixer --toggle-mute
-    else
-        pamixer --unmute
-        pamixer --$1 $STEP
-    fi
-
-    if [ "$(pamixer --get-mute)" = "true" ]; then
-        ARGS="Mute"
-    else
-        ARGS="-h int:value:$(pamixer --get-volume || true)"
-    fi
-    dunstify --replace=10002 Volume $ARGS
+    notify -h "int:value:${VOLUME}"
 fi
