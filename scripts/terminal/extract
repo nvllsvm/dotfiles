@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 import argparse
+import functools
 import getpass
 import pathlib
 import re
+import shutil
 import subprocess
 
 
@@ -10,6 +12,12 @@ class p7zip:
 
     _PART_RE = re.compile(r'(.*\.part)(\d+)(\.rar)$')
     _ALT_PART_RE = re.compile(r'(.*\.)(\d+)$')
+
+    @staticmethod
+    @functools.lru_cache()
+    def check():
+        if not shutil.which('7z'):
+            raise KeyError
 
     @staticmethod
     def extract(path, dest, password=''):
@@ -68,6 +76,12 @@ class p7zip:
 
 class unzip:
     @staticmethod
+    @functools.lru_cache()
+    def check():
+        if not shutil.which('unzip'):
+            raise KeyError
+
+    @staticmethod
     def contents(path):
         proc = subprocess.run(
             ['unzip', '-qq', '-l', path],
@@ -90,6 +104,13 @@ class unzip:
 
 
 class unrar:
+
+    @staticmethod
+    @functools.lru_cache()
+    def check():
+        if not shutil.which('unrar'):
+            raise KeyError
+
     @staticmethod
     def contents(path):
         proc = subprocess.run(
@@ -123,6 +144,12 @@ class unrar:
 class innoextract:
 
     @staticmethod
+    @functools.lru_cache()
+    def check():
+        if not shutil.which('innoextract'):
+            raise KeyError
+
+    @staticmethod
     def contents(path):
         proc = subprocess.run(
             ['innoextract', '--quiet', '--list', str(path)],
@@ -149,6 +176,12 @@ class innoextract:
 class tar:
 
     @staticmethod
+    @functools.lru_cache()
+    def check():
+        if not shutil.which('tar'):
+            raise KeyError
+
+    @staticmethod
     def contents(path):
         proc = subprocess.run(
             ['tar', 'tf', str(path)],
@@ -168,6 +201,12 @@ class tar:
 
 
 class zstd:
+
+    @staticmethod
+    @functools.lru_cache()
+    def check():
+        if not shutil.which('zstd'):
+            raise KeyError
 
     @staticmethod
     def contents(path):
@@ -207,19 +246,22 @@ def _get_class(path):
     suffixes = [suffix.lower() for suffix in path.suffixes]
     suffix = suffixes[-1]
     if len(suffixes) > 1 and suffixes[-2] == '.tar':
-        return tar
+        cls = tar
     elif suffix in ('.tar', '.tgz'):
-        return tar
+        cls = tar
     elif suffix == '.zst':
-        return zstd
+        cls = zstd
     elif suffix in ('.zip', '.pk3'):
-        return unzip
+        cls = unzip
     elif suffix == '.rar':
-        return unrar
+        cls = unrar
     elif suffix == '.exe':
-        return innoextract
+        cls = innoextract
     else:
-        return p7zip
+        cls = p7zip
+
+    cls.check()
+    return cls
 
 
 def main():
