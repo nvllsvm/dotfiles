@@ -27,4 +27,8 @@ snixembed --fork
 nm-applet &
 syncthing-gtk &
 
+if command -v mpd-notifier > /dev/null; then
+    mpd-notifier &
+fi
+
 exec i3

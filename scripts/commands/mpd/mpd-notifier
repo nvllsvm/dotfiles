@@ -1,0 +1,64 @@
+#!/usr/bin/env python
+import pathlib
+import subprocess
+
+import mpd
+
+LIBRARY = pathlib.Path('~/Audio/Lossy_opus_128').expanduser()
+if not LIBRARY.exists():
+    LIBRARY = pathlib.Path('/storage/Audio/Library')
+
+NOTIFICATION_ID = 10008
+
+
+def dunstify(title, subtitle=None, replace=None, icon=None):
+    args = ['dunstify', title]
+    if subtitle:
+        args.append(subtitle)
+    if replace:
+        args.extend(['--replace', str(replace)])
+    if icon:
+        args.extend(['--icon', str(icon)])
+    subprocess.run(args, check=True)
+
+
+client = mpd.MPDClient()
+client.timeout = 5
+client.connect('localhost', 6600)
+
+while True:
+    status = client.status()
+    event = client.idle()
+    new_status = client.status()
+
+    if new_status['state'] == 'stop':
+        dunstify('mpd', '[stopped]', replace=NOTIFICATION_ID)
+        continue
+
+    if new_status['state'] == 'pause':
+        dunstify('mpd', '[paused]', replace=NOTIFICATION_ID)
+        continue
+
+    if status.get('songid') == new_status.get('songid'):
+        if status['state'] == new_status['state']:
+            if new_status['time'].split(':')[0] != '0':
+                continue
+
+    current = client.currentsong()
+    if not current:
+        continue
+
+    art_path = None
+    for path in LIBRARY.joinpath(current['file']).parent.iterdir():
+        if path.name in ('cover.jpg', 'cover.png'):
+            art_path = path
+            break
+
+    dunstify(
+        current['title'],
+        subtitle=current['artist'],
+        icon=art_path,
+        replace=NOTIFICATION_ID)
+
+client.close()
+client.disconnect()
