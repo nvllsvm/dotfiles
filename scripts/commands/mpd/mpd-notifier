@@ -35,10 +35,6 @@ while True:
         dunstify('mpd', '[stopped]', replace=NOTIFICATION_ID)
         continue
 
-    if new_status['state'] == 'pause':
-        dunstify('mpd', '[paused]', replace=NOTIFICATION_ID)
-        continue
-
     if status.get('songid') == new_status.get('songid'):
         if status['state'] == new_status['state']:
             if new_status['time'].split(':')[0] != '0':
@@ -54,11 +50,17 @@ while True:
             art_path = path
             break
 
-    dunstify(
-        current['title'],
-        subtitle=current['artist'],
-        icon=art_path,
-        replace=NOTIFICATION_ID)
+    if new_status['state'] == 'pause':
+        dunstify(
+            '[paused]',
+            replace=NOTIFICATION_ID,
+            icon=art_path)
+    else:
+        dunstify(
+            current['title'],
+            subtitle=current['artist'],
+            icon=art_path,
+            replace=NOTIFICATION_ID)
 
 client.close()
 client.disconnect()
