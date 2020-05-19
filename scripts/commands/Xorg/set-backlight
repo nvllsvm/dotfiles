@@ -4,34 +4,34 @@ set -e
 STEP=10
 MINIMUM=1
 
-floor() {
-    sed 's/\..*//g'
+current_light() {
+    printf %d "$(light)"
 }
 
-if [ "$1" = "dec" ]; then
-    if [ "$(light | floor)" -gt "$STEP" ]; then
-        light -U "$STEP"
-    else
-        light -S "$MINIMUM"
-    fi
-elif [ "$1" = "inc" ]; then
-    if [ "$(light | floor)" -lt "$STEP" ]; then
-        light -S "$STEP"
-    else
-        light -A "$STEP"
-    fi
-elif [ "$#" = '0' ]; then
-    light | floor
-    exit
-else
-    cat << EOF
+case "$1" in
+    dec)
+        if [ "$(current_light)" -gt "$STEP" ]; then
+            light -U "$STEP"
+        else
+            light -S "$MINIMUM"
+        fi
+        ;;
+    inc)
+        if [ "$(current_light)" -lt "$STEP" ]; then
+            light -S "$STEP"
+        else
+            light -A "$STEP"
+        fi
+        ;;
+    *)
+        cat << EOF
 inc:  Increase backlight by 10
 dec:  Decrease backlight by 10
 EOF
     exit 1
-fi
+esac
 
 dunstify \
-    --hints "int:value:$(light | floor)" \
+    --hints "int:value:$(current_light)" \
     --appname backlight \
     '💡 Backlight'
