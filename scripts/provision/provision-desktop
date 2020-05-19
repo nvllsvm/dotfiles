@@ -71,7 +71,6 @@ if [[ $osname == Linux* ]]; then
             rofi \
             rofimoji \
             syncthing \
-            syncthing-gtk \
             transmission-remote-gtk \
             ttf-dejavu-emojiless \
             xclip \
