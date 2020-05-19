@@ -33,7 +33,8 @@ while True:
     new_status = client.status()
 
     if new_status['state'] == 'stop':
-        _dunstify('mpd', '[stopped]')
+        if status['state'] == 'play':
+            _dunstify('mpd', '[stopped]')
         continue
 
     if status.get('songid') == new_status.get('songid'):
