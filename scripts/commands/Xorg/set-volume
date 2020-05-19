@@ -1,6 +1,9 @@
 #!/usr/bin/env sh
 notify() {
-    dunstify --replace=10002 '🔊 Volume' "$@"
+    dunstify \
+        --appname volume \
+        --replace 10002 \
+        '🔊 Volume' "$@"
 }
 
 res="$(pamixer --get-mute --get-volume "$@")"

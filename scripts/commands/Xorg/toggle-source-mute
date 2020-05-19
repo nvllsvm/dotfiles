@@ -1,6 +1,9 @@
 #!/usr/bin/env sh
 notify() {
-    dunstify --replace=10003 '🎙 Microphone' "$@"
+    dunstify \
+        --appname volume \
+        --replace 10003 \
+        '🎙 Microphone' "$@"
 }
 
 MUTED="$(pamixer --get-mute --toggle --set-volume 100 --default-source)"

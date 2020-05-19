@@ -31,4 +31,7 @@ EOF
     exit 1
 fi
 
-dunstify Backlight -h int:value:$(light | floor)
+dunstify \
+    --hints "int:value:$(light | floor)" \
+    --appname backlight \
+    Backlight

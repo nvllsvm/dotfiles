@@ -8,15 +8,16 @@ LIBRARY = pathlib.Path('~/Audio/Lossy_opus_128').expanduser()
 if not LIBRARY.exists():
     LIBRARY = pathlib.Path('/storage/Audio/Library')
 
-NOTIFICATION_ID = 10008
 
-
-def dunstify(title, subtitle=None, replace=None, icon=None):
-    args = ['dunstify', title]
+def _dunstify(title, subtitle=None, icon=None):
+    args = [
+        'dunstify',
+        title,
+        '--replace', '10008',
+        '--appname', 'mpd',
+    ]
     if subtitle:
         args.append(subtitle)
-    if replace:
-        args.extend(['--replace', str(replace)])
     if icon:
         args.extend(['--icon', str(icon)])
     subprocess.run(args, check=True)
@@ -32,7 +33,7 @@ while True:
     new_status = client.status()
 
     if new_status['state'] == 'stop':
-        dunstify('mpd', '[stopped]', replace=NOTIFICATION_ID)
+        _dunstify('mpd', '[stopped]')
         continue
 
     if status.get('songid') == new_status.get('songid'):
@@ -51,16 +52,14 @@ while True:
             break
 
     if new_status['state'] == 'pause':
-        dunstify(
+        _dunstify(
             '[paused]',
-            replace=NOTIFICATION_ID,
             icon=art_path)
     else:
-        dunstify(
+        _dunstify(
             current['title'],
             subtitle=current['artist'],
-            icon=art_path,
-            replace=NOTIFICATION_ID)
+            icon=art_path)
 
 client.close()
 client.disconnect()

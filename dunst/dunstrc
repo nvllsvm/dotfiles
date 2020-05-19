@@ -318,16 +318,11 @@
 #
 
 [volume]
-    summary = Volume
+    appname = volume
     timeout = 1
 
 [backlight]
-    summary = Backlight
+    appname = backlight
     timeout = 1
-
-[mpd-notification]
-    summary = MPD Notification
-    format = "%b"
-
 
 # vim: ft=cfg
