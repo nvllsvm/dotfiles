@@ -34,4 +34,4 @@ fi
 dunstify \
     --hints "int:value:$(light | floor)" \
     --appname backlight \
-    Backlight
+    '💡 Backlight'
