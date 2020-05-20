@@ -9,15 +9,14 @@ if not LIBRARY.exists():
     LIBRARY = pathlib.Path('/storage/Audio/Library')
 
 
-def _dunstify(title, subtitle=None, icon=None):
+def _dunstify(text, icon=None):
     args = [
         'dunstify',
-        title,
-        '--replace', '10008',
-        '--appname', 'mpd',
+        'mpd',
+        text,
+        '--hints=string:x-dunst-stack-tag:mpd-notifier',
+        '--appname', 'mpd-notifier',
     ]
-    if subtitle:
-        args.append(subtitle)
     if icon:
         args.extend(['--icon', str(icon)])
     subprocess.run(args, check=True)
@@ -34,7 +33,7 @@ while True:
 
     if new_status['state'] == 'stop':
         if status['state'] == 'play':
-            _dunstify('mpd', '[stopped]')
+            _dunstify('[stopped]')
         continue
 
     if status.get('songid') == new_status.get('songid'):
@@ -58,8 +57,7 @@ while True:
             icon=art_path)
     else:
         _dunstify(
-            current['title'],
-            subtitle=current['artist'],
+            '<b>{}</b>\n{}'.format(current['title'], current['artist']),
             icon=art_path)
 
 client.close()

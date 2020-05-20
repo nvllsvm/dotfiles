@@ -32,6 +32,5 @@ EOF
 esac
 
 dunstify \
-    --hints "int:value:$(current_light)" \
-    --appname backlight \
-    '💡 Backlight'
+    --hints=string:x-dunst-stack-tag:set-backlight \
+    "💡 Backlight $(current_light)"

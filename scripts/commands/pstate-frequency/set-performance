@@ -20,4 +20,7 @@ if [ -n "$pct" ]; then
         sudo pstate-frequency -q -S -g powersave -m "$pct" -t 0
     fi
 fi
-dunstify --replace 12385 "Max CPU" "$(current_pct)%"
+
+dunstify \
+    --hints=string:x-dunst-stack-tag:set-performance \
+    "Max CPU" "$(current_pct)%"

@@ -1,6 +1,8 @@
 #!/usr/bin/env sh
 notify() {
-    dunstify --replace=10022 "$@"
+    dunstify \
+        --hints=string:x-dunst-stack-tag:nmcli-toggle \
+        "$@"
 }
 
 case "$(nmcli networking)" in

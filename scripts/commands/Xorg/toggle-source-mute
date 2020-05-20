@@ -1,8 +1,7 @@
 #!/usr/bin/env sh
 notify() {
     dunstify \
-        --appname volume \
-        --replace 10003 \
+        --hints=string:x-dunst-stack-tag:toggle-source-mute \
         '🎙 Microphone' "$@"
 }
 

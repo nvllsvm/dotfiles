@@ -317,12 +317,8 @@
 #    urgency = normal
 #
 
-[volume]
-    appname = volume
-    timeout = 1
-
-[backlight]
-    appname = backlight
-    timeout = 1
+[mpd-notifier]
+    appname = mpd-notifier
+    format = %b
 
 # vim: ft=cfg
