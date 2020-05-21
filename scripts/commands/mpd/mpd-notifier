@@ -4,9 +4,7 @@ import subprocess
 
 import mpd
 
-LIBRARY = pathlib.Path('~/Audio/Lossy_opus_128').expanduser()
-if not LIBRARY.exists():
-    LIBRARY = pathlib.Path('/storage/Audio/Library')
+LIBRARY = pathlib.Path('~/.config/mpd/library').expanduser()
 
 
 def _dunstify(text, icon=None):
