@@ -50,7 +50,8 @@ def _sync(source_dir, target_dir):
             shutil.copy(source, target / source.name)
 
     for path in _all_paths(target_dir):
-        if path not in expected:
+        # TODO delete empty dirs
+        if path.is_file() and path not in expected:
             try:
                 if path.is_dir():
                     shutil.rmtree(path)
@@ -64,7 +65,7 @@ def main():
     source_dir = pathlib.Path('/storage/Games')
     target_dir = pathlib.Path('/storage/Syncthing/Default/RetroArch/rom')
 
-    for d in ('GB', 'GBC', 'GBA', 'NES', 'SNES'):
+    for d in ('GB', 'GBC', 'GBA', 'J2ME', 'NES', 'SNES'):
         _sync(source_dir / d, target_dir / d)
 
 
