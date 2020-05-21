@@ -27,7 +27,7 @@ snixembed --fork
 nm-applet &
 
 if command -v mpd-notifier > /dev/null; then
-    mpd-notifier &
+    mpd-notifier --library ~/.config/mpd/library &
 fi
 
 exec i3

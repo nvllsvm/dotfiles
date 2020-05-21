@@ -1,10 +1,75 @@
 #!/usr/bin/env python
+import argparse
+import contextlib
+import logging
 import pathlib
 import subprocess
+import time
 
 import mpd
 
-LIBRARY = pathlib.Path('~/.config/mpd/library').expanduser()
+_LOGGER = logging.getLogger('mpd-notifier')
+
+
+@contextlib.contextmanager
+def _mpd_client(*args, **kwargs):
+    attempts = 3
+    for attempt in range(1, attempts + 1):
+        try:
+            client = mpd.MPDClient()
+            client.connect(*args, **kwargs)
+            break
+        except ConnectionRefusedError:
+            _LOGGER.info(
+                'Connection failure (attempt %d of %d)', attempt, attempts)
+            if attempt == attempts:
+                raise
+            else:
+                time.sleep(1)
+    try:
+        yield client
+    finally:
+        client.disconnect()
+
+
+def _run(client, library):
+    library = pathlib.Path(library)
+
+    while True:
+        status = client.status()
+        client.idle()
+        new_status = client.status()
+
+        if new_status['state'] == 'stop':
+            if status['state'] == 'play':
+                _dunstify('[stopped]')
+            continue
+
+        if status.get('songid') == new_status.get('songid'):
+            if status['state'] == new_status['state']:
+                if new_status['time'].split(':')[0] != '0':
+                    continue
+
+        current = client.currentsong()
+        if not current:
+            continue
+
+        art_path = None
+        for path in library.joinpath(current['file']).parent.iterdir():
+            if path.name in ('cover.jpg', 'cover.png'):
+                art_path = path
+                break
+
+        if new_status['state'] == 'pause':
+            _dunstify(
+                '[paused]',
+                icon=art_path)
+        else:
+            _dunstify(
+                '<b>{}</b>\n{}'.format(
+                    current['title'],
+                    current['artist']),
+                icon=art_path)
 
 
 def _dunstify(text, icon=None):
@@ -20,43 +85,23 @@ def _dunstify(text, icon=None):
     subprocess.run(args, check=True)
 
 
-client = mpd.MPDClient()
-client.timeout = 5
-client.connect('localhost', 6600)
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--host', default='localhost')
+    parser.add_argument('--port', type=int, default=6600)
+    parser.add_argument('--library', required=True)
+    args = parser.parse_args()
 
-while True:
-    status = client.status()
-    event = client.idle()
-    new_status = client.status()
+    logging.basicConfig(level=logging.INFO, format='%(message)s')
 
-    if new_status['state'] == 'stop':
-        if status['state'] == 'play':
-            _dunstify('[stopped]')
-        continue
+    while True:
+        with _mpd_client(args.host, args.port) as client:
+            client.timeout = 5
+            try:
+                _run(client, args.library)
+            except mpd.ConnectionError:
+                pass
 
-    if status.get('songid') == new_status.get('songid'):
-        if status['state'] == new_status['state']:
-            if new_status['time'].split(':')[0] != '0':
-                continue
 
-    current = client.currentsong()
-    if not current:
-        continue
-
-    art_path = None
-    for path in LIBRARY.joinpath(current['file']).parent.iterdir():
-        if path.name in ('cover.jpg', 'cover.png'):
-            art_path = path
-            break
-
-    if new_status['state'] == 'pause':
-        _dunstify(
-            '[paused]',
-            icon=art_path)
-    else:
-        _dunstify(
-            '<b>{}</b>\n{}'.format(current['title'], current['artist']),
-            icon=art_path)
-
-client.close()
-client.disconnect()
+if __name__ == '__main__':
+    main()
