@@ -1,1 +1,0 @@
-%admin		ALL = (ALL) NOPASSWD: /usr/bin/renice, /usr/bin/nice
