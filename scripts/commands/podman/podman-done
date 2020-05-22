@@ -39,8 +39,11 @@ log() {
     printf "%b%s%b\n" "${YELLOW}" "$@" "${RESET_COLOR}"
 }
 
+log "Removing all pods ..."
+podman pod rm --all --force
+
 log "Removing all containers ..."
-podman rm -af
+podman rm --all --force
 
 log "Pruning volumes ..."
 podman volume prune -f
