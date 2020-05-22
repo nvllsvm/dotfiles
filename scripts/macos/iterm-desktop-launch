@@ -1,2 +1,0 @@
-#!/usr/local/bin/zsh -li
-exec "$DOTFILES/scripts/terminal/desktop-launcher" "$@"
