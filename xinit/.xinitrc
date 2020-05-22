@@ -14,7 +14,6 @@ set +a
 xset s off -dpms
 
 /usr/lib/gsd-xsettings &
-setup-outputs
 
 picom &
 xss-lock -- lock-screen &
@@ -29,5 +28,7 @@ nm-applet &
 if command -v mpd-notifier > /dev/null; then
     mpd-notifier --library ~/.config/mpd/library &
 fi
+
+setup-outputs
 
 exec i3
