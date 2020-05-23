@@ -1,3 +1,2 @@
 #!/usr/bin/env sh
 jellyfin-mpv-shim &
-sshfs-sol &
