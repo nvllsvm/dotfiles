@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
 set -eu
-RM=
-if [ "$1" = '--rm' ]; then
-    RM=1
+RM=1
+if [ "$1" = '--keep' ]; then
+    RM=
     shift
 fi
 
