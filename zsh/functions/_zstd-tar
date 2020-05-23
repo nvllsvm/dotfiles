@@ -1,0 +1,11 @@
+#compdef zstd-tar
+
+typeset -A opt_args
+
+_zstd-tar() {
+  _arguments \
+    '--keep[keep source files]' \
+    '*:: :_files'
+
+}
+_zstd-tar
