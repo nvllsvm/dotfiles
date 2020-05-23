@@ -47,5 +47,5 @@ podman system migrate || true
 
 sol-docker restart
 
-sudo mount --bind ~ /srv/nfs4/ar
+sudo mount --bind ~ar /srv/nfs4/ar
 sudo mount --bind /storage /srv/nfs4/storage
