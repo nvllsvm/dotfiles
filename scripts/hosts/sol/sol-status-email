@@ -56,23 +56,26 @@ table tr.failure {
 }
 </style>
 <table>
+    {% set columns = ['Id', 'Result', 'ExecMainStartTimestamp'] %}
     <tr>
-        {%- for column in headers %}
+        {%- for column in columns %}
         <th>{{- column -}}</th>
         {%- endfor %}
     </tr>
-    {%- for (success, row) in table -%}
-    {%- if not success -%}
+    {%- for unit in units | sort(attribute="Id")-%}
+    {%- if unit.Result | join('') != 'success' -%}
     <tr class="failure">
     {%- else -%}
     <tr>
     {%- endif -%}
-        {%- for column in row %}
+        {%- for column in columns %}
         <td>
-        {%- if column is string %}
-        {{- column -}}
+        {%- if unit[column] is none %}
+        n/a
+        {%- elif unit[column] is string %}
+        {{- unit[column] -}}
         {% else %}
-        {{- column | join('</br>') -}}
+        {{- unit[column] | join('</br>') -}}
         {% endif -%}
         </td>
         {%- endfor %}
@@ -112,20 +115,10 @@ def unit_properties(service, user=False):
     for line in lines:
         prop, value = line.split('=', 1)
         properties[prop].append(value)
-    return dict(properties)
-
-
-def get_table(units, user=False):
-    table = []
-    for unit in units:
-        properties = unit_properties(unit, user=user)
-        row = [
-            unit,
-            properties['Result'],
-            properties.get('ExecMainStartTimestamp', 'n/a'),
-        ]
-        table.append([properties['Result'][0] == 'success', row])
-    return table
+    return {
+        p[0] if len(p) == 1 else p: v
+        for p, v in dict(properties).items()
+    }
 
 
 def main():
@@ -143,14 +136,14 @@ def main():
             parser.error('--to is required')
             parser.exit(1)
 
-    table = []
     template = jinja2.Template(TEMPLATE)
-    headers = ('Unit', 'Result', 'Last')
 
-    table.extend(get_table(USER_UNITS, user=True))
-    table.extend(get_table(SYSTEM_UNITS))
-    output = template.render(
-        headers=headers, table=sorted(table, key=lambda x: x[0]))
+    units = []
+    for unit in SYSTEM_UNITS:
+        units.append(unit_properties(unit))
+    for unit in USER_UNITS:
+        units.append(unit_properties(unit, user=True))
+    output = template.render(units=units)
     if args.dummy:
         print(output)
     else:
