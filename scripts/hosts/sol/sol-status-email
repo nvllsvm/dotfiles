@@ -124,7 +124,7 @@ def get_table(units, user=False):
             properties['Result'],
             properties.get('ExecMainStartTimestamp', 'n/a'),
         ]
-        table.append([properties['Result'] != 'success', row])
+        table.append([properties['Result'][0] == 'success', row])
     return table
 
 
