@@ -264,8 +264,6 @@ def main():
     if args.cmd == 'add':
         while task := input('Task: ').strip():
             item = TodoItem(' '.join([task, *args.common]))
-            if not item.created_date:
-                item.created_date = datetime.date.today()
             item.due_date = args.due
             items.append(item)
             path.write_text('\n'.join(sorted(str(item) for item in items if str(item))))
