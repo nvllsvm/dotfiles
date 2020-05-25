@@ -24,6 +24,7 @@ USER_UNITS = {
     'gog-update.service',
     'mbsync.service',
     'sol-update-remotes.service',
+    'vdirsyncer.service',
     'wasabi-sync.service',
 }
 
