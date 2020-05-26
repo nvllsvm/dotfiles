@@ -1,5 +1,4 @@
-#!/usr/bin/env sh
-set -e
+#!/usr/bin/env zsh
 case "$1" in
     copy|paste)
         MODE="$1"
@@ -9,52 +8,100 @@ case "$1" in
         exit 1
 esac
 
-if [ -n "$WAYLAND_DISPLAY" ]; then
-    case "$MODE" in
-        copy)
-            exec wl-copy
-            ;;
-        paste)
-            exec wl-paste
-            ;;
-    esac
-elif [ -n "$XAUTHORITY" ]; then
-    case "$MODE" in
-        copy)
-            exec xclip -selection c
-            ;;
-        paste)
-            exec xclip -selection c -o
-            ;;
-    esac
-elif command -v termux-clipboard-get > /dev/null; then
-    case "$MODE" in
-        copy)
-            exec termux-clipboard-set
-            ;;
-        paste)
-            exec termux-clipboard-get
-            ;;
-    esac
-elif [ "$(uname)" = 'Darwin' ]; then
-    case "$MODE" in
-        copy)
-            exec pbcopy
-            ;;
-        paste)
-            exec pbpaste
-            ;;
-    esac
-elif command -v tmux > /dev/null; then
-    case "$MODE" in
-        copy)
-            exec tmux load-buffer -
-            ;;
-        paste)
-            exec tmux save-buffer -
-            ;;
-    esac
+clipboard_wayland() {
+    if [ -n "$WAYLAND_DISPLAY" ]; then
+        case "$MODE" in
+            copy)
+                wl-copy
+                ;;
+            paste)
+                wl-paste
+                ;;
+        esac
+    else
+        return 1
+    fi
+}
+
+
+clipboard_xorg() {
+    if [ -n "$XAUTHORITY" ]; then
+        case "$MODE" in
+            copy)
+                xclip -selection c
+                ;;
+            paste)
+                xclip -selection c -o
+                ;;
+        esac
+    else
+        return 1
+    fi
+}
+
+
+clipboard_macos() {
+    if command -v pbcopy > /dev/null; then
+        case "$MODE" in
+            copy)
+                pbcopy
+                ;;
+            paste)
+                pbpaste
+                ;;
+        esac
+    else
+        return 1
+    fi
+}
+
+
+clipboard_tmux() {
+    if command -v tmux > /dev/null; then
+        case "$MODE" in
+            copy)
+                tmux load-buffer -
+                ;;
+            paste)
+                tmux save-buffer -
+                ;;
+        esac
+    else
+        return 1
+    fi
+}
+
+
+clipboard_termux() {
+    if command -v termux-clipboard-get > /dev/null; then
+        case "$MODE" in
+            copy)
+                termux-clipboard-set
+                ;;
+            paste)
+                termux-clipboard-get
+                ;;
+        esac
+    else
+        return 1
+    fi
+}
+
+
+if [ "$MODE" = 'copy' ]; then
+    tee --output-error=warn \
+        >(clipboard_macos) \
+        >(clipboard_termux) \
+        >(clipboard_tmux) \
+        >(clipboard_wayland) \
+        >(clipboard_xorg) \
+        > /dev/null 2> /dev/null
+    exit 0
 else
-    echo error: no suitable clipboard command detected >&2
-    exit 1
+    clipboard_wayland \
+        || clipboard_xorg \
+        || clipboard_macos \
+        || clipboard_termux \
+        || clipboard_tmux \
+        || (echo error: no suitable clipboard command detected >&2; exit 1)
 fi
