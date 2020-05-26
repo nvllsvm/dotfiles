@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env sh
 case "$1" in
     copy|paste)
         MODE="$1"
@@ -87,21 +87,9 @@ clipboard_termux() {
     fi
 }
 
-
-if [ "$MODE" = 'copy' ]; then
-    tee --output-error=warn \
-        >(clipboard_macos) \
-        >(clipboard_termux) \
-        >(clipboard_tmux) \
-        >(clipboard_wayland) \
-        >(clipboard_xorg) \
-        > /dev/null 2> /dev/null
-    exit 0
-else
-    clipboard_wayland \
-        || clipboard_xorg \
-        || clipboard_macos \
-        || clipboard_termux \
-        || clipboard_tmux \
-        || (echo error: no suitable clipboard command detected >&2; exit 1)
-fi
+clipboard_wayland \
+    || clipboard_xorg \
+    || clipboard_macos \
+    || clipboard_termux \
+    || clipboard_tmux \
+    || (echo error: no suitable clipboard command detected >&2; exit 1)
