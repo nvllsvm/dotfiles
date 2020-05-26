@@ -36,7 +36,7 @@ elif command -v termux-clipboard-get > /dev/null; then
             exec termux-clipboard-get
             ;;
     esac
-elif [ "$(uname)" = 'Dawrin' ]; then
+elif [ "$(uname)" = 'Darwin' ]; then
     case "$MODE" in
         copy)
             exec pbcopy
