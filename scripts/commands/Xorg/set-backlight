@@ -5,7 +5,7 @@ STEP=10
 MINIMUM=1
 
 current_light() {
-    printf %d "$(light)"
+    printf %.0f "$(light)"
 }
 
 case "$1" in
