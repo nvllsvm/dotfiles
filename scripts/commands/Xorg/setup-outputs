@@ -35,6 +35,14 @@ phobos() {
             set-desktop-themes --dpi 96
             apply-display-calibration
             ;;
+        external)
+            xrandr \
+                --output DP1 --primary --mode 3440x1440 --refresh 60 --pos 0x0 --rotate normal \
+                --output DP2 --off \
+                --output eDP1 --off
+            set-desktop-themes --dpi 96
+            apply-display-calibration --reset
+            ;;
         *)
             cat << EOF
 Options:
