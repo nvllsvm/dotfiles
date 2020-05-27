@@ -29,6 +29,6 @@ if command -v mpd-notifier > /dev/null; then
     mpd-notifier --library ~/.config/mpd/library &
 fi
 
-setup-outputs
+autorandr --change --force
 
 exec i3
