@@ -238,7 +238,7 @@ def _build_dest(path, parent, child):
         if len(path.suffixes) > 1 and path.suffixes[-2].lower() == '.tar':
             dest = parent / pathlib.Path(path.stem).stem
         else:
-            dest = parent / path.with_name(path.stem)
+            dest = parent / pathlib.Path(path.stem)
 
         while dest.exists():
             dest = dest.with_name(f'{dest.name}_')
