@@ -6,10 +6,9 @@ GOG_DIR=/storage/Games/PC/GOG.com
 
 podman run \
     --rm \
-    --pull always \
     --quiet \
     -e HOME \
     -v $GOG_DIR:/downloads \
     -v ~/.cache/lgogdownloader:/cache \
     -v ~/.dotfiles/private/lgogdownloader:/config \
-    $IMAGE > /dev/null 2>&1
+    $IMAGE
