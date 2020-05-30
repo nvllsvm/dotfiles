@@ -1,5 +1,10 @@
 #!/usr/bin/env sh
 set -eu
+
+zstd_compress() {
+    zstd -T0 --ultra -22 "$@"
+}
+
 RM=1
 if [ "$1" = '--keep' ]; then
     RM=
@@ -14,9 +19,9 @@ SOURCE="$(realpath "$1")"
 DEST="$(basename "$SOURCE").tar.zst"
 
 if [ -f "$SOURCE" ]; then
-    tar cf - -C "$(dirname "$SOURCE")" "$(basename "$SOURCE")" | zstd -T0 --ultra -22 -o "$DEST"
+    tar cf - -C "$(dirname "$SOURCE")" "$(basename "$SOURCE")" | zstd_compress -o "$DEST"
 elif [ -d "$SOURCE" ]; then
-    find "$SOURCE" -printf '%P\0' | tar cf - -C "$SOURCE" --no-recursion --verbatim-files-from --null -T - | zstd -T0 --ultra -22 -o "$DEST"
+    find "$SOURCE" -printf '%P\0' | tar cf - -C "$SOURCE" --no-recursion --verbatim-files-from --null -T - | zstd_compress -o "$DEST"
 else
     exit 1
 fi
