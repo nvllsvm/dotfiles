@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-exec setup-outputs
+exec autorandr --force --load mars-office
