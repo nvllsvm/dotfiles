@@ -15,7 +15,6 @@ xset s off -dpms
 
 /usr/lib/gsd-xsettings &
 
-picom &
 xss-lock -- lock-screen &
 
 snixembed --fork

@@ -1,2 +1,3 @@
 #!/usr/bin/env sh
 set-desktop-themes --dpi 96
+picom -b
