@@ -3,7 +3,7 @@ if pidof lightdm; then
     dm-tool lock
 else
     xset dpms 0 5
-    i3lock -n -c 000000
+    i3lock -n -c 555555
     xset -dpms
     killall -USR1 i3status
 fi
