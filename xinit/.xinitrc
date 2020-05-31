@@ -30,5 +30,4 @@ fi
 
 autorandr --change --force
 
-lock-screen &
 exec i3
