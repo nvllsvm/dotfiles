@@ -18,11 +18,11 @@ xset s off -dpms
 picom &
 xss-lock -- lock-screen &
 
+snixembed --fork
 if command -v xinit-$(hostname) > /dev/null; then
     xinit-$(hostname)
 fi
 
-snixembed --fork
 nm-applet &
 
 if command -v mpd-notifier > /dev/null; then
