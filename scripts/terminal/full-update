@@ -3,13 +3,9 @@ set -eu
 YELLOW='\033[1;33m'
 RESET_COLOR='\033[0m'
 
-full_update() {
-    printf '%bfull-update - start %s%b\n' "$YELLOW" "$(date)" "$RESET_COLOR"
-    for cmd in "$DOTFILES/full-update/"*; do
-        printf '%bNow running %s ...%b\n' "$YELLOW" "$cmd" "$RESET_COLOR"
-        "$cmd"
-    done
-    printf '%bfull-update - done %s%b\n' "$YELLOW" "$(date)" "$RESET_COLOR"
-}
-
-full_update
+printf '%bfull-update - start %s%b\n' "$YELLOW" "$(date)" "$RESET_COLOR"
+for cmd in "$DOTFILES/full-update/"*; do
+    printf '%bNow running %s ...%b\n' "$YELLOW" "$cmd" "$RESET_COLOR"
+    "$cmd"
+done
+printf '%bfull-update - done %s%b\n' "$YELLOW" "$(date)" "$RESET_COLOR"
