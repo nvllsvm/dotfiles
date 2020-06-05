@@ -4,7 +4,7 @@ set -e
 show_usage() {
     cat << EOF
 usage: disk-benchmark [-s SIZE] [DIR]
-    -s, --size      size in megabytes. defaults to 1024M
+    -s, --size      size in megabytes. defaults to 1024
         --help      show help and exit
 EOF
 }
