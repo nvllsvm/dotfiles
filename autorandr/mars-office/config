@@ -2,13 +2,13 @@ output DVI-I-0
 off
 output DVI-I-1
 off
-output HDMI-0
-off
 output DP-1
 off
 output DP-3
 off
 output DP-5
+off
+output HDMI-0
 off
 output DP-2
 off
