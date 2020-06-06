@@ -206,6 +206,58 @@ class tar:
         return [path]
 
 
+class gzip:
+
+    @staticmethod
+    @functools.lru_cache()
+    def check():
+        if not shutil.which('gzip'):
+            raise KeyError
+
+    @staticmethod
+    def contents(path):
+        return [path.with_suffix('').name]
+
+    @staticmethod
+    def extract(path, dest, password=None):
+        target = dest / path.with_suffix('').name
+        with open(target, 'w') as handle:
+            subprocess.run(
+                ['gzip', '-d', '-c', '--', path],
+                stdout=handle,
+                check=True)
+
+    @staticmethod
+    def volumes(path, password=''):
+        return [path]
+
+
+class xz:
+
+    @staticmethod
+    @functools.lru_cache()
+    def check():
+        if not shutil.which('xz'):
+            raise KeyError
+
+    @staticmethod
+    def contents(path):
+        return [path.with_suffix('').name]
+
+    @staticmethod
+    def extract(path, dest, password=None):
+        target = dest / path.with_suffix('').name
+        with open(target, 'w') as handle:
+            subprocess.run(
+                ['xz', '-d', '-c', '--', path],
+                stdout=handle,
+                check=True)
+
+    @staticmethod
+    def volumes(path, password=''):
+        return [path]
+
+
 class zstd:
 
     @staticmethod
@@ -257,6 +309,10 @@ def _get_class(path):
         cls = tar
     elif suffix == '.zst':
         cls = zstd
+    elif suffix == '.gz':
+        cls = gzip
+    elif suffix == '.xz':
+        cls = xz
     elif suffix in ('.zip', '.pk3'):
         cls = unzip
     elif suffix == '.rar':
