@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-uptime
+uptime --pretty
 
 systemctl --user import-environment HOME PATH MAIL DOTFILES
 
