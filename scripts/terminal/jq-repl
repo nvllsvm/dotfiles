@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+echo '' | fzf --print-query --preview="jq --color-output {q} <(cat \"$1\")"
