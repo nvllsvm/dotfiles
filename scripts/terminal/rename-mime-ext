@@ -1,0 +1,31 @@
+#!/usr/bin/env python
+import argparse
+import pathlib
+
+import magic
+
+
+def all_files(root):
+    stack = [pathlib.Path(root)]
+    files = []
+    while stack:
+        for path in stack.pop().iterdir():
+            if path.is_file():
+                files.append(path)
+            elif path.is_dir():
+                stack.append(path)
+    return files
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('path', type=pathlib.Path)
+    args = parser.parse_args()
+
+    for path in all_files(args.path):
+        mime = magic.from_file(str(path), mime=True)
+        print(path, mime)
+
+
+if __name__ == '__main__':
+    main()
