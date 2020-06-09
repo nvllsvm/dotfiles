@@ -78,6 +78,7 @@ def _dunstify(text, icon=None):
         'mpd',
         text,
         '--hints=string:x-dunst-stack-tag:mpd-notifier',
+        '--hints=int:transient:1',
         '--appname', 'mpd-notifier',
     ]
     if icon:
