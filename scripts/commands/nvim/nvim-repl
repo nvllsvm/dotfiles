@@ -31,9 +31,14 @@ determine_filetype() {
     esac
 }
 
+NVIM_COMMAND=REPL
 WORKFILE=
 while true; do
     case "$1" in
+        -i|--instant)
+            NVIM_COMMAND=REPLInstant
+            shift
+            ;;
         -f)
             shift
             if [ $# -eq 0 ]; then
@@ -54,13 +59,10 @@ while true; do
     esac
 done
 
+FILETYPE="$(determine_filetype "$COMMAND")"
 if [ -z "$WORKFILE" ]; then
-    WORKFILE="$(mktemp)"
-    cleanup() {
-        rm -f "$WORKFILE"
-    }
-    trap cleanup EXIT
+    WORKFILE="${TMPDIR:-/tmp}/nvim-repl-${FILETYPE}"
+    touch workfile
 fi
 
-FILETYPE="$(determine_filetype "$COMMAND")"
-nvim "$WORKFILE" -c "set filetype=$FILETYPE | REPL '$COMMAND'"
+exec nvim "$WORKFILE" -c "set filetype=$FILETYPE | $NVIM_COMMAND '$COMMAND'"

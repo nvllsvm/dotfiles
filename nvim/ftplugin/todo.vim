@@ -1,1 +1,2 @@
-let g:auto_save = 1
+autocmd InsertLeave * :update
+autocmd TextChanged * :update

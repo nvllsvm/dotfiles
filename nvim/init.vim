@@ -48,7 +48,14 @@ function StripTrailingWhitespace()
   endif
 endfunction
 
-function _REPL()
+function _REPLAuto()
+    if getbufinfo(1)[0].changed
+        call _REPLRun()
+    endif
+endfunction
+
+function _REPLRun()
+    :update
     let repl_file = expand("%:p")
     wincmd p
     set nomodified
@@ -59,10 +66,16 @@ function _REPL()
     wincmd p
 endfunction
 
+function _REPLInitInstant()
+    autocmd TextChangedI * call _REPLAuto()
+    autocmd TextChangedP * call _REPLAuto()
+endfunction
+
+
 function _REPLInit(...)
-    let g:auto_save = 1
     let g:repl_cmd = a:1
-    autocmd BufWritePost * call _REPL()
+    autocmd InsertLeave * call _REPLAuto()
+    autocmd TextChanged * call _REPLAuto()
     autocmd BufDelete * :qa
     autocmd QuitPre * :qa
     set splitright
@@ -70,10 +83,11 @@ function _REPLInit(...)
     set nonu
     set nornu
     wincmd p
-    call _REPL()
+    call _REPLRun()
 endfunction
 
 command! -nargs=1 REPL call _REPLInit(<args>)
+command! -nargs=1 REPLInstant call _REPLInit(<args>) | call _REPLInitInstant()
 
 command FixEmpty :set expandtab | :retab | call StripTrailingWhitespace() | :%s/\r//ge
 
@@ -99,8 +113,6 @@ Plug 'junegunn/fzf.vim'
 Plug 'rust-lang/rust.vim'
 
 Plug 'rbgrouleff/bclose.vim'
-
-Plug '907th/vim-auto-save'
 
 Plug 'udalov/kotlin-vim'
 Plug 'keith/swift.vim'

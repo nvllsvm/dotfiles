@@ -1,4 +1,5 @@
-let g:auto_save = 1
+autocmd InsertLeave * :update
+autocmd TextChanged * :update
 
 " talbe_mode_always_active breaks highlighting
 TableModeEnable
