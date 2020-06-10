@@ -62,7 +62,6 @@ done
 FILETYPE="$(determine_filetype "$COMMAND")"
 if [ -z "$WORKFILE" ]; then
     WORKFILE="${TMPDIR:-/tmp}/nvim-repl-${FILETYPE}"
-    touch workfile
 fi
 
 exec nvim "$WORKFILE" -c "set filetype=$FILETYPE | $NVIM_COMMAND '$COMMAND'"
