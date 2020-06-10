@@ -1,2 +1,3 @@
 #!/usr/bin/env sh
-rsync -av --progress --delete /storage/Syncthing/Default/RetroArch/rom/ odroidgoadvance:/roms
+rsync -av --progress --delete /storage/Syncthing/Default/RetroArch/rom/ odroidgoadvance:~/roms
+rsync -av --progress --delete /storage/Syncthing/Default/RetroArch/bios/ odroidgoadvance:~/bios
