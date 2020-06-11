@@ -33,4 +33,4 @@ esac
 
 dunstify \
     --hints=string:x-dunst-stack-tag:set-backlight \
-    "💡 Backlight $(current_light)"
+    "💡 Backlight" "$(current_light)"
