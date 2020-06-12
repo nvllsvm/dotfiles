@@ -65,7 +65,7 @@ def main():
     source_dir = pathlib.Path('/storage/Games')
     target_dir = pathlib.Path('/storage/Syncthing/Default/RetroArch/rom')
 
-    for d in ('GB', 'GBC', 'GBA', 'J2ME', 'NES', 'SNES'):
+    for d in ('GB', 'GBC', 'GBA', 'NES', 'SNES'):
         _sync(source_dir / d, target_dir / d)
 
 
