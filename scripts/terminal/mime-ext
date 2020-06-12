@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 import argparse
+import collections
+import json
 import pathlib
 
 import magic
@@ -19,12 +21,20 @@ def all_files(root):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('path', type=pathlib.Path)
+    parser.add_argument('path', default='.', nargs='?')
     args = parser.parse_args()
 
+    exts = collections.defaultdict(set)
     for path in all_files(args.path):
         mime = magic.from_file(str(path), mime=True)
-        print(path, mime)
+        exts[mime].add(path)
+
+    exts = {
+        ext: sorted(str(p.resolve()) for p in paths)
+        for ext, paths in exts.items()
+    }
+
+    print(json.dumps(exts, indent=2, sort_keys=True))
 
 
 if __name__ == '__main__':
