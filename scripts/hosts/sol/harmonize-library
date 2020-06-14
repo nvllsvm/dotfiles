@@ -17,12 +17,3 @@ harmonize() {
 }
 
 harmonize -n "$(nproc)" "$SOURCE" "$TARGET" --codec opus --bitrate 128 --music
-
-printf 'Updating Airsonic library .'
-gonic-cli startScan > /dev/null
-
-while [ "$(gonic-cli getScanStatus | jq '.scanning')" = 'true' ]; do
-    printf .
-    sleep 1
-done
-echo ' Done'
