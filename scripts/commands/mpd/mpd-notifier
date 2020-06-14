@@ -7,6 +7,7 @@ import subprocess
 import time
 
 import mpd
+import setproctitle
 
 _LOGGER = logging.getLogger('mpd-notifier')
 
@@ -77,8 +78,8 @@ def _dunstify(text, icon=None):
         'dunstify',
         'mpd',
         text,
-        '--hints=string:x-dunst-stack-tag:mpd-notifier',
         '--hints=int:transient:1',
+        '--hints=string:x-dunst-stack-tag:mpd-notifier',
         '--appname', 'mpd-notifier',
     ]
     if icon:
@@ -87,6 +88,8 @@ def _dunstify(text, icon=None):
 
 
 def main():
+    setproctitle.setproctitle('mpd-notifier')
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--host', default='localhost')
     parser.add_argument('--port', type=int, default=6600)
