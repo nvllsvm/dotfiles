@@ -52,7 +52,6 @@ if [[ $osname == Linux* ]]; then
             i3lock \
             i3status \
             kid3-qt \
-            maim \
             mpc \
             mpd \
             mpv \
