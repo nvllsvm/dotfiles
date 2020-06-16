@@ -320,5 +320,6 @@
 [mpd-notifier]
     appname = mpd-notifier
     format = %b
+    timeout = 2
 
 # vim: ft=cfg
