@@ -35,7 +35,7 @@ done
 NOTE_FILE=
 case $# in
     0)
-        NOTE_FILE="$(rg -0 --hidden '.+' | sort -u | fzf | tr '\0' '\n' | head -n 1)"
+        NOTE_FILE="$(srch)"
         if [ -z "$NOTE_FILE" ]; then
             exit
         fi
