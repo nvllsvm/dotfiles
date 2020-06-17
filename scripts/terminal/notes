@@ -27,10 +27,6 @@ while true; do
                 exec notes "$NOTE_FILE"
             fi 
             ;;
-        -r)
-            shift
-            exec rg -i --hidden -- "$@"
-            ;;
         *)
             break
     esac
@@ -39,7 +35,10 @@ done
 NOTE_FILE=
 case $# in
     0)
-        NOTE_FILE=scratch/$(date +%Y-%m-%d).md
+        NOTE_FILE="$(rg -0 --hidden '.+' | sort -u | fzf | tr '\0' '\n' | head -n 1)"
+        if [ -z "$NOTE_FILE" ]; then
+            exit
+        fi
         ;;
     1)
         NOTE_FILE="$1"
