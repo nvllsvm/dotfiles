@@ -1,2 +1,3 @@
 #!/usr/bin/env sh
+export LC_ALL=C
 rg -0 --hidden -g '!\.git/' '.+' | sed 's/\x0/\x0 /' | sort -u | fzf --literal --bind ctrl-l:clear-query | tr '\0' '\n' | head -n 1
