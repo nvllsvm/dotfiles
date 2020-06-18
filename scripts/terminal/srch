@@ -1,8 +1,13 @@
 #!/usr/bin/env sh
 NTH_ARG=
 WITH_NTH_ARG=
+NO_FZF=
 while true; do
     case "$1" in
+        --no-fzf)
+            NO_FZF=1
+            shift
+            ;;
         --no-filename)
             NTH_ARG='--nth=2..'
             WITH_NTH_ARG='--with-nth=2..'
@@ -13,5 +18,12 @@ while true; do
     esac
 done
 
-export LC_ALL=C
-rg -0 --hidden -g '!\.git/' '.+' | sed 's/\x0/\x0 /' | sort -u | fzf $NTH_ARG $WITH_NTH_ARG --literal --bind ctrl-l:clear-query | tr '\0' '\n' | head -n 1
+get_contents() {
+    rg -0 --hidden -g '!\.git/' '.+' | sed 's/\x0/\x0 /' | LC_ALL=C sort -u
+}
+
+if [ -n "$NO_FZF" ]; then
+    get_contents
+else
+    get_contents | fzf $NTH_ARG $WITH_NTH_ARG --literal --bind ctrl-l:clear-query | tr '\0' '\n' | head -n 1
+fi
