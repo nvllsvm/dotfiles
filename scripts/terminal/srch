@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-rg -0 --hidden -g '!\.git/' '.+' | sort -u | sed 's/\x0/\x0 /' | fzf --literal --bind ctrl-d:clear-query | tr '\0' '\n' | head -n 1
+rg -0 --hidden -g '!\.git/' '.+' | sort -u | sed 's/\x0/\x0 /' | fzf --literal --bind ctrl-l:clear-query | tr '\0' '\n' | head -n 1
