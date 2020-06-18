@@ -1,3 +1,17 @@
 #!/usr/bin/env sh
+NTH_ARG=
+WITH_NTH_ARG=
+while True; do
+    case "$1" in
+        --no-filename)
+            NTH_ARG='--nth=2..'
+            WITH_NTH_ARG='--with-nth=2..'
+            shift
+            ;;
+        *)
+            break
+    esac
+done
+
 export LC_ALL=C
-rg -0 --hidden -g '!\.git/' '.+' | sed 's/\x0/\x0 /' | sort -u | fzf --literal --bind ctrl-l:clear-query | tr '\0' '\n' | head -n 1
+rg -0 --hidden -g '!\.git/' '.+' | sed 's/\x0/\x0 /' | sort -u | fzf $NTH_ARG $WITH_NTH_ARG --literal --bind ctrl-l:clear-query | tr '\0' '\n' | head -n 1
