@@ -22,8 +22,16 @@ get_contents() {
     rg -0 --hidden -g '!\.git/' '.+' | sed 's/\x0/\x0 /' | LC_ALL=C sort -u
 }
 
-if [ -n "$NO_FZF" ]; then
-    get_contents
+show_fzf() {
+    fzf $NTH_ARG $WITH_NTH_ARG --literal --bind ctrl-l:clear-query | tr '\0' '\n' | head -n 1
+}
+
+if [ -t 0 ]; then
+    if [ -n "$NO_FZF" ]; then
+        get_contents
+    else
+        get_contents | show_fzf
+    fi
 else
-    get_contents | fzf $NTH_ARG $WITH_NTH_ARG --literal --bind ctrl-l:clear-query | tr '\0' '\n' | head -n 1
+    show_fzf
 fi
