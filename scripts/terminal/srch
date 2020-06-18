@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 NTH_ARG=
 WITH_NTH_ARG=
-while True; do
+while true; do
     case "$1" in
         --no-filename)
             NTH_ARG='--nth=2..'
