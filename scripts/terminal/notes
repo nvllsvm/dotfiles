@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -e
 
-NOTES_DIR="${NOTES_DIR:-$HOME/Notes}"
+NOTES_DIR="${NOTES_DIR:-$HOME/notes}"
 if ! [ -d "$NOTES_DIR" ]; then
     echo error: notes directory does not exist: \""$NOTES_DIR"\" >&2
     exit 1
