@@ -17,7 +17,7 @@ update_repo() {
 
     # non-user files
     if command -v sudo > /dev/null; then
-        for tag in common "$(hostname)"; do
+        for tag in common $(hostname); do
             backup_root="$2/non-user/$tag"
             if [ -d "$backup_root" ]; then
                 for source in $(find "$backup_root" -type f); do
