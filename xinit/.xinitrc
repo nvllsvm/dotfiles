@@ -17,7 +17,6 @@ xset s off -dpms
 
 xss-lock -- lock-screen &
 
-snixembed --fork
 if command -v xinit-$(hostname) > /dev/null; then
     xinit-$(hostname)
 fi
