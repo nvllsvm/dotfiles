@@ -154,12 +154,12 @@ for_window [class="dosbox-staging"] fullscreen
 bindsym $mod+b bar mode toggle
 bindsym $mod+m move position center
 
-bindsym $mod+Return exec alacritty
+bindsym $mod+Return exec --no-startup-id alacritty
 bindsym $mod+space exec desktop-launcher
 bindsym ctrl+$mod+space exec rofimoji --skin-tone neutral
 bindsym $mod+Escape exec lock-screen
 
-bindsym $mod+Shift+s exec flameshot gui
+bindsym $mod+Shift+s exec --no-startup-id flameshot gui
 
 bindsym $mod+F1 exec i3-f1
 bindsym $mod+F2 exec i3-f2
