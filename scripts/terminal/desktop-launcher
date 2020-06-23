@@ -7,6 +7,9 @@ import subprocess
 import sys
 import urllib.parse
 
+WHITELISTED = {
+    'jira',
+}
 
 HIST = pathlib.Path('~/.cache/launcher.hist').expanduser()
 
@@ -99,7 +102,7 @@ if sys.platform == 'darwin':
 else:
     result = rofi(cmds)
 
-if result in cmds:
+if result in cmds or result.split()[0] in WHITELISTED:
     if sys.platform == 'darwin':
         if result in apps:
             history[result] += 1
@@ -113,7 +116,7 @@ if result in cmds:
         parts = result.strip().split()
         cmd = parts[0]
         history[cmd] += 1
-        launch(result)
+        launch(*result.split())
     HIST.write_text('\n'.join(f'{v} {k}' for k, v in history.items() if v))
 elif result:
     result = result.strip()
