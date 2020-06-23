@@ -7,11 +7,8 @@ import subprocess
 import sys
 import urllib.parse
 
-WHITELISTED = {
-    'jira',
-}
-
 HIST = pathlib.Path('~/.cache/launcher.hist').expanduser()
+BOOKMARKS = pathlib.Path('~/.config/desktop-launcher/bookmarks').expanduser()
 
 
 def launch(*args):
@@ -91,18 +88,20 @@ if HIST.is_file():
         count, cmd = line.split(' ', 1)
         history[cmd] = int(count)
 
+bookmarks = BOOKMARKS.read_text().splitlines()
+
 if sys.platform == 'darwin':
     apps = sorted(find_applications())
 else:
     apps = find_executables()
-cmds = sorted(apps, key=lambda x: (history[x] * -1, x))
+cmds = sorted([*apps, *bookmarks], key=lambda x: (history[x] * -1, x))
 
 if sys.platform == 'darwin':
     result = fzf(cmds)
 else:
     result = rofi(cmds)
 
-if result in cmds or result.split()[0] in WHITELISTED:
+if result in apps:
     if sys.platform == 'darwin':
         if result in apps:
             history[result] += 1
