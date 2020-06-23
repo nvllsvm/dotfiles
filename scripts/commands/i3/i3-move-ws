@@ -1,0 +1,61 @@
+#!/usr/bin/env python
+import json
+import subprocess
+
+
+def i3msg(command='', cmd_type='run_command'):
+    proc = subprocess.run(
+        ['i3-msg', '-t', cmd_type, command],
+        stdout=subprocess.PIPE,
+        check=True)
+    return json.loads(proc.stdout.decode())
+
+
+def outputs():
+    outputs = []
+    for output in i3msg(cmd_type='get_outputs'):
+        if output['current_workspace']:
+            outputs.append(output)
+
+    return outputs
+
+
+def main():
+    commands = []
+
+    primary = None
+    secondary = []
+
+    for output in outputs():
+        name = output['name']
+        current_ws = output['current_workspace']
+
+        if output['primary']:
+            primary = name
+        else:
+            secondary.append(name)
+
+        commands.extend([
+            f'workspace {current_ws}',
+            f'workspace {name}'])
+
+    for ws in range(10, 0, -1):
+        commands.extend([
+            f'workspace {primary}',
+            f'[workspace={ws}] move workspace to {primary}',
+        ])
+
+    for ws, output in zip(range(10, 0, -1), secondary):
+        commands.extend([
+            f'workspace {output}',
+            f'[workspace={ws}] move workspace to {name}',
+            f'workspace {ws}',
+        ])
+
+    commands.append('workspace 1')
+
+    i3msg(';'.join(commands))
+
+
+if __name__ == '__main__':
+    main()
