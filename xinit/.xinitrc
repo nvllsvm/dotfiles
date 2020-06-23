@@ -24,6 +24,10 @@ fi
 
 nm-applet &
 
+if command -v syncthingtray > /dev/null; then
+    syncthingtray &
+fi
+
 if command -v mpd-notifier > /dev/null; then
     mpd-notifier --library ~/.config/mpd/library &
 fi
