@@ -155,9 +155,9 @@ bindsym $mod+b bar mode toggle
 bindsym $mod+m move position center
 
 bindsym $mod+Return exec --no-startup-id alacritty
-bindsym $mod+space exec desktop-launcher
-bindsym ctrl+$mod+space exec rofimoji --skin-tone neutral
-bindsym $mod+Escape exec lock-screen
+bindsym $mod+space exec --no-startup-id desktop-launcher
+bindsym ctrl+$mod+space exec --no-startup-id rofimoji --skin-tone neutral
+bindsym $mod+Escape exec --no-startup-id lock-screen
 
 bindsym $mod+Shift+s exec --no-startup-id flameshot gui
 
