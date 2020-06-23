@@ -24,7 +24,7 @@ fi
 nm-applet &
 
 if command -v syncthingtray > /dev/null; then
-    syncthingtray &
+    syncthingtray --wait &
 fi
 
 if command -v mpd-notifier > /dev/null; then
