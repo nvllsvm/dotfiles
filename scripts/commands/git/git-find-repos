@@ -10,4 +10,4 @@ case $# in
         echo 'error: unknown arguments' >&2
         exit 1
 esac
-exec find "$SEARCH_DIR" -type d -name .git -exec dirname {} \;
+exec find "$SEARCH_DIR" -type d -name .git -printf "%h\n";
