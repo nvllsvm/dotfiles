@@ -22,14 +22,3 @@ def_key "n"
     next_found_item
 def_key "N"
     previous_found_item
-
-
-# prevent accidentally changing volume
-def_key "left"
-    dummy
-def_key "right"
-    dummy
-def_key "-"
-    dummy
-def_key "+"
-    dummy
