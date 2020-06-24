@@ -88,7 +88,10 @@ if HIST.is_file():
         count, cmd = line.split(' ', 1)
         history[cmd] = int(count)
 
-bookmarks = BOOKMARKS.read_text().splitlines()
+try:
+    bookmarks = BOOKMARKS.read_text().splitlines()
+except FileNotFoundError:
+    bookmarks = []
 
 if sys.platform == 'darwin':
     apps = sorted(find_applications())
