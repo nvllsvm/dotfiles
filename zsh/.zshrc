@@ -119,3 +119,5 @@ all_commands() {
     bashcompinit
     compgen -c | sort -u
 }
+
+PROMPT_EOL_MARK=''
