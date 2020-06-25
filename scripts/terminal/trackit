@@ -9,7 +9,7 @@ import re
 import subprocess
 import sys
 
-NOTES_DIR = pathlib.Path(os.environ.get('NOTES_DIR', '~/Notes')).expanduser()
+NOTES_DIR = pathlib.Path(os.environ.get('NOTES_DIR', '~/notes')).expanduser()
 TRACKIT_DIR = NOTES_DIR / 'trackit'
 
 _NUM_RE = re.compile(r'(\d+)')
