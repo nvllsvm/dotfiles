@@ -2,6 +2,7 @@
 launch() {
     nohup "$@" > /dev/null 2>&1 &
 }
+launch caprine
 launch riot-desktop --hidden
 launch signal-desktop --use-tray-icon --start-in-tray
 launch slack --startup
