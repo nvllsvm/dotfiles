@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+if [ $# -eq 0 ] && [ -t 0 ] && [ -t 1 ]; then
+    if [ -e /usr/local/bin/zsh ]; then
+        LANG=en_US.UTF-8 exec /usr/local/bin/zsh -ic tmux-attach
+    else
+        LANG=en_US.UTF-8 exec /bin/zsh -ic tmux-attach
+    fi
+else
+    exec "$@"
+fi
