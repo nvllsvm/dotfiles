@@ -281,6 +281,29 @@ class zstd:
         return [path]
 
 
+class brotli:
+
+    @staticmethod
+    @functools.lru_cache()
+    def check():
+        if not shutil.which('brotli'):
+            raise KeyError
+
+    @staticmethod
+    def contents(path):
+        return [path.with_suffix('').name]
+
+    @staticmethod
+    def extract(path, dest, password=None):
+        subprocess.run(
+            ['brotli', '-d', '--', path],
+            check=True)
+
+    @staticmethod
+    def volumes(path, password=''):
+        return [path]
+
+
 def _build_dest(path, parent, child):
     if parent is None:
         parent = path.parent
@@ -309,6 +332,8 @@ def _get_class(path):
         cls = tar
     elif suffix == '.zst':
         cls = zstd
+    elif suffix == '.br':
+        cls = brotli
     elif suffix == '.gz':
         cls = gzip
     elif suffix == '.xz':
