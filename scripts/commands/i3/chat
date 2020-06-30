@@ -6,3 +6,4 @@ launch caprine
 launch riot-desktop --hidden
 launch signal-desktop --use-tray-icon --start-in-tray
 launch slack --startup
+launch discord --startup
