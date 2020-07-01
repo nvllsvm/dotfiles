@@ -1,0 +1,2 @@
+# prevents `reset SuperSpeed Gen 1 USB device number` errors
+ACTION=="add", SUBSYSTEM=="usb", TEST=="power/control", ATTR{power/control}="on"
