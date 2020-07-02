@@ -2,6 +2,7 @@
 notify() {
     dunstify \
         --hints=string:x-dunst-stack-tag:set-volume \
+        --hints=int:transient:1 \
         '🔊 Volume' "$@"
 }
 
