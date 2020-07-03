@@ -9,7 +9,6 @@ import jinja2
 
 SYSTEM_UNITS = {
     'fstrim.service',
-    'linode-dynamic-dns.service',
     'logrotate.service',
     'man-db.service',
     'shadow.service',
