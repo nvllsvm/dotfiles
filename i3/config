@@ -150,7 +150,7 @@ hide_edge_borders vertical
 for_window [class="^.*"] border pixel 2
 #for_window [floating] resize set 60 ppt 80 ppt, move position center
 for_window [class="dosbox-staging"] fullscreen
-for_window [class=".*Foliate.*"] floating disable
+for_window [class=".*Foliate.*" title="^Open.*"] floating disable
 
 bindsym $mod+b bar mode toggle
 bindsym $mod+m move position center
