@@ -12,3 +12,4 @@ setlocal formatoptions+=cn
 nnoremap <leader>m :TableModeRealign<Cr>:TableSort<Cr>
 set linebreak
 set list& listchars&
+highlight Title cterm=bold
