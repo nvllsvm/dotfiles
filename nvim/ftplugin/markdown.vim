@@ -13,3 +13,5 @@ nnoremap <leader>m :TableModeRealign<Cr>:TableSort<Cr>
 set linebreak
 set list& listchars&
 highlight Title cterm=bold
+
+let g:vim_markdown_conceal = 0
