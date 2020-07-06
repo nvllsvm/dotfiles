@@ -4,7 +4,7 @@ autocmd TextChanged * :update
 " talbe_mode_always_active breaks highlighting
 TableModeEnable
 
-let g:vim_markdown_auto_insert_bullets=0
+let g:vim_markdown_auto_insert_bullets=1
 let g:vim_markdown_new_list_item_indent=0
 setlocal formatlistpat=^\\s*\\d\\+[.\)]\\s\\+\\\|^\\s*[*+~-]\\s\\+\\\|^\\(\\\|[*#]\\)\\[^[^\\]]\\+\\]:\\s 
 setlocal comments=n:>
