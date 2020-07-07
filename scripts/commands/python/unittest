@@ -1,2 +1,2 @@
-#!/usr/bin/env sh
-exec python -m unittest "$@"
+#!/usr/bin/env python
+import unittest.__main__
