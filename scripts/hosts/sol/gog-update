@@ -3,12 +3,15 @@ set -e
 
 IMAGE=nvllsvm/lgogdownloader
 GOG_DIR=/storage/Games/PC/GOG.com
+CACHE_DIR=~/.cache/lgogdownloader
 
-podman run \
+mkdir -p "$CACHE_DIR"
+
+exec podman run \
     --rm \
     --quiet \
     -e HOME \
-    -v $GOG_DIR:/downloads \
-    -v ~/.cache/lgogdownloader:/cache \
+    -v "$GOG_DIR":/downloads \
+    -v "$CACHE_DIR":/cache \
     -v ~/.dotfiles/private/lgogdownloader:/config \
-    $IMAGE
+    "$IMAGE"
