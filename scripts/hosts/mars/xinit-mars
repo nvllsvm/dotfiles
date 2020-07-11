@@ -1,3 +1,4 @@
 #!/usr/bin/env sh
+export RADV_PERFTEST=aco
 chat &
 jellyfin-mpv-shim &
