@@ -5,7 +5,7 @@ if [ -d "$1" ]; then
     exit
 else
     case "$1" in
-        *.tar.*|*.rar|*.7z|*.zip|*.iso|*.zst|*.exe|*.pk3)
+        *.tar.*|*.rar|*.7z|*.zip|*.iso|*.zst|*.exe|*.pk3|*.tar)
             extract -l "$1"
             ;;
         *)
