@@ -1,13 +1,13 @@
-output HDMI-1
+output HDMI-A-0
 off
-output DP-1
+output DisplayPort-0
 off
-output DP-3
-crtc 1
+output DisplayPort-2
+crtc 2
 mode 1920x1200
 pos 0x0
 rate 59.95
-output DP-2
+output DisplayPort-1
 crtc 0
 mode 1920x1200
 pos 1920x0
