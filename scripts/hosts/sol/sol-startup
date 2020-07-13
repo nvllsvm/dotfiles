@@ -30,6 +30,10 @@ sudo systemctl start zfs-scrub@pool1.timer
 
 zpool status -v
 
+echo Starting NFS binds ...
+sudo mount --bind ~ar /srv/nfs4/ar
+sudo mount --bind /storage /srv/nfs4/storage
+
 echo Starting systemd units ...
 systemctl --user enable --now backup-youtube-nullsum.timer
 systemctl --user enable --now git-repo-backup.timer
@@ -46,6 +50,3 @@ echo Starting podman ...
 podman system migrate || true
 
 sol-docker restart
-
-sudo mount --bind ~ar /srv/nfs4/ar
-sudo mount --bind /storage /srv/nfs4/storage
