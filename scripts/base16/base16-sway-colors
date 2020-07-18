@@ -4,30 +4,30 @@ import pathlib
 
 
 ATTRIBUTE_MAP = {
-    'color00': 'color0',
-    'color01': 'color1',
-    'color02': 'color2',
-    'color03': 'color3',
-    'color04': 'color4',
-    'color05': 'color5',
-    'color06': 'color6',
-    'color07': 'color7',
-    'color08': 'color8',
-    'color09': 'color9',
-    'color10': 'color10',
-    'color11': 'color11',
-    'color12': 'color12',
-    'color13': 'color13',
-    'color14': 'color14',
-    'color15': 'color15',
-    'color16': 'color16',
-    'color17': 'color17',
-    'color18': 'color18',
-    'color19': 'color19',
-    'color20': 'color20',
-    'color21': 'color21',
-    'color_background': 'background',
-    'color_foreground': 'foreground'
+    'color00': 'color_00',
+    'color01': 'color_01',
+    'color02': 'color_02',
+    'color03': 'color_03',
+    'color04': 'color_04',
+    'color05': 'color_05',
+    'color06': 'color_06',
+    'color07': 'color_07',
+    'color08': 'color_08',
+    'color09': 'color_09',
+    'color10': 'color_10',
+    'color11': 'color_11',
+    'color12': 'color_12',
+    'color13': 'color_13',
+    'color14': 'color_14',
+    'color15': 'color_15',
+    'color16': 'color_16',
+    'color17': 'color_17',
+    'color18': 'color_18',
+    'color19': 'color_19',
+    'color20': 'color_20',
+    'color21': 'color_21',
+    'color_background': 'color_bg',
+    'color_foreground': 'color_fg'
 }
 
 
@@ -63,7 +63,7 @@ def main():
     attributes = base16_xresources(args.theme)
     print(
         '\n'.join(
-            f'set ${attribute} #{color}'
+            f'set ${ATTRIBUTE_MAP[attribute]} #{color}'
             for attribute, color in attributes.items()
         )
     )

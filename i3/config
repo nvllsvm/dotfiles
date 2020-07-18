@@ -1,29 +1,29 @@
 set $mod Mod4
 
-set_from_resource $color_background background #000000
-set_from_resource $color_foreground foreground #000000
-set_from_resource $color0 color0 #000000
-set_from_resource $color1 color1 #000000
-set_from_resource $color2 color2 #000000
-set_from_resource $color3 color3 #000000
-set_from_resource $color4 color4 #000000
-set_from_resource $color5 color5 #000000
-set_from_resource $color6 color6 #000000
-set_from_resource $color7 color7 #000000
-set_from_resource $color8 color8 #000000
-set_from_resource $color9 color9 #000000
-set_from_resource $color10 color10 #000000
-set_from_resource $color11 color11 #000000
-set_from_resource $color12 color12 #000000
-set_from_resource $color13 color13 #000000
-set_from_resource $color14 color14 #000000
-set_from_resource $color15 color15 #000000
-set_from_resource $color16 color16 #000000
-set_from_resource $color17 color17 #000000
-set_from_resource $color18 color18 #000000
-set_from_resource $color19 color19 #000000
-set_from_resource $color20 color20 #000000
-set_from_resource $color21 color21 #000000
+set_from_resource $color_bg background #000000
+set_from_resource $color_fg foreground #000000
+set_from_resource $color_00 color0 #000000
+set_from_resource $color_01 color1 #000000
+set_from_resource $color_02 color2 #000000
+set_from_resource $color_03 color3 #000000
+set_from_resource $color_04 color4 #000000
+set_from_resource $color_05 color5 #000000
+set_from_resource $color_06 color6 #000000
+set_from_resource $color_07 color7 #000000
+set_from_resource $color_08 color8 #000000
+set_from_resource $color_09 color9 #000000
+set_from_resource $color_10 color10 #000000
+set_from_resource $color_11 color11 #000000
+set_from_resource $color_12 color12 #000000
+set_from_resource $color_13 color13 #000000
+set_from_resource $color_14 color14 #000000
+set_from_resource $color_15 color15 #000000
+set_from_resource $color_16 color16 #000000
+set_from_resource $color_17 color17 #000000
+set_from_resource $color_18 color18 #000000
+set_from_resource $color_19 color19 #000000
+set_from_resource $color_20 color20 #000000
+set_from_resource $color_21 color21 #000000
 
 set_from_resource $font facename Monospace
 set_from_resource $fontSize fontsize 11
@@ -125,26 +125,26 @@ bar {
     tray_output       primary
 
     colors {
-        background $color_background
-        statusline $color_foreground
-        separator  $color_foreground
+        background $color_bg
+        statusline $color_fg
+        separator  $color_fg
 
         # border background text
-        focused_workspace  $color19 $color19 $color_foreground
-        active_workspace   $color18 $color19 $color_foreground
-        inactive_workspace $color_background $color_background $color8
-        urgent_workspace   $color1  $color1  $color_foreground
+        focused_workspace  $color_19 $color_19 $color_fg
+        active_workspace   $color_18 $color_19 $color_fg
+        inactive_workspace $color_bg $color_bg $color_08
+        urgent_workspace   $color_01 $color_01 $color_fg
     }
 }
 
-# class                 border   backgr            text              indicator child_border
-client.focused          $color19 $color19          $color_foreground $color8   $color19
-client.focused_inactive $color18 $color18          $color8           $color8   $color18
-client.unfocused        $color18 $color18          $color8           $color8   $color_background
-client.urgent           $color1  $color_background $color_foreground $color8   $color1
-client.placeholder      $color19 $color_background $color_foreground $color8   $color18
+# class                 border    bg        text      indicator child_border
+client.focused          $color_19 $color_19 $color_fg $color_08 $color_19
+client.focused_inactive $color_18 $color_18 $color_08 $color_08 $color_18
+client.unfocused        $color_18 $color_18 $color_08 $color_08 $color_bg
+client.urgent           $color_01 $color_bg $color_fg $color_08 $color_01
+client.placeholder      $color_19 $color_bg $color_fg $color_08 $color_18
 
-client.background       $color_background
+client.background       $color_bg
 
 hide_edge_borders vertical
 for_window [class="^.*"] border pixel 2
