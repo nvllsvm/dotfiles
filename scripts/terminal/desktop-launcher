@@ -14,6 +14,12 @@ BOOKMARKS = pathlib.Path('~/.config/desktop-launcher/bookmarks').expanduser()
 def launch(*args):
     if sys.platform == 'darwin':
         subprocess.run(args, check=True)
+    elif 'SWAYSOCK' in os.environ:
+        cmd = ' '.join(shlex.quote(arg) for arg in args)
+        subprocess.run(
+            ['swaymsg', '-q', '-t', 'command', 'exec', '--', cmd],
+            check=True
+        )
     elif 'I3SOCK' in os.environ:
         cmd = ' '.join(shlex.quote(arg) for arg in args)
         subprocess.run(
@@ -99,10 +105,11 @@ else:
     apps = find_executables()
 cmds = sorted([*apps, *bookmarks], key=lambda x: (history[x] * -1, x))
 
-if sys.platform == 'darwin':
-    result = fzf(cmds)
-else:
+if 'XAUTHORITY' in os.environ:
     result = rofi(cmds)
+else:
+    result = fzf(cmds)
+
 
 if result in apps:
     if sys.platform == 'darwin':
