@@ -13,6 +13,7 @@ usage: set-desktop-themes [--help] [--dpi DPI] [--large]
 EOF
 }
 
+unset LARGE_DPI
 while true; do
     case "$1" in
         --dpi)
@@ -22,6 +23,7 @@ while true; do
             ;;
         --large)
             LARGE=1
+            LARGE_DPI=128
             shift
             ;;
         --help)
@@ -97,7 +99,7 @@ BACKGROUND_COLOR="$(echo "$COLORS" | grep background | awk '{print substr($2, 2,
 xrdb << EOF
 *facename: ${FONT_NAME}
 *fontsize: ${FONT_SIZE}
-*font: xft:${FONT_NAME}:size=${FONT_SIZE}:antialias=true:dpi=${DPI}
+*font: xft:${FONT_NAME}:size=${FONT_SIZE}:antialias=true:dpi=${LARGE_DPI:-$DPI}
 *boldFont:
 
 rofi.font:	${FONT_NAME} ${FONT_SIZE}
