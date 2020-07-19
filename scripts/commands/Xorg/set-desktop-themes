@@ -38,7 +38,7 @@ while true; do
             break
     esac
 done
-FONT_DPI="${FONT_DPI:-DPI}"
+FONT_DPI="${FONT_DPI:-$DPI}"
 
 if [ -z "$DPI" ]; then
     . "$CURRENT_THEME"
