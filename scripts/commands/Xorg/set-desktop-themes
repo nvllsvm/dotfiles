@@ -13,7 +13,6 @@ usage: set-desktop-themes [--help] [--dpi DPI] [--large]
 EOF
 }
 
-unset FONT_DPI
 while true; do
     case "$1" in
         --dpi)
@@ -50,7 +49,6 @@ else
 
         if [ -n "$LARGE" ]; then
             DUNST_GEOMETRY=300x5-0+28
-            FONT_DPI=128
             FONT_SIZE=14
         else
             DUNST_GEOMETRY=300x5-0+20
@@ -71,8 +69,6 @@ else
         fi
     fi
 
-    FONT_DPI="${FONT_DPI:-$DPI}"
-
     # save settings
     cat > "$CURRENT_THEME" << EOF
 BORDER_WIDTH="$BORDER_WIDTH"
@@ -80,7 +76,6 @@ CURSOR_SIZE="$CURSOR_SIZE"
 DPI="$DPI"
 DUNST_GEOMETRY="$DUNST_GEOMETRY"
 DUNST_MAX_ICON_SIZE="$DUNST_MAX_ICON_SIZE"
-FONT_DPI="$FONT_DPI"
 FONT_NAME="$FONT_NAME"
 FONT_SIZE="$FONT_SIZE"
 SCALING_FACTOR="$SCALING_FACTOR"
@@ -101,14 +96,14 @@ BACKGROUND_COLOR="$(echo "$COLORS" | grep background | awk '{print substr($2, 2,
 xrdb << EOF
 *facename: ${FONT_NAME}
 *fontsize: ${FONT_SIZE}
-*font: xft:${FONT_NAME}:size=${FONT_SIZE}:antialias=true:dpi=${FONT_DPI}
+*font: xft:${FONT_NAME}:size=${FONT_SIZE}:antialias=true:dpi=${DPI}
 *boldFont:
 
 rofi.font:	${FONT_NAME} ${FONT_SIZE}
 rofi.dpi:	${DPI}
 rofi.bw:	${BORDER_WIDTH}
 
-Xft.dpi: ${FONT_DPI}
+Xft.dpi: ${DPI}
 
 Xcursor.size: ${CURSOR_SIZE}
 ${COLORS}
