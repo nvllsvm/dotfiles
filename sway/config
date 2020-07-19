@@ -1,33 +1,11 @@
+include ~/.config/sway/colors
+include ~/.config/sway/outputs
+
+output "*" bg $color_bg solid_color
+
 set $mod Mod4
 
-set_from_resource $color_bg background #000000
-set_from_resource $color_fg foreground #000000
-set_from_resource $color_00 color0 #000000
-set_from_resource $color_01 color1 #000000
-set_from_resource $color_02 color2 #000000
-set_from_resource $color_03 color3 #000000
-set_from_resource $color_04 color4 #000000
-set_from_resource $color_05 color5 #000000
-set_from_resource $color_06 color6 #000000
-set_from_resource $color_07 color7 #000000
-set_from_resource $color_08 color8 #000000
-set_from_resource $color_09 color9 #000000
-set_from_resource $color_10 color10 #000000
-set_from_resource $color_11 color11 #000000
-set_from_resource $color_12 color12 #000000
-set_from_resource $color_13 color13 #000000
-set_from_resource $color_14 color14 #000000
-set_from_resource $color_15 color15 #000000
-set_from_resource $color_16 color16 #000000
-set_from_resource $color_17 color17 #000000
-set_from_resource $color_18 color18 #000000
-set_from_resource $color_19 color19 #000000
-set_from_resource $color_20 color20 #000000
-set_from_resource $color_21 color21 #000000
-
-set_from_resource $font facename Monospace
-set_from_resource $fontSize fontsize 11
-font pango:$font $fontSize
+font pango:Monospace 11
 
 floating_modifier $mod
 
@@ -81,16 +59,16 @@ bindsym $mod+Shift+8 move container to workspace 8
 bindsym $mod+Shift+9 move container to workspace 9
 bindsym $mod+Shift+0 move container to workspace 10
 
-bindsym $mod+Shift+c restart
+bindsym $mod+Shift+c reload
 
 mode "resize" {
-        bindsym h resize shrink width 10 px or 10 ppt
-        bindsym j resize grow height 10 px or 10 ppt
-        bindsym k resize shrink height 10 px or 10 ppt
-        bindsym l resize grow width 10 px or 10 ppt
+    bindsym h resize shrink width 10 px or 10 ppt
+    bindsym j resize grow height 10 px or 10 ppt
+    bindsym k resize shrink height 10 px or 10 ppt
+    bindsym l resize grow width 10 px or 10 ppt
 
-        bindsym Return mode "default"
-        bindsym Escape mode "default"
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
 }
 
 bindsym $mod+r mode "resize"
@@ -123,27 +101,22 @@ client.placeholder      $color_19 $color_bg $color_fg $color_08 $color_18
 
 client.background       $color_bg
 
+for_window [title=".*"] border pixel 2
 hide_edge_borders vertical
-for_window [title="^.*"] border pixel 2
 for_window [class="dosbox-staging"] fullscreen
 for_window [class=".*Foliate.*" title="^Open.*"] floating disable
 for_window [class="okular"] floating disable
+for_window [title="desktop-launcher"] floating enable
 
 bindsym $mod+b bar mode toggle
 bindsym $mod+m move position center
 
 bindsym $mod+Return exec --no-startup-id alacritty
-bindsym $mod+space exec --no-startup-id desktop-launcher
-bindsym $mod+ctrl+space exec --no-startup-id rofimoji --skin-tone neutral
-bindsym $mod+Escape exec --no-startup-id lock-screen
-bindsym $mod+Shift+s exec --no-startup-id flameshot gui
+bindsym $mod+space exec --no-startup-id alacritty --command=desktop-launcher --title=desktop-launcher
+bindsym ctrl+$mod+space exec --no-startup-id rofimoji --skin-tone neutral
+bindsym $mod+Escape exec --no-startup-id swaylock -f
 
-bindsym $mod+F1 exec i3-f1
-bindsym $mod+F2 exec i3-f2
-bindsym $mod+F3 exec i3-f3
-bindsym $mod+F4 exec i3-f4
-bindsym $mod+F5 exec i3-f5
-bindsym $mod+F6 exec i3-f6
+bindsym $mod+Shift+s exec --no-startup-id flameshot gui
 
 bindsym XF86AudioMute exec --no-startup-id set-volume --toggle-mute
 bindsym XF86AudioLowerVolume exec --no-startup-id set-volume --unmute --decrease 5
@@ -157,3 +130,5 @@ bindsym XF86AudioNext exec --no-startup-id mpc next
 
 bindsym XF86MonBrightnessDown exec --no-startup-id set-backlight dec
 bindsym XF86MonBrightnessUp exec --no-startup-id set-backlight inc
+
+exec swayidle -w before-sleep 'swaylock -f'
