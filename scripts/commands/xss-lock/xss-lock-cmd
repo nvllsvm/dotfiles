@@ -1,8 +1,7 @@
 #!/usr/bin/env sh
-if pidof lightdm; then
-    dm-tool lock
-else
-    xset dpms 0 5
+xset +dpms
+xset dpms 0 0 10
+if ! pidof i3lock; then
     i3lock -n -c 555555
     xset -dpms
     killall -USR1 i3status

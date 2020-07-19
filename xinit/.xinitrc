@@ -15,7 +15,7 @@ xset s off -dpms
 
 /usr/lib/gsd-xsettings &
 
-xss-lock -- lock-screen &
+xss-lock -- xss-lock-cmd &
 
 if command -v xinit-$(hostname) > /dev/null; then
     xinit-$(hostname)

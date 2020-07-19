@@ -135,7 +135,7 @@ bindsym $mod+m move position center
 bindsym $mod+Return exec --no-startup-id alacritty
 bindsym $mod+space exec --no-startup-id desktop-launcher
 bindsym $mod+ctrl+space exec --no-startup-id rofimoji --skin-tone neutral
-bindsym $mod+Escape exec --no-startup-id lock-screen
+bindsym $mod+Escape exec --no-startup-id xss-lock-cmd
 bindsym $mod+Shift+s exec --no-startup-id flameshot gui
 
 bindsym $mod+F1 exec i3-f1
