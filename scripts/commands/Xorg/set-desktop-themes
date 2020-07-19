@@ -23,7 +23,6 @@ while true; do
             ;;
         --large)
             LARGE=1
-            FONT_DPI=128
             shift
             ;;
         --help)
@@ -38,8 +37,6 @@ while true; do
             break
     esac
 done
-FONT_DPI="${FONT_DPI:-$DPI}"
-
 if [ -z "$DPI" ]; then
     . "$CURRENT_THEME"
 else
@@ -53,6 +50,7 @@ else
 
         if [ -n "$LARGE" ]; then
             DUNST_GEOMETRY=300x5-0+28
+            FONT_DPI=128
             FONT_SIZE=14
         else
             DUNST_GEOMETRY=300x5-0+20
@@ -72,6 +70,8 @@ else
             FONT_SIZE=10
         fi
     fi
+
+    FONT_DPI="${FONT_DPI:-$DPI}"
 
     # save settings
     cat > "$CURRENT_THEME" << EOF
