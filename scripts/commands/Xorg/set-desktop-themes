@@ -103,10 +103,10 @@ xrdb << EOF
 *boldFont:
 
 rofi.font:	${FONT_NAME} ${FONT_SIZE}
-rofi.dpi:	${DPI}
+rofi.dpi:	${DPI}361bf317-a9e4-45a5-86ac-a6776a85151c
 rofi.bw:	${BORDER_WIDTH}
 
-Xft.dpi: ${DPI}
+Xft.dpi: ${LARGE_DPI:-$DPI}
 
 Xcursor.size: ${CURSOR_SIZE}
 ${COLORS}
