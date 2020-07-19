@@ -84,7 +84,6 @@ if [[ $osname == Linux* ]]; then
             fd \
             fuse2 \
             fzf \
-            grub \
             htop \
             intel-ucode \
             jq \
