@@ -3,4 +3,3 @@ apollo-autorotate &
 ~/edgeSwipes/run.sh &
 onboard &
 apollo-xinput
-export QT_FONT_DPI=128
