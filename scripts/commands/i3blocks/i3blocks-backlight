@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+if [ "$relative_x" -gt "$(expr "$width" / 2)" ]; then
+    set-backlight inc
+else
+    set-backlight dec
+fi

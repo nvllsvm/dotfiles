@@ -104,6 +104,7 @@ bar {
 
     colors {
         background $color_bg
+        separator  $color_bg
         statusline $color_fg
 
         # border background text

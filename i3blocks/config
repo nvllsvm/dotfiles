@@ -1,24 +1,14 @@
-[volume]
-full_text=🔊
+[backlight_buttons]
+full_text=" - BACKLIGHT + "
+command=i3blocks-backlight
+background=#F79494
+color=#000000
 
-[volume_inc]
-full_text=🔼
-command=set-volume --unmute --increase 5
-
-[volume_dec]
-full_text=🔽
-command=set-volume --unmute --decrease 5
-
-[backlight]
-full_text=💡
-
-[backlight_inc]
-full_text=🔼
-command=set-backlight inc
-
-[backlight_dec]
-full_text=🔽
-command=set-backlight dec
+[volume_buttons]
+full_text=" - VOL + "
+command=i3blocks-volume
+background=#F79494
+color=#000000
 
 [time]
 command=date '+%Y-%m-%d %H:%M'
