@@ -81,7 +81,7 @@ bindsym $mod+Shift+8 move container to workspace 8
 bindsym $mod+Shift+9 move container to workspace 9
 bindsym $mod+Shift+0 move container to workspace 10
 
-bindsym $mod+Shift+c restart
+bindsym $mod+Shift+r restart
 
 mode "resize" {
         bindsym h resize shrink width 10 px or 10 ppt
