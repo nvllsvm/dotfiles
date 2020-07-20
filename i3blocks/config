@@ -18,6 +18,10 @@ command=i3blocks-volume
 background=#F79494
 color=#000000
 
+[battery]
+command=i3blocks-battery
+interval=30
+
 [time]
 command=date '+%Y-%m-%d %H:%M'
 interval=30
