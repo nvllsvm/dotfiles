@@ -100,11 +100,11 @@ bar {
     position          top
     workspace_buttons yes
     tray_output       primary
+    separator_symbol  "   "
 
     colors {
         background $color_bg
         statusline $color_fg
-        separator  $color_fg
 
         # border background text
         focused_workspace  $color_19 $color_19 $color_fg

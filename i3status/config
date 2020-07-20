@@ -1,8 +1,6 @@
 general {
     colors = true
     interval = 30
-    separator = "    "
-    output_format = "None"
 }
 
 order += "battery all"

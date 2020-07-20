@@ -1,7 +1,0 @@
-#!/usr/bin/env sh
-## i3status likes to output two lines upon startup.
-## force a refresh shortly after starting
-if [ $# -eq 0 ]; then
-    sh -c 'sleep 0.5; killall -USR1 i3status' &
-fi
-exec "$(which -a "${0##*/}" | grep -m 1 -v "^$0$")" "$@"
