@@ -128,17 +128,14 @@ EOF
 
 hsetroot -solid "$(xrdb -query | grep '\*background' | awk '{print $2}')"
 
-if pidof i3 > /dev/null; then
-    # need to restart to ensure cursor size on status bar is updated
-    i3 restart > /dev/null 2>&1 || true
+i3 restart > /dev/null 2>&1 || true
 
-    pkill -9 dunst || true
-    dunst \
-        -font "$FONT_NAME $FONT_SIZE" \
-        -frame_width "$BORDER_WIDTH" \
-        -max_icon_size "$DUNST_MAX_ICON_SIZE" \
-        -geometry "$DUNST_GEOMETRY" > /dev/null 2>&1 &
-fi
+pkill -9 dunst || true
+dunst \
+    -font "$FONT_NAME $FONT_SIZE" \
+    -frame_width "$BORDER_WIDTH" \
+    -max_icon_size "$DUNST_MAX_ICON_SIZE" \
+    -geometry "$DUNST_GEOMETRY" > /dev/null 2>&1 &
 
 if [ -d ~/.config/sway ]; then
     base16-sway-colors > ~/.config/sway/colors
