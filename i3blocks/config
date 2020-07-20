@@ -1,5 +1,9 @@
 markup=pango
 
+[suspend]
+full_text=SUSPEND
+command=systemctl suspend
+
 [backlight_buttons]
 full_text=<b> — </b>BACKLIGHT<b> + </b>
 command=i3blocks-backlight
