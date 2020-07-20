@@ -1,11 +1,11 @@
+markup=pango
+
 [backlight_buttons]
-full_text=" - BACKLIGHT + "
+full_text=<b> — </b>BACKLIGHT<b> + </b>
 command=i3blocks-backlight
-background=#F79494
-color=#000000
 
 [volume_buttons]
-full_text=" - VOL + "
+full_text=<b> — </b>VOL<b> + </b>
 command=i3blocks-volume
 background=#F79494
 color=#000000
