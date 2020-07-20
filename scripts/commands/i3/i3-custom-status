@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-case $(hostname) in
+case "$(hostname)" in
     apollo)
         exec i3blocks -c "$DOTFILES/i3blocks/config_apollo" "$@"
         ;;
