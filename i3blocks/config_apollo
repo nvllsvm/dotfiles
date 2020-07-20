@@ -1,8 +1,8 @@
 markup=pango
 
 [launcher]
-full_text=launcher
-command=onboard && desktop-launcher
+full_text=LAUNCHER
+command=desktop-launcher
 
 [suspend]
 full_text=SUSPEND
@@ -15,8 +15,6 @@ command=i3blocks-backlight
 [volume_buttons]
 full_text=<b> — </b>VOL<b> + </b>
 command=i3blocks-volume
-background=#F79494
-color=#000000
 
 [battery]
 command=i3blocks-battery
