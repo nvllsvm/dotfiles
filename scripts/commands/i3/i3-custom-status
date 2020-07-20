@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+case $(hostname) in
+    apollo)
+        exec i3blocks -c "$DOTFILES/i3blocks/config_apollo"
+        ;;
+    *)
+        exec i3status -c "$DOTFILES/i3status/config"
+        ;;
+esac
