@@ -2,7 +2,7 @@
 xset +dpms
 xset dpms 0 0 10
 if ! pidof i3lock; then
-    sleep 5 && onboard &
+    sh -c 'sleep 5 && onboard' &
     i3lock -n -c 8c8cb8
     xset -dpms
     killall -USR1 i3status
