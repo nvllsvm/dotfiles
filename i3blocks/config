@@ -1,5 +1,9 @@
 markup=pango
 
+[launcher]
+full_text=launcher
+command=onboard && desktop-launcher
+
 [suspend]
 full_text=SUSPEND
 command=systemctl suspend
