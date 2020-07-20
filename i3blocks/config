@@ -1,0 +1,28 @@
+separator=false
+align=center
+
+[volume]
+full_text=🔊
+
+[volume_inc]
+full_text=🔼
+command=set-volume --unmute --increase 5
+
+[volume_dec]
+full_text=🔽
+command=set-volume --unmute --decrease 5
+
+[backlight]
+full_text=💡
+
+[backlight_inc]
+full_text=🔼
+command=set-backlight inc
+
+[backlight_dec]
+full_text=🔽
+command=set-backlight dec
+
+[time]
+command=date '+%Y-%m-%d %H:%M'
+interval=30
