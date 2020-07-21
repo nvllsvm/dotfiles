@@ -18,7 +18,6 @@ SYSTEM_UNITS = {
 }
 
 USER_UNITS = {
-    'backup-youtube-nullsum.service',
     'git-repo-backup.service',
     'gog-update.service',
     'mbsync.service',

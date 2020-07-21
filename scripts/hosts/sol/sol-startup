@@ -35,7 +35,6 @@ sudo mount --bind ~ar /srv/nfs4/ar
 sudo mount --bind /storage /srv/nfs4/storage
 
 echo Starting systemd units ...
-systemctl --user enable --now backup-youtube-nullsum.timer
 systemctl --user enable --now git-repo-backup.timer
 systemctl --user enable --now gog-update.timer
 systemctl --user enable --now mbsync.timer

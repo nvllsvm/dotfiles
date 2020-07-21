@@ -1,6 +1,0 @@
-[Unit]
-Description=Run backup-youtube-nullsum
-
-[Service]
-ExecStart=zsh -ic backup-youtube-nullsum
-SyslogIdentifier=backup-youtube-nullsum

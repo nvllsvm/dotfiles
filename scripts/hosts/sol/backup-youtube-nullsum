@@ -1,4 +1,0 @@
-#!/usr/bin/env sh
-exec youtube-dl \
-    -o '/storage/Backup/nullsum_youtube/%(upload_date)s-%(id)s-%(title)s.%(ext)s' \
-    'https://www.youtube.com/user/Draje0'
