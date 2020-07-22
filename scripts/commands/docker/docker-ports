@@ -1,0 +1,108 @@
+#!/usr/bin/env python3
+import argparse
+import collections
+import json
+import logging
+import subprocess
+
+LOGGER = logging.getLogger('docker-healthchecker')
+
+
+class Docker:
+
+    @staticmethod
+    def inspect(container_ids):
+        result = subprocess.run(
+            ['docker', 'inspect', *container_ids],
+            stdout=subprocess.PIPE,
+            check=True
+        )
+        return json.loads(result.stdout.decode().strip())
+
+
+class DockerCompose:
+
+    @staticmethod
+    def container_ids():
+        result = subprocess.run(
+            ['docker', 'ps', '-aq'],
+            stdout=subprocess.PIPE,
+            check=True
+        )
+        return result.stdout.decode().splitlines()
+
+
+def host_ports(container_ids):
+    tcp_ports = collections.defaultdict(dict)
+    udp_ports = collections.defaultdict(dict)
+    for container in Docker.inspect(container_ids):
+        name = container['Config']['Labels']['com.docker.compose.service']
+
+        for container_port, host_ports in container['NetworkSettings']['Ports'].items():
+            port, protocol = container_port.split('/')
+            port = int(port)
+            if host_ports:
+                host_port = int(host_ports[0]['HostPort'])
+                if protocol == 'tcp':
+                    tcp_ports[name][port] = host_port
+                elif protocol == 'udp':
+                    udp_ports[name][port] = host_port
+
+    return dict(tcp_ports), dict(udp_ports)
+
+
+def is_healthy(inspect_data):
+    container_id = inspect_data['Id']
+    LOGGER.info('%s - checking', container_id)
+    healthcheck = inspect_data['Config'].get('Healthcheck')
+    if healthcheck:
+        hc_type = healthcheck['Test'][0]
+        hc_args = healthcheck['Test'][1:]
+        if hc_type == 'CMD-SHELL':
+            result = subprocess.run(
+                ['docker', 'exec', container_id, '/bin/sh', '-c', hc_args[0]],
+                stderr=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL
+            )
+        elif hc_type == 'CMD':
+            result = subprocess.run(
+                ['docker', 'exec', container_id, *hc_args],
+                stderr=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL
+            )
+        else:
+            raise NotImplementedError(hc_type)
+        healthy = not bool(result.returncode)
+        LOGGER.info(
+            '%s - %s',
+            container_id,
+            'healthy' if healthy else 'unhealthy'
+        )
+        return healthy
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--verbose', action='store_true')
+    args = parser.parse_args()
+
+    if args.verbose:
+        logging.basicConfig(level=logging.INFO)
+
+    tcp_ports, udp_ports = host_ports(DockerCompose.container_ids())
+
+    env = []
+    for service, ports in tcp_ports.items():
+        service = service.upper().replace('-', '_')
+        for container_port, host_port in ports.items():
+            env.append(f'export {service}_TCP_{container_port}={host_port}')
+    for service, ports in udp_ports.items():
+        service = service.upper().replace('-', '_')
+        for container_port, host_port in ports.items():
+            env.append(f'export {service}_UDP_{container_port}={host_port}')
+
+    print('\n'.join(sorted(env)))
+
+
+if __name__ == '__main__':
+    main()
