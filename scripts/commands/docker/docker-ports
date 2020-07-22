@@ -51,36 +51,6 @@ def host_ports(container_ids):
     return dict(tcp_ports), dict(udp_ports)
 
 
-def is_healthy(inspect_data):
-    container_id = inspect_data['Id']
-    LOGGER.info('%s - checking', container_id)
-    healthcheck = inspect_data['Config'].get('Healthcheck')
-    if healthcheck:
-        hc_type = healthcheck['Test'][0]
-        hc_args = healthcheck['Test'][1:]
-        if hc_type == 'CMD-SHELL':
-            result = subprocess.run(
-                ['docker', 'exec', container_id, '/bin/sh', '-c', hc_args[0]],
-                stderr=subprocess.DEVNULL,
-                stdout=subprocess.DEVNULL
-            )
-        elif hc_type == 'CMD':
-            result = subprocess.run(
-                ['docker', 'exec', container_id, *hc_args],
-                stderr=subprocess.DEVNULL,
-                stdout=subprocess.DEVNULL
-            )
-        else:
-            raise NotImplementedError(hc_type)
-        healthy = not bool(result.returncode)
-        LOGGER.info(
-            '%s - %s',
-            container_id,
-            'healthy' if healthy else 'unhealthy'
-        )
-        return healthy
-
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--verbose', action='store_true')
