@@ -5,8 +5,6 @@ import json
 import logging
 import subprocess
 
-LOGGER = logging.getLogger('docker-healthchecker')
-
 
 class Docker:
 
