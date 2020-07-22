@@ -2,7 +2,6 @@
 import argparse
 import collections
 import json
-import logging
 import subprocess
 
 
@@ -51,11 +50,7 @@ def host_ports(container_ids):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--verbose', action='store_true')
-    args = parser.parse_args()
-
-    if args.verbose:
-        logging.basicConfig(level=logging.INFO)
+    parser.parse_args()
 
     tcp_ports, udp_ports = host_ports(DockerCompose.container_ids())
 
