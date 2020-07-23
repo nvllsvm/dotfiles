@@ -56,6 +56,10 @@ repotool_remove() {
     sudo pacsync "$DATABASE" > /dev/null
 }
 
+sync_nullsum() {
+    rsync -av --progress /var/cache/pacman/sol/ nullsum.net:~/r/arch/x86_64
+}
+
 usage() {
     cat << EOF
 usage: repotool.sh (add|remove|update)
@@ -66,16 +70,19 @@ case "$1" in
     update)
         shift
         repotool_update "$@"
+        sync_nullsum
         exit
         ;;
     add)
         shift
         repotool_add "$@"
+        sync_nullsum
         exit
         ;;
     remove)
         shift
         repotool_remove "$@"
+        sync_nullsum
         exit
         ;;
     --help)

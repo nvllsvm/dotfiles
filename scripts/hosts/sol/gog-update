@@ -14,4 +14,4 @@ exec podman run \
     -v "$GOG_DIR":/downloads \
     -v "$CACHE_DIR":/cache \
     -v ~/.dotfiles/private/lgogdownloader:/config \
-    "$IMAGE"
+    "$IMAGE" > /dev/null 2>&1
