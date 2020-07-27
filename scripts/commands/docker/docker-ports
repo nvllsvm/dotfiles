@@ -22,7 +22,7 @@ class DockerCompose:
     @staticmethod
     def container_ids():
         result = subprocess.run(
-            ['docker', 'ps', '-aq'],
+            ['docker-compose', 'ps', '-aq'],
             stdout=subprocess.PIPE,
             check=True
         )
