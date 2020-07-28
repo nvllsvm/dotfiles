@@ -6,6 +6,8 @@ import concurrent.futures
 import configparser
 import contextlib
 import datetime
+import distutils
+import distutils.util
 import glob
 import gzip
 import hashlib
