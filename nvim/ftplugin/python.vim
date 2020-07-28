@@ -4,4 +4,4 @@ let g:jedi#completions_enabled = 0
 let g:jedi#usages_command = "<leader>N"
 
 " causes jedi plugin noise
-let PYTHONWARNINGS = ""
+let $PYTHONWARNINGS = ""
