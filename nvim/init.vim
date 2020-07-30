@@ -97,6 +97,7 @@ Plug 'deoplete-plugins/deoplete-jedi', { 'do': ':UpdateRemotePlugins' }
 Plug 'neomake/neomake'
 Plug 'chriskempson/base16-vim'
 Plug 'dbeniamine/todo.txt-vim'
+Plug 'davidhalter/jedi-vim'
 
 Plug 'Vimjas/vim-python-pep8-indent'
 Plug 'fisadev/vim-isort'
