@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-exec sudo reflector --verbose --sort rate -a 2 -n 30 --save "$DOTFILES_PRIVATE/non-user/common/etc/pacman.d/mirrorlist"
+exec reflector --verbose --sort rate -a 2 -n 30 --save "$DOTFILES_PRIVATE/non-user/common/etc/pacman.d/mirrorlist"
