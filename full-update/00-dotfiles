@@ -1,6 +1,4 @@
 #!/usr/bin/env sh
-set -e
-
 if [ "$1" = '-v' ]; then
     VERBOSE=1
     shift
