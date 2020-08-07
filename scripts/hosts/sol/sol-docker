@@ -2,15 +2,4 @@
 export COMPOSE_PROJECT_NAME=sol-docker
 export COMPOSE_FILE="$HOME/Code/sol-docker/docker-compose.yaml"
 
-if [ "$1" = "restart" ]; then
-    if [ -n "$2" ]; then
-        docker-compose stop "$2"
-    else
-        sol-docker down
-    fi
-    exec docker-compose up -d
-elif [ "$1" = "down" ]; then
-    exec docker-compose down --remove-orphans
-else
-    exec docker-compose "$@"
-fi
+exec docker-compose "$@"

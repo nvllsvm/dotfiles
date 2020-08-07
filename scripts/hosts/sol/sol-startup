@@ -50,4 +50,5 @@ sudo systemctl start docker
 echo Starting podman ...
 podman system migrate || true
 
-sol-docker restart
+sol-docker down --remove-orphans
+sol-docker up -d
