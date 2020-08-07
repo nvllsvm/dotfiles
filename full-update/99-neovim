@@ -21,7 +21,9 @@ update_venv() {
         create_venv
     fi
     . "$VENV/bin/activate"
-    python -m pip install --quiet --upgrade pynvim jedi $(pip freeze --all | cut -d = -f 1)
+    python -m pip install --quiet --upgrade $(pip freeze --all | cut -d = -f 1) 2> /dev/null
+    # install after updating to ensure compatible deps exist for explicit pkgs
+    python -m pip install --quiet --upgrade pynvim jedi
 }
 
 if [ ! -f ~/.config/nvim/autoload/plug.vim ]; then
