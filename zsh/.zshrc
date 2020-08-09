@@ -111,7 +111,6 @@ fi
 #
 # set last to make local take precedence
 path=(
-    ~/bin
     ~/.local/bin
     "$path[@]"
 )
