@@ -208,3 +208,4 @@ augroup END
 let g:clipboard = {'copy': {'*': 'cbcopy', '+': 'cbcopy'}, 'paste': {'*': 'cbpaste', '+': 'cbpaste'}}
 
 let g:mkdp_echo_preview_url = 1
+let g:netrw_browsex_viewer= "open"
