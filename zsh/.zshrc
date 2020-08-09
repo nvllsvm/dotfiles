@@ -110,7 +110,11 @@ if [ -d "$host_scripts" ]; then
 fi
 #
 # set last to make local take precedence
-path=(~/.local/bin "$path[@]")
+path=(
+    ~/bin
+    ~/.local/bin
+    "$path[@]"
+)
 
 unset host_scripts
 
