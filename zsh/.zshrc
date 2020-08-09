@@ -61,14 +61,6 @@ function zle-line-init zle-keymap-select {
 zle -N zle-line-init
 zle -N zle-keymap-select
 
-# fixes some misbehaving combinations like dotnet and VTE terminals.
-# application mode remaps arrows to ex. ^[OA and
-# breaks history search.
-add-zsh-hook precmd set_cursor_key_to_cursor
-set_cursor_key_to_cursor () {
-    printf '\e[?1l'
-}
-
 fpath=("$DOTFILES/zsh/functions" "$fpath[@]")
 
 host_dir="$DOTFILES/zsh/hosts/$HOST"
