@@ -43,6 +43,7 @@ for name in [
         'psycopg2',
         'redis',
         'tabulate',
+        'toml',
         'yaml',
         'yarl',
 ]:
