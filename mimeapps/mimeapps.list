@@ -1,7 +1,7 @@
 [Default Applications]
 application/epub+zip=com.github.johnfactotum.Foliate.desktop
 application/pdf=org.kde.okular.desktop
-application/vnd.comicbook+zip=mcomix.desktop
+application/vnd.comicbook+zip=org.kde.okular.desktop
 application/x-extension-htm=firefox.desktop
 application/x-extension-html=firefox.desktop
 application/x-extension-shtml=firefox.desktop
