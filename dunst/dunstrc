@@ -80,7 +80,7 @@
     # Don't remove messages, if the user is idle (no mouse or keyboard input)
     # for longer than idle_threshold seconds.
     # Set to 0 to disable.
-    idle_threshold = 60
+    idle_threshold = 0
 
     ### Text ###
 
@@ -165,10 +165,10 @@
 
     # Should a notification popped up from history be sticky or timeout
     # as if it would normally do.
-    sticky_history = yes
+    sticky_history = no
 
     # Maximum amount of notifications kept in history
-    history_length = 20
+    history_length = 0
 
     ### Misc/Advanced ###
 
