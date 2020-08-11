@@ -145,3 +145,20 @@ def now():
 
 def utcnow():
     return datetime.datetime.now().astimezone(datetime.timezone.utc)
+
+
+def cbcopy(data):
+    if not isinstance(data, bytes):
+        data = data.encode()
+    subprocess.run(
+        ['cbcopy'],
+        input=data,
+        check=True)
+
+
+def cbpaste():
+    proc = subprocess.run(
+        ['cbpaste'],
+        stdout=subprocess.PIPE,
+        check=True)
+    return proc.stdout
