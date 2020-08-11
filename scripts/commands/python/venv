@@ -145,9 +145,13 @@ def main():
     create_virtualenv(python_bin, env_folder)
 
     env_folder.joinpath('.parent').symlink_to(cwd)
-    activate_path = env_folder.joinpath('bin/activate')
+    activate_path = shlex.quote(str(env_folder.joinpath('bin/activate')))
     cwd_envrc.write_text('\n'.join([
-        f'. {shlex.quote(str(activate_path))}',
+        f'if ! [ -f {activate_path} ]; then',
+        '    echo "error: must reset virtualenv" >&2',
+        '    exit 1',
+        'fi',
+        f'. {activate_path}',
         "# prevent direnv from warning about prompt export failure",
         "unset PS1",
         "# export PIP_USER even though it's disabled in pip.conf",
