@@ -1,2 +1,7 @@
 #!/usr/bin/env sh
-sol-docker exec nextcloud su www-data -s /bin/sh -c './occ preview:generate-all'
+sol-docker exec -T -u www-data nextcloud sh -c '
+set -x
+/var/www/html/occ preview:delete_old -vvv
+/var/www/html/occ preview:pre-generate -vvv
+/var/www/html/occ preview:generate-all -vvv
+'
