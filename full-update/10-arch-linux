@@ -23,6 +23,8 @@ if ! command -v yay > /dev/null 2>&1; then
     cd -
     cd /tmp/yay-install/yay
     makepkg -s --install --noconfirm
+    rm -rf /tmp/yay-install
+    cd -
 fi
 log 'Updating packages'
 yay -Syu --noconfirm --devel
