@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+set -e
+if [ $# -eq 1 ]; then
+    cd "$1" || exit 1
+fi
+
+mount -t proc /proc ./proc
+mount --rbind /sys ./sys
+mount --rbind /dev ./dev
+cp /etc/resolv.conf ./etc/resolv.conf
+chroot ./ /bin/sh
