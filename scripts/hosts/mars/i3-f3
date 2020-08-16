@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-exec setup-outputs mars-tv-half
+exec setup-outputs mars-tv-1080p
