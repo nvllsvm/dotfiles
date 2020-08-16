@@ -1,6 +1,6 @@
-output HDMI-A-0
-off
 output DisplayPort-0
+off
+output HDMI-A-0
 off
 output DisplayPort-2
 crtc 2
