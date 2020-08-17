@@ -1,0 +1,162 @@
+#!/usr/bin/env python
+import argparse
+import getpass
+import urllib.parse
+
+import httpx
+
+
+class RabbitMQ:
+
+    def __init__(self, url, vhost, username, password):
+        self._url = url
+        self._vhost = urllib.parse.quote(vhost, safe='')
+        self._client = httpx.Client()
+        self._client.auth = (username, password)
+
+    def create_exchange(self, exchange, exchange_type, durable=False):
+        payload = {'type': exchange_type}
+        if durable:
+            payload['durable'] = durable
+        exchange = self._quote(exchange)
+        url = f'{self._url}/api/exchanges/{self._vhost}/{exchange}'
+        response = self._client.put(url, json=payload)
+        assert response.status_code in (201, 204)
+
+    def create_queue(self, queue, message_ttl=None, dead_letter_exchange=None,
+                     durable=False):
+        payload = {'arguments': {}}
+        if message_ttl:
+            payload['arguments']['x-message-ttl'] = message_ttl
+        if dead_letter_exchange:
+            payload['arguments']['dead-letter-exchange'] = dead_letter_exchange
+        if durable:
+            payload['durable'] = durable
+
+        queue = self._quote(queue)
+        url = f'{self._url}/api/queues/{self._vhost}/{queue}'
+        response = self._client.put(url, json=payload)
+        assert response.status_code in (201, 204)
+
+    def delete_queue(self, queue):
+        queue = self._quote(queue)
+        url = f'{self._url}/api/queues/{self._vhost}/{queue}'
+        response = self._client.delete(url)
+        assert response.status_code in (201, 204, 404)
+
+    def delete_exchange(self, exchange):
+        exchange = self._quote(exchange)
+        url = f'{self._url}/api/exchanges/{self._vhost}/{exchange}'
+        response = self._client.delete(url)
+        assert response.status_code in (201, 204, 404)
+
+    def bind(self, exchange, queue, routing):
+        exchange = self._quote(exchange)
+        queue = self._quote(queue)
+        url = f'{self._url}/api/bindings/{self._vhost}/e/{exchange}/q/{queue}'
+        response = self._client.post(
+            url,
+            json={
+                'routing_key': routing
+            })
+        assert response.status_code in (201, 204)
+
+    @staticmethod
+    def _quote(value):
+        return urllib.parse.quote(value, safe='')
+
+
+class _Parser:
+
+    @staticmethod
+    def _setup_rabbitmq(args):
+        password = args.password
+        if password is None:
+            password = getpass.getpass()
+        return RabbitMQ(args.url, args.vhost, args.user, password)
+
+    @staticmethod
+    def create_exchange(args):
+        rabbitmq = _Parser._setup_rabbitmq(args)
+        rabbitmq.create_exchange(
+            exchange=args.exchange,
+            exchange_type=args.type,
+            durable=args.durable)
+
+    @staticmethod
+    def create_queue(args):
+        rabbitmq = _Parser._setup_rabbitmq(args)
+        rabbitmq.create_queue(
+            queue=args.queue,
+            message_ttl=args.message_ttl,
+            dead_letter_exchange=args.dlx,
+            durable=args.durable)
+
+    @staticmethod
+    def delete_queue(args):
+        rabbitmq = _Parser._setup_rabbitmq(args)
+        rabbitmq.delete_queue(queue=args.queue)
+
+    @staticmethod
+    def delete_exchange(args):
+        rabbitmq = _Parser._setup_rabbitmq(args)
+        rabbitmq.delete_exchange(exchange=args.exchange)
+
+    @staticmethod
+    def bind(args):
+        rabbitmq = _Parser._setup_rabbitmq(args)
+        rabbitmq.bind(
+            exchange=args.exchange,
+            queue=args.queue,
+            routing=args.routing)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--url', required=True)
+    parser.add_argument('--user', required=True)
+    parser.add_argument('--password')
+    parser.add_argument('--vhost', default='/')
+
+    subparsers = parser.add_subparsers(dest='command', metavar='COMMAND',
+                                       required=True)
+    create_exchange = subparsers.add_parser('create-exchange')
+    create_exchange.set_defaults(func=_Parser.create_exchange)
+    create_exchange.add_argument('--durable', action='store_true')
+    create_exchange.add_argument('--type', choices=['topic'], default='topic')
+    create_exchange.add_argument('exchange')
+
+    create_queue = subparsers.add_parser('create-queue')
+    create_queue.set_defaults(func=_Parser.create_queue)
+    create_queue.add_argument('--durable', action='store_true')
+    create_queue.add_argument('--message-ttl', type=int)
+    create_queue.add_argument('--dlx')
+    create_queue.add_argument('queue')
+
+    delete_exchange = subparsers.add_parser('delete-exchange')
+    delete_exchange.set_defaults(func=_Parser.delete_exchange)
+    delete_exchange.add_argument('exchange')
+
+    delete_queue = subparsers.add_parser('delete-queue')
+    delete_queue.set_defaults(func=_Parser.delete_queue)
+    delete_queue.add_argument('queue')
+
+    bind = subparsers.add_parser('bind')
+    bind.set_defaults(func=_Parser.bind)
+    bind.add_argument('--exchange', required=True)
+    bind.add_argument('--queue', required=True)
+    bind.add_argument('--routing', default='#')
+
+    args = parser.parse_args()
+    args.func(args)
+
+
+if __name__ == '__main__':
+    main()
+
+"""
+    cat << EOF
+EOF
+
+
+"""
