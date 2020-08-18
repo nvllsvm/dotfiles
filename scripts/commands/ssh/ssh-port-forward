@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+set -eu
+ARG="$(printf '%s' "$1" | tr ':' ' ')"
+REMOTE="$(printf '%s' "$ARG" | awk '{ print $1}')"
+PORT="$(printf '%s' "$ARG" | awk '{ print $2}')"
+exec ssh -L "$PORT":localhost:"$PORT" "$REMOTE"
