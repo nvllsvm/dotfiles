@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+curl https://livejs.com/live.js -O
