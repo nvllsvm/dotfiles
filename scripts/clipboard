@@ -56,6 +56,22 @@ clipboard_macos() {
 }
 
 
+clipboard_tmux_ssh() {
+    if [ -n "$SSH_TTY" ] && command -v tmux > /dev/null; then
+        case "$MODE" in
+            copy)
+                tmux load-buffer -
+                ;;
+            paste)
+                tmux save-buffer -
+                ;;
+        esac
+    else
+        return 1
+    fi
+}
+
+
 clipboard_tmux() {
     if command -v tmux > /dev/null; then
         case "$MODE" in
@@ -87,7 +103,8 @@ clipboard_termux() {
     fi
 }
 
-clipboard_wayland \
+clipboard_tmux_ssh \
+    || clipboard_wayland \
     || clipboard_xorg \
     || clipboard_macos \
     || clipboard_termux \
