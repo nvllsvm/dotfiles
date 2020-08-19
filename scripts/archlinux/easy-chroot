@@ -18,3 +18,4 @@ chroot ./ /bin/sh
 
 umount --recursive ./dev
 umount --recursive ./sys
+umount ./proc
