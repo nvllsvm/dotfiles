@@ -6,8 +6,8 @@ evdev:input:b0003v258Ap6A99*
  KEYBOARD_KEY_70039=esc       # capslock
  KEYBOARD_KEY_70065=leftmeta  # menu
 
-# xps 13 9360
-evdev:atkbd:dmi:bvnDellInc.:bvr2.13.0:bd11/14/2019:svnDellInc.:pnXPS139360:*
+# built in keyboards
+evdev:atkbd:dmi:*
  KEYBOARD_KEY_3a=esc       # capslock
 
 # surface go type cover
