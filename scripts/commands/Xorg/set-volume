@@ -3,7 +3,7 @@ notify() {
     dunstify \
         --hints=string:x-dunst-stack-tag:set-volume \
         --hints=int:transient:1 \
-        '🔊 Volume' "$@"
+        'Volume' "$@"
 }
 
 res="$(pamixer --get-mute --get-volume "$@")"
