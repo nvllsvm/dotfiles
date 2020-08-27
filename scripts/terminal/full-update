@@ -9,6 +9,14 @@ run_script() {
     ./"$1"
 }
 
+show_help() {
+    cat << EOF
+usage: full-update [script ...]
+
+    --help      show help and exit
+    --list      list scripts and exit
+EOF
+}
 cd "$DOTFILES/full-update" || exit 1
 
 while [ $# -gt 0 ]; do
@@ -18,6 +26,7 @@ while [ $# -gt 0 ]; do
             exit
             ;;
         --help)
+            show_help
             exit
             ;;
         *)
