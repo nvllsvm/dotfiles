@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+set -e
+
+fix_permissions() {
+    echo "Processing $1"
+    fd -0 -t d . "$1" | xargs -0 chmod 755
+    fd -0 -t f . "$1" | xargs -0 chmod 644
+    chown -hR ar:ar "$1"
+}
+
+fix_permissions /storage/Audio
+fix_permissions /storage/Books
+fix_permissions /storage/Games
+fix_permissions /storage/Personal\ Creations
+fix_permissions /storage/Pictures
+fix_permissions /storage/Software
+fix_permissions /storage/Video

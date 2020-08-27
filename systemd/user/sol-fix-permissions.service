@@ -1,0 +1,6 @@
+[Unit]
+Description=Run sol-fix-permissions
+
+[Service]
+ExecStart=zsh -ic sol-fix-permissions
+SyslogIdentifier=sol-fix-permissions

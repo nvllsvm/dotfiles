@@ -1,0 +1,9 @@
+[Unit]
+Description=Run sol-fix-permissions every day
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+
+[Install]
+WantedBy=timers.target
