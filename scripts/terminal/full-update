@@ -1,11 +1,36 @@
 #!/usr/bin/env sh
 set -eu
+
 YELLOW='\033[1;33m'
 RESET_COLOR='\033[0m'
 
+run_script() {
+    printf '%bRunning %s ...%b\n' "$YELLOW" "$1" "$RESET_COLOR"
+    ./"$1"
+}
+
+cd "$DOTFILES/full-update" || exit 1
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --list)
+            ls | sort
+            exit
+            ;;
+        --help)
+            exit
+            ;;
+        *)
+            for arg in "$@"; do
+                run_script "$arg"
+            done
+            exit
+            ;;
+    esac
+done
+
 printf '%bfull-update - start %s%b\n' "$YELLOW" "$(date)" "$RESET_COLOR"
-for cmd in "$DOTFILES/full-update/"*; do
-    printf '%bNow running %s ...%b\n' "$YELLOW" "$cmd" "$RESET_COLOR"
-    "$cmd"
+for cmd in *; do
+    run_script "$cmd"
 done
 printf '%bfull-update - done %s%b\n' "$YELLOW" "$(date)" "$RESET_COLOR"
