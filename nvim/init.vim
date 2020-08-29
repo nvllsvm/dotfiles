@@ -121,7 +121,6 @@ Plug 'Glench/Vim-Jinja2-Syntax'
 Plug 'cespare/vim-toml'
 
 Plug 'ledger/vim-ledger'
-Plug 'jceb/vim-orgmode'
 call plug#end()
 
 let $FZF_DEFAULT_COMMAND = "fd --type file --ignore-file ~/.config/nvim/fzf_fd_ignore"
