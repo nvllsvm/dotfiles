@@ -6,7 +6,7 @@ hi def link mkdTodo  Todo
 
 " checkbox
 syn match mkdCheckbox /\[[ x]\]/ containedin=mkdNonListItemBlock,mkdListItemLine
-hi def link mkdCheckbox  Special
+hi def link mkdCheckbox  Todo
 
 " highlight leading #'s in headings 
 hi def link mkdHeading Title
