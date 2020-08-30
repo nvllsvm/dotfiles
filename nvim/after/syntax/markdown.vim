@@ -9,8 +9,10 @@ syn match mkdTodo /TODO:\?/ containedin=htmlH[1-6],mkdNonListItemBlock,mkdListIt
 hi def link mkdTodo Todo
 
 " checkbox
-syn match mkdCheckbox /\[[ x]\]/ containedin=mkdNonListItemBlock,mkdListItemLine
-hi def link mkdCheckbox String
+syn match mkdCheckboxUnchecked /\[ \]/ containedin=mkdNonListItemBlock,mkdListItemLine
+syn match mkdCheckboxChecked /\[x\].*/ containedin=mkdNonListItemBlock,mkdListItemLine
+hi def link mkdCheckboxUnchecked String
+hi def link mkdCheckboxChecked Comment
 
 " highlight leading #'s in headings 
 hi def link mkdHeading        Title
