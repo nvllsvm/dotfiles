@@ -212,3 +212,10 @@ let g:clipboard = {'copy': {'*': 'cbcopy', '+': 'cbcopy'}, 'paste': {'*': 'cbpas
 
 let g:mkdp_echo_preview_url = 1
 let g:netrw_browsex_viewer= "open"
+
+function _IdentifyHighlightingGroup()
+    echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<'
+    \ . synIDattr(synID(line("."),col("."),0),"name") . "> lo<"
+    \ . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"
+endfunction
+command IdentifyHighlightingGroup :call _IdentifyHighlightingGroup()
