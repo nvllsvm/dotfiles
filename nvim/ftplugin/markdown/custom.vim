@@ -18,3 +18,5 @@ highlight Title cterm=bold
 set conceallevel=2
 
 let g:vim_markdown_conceal_code_blocks = 0
+
+let g:vim_markdown_folding_style_pythonic = 1
