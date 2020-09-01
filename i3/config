@@ -157,5 +157,5 @@ bindsym XF86AudioNext exec --no-startup-id mpc next
 bindsym XF86MonBrightnessDown exec --no-startup-id set-backlight dec
 bindsym XF86MonBrightnessUp exec --no-startup-id set-backlight inc
 
-bindsym $mod+Shift+BackSpace move scratchpad
+bindsym $mod+Shift+backslash move scratchpad
 bindsym $mod+backslash scratchpad show
