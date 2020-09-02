@@ -18,7 +18,7 @@ if ! command -v yay > /dev/null 2>&1; then
     mkdir /tmp/yay-install
     trap 'rm -rf /tmp/yay-install' INT EXIT
     cd /tmp/yay-install
-    curl https://aur.archlinux.org/cgit/aur.git/snapshot/yay.tar.gz | tar -zxvf yay.tar.gz
+    curl https://aur.archlinux.org/cgit/aur.git/snapshot/yay.tar.gz | tar -zxv
     cd -
     cd /tmp/yay-install/yay
     makepkg -s --install --noconfirm
