@@ -10,8 +10,8 @@ hi def link mkdTodo Todo
 hi Todo cterm=bold
 
 " checkbox
-syn match mkdCheckboxUnchecked /\[ \]/ containedin=mkdNonListItemBlock,mkdListItemLine
-syn match mkdCheckboxChecked /\[x\].*/ containedin=mkdNonListItemBlock,mkdListItemLine
+syn match mkdCheckboxUnchecked /\[ \]/ containedin=htmlH[1-6],mkdNonListItemBlock,mkdListItemLine
+syn match mkdCheckboxChecked /\[x\].*/ containedin=htmlH[1-6],mkdNonListItemBlock,mkdListItemLine
 hi def mkdCheckboxUnchecked ctermfg=8
 hi def mkdCheckboxChecked ctermfg=8
 
