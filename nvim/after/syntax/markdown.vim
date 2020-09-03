@@ -26,14 +26,14 @@ hi mkdHeading ctermfg=8
 " purple
 hi htmlH1 cterm=bold ctermfg=5
 " blue
-hi htmlH2 cterm=bold ctermfg=4
+hi htmlH2 ctermfg=4
 " green
-hi htmlH3 cterm=bold ctermfg=2
+hi htmlH3 ctermfg=2
 " red
-hi htmlH4 cterm=bold ctermfg=1
+hi htmlH4 ctermfg=1
 " cyan
-hi htmlH5 cterm=bold ctermfg=6
+hi htmlH5 ctermfg=6
 " orange
-hi htmlH6 cterm=bold ctermfg=17
+hi htmlH6 ctermfg=17
 
 syntax case ignore
