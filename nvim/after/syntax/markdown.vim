@@ -7,13 +7,13 @@ hi def link mkdDue Todo
 " todo
 syn match mkdTodo /TODO:\?/ containedin=htmlH[1-6],mkdNonListItemBlock,mkdListItemLine
 hi def link mkdTodo Todo
-hi Todo cterm=bold,reverse
+hi Todo cterm=bold
 
 " checkbox
 syn match mkdCheckboxUnchecked /\[ \]/ containedin=mkdNonListItemBlock,mkdListItemLine
 syn match mkdCheckboxChecked /\[x\].*/ containedin=mkdNonListItemBlock,mkdListItemLine
-hi def link mkdCheckboxUnchecked String
-hi def link mkdCheckboxChecked Comment
+hi def mkdCheckboxUnchecked ctermfg=8
+hi def mkdCheckboxChecked ctermfg=8
 
 " bold and italics
 hi mkdItalic        term=italic cterm=italic gui=italic
@@ -24,16 +24,16 @@ hi mkdBoldItalic    term=bold,italic cterm=bold,italic gui=bold,italic
 hi mkdHeading ctermfg=8
 
 " purple
-hi htmlH1 cterm=bold,underline ctermfg=5
+hi htmlH1 cterm=bold ctermfg=5
 " blue
-hi htmlH2 cterm=bold,underline ctermfg=4
-" orange
-hi htmlH3 cterm=bold,underline ctermfg=17
+hi htmlH2 cterm=bold ctermfg=4
 " green
-hi htmlH4 cterm=bold,underline ctermfg=2
+hi htmlH3 cterm=bold ctermfg=2
 " red
-hi htmlH5 cterm=bold,underline ctermfg=1
+hi htmlH4 cterm=bold ctermfg=1
 " cyan
-hi htmlH6 cterm=bold,underline ctermfg=6
+hi htmlH5 cterm=bold ctermfg=6
+" orange
+hi htmlH6 cterm=bold ctermfg=17
 
 syntax case ignore
