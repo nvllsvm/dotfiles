@@ -20,3 +20,10 @@ set conceallevel=2
 let g:vim_markdown_conceal_code_blocks = 0
 
 let g:vim_markdown_folding_style_pythonic = 1
+
+
+" r Automatically insert the current comment leader after hitting
+"   <Enter> in Insert mode.
+" o Automatically insert the current comment leader after hitting 'o' or
+"   'O' in Normal mode.
+set formatoptions+=ro
