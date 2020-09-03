@@ -24,16 +24,16 @@ hi mkdBoldItalic    term=bold,italic cterm=bold,italic gui=bold,italic
 hi mkdHeading ctermfg=8
 
 " purple
-hi htmlH1 cterm=bold ctermfg=5
+hi htmlH1 cterm=bold,underline ctermfg=5
 " blue
-hi htmlH2 ctermfg=4
-" green
-hi htmlH3 ctermfg=2
-" red
-hi htmlH4 ctermfg=1
+hi htmlH2 cterm=bold ctermfg=4
 " cyan
-hi htmlH5 ctermfg=6
+hi htmlH3 ctermfg=6
+" yellow
+hi htmlH4 ctermfg=11
 " orange
-hi htmlH6 ctermfg=17
+hi htmlH5 ctermfg=16
+" red
+hi htmlH6 ctermfg=1
 
 syntax case ignore
