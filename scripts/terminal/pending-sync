@@ -1,2 +1,3 @@
 #!/usr/bin/env sh
-watch -d "$@" -- grep -e Dirty: -e Writeback: /proc/meminfo
+total="$(grep -e '^Dirty:' -e '^Writeback:' /proc/meminfo | awk '{split($0,a); sum += a[2]} END {print sum}')"
+numfmt --to=iec $((1024 * total))
