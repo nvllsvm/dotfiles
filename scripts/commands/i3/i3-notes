@@ -4,7 +4,7 @@ already_running() {
     i3-msg -t get_tree | jq | grep '"title": "i3-scratchpad"'
 }
 if ! already_running; then
-    i3-msg "exec alacritty --title i3-scratchpad --command zsh -ic 'notes todo.md'" 
+    i3-msg "exec --no-startup-id alacritty --title i3-scratchpad --command zsh -ic 'notes todo.md'" 
     # wait for the window to show
     while true; do
         if already_running; then
