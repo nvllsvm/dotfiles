@@ -1,5 +1,5 @@
-autocmd InsertLeave * :update
-autocmd TextChanged * :update
+autocmd InsertLeave,TextChanged,FocusLost * :update
+autocmd FocusGained * :e
 
 " talbe_mode_always_active breaks highlighting
 TableModeEnable
