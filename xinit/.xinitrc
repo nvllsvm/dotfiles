@@ -33,6 +33,4 @@ fi
 
 autorandr --change --force
 
-i3-autoscratchpad
-
 exec i3
