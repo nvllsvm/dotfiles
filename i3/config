@@ -127,6 +127,7 @@ for_window [title="^.*"] border pixel 2
 for_window [class="dosbox-staging"] fullscreen
 for_window [class=".*Foliate.*" title="^Open.*"] floating disable
 for_window [class="okular"] floating disable
+for_window [title="i3-scratchpad"] move scratchpad
 
 bindsym $mod+b bar mode toggle
 bindsym $mod+m move position center
@@ -157,5 +158,4 @@ bindsym XF86AudioNext exec --no-startup-id mpc next
 bindsym XF86MonBrightnessDown exec --no-startup-id set-backlight dec
 bindsym XF86MonBrightnessUp exec --no-startup-id set-backlight inc
 
-bindsym $mod+Shift+backslash move scratchpad
-bindsym $mod+backslash scratchpad show
+bindsym $mod+backslash exec --no-startup-id i3-notes
