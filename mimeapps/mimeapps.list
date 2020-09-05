@@ -12,6 +12,7 @@ audio/flac=mpv.desktop
 audio/mpeg=mpv.desktop
 audio/x-opus+ogg=mpv.desktop
 audio/x-wav=mpv.desktop
+video/x-matroska=mpv.desktop
 image/bmp=org.nomacs.ImageLounge.desktop
 image/gif=org.nomacs.ImageLounge.desktop
 image/jpeg=org.nomacs.ImageLounge.desktop
