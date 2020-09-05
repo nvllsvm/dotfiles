@@ -160,4 +160,4 @@ bindsym XF86MonBrightnessUp exec --no-startup-id set-backlight inc
 
 bindsym $mod+backslash exec --no-startup-id i3-notes
 
-exec --no-startup-id i3-autoscratchpad
+exec_always --no-startup-id i3-autoscratchpad
