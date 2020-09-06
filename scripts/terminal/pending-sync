@@ -1,3 +1,4 @@
 #!/usr/bin/env sh
-total="$(grep -e '^Dirty:' -e '^Writeback:' /proc/meminfo | awk '{split($0,a); sum += a[2]} END {print sum}')"
-numfmt --to=iec $((1024 * total))
+grep -e '^Dirty:' -e '^Writeback:' /proc/meminfo | awk '
+    {split($0,a); sum += a[2]} END { split( "K M G" , v ); s=1; while( sum>1024 ){ sum/=1024; s++ } { printf "%0.1f%s\n", sum, v[s] } }
+'
