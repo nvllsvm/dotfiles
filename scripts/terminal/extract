@@ -9,7 +9,6 @@ import subprocess
 
 
 class p7zip:
-
     _PART_RE = re.compile(r'(.*\.part)(\d+)(\.rar)$')
     _ALT_PART_RE = re.compile(r'(.*\.)(\d+)$')
 
@@ -104,7 +103,6 @@ class unzip:
 
 
 class unrar:
-
     @staticmethod
     @functools.lru_cache()
     def check():
@@ -142,16 +140,13 @@ class unrar:
 
 
 class innoextract:
-
-    # TODO: add GOG installer detection
-
     @staticmethod
     @functools.lru_cache()
     def check():
         if not shutil.which('innoextract'):
             raise KeyError
 
-        # needed for GOG only (*.bin files)
+        # needed for GOG only ? (*.bin files)
         if not shutil.which('unrar'):
             raise KeyError
 
@@ -180,7 +175,6 @@ class innoextract:
 
 
 class tar:
-
     @staticmethod
     @functools.lru_cache()
     def check():
@@ -207,7 +201,6 @@ class tar:
 
 
 class gzip:
-
     @staticmethod
     @functools.lru_cache()
     def check():
@@ -233,7 +226,6 @@ class gzip:
 
 
 class xz:
-
     @staticmethod
     @functools.lru_cache()
     def check():
@@ -259,7 +251,6 @@ class xz:
 
 
 class zstd:
-
     @staticmethod
     @functools.lru_cache()
     def check():
@@ -282,7 +273,6 @@ class zstd:
 
 
 class brotli:
-
     @staticmethod
     @functools.lru_cache()
     def check():
