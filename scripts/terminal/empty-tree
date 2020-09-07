@@ -36,14 +36,11 @@ def empty_trees(root):
     children = set()
     for a in empty:
         for b in empty:
-            if is_child(b, a):
+            # is child
+            if a in b.parents:
                 children.add(b)
 
     return empty - children
-
-
-def is_child(path, root):
-    return root in path.parents
 
 
 def main():
