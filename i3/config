@@ -129,21 +129,28 @@ for_window [class=".*Foliate.*" title="^Open.*"] floating disable
 for_window [class="okular"] floating disable
 for_window [instance="i3-scratchpad"] move scratchpad
 
+for_window [class="Element"] move to workspace element
+for_window [class="Signal"] move to workspace signal
+for_window [class="Slack"] move to workspace slack
+
 bindsym $mod+b bar mode toggle
 bindsym $mod+m move position center
 
-bindsym $mod+Return exec --no-startup-id alacritty
+bindsym $mod+Return exec --no-startup-id alacritty --command zsh -ic tmux-attach
 bindsym $mod+space exec --no-startup-id desktop-launcher
 bindsym $mod+ctrl+space exec --no-startup-id rofimoji --skin-tone neutral
 bindsym $mod+Escape exec --no-startup-id xss-lock-cmd
 bindsym $mod+Shift+s exec --no-startup-id flameshot gui
+bindsym $mod+Tab exec --no-startup-id i3-window-switch
 
-bindsym $mod+F1 exec i3-f1
-bindsym $mod+F2 exec i3-f2
-bindsym $mod+F3 exec i3-f3
-bindsym $mod+F4 exec i3-f4
-bindsym $mod+F5 exec i3-f5
-bindsym $mod+F6 exec i3-f6
+bindsym $mod+F1 exec --no-startup-id i3-f1
+bindsym $mod+F2 exec --no-startup-id i3-f2
+bindsym $mod+F3 exec --no-startup-id i3-f3
+bindsym $mod+F4 exec --no-startup-id i3-f4
+bindsym $mod+F5 exec --no-startup-id i3-f5
+bindsym $mod+F6 exec --no-startup-id i3-f6
+bindsym $mod+equal workspace next_on_output
+bindsym $mod+minus workspace prev_on_output
 
 bindsym XF86AudioMute exec --no-startup-id set-volume --toggle-mute
 bindsym XF86AudioLowerVolume exec --no-startup-id set-volume --unmute --decrease 5
