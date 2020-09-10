@@ -1,0 +1,20 @@
+#!/usr/bin/env sh
+set -ux
+
+TITLE="$1"
+shift
+
+show_scratchpad() {
+    i3-msg "[instance=\"i3-scratchpad\" title=\"${TITLE}\"] scratchpad show"
+}
+
+if ! show_scratchpad; then
+    i3-msg "exec --no-startup-id alacritty --class i3-scratchpad --title ${TITLE} --command zsh -ic '$*'"
+    # wait for the window to show
+    while true; do
+        if show_scratchpad; then
+            break
+        fi
+        sleep 0.25
+    done
+fi

@@ -127,7 +127,7 @@ for_window [title="^.*"] border pixel 2
 for_window [class="dosbox-staging"] fullscreen
 for_window [class=".*Foliate.*" title="^Open.*"] floating disable
 for_window [class="okular"] floating disable
-for_window [title="i3-scratchpad"] move scratchpad
+for_window [instance="i3-scratchpad"] move scratchpad
 
 bindsym $mod+b bar mode toggle
 bindsym $mod+m move position center
@@ -151,6 +151,7 @@ bindsym XF86AudioRaiseVolume exec --no-startup-id set-volume --unmute --increase
 
 bindsym Shift+XF86AudioMute exec --no-startup-id toggle-source-mute
 
+bindsym $mod+XF86AudioPlay exec --no-startup-id i3-scratchpad-alacritty ncmpcpp ncmpcpp
 bindsym XF86AudioPlay exec --no-startup-id mpc toggle
 bindsym XF86AudioPrev exec --no-startup-id mpc prev
 bindsym XF86AudioNext exec --no-startup-id mpc next
@@ -158,6 +159,6 @@ bindsym XF86AudioNext exec --no-startup-id mpc next
 bindsym XF86MonBrightnessDown exec --no-startup-id set-backlight dec
 bindsym XF86MonBrightnessUp exec --no-startup-id set-backlight inc
 
-bindsym $mod+backslash exec --no-startup-id i3-notes
+bindsym $mod+backslash exec --no-startup-id i3-scratchpad-alacritty notes notes todo.md
 
 exec_always --no-startup-id i3-autoscratchpad
