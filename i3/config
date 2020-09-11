@@ -129,14 +129,10 @@ for_window [class=".*Foliate.*" title="^Open.*"] floating disable
 for_window [class="okular"] floating disable
 for_window [instance="i3-scratchpad"] move scratchpad
 
-for_window [class="Element"] move to workspace element
-for_window [class="Signal"] move to workspace signal
-for_window [class="Slack"] move to workspace slack
-
 bindsym $mod+b bar mode toggle
 bindsym $mod+m move position center
 
-bindsym $mod+Return exec --no-startup-id alacritty --command zsh -ic tmux-attach
+bindsym $mod+Return exec --no-startup-id alacritty
 bindsym $mod+space exec --no-startup-id desktop-launcher
 bindsym $mod+ctrl+space exec --no-startup-id rofimoji --skin-tone neutral
 bindsym $mod+Escape exec --no-startup-id xss-lock-cmd
