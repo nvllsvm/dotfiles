@@ -28,10 +28,10 @@ try:
     ]
     table = []
     for node in nodes:
-        num = node.workspace().num
-        if num == -1:
-            num = ''
-        table.append((node, '\t'.join([str(num), node.name])))
+        ws = node.workspace().name
+        if ws == '__i3_scratch':
+            ws = ''
+        table.append((node, '\t'.join([ws, node.name])))
     table = sorted(table, key=lambda x: x[1])
     result = rofi(row[1] for row in table)
     if result and result != '-1':
