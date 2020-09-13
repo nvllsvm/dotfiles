@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import i3ipc
 
-
 conn = i3ipc.Connection()
 
 primary_output = None
