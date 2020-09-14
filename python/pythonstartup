@@ -43,6 +43,7 @@ for name in [
         'pkg_resources',
         'psycopg2',
         'redis',
+        'requests',
         'tabulate',
         'toml',
         'yaml',
