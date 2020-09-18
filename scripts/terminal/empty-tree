@@ -10,12 +10,15 @@ def iter_dirs(root):
 
     stack = [root]
     while stack:
-        for path in stack.pop().iterdir():
-            if path.is_dir() and not path.is_symlink():
-                dirs.add(path)
-                stack.append(path)
-            else:
-                other.add(path)
+        try:
+            for path in stack.pop().iterdir():
+                if path.is_dir() and not path.is_symlink():
+                    dirs.add(path)
+                    stack.append(path)
+                else:
+                    other.add(path)
+        except FileNotFoundError:
+            pass
 
     return dirs, other
 
