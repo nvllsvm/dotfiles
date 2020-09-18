@@ -3,7 +3,7 @@ set -eu
 
 zstd_compress() {
     # -T0 uses number of cores, not threads
-    zstd "-T$(nproc)" --ultra -22 "$@"
+    zstd -f "-T$(nproc)" --ultra -22 "$@"
 }
 
 RM=1
