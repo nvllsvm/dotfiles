@@ -5,28 +5,10 @@ uptime --pretty
 
 systemctl --user import-environment HOME PATH MAIL DOTFILES
 
-echo -n 'Enter decryption password: '
-read -s password
-echo
+sudo zfs load-key storage/encrypted
 
-mount_crypt () {
-    echo Opening $1 ...
-    echo -n $password | sudo cryptsetup open /dev/disk/by-uuid/$1 $1 -d -
-}
-
-mount_crypt ad7cb191-15a7-411d-9689-49176a453925
-mount_crypt e203bc9e-ab17-4d4e-88c3-8f4dd6300b5e
-mount_crypt 972a046c-93ab-45a5-bd7d-9be7f91034d6
-mount_crypt 94251377-a863-4775-b862-5bb2f6ac57e8
-mount_crypt 9abbface-58b2-42be-b92e-ef12d0f3c8a5
-mount_crypt cf9aba26-4289-4d36-a5a1-8eb84d5a564d
-
-sudo systemctl start zfs.target
-sudo systemctl start zfs-import-cache
 sudo systemctl start zfs-mount
-sudo systemctl start zfs-import.target
 sudo systemctl start zfs-share.service
-sudo systemctl start zfs-scrub@pool1.timer
 
 zpool status -v
 
