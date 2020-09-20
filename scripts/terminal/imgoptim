@@ -78,7 +78,10 @@ async def main():
 
     files = set()
     for path in args.path:
-        files.update(all_files(path))
+        if path.is_file():
+            files.add(path)
+        else:
+            files.update(all_files(path))
 
     before_total = 0
     after_total = 0
