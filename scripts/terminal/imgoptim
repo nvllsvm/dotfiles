@@ -35,7 +35,7 @@ async def optimize_jpeg(path, strip=False):
 
 async def optimize_png(path, strip=False):
     args = [
-        'oxipng', '--quiet', '--opt', 'max'
+        'oxipng', '--quiet', '--zopfli', '--opt', 'max'
     ]
 
     if strip:
