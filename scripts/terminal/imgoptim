@@ -1,2 +1,108 @@
-#!/usr/bin/env sh
-oxipng -o max "$@"
+#!/usr/bin/env python
+import argparse
+import asyncio
+import pathlib
+
+import magic
+
+
+def all_files(root):
+    stack = [root]
+    files = set()
+    while stack:
+        for path in stack.pop().iterdir():
+            if path.is_dir():
+                stack.append(path)
+            else:
+                files.add(path)
+    return sorted(files)
+
+
+async def optimize_jpeg(path, strip=False):
+    args = [
+        'jpegoptim', '--quiet', '--all-progressive',
+    ]
+
+    if strip:
+        args.append('--strip-all')
+    else:
+        args.append('--strip-none')
+
+    args.extend(['--', path])
+    proc = await asyncio.create_subprocess_exec(*args)
+    await proc.wait()
+
+
+async def optimize_png(path, strip=False):
+    args = [
+        'oxipng', '--quiet', '--opt', 'max'
+    ]
+
+    if strip:
+        args.extend(['--strip', 'all'])
+
+    args.extend(['--', path])
+    proc = await asyncio.create_subprocess_exec(*args)
+    await proc.wait()
+
+
+_MIME_OPTIMIZATIONS = {
+    'image/jpeg': optimize_jpeg,
+    'image/png': optimize_png,
+}
+
+
+def format_diff(before, after):
+    diff = ((before - after) / before) * 100
+    if diff:
+        diff = '{:.2f}'.format(diff)
+        if not float(diff):
+            diff = f'<{diff}'
+    return diff
+
+
+def sizeof_fmt(num):
+    for unit in ['B', 'KB', 'MB', 'GB', 'TB', 'PB']:
+        if abs(num) < 1024.0:
+            return f'{num:.1f}{unit}'
+        num /= 1024.0
+    raise RuntimeError
+
+
+async def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-r', '--recursive', action='store_true')
+    parser.add_argument('--strip', action='store_true')
+    parser.add_argument('path', nargs='+', type=pathlib.Path)
+    args = parser.parse_args()
+
+    files = set()
+    for path in args.path:
+        files.update(all_files(path))
+
+    before_total = 0
+    after_total = 0
+    for f in sorted(files):
+        if func := _MIME_OPTIMIZATIONS.get(magic.from_file(str(f), mime=True)):
+            before = f.stat().st_size
+            before_total += before
+
+            await func(f, strip=args.strip)
+
+            after = f.stat().st_size
+            after_total += after
+
+            if diff := format_diff(before, after):
+                s = f'{diff:>6}%'
+            else:
+                s = 7 * '-'
+            print(f'{s}  {f}')
+
+    if diff := format_diff(before_total, after_total):
+        print(f'Total: {diff} ({sizeof_fmt(before_total - after_total)})')
+    else:
+        print('Total: -')
+
+
+if __name__ == '__main__':
+    asyncio.run(main())
