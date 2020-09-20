@@ -14,7 +14,7 @@ SYSTEM_UNITS = {
     'shadow.service',
     'sol-backup.service',
     'systemd-tmpfiles-clean.service',
-    'zfs-scrub@pool1.service',
+    'zfs-scrub@storage.service',
 }
 
 USER_UNITS = {
