@@ -178,12 +178,14 @@ class gnu_tar:
     @staticmethod
     @functools.lru_cache()
     def check():
-        if not shutil.which('tar'):
+        try:
+            proc = subprocess.run(
+                ['tar', '--version'],
+                stdout=subprocess.PIPE,
+                check=True)
+        except FileNotFoundError:
             raise KeyError
-        proc = subprocess.run(
-            ['tar', '--version'],
-            stdout=subprocess.PIPE,
-            check=True)
+
         if 'GNU tar' not in proc.stdout.decode().splitlines()[0]:
             raise KeyError
 
