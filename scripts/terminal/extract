@@ -174,11 +174,17 @@ class innoextract:
         return [path]
 
 
-class tar:
+class gnu_tar:
     @staticmethod
     @functools.lru_cache()
     def check():
         if not shutil.which('tar'):
+            raise KeyError
+        proc = subprocess.run(
+            ['tar', '--version'],
+            stdout=subprocess.PIPE,
+            check=True)
+        if 'GNU tar' not in proc.stdout.decode().splitlines()[0]:
             raise KeyError
 
     @staticmethod
@@ -318,9 +324,9 @@ def _get_class(path):
     suffixes = [suffix.lower() for suffix in path.suffixes]
     suffix = suffixes[-1]
     if len(suffixes) > 1 and suffixes[-2] == '.tar':
-        cls = tar
+        cls = gnu_tar
     elif suffix in ('.tar', '.tgz'):
-        cls = tar
+        cls = gnu_tar
     elif suffix == '.zst':
         cls = zstd
     elif suffix == '.br':
