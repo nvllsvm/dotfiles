@@ -21,6 +21,7 @@ USER_UNITS = {
     'git-repo-backup.service',
     'gog-update.service',
     'mbsync.service',
+    'sol-fix-permissions.service',
     'sol-update-remotes.service',
     'vdirsyncer.service',
     'wasabi-sync.service',
