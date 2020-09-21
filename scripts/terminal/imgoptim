@@ -117,10 +117,11 @@ async def main():
                 s = 7 * '-'
             print(f'{s}  {f}')
 
-    if diff := format_diff(before_total, after_total):
-        print(f'Total: {diff}% ({sizeof_fmt(before_total - after_total)})')
-    else:
-        print('Total: -')
+    if before_total:
+        if diff := format_diff(before_total, after_total):
+            print(f'Total: {diff}% ({sizeof_fmt(before_total - after_total)})')
+        else:
+            print('Total: -')
 
 
 if __name__ == '__main__':
