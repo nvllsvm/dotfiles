@@ -96,7 +96,13 @@ async def main():
     before_total = 0
     after_total = 0
     for f in sorted(files):
-        if func := _MIME_OPTIMIZATIONS.get(determine_mime(f)):
+        try:
+            mimetype = determine_mime(f)
+        except (FileNotFoundError, IsADirectoryError):
+            # broken symlink can cause this
+            continue
+
+        if func := _MIME_OPTIMIZATIONS.get(mimetype):
             before = f.stat().st_size
             before_total += before
 
