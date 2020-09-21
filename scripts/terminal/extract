@@ -184,7 +184,7 @@ class tar:
     @staticmethod
     def contents(path):
         proc = subprocess.run(
-            ['tar', 'tf', str(path)],
+            ['tar', 'tf', str(path), '--force-local'],
             stdout=subprocess.PIPE,
             check=True)
         return proc.stdout.decode().splitlines()
@@ -192,7 +192,8 @@ class tar:
     @staticmethod
     def extract(path, dest, password=None):
         subprocess.run(
-            ['tar', 'xf', path, f'--one-top-level={dest}', '--keep-old-files'],
+            ['tar', 'xf', path, '--force-local', f'--one-top-level={dest}',
+             '--keep-old-files'],
             check=True)
 
     @staticmethod
