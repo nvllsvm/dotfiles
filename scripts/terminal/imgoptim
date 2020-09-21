@@ -52,6 +52,7 @@ _MIME_OPTIMIZATIONS = {
 
 
 def determine_mime(path):
+    # roughly 2.5x faster than using libmagic
     with open(path, 'rb') as f:
         start = f.read(8)
         if start == b'\x89PNG\r\n\x1a\n':
