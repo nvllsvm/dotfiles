@@ -115,7 +115,6 @@ Plug 'rust-lang/rust.vim'
 Plug 'rbgrouleff/bclose.vim'
 
 Plug 'udalov/kotlin-vim'
-Plug 'keith/swift.vim'
 
 Plug 'Glench/Vim-Jinja2-Syntax'
 Plug 'cespare/vim-toml'
