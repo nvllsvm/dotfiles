@@ -3,6 +3,7 @@ import argparse
 import asyncio
 import os
 import pathlib
+import subprocess
 
 
 def all_files(root):
@@ -45,9 +46,32 @@ async def optimize_png(path, strip=False):
     await proc.wait()
 
 
+async def optimize_gif(path, strip=False):
+    args = [
+        'gifsicle', '--output=-', '--same-loopcount', '--same-delay',
+        '--no-warnings', '--optimize=3'
+    ]
+
+    if strip:
+        args.extend(['--no-comments', '--no-names', '--no-extensions'])
+
+    args.extend(['--', path])
+    proc = await asyncio.create_subprocess_exec(
+        *args,
+        stdout=subprocess.PIPE)
+    result, _ = await proc.communicate()
+    if proc.returncode != 0:
+        return
+    # optimized results can be larger than the original.
+    # not sure why
+    if path.stat().st_size > len(result):
+        path.write_bytes(result)
+
+
 _MIME_OPTIMIZATIONS = {
     'image/jpeg': optimize_jpeg,
     'image/png': optimize_png,
+    'image/gif': optimize_gif,
 }
 
 
@@ -61,6 +85,8 @@ def determine_mime(path):
             f.seek(-2, os.SEEK_END)
             if f.read(2) == b'\xff\xd9':
                 return 'image/jpeg'
+        elif start[0:6] in (b'GIF87a', b'GIF89a'):
+            return 'image/gif'
 
 
 def format_diff(before, after):
