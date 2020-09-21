@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 import argparse
 import asyncio
+import io
 import pathlib
-
-import magic
 
 
 def all_files(root):
@@ -52,6 +51,17 @@ _MIME_OPTIMIZATIONS = {
 }
 
 
+def determine_mime(path):
+    with open(path, 'rb') as f:
+        start = f.read(8)
+        if start == b'\x89PNG\r\n\x1a\n':
+            return 'image/png'
+        elif start[0:2] == b'\xff\xd8':
+            f.seek(-2, io.SEEK_END)
+            if f.read(2) == b'\xff\xd9':
+                return 'image/jpeg'
+
+
 def format_diff(before, after):
     diff = ((before - after) / before) * 100
     if diff:
@@ -86,7 +96,7 @@ async def main():
     before_total = 0
     after_total = 0
     for f in sorted(files):
-        if func := _MIME_OPTIMIZATIONS.get(magic.from_file(str(f), mime=True)):
+        if func := _MIME_OPTIMIZATIONS.get(determine_mime(f)):
             before = f.stat().st_size
             before_total += before
 
