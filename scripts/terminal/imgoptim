@@ -81,7 +81,6 @@ def sizeof_fmt(num):
 
 async def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-r', '--recursive', action='store_true')
     parser.add_argument('--strip', action='store_true')
     parser.add_argument('path', nargs='+', type=pathlib.Path)
     args = parser.parse_args()
