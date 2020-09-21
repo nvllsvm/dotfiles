@@ -69,9 +69,9 @@ async def optimize_gif(path, strip=False):
 
 
 _MIME_OPTIMIZATIONS = {
+    'image/gif': optimize_gif,
     'image/jpeg': optimize_jpeg,
     'image/png': optimize_png,
-    'image/gif': optimize_gif,
 }
 
 
