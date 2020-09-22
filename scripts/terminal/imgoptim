@@ -39,7 +39,7 @@ async def optimize_png(path, strip=False):
     ]
 
     if strip:
-        args.extend(['--strip', 'all'])
+        args.extend(['--strip', 'safe'])
 
     args.extend(['--', path])
     proc = await asyncio.create_subprocess_exec(*args)
