@@ -20,7 +20,7 @@ def all_files(root):
 
 def sha256sum(path):
     result = subprocess.run(
-        ['sha256sum', str(path)],
+        ['sha256sum', '--', str(path)],
         check=True,
         stdout=subprocess.PIPE)
     return result.stdout.decode().split()[0]
