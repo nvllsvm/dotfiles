@@ -10,7 +10,7 @@ if [[ $OSTYPE == darwin* ]]; then
 
     path=(
         "$DOTFILES/scripts/macos"
-        /usr/local/opt/curl/bin
+        /usr/local/opt/curl-openssl/bin
         /usr/local/opt/sqlite/bin
         /usr/local/sbin
         "$path[@]"
