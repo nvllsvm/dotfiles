@@ -3,13 +3,10 @@ off
 output HDMI-A-0
 off
 output DisplayPort-2
-crtc 2
-mode 1920x1200
-pos 0x0
-rate 59.95
+off
 output DisplayPort-1
 crtc 0
 mode 1920x1200
-pos 1920x0
+pos 0x0
 primary
 rate 59.95
