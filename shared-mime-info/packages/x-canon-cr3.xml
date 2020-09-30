@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+    <mime-type type="image/x-canon-cr3">
+        <comment>foo file</comment>
+        <glob-deleteall/>
+        <glob pattern="*.cr3"/>
+    </mime-type>
+</mime-info>
