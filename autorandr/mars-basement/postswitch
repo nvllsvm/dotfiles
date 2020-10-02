@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 set-desktop-themes --dpi 96
-paswitch 'alsa_output.pci-0000_0f_00.4.analog-stereo'
+paswitch 'alsa_output.pci-0000_10_00.4.analog-stereo'
 i3-move-ws
