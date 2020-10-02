@@ -7,29 +7,17 @@ ROOT_UUID="$(lsblk -dno UUID "$ROOT_DEV")"
 
 rm -rf \
     "$BOOT/arch" \
-    "$BOOT/EFI/shellx64_v1.efi" \
-    "$BOOT/EFI/shellx64_v2.efi"
+    "$BOOT/shellx64.efi"
 
 7z x -ba -o"$BOOT" "$1" \
     arch \
-    EFI/shellx64_v1.efi \
-    EFI/shellx64_v2.efi
+    shellx64.efi
 
-cat > "$BOOT/loader/entries/archiso.conf" << EOF
-title   archiso
-linux   /arch/boot/x86_64/vmlinuz
-initrd  /arch/boot/intel_ucode.img
-initrd  /arch/boot/amd_ucode.img
-initrd  /arch/boot/x86_64/archiso.img
+cat > "$BOOT/loader/entries/arch_install.conf" << EOF
+title   Arch Linux install medium (x86_64, UEFI)
+linux   /arch/boot/x86_64/vmlinuz-linux
+initrd  /arch/boot/intel-ucode.img
+initrd  /arch/boot/amd-ucode.img
+initrd  /arch/boot/x86_64/initramfs-linux.img
 options archisobasedir=arch archisodevice=/dev/disk/by-uuid/$ROOT_UUID
-EOF
-
-cat > "$BOOT/loader/entries/uefi-shell-v1-x86_64.conf" << EOF
-title  UEFI Shell x86_64 v1
-efi    /EFI/shellx64_v1.efi
-EOF
-
-cat > "$BOOT/loader/entries/uefi-shell-v2-x86_64.conf" << EOF
-title  UEFI Shell x86_64 v2
-efi    /EFI/shellx64_v2.efi
 EOF
