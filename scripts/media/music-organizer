@@ -192,6 +192,23 @@ def all_dirs(root):
     return sorted(directories)
 
 
+def set_permissions(path):
+    os.chown(path, os.getuid(), os.getgid())
+    if path.is_dir():
+        os.chmod(
+            path,
+            stat.S_IRUSR + stat.S_IRGRP + stat.S_IROTH +
+            stat.S_IXUSR + stat.S_IXGRP + stat.S_IXOTH +
+            stat.S_IWUSR
+        )
+    else:
+        os.chmod(
+            path,
+            stat.S_IRUSR + stat.S_IRGRP + stat.S_IROTH +
+            stat.S_IWUSR
+        )
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('directory', type=pathlib.Path)
@@ -200,17 +217,8 @@ def main():
 
     logging.basicConfig(format='%(levelname)s %(message)s', level=logging.INFO)
 
-    uid = os.getuid()
-    gid = os.getgid()
-
     for root_path in all_dirs(args.directory):
-        os.chown(root_path, uid, gid)
-        os.chmod(
-            root_path,
-            stat.S_IRUSR + stat.S_IRGRP + stat.S_IROTH +
-            stat.S_IXUSR + stat.S_IXGRP + stat.S_IXOTH +
-            stat.S_IWUSR
-        )
+        set_permissions(root_path)
         rename_extensions(root_path)
         organize_images(root_path)
         check_cue_files(root_path)
@@ -219,12 +227,7 @@ def main():
             albums = set()
 
             for path in {p for p in root_path.iterdir() if p.is_file()}:
-                os.chown(path, uid, gid)
-                os.chmod(
-                    path,
-                    stat.S_IRUSR + stat.S_IRGRP + stat.S_IROTH +
-                    stat.S_IWUSR
-                )
+                set_permissions(path)
                 if path.suffix in AUDIO_EXT:
                     metadata = mutagen.File(path, easy=True)
                     check_metadata(path, metadata)
