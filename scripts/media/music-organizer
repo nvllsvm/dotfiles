@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 import argparse
+import collections
 import logging
 import os
 import pathlib
 import stat
+import string
 import subprocess
 
 import chardet
@@ -217,6 +219,8 @@ def main():
 
     logging.basicConfig(format='%(levelname)s %(message)s', level=logging.INFO)
 
+    artists = set()
+
     for root_path in all_dirs(args.directory):
         set_permissions(root_path)
         rename_extensions(root_path)
@@ -238,9 +242,35 @@ def main():
                         albums.add(metadata['album'][0])
                     except KeyError:
                         pass
+                    try:
+                        artists.update(metadata['artist'])
+                    except KeyError:
+                        pass
+                    try:
+                        artists.update(metadata['albumartist'])
+                    except KeyError:
+                        pass
 
             if len(albums) > 1:
                 LOGGER.error(f'Multiple album tags in "{root_path}"')
+
+    # audit artist title variations
+    artist_variants = collections.defaultdict(set)
+
+    valid_chars = string.ascii_lowercase + string.digits
+
+    for artist in artists:
+        normalized = ''.join([
+            c
+            for c in artist.lower()
+            if c in valid_chars
+        ])
+        if normalized:
+            artist_variants[normalized].add(artist)
+
+    for normalized, variants in artist_variants.items():
+        if len(variants) > 1:
+            LOGGER.error('artist variants: %s - %s', normalized, variants)
 
 
 if __name__ == '__main__':
