@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import argparse
 import pathlib
-import shutil
 
 
 def iter_dirs(root):
@@ -33,19 +32,6 @@ def empty_dirs(root):
     return empty
 
 
-def empty_trees(root):
-    empty = empty_dirs(root)
-
-    children = set()
-    for a in empty:
-        for b in empty:
-            # is child
-            if a in b.parents:
-                children.add(b)
-
-    return empty - children
-
-
 def main():
     parser = argparse.ArgumentParser(
         description='List the tops of empty directory trees.'
@@ -57,10 +43,12 @@ def main():
     parser.add_argument('path', type=pathlib.Path, nargs='?', default='.')
     args = parser.parse_args()
 
-    for path in sorted(empty_trees(args.path)):
+    for path in reversed(sorted(empty_dirs(args.path))):
+        # use rmdir isntead of shutil.rmtree to ensure no fails added since
+        # initial scan
         print(path)
         if args.remove:
-            shutil.rmtree(path)
+            path.rmdir()
 
 
 if __name__ == '__main__':
