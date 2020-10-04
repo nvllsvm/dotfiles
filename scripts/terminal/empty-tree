@@ -44,10 +44,9 @@ def main():
     args = parser.parse_args()
 
     for path in reversed(sorted(empty_dirs(args.path))):
-        # use rmdir isntead of shutil.rmtree to ensure no fails added since
-        # initial scan
         print(path)
         if args.remove:
+            # use instead of shutil.rmtree to ensure nothing added since scan
             path.rmdir()
 
 
