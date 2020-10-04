@@ -364,8 +364,10 @@ def _get_class(path):
         cls = unrar
     elif suffix == '.exe':
         cls = innoextract
-    else:
+    elif suffix == '.7z':
         cls = p7zip
+    else:
+        raise NotImplementedError(path)
 
     cls.check()
     return cls
