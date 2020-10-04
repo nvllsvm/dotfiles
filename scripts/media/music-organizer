@@ -200,9 +200,8 @@ def main():
 
     logging.basicConfig(format='%(levelname)s %(message)s', level=logging.INFO)
 
-    # TODO: autolookup
-    uid = 1000
-    gid = 1000
+    uid = os.getuid()
+    gid = os.getgid()
 
     for root_path in all_dirs(args.directory):
         os.chown(root_path, uid, gid)
