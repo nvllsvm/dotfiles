@@ -19,7 +19,9 @@ class p7zip:
             raise KeyError
 
     @staticmethod
-    def extract(path, dest, password=''):
+    def extract(path, dest, password='', overwrite=False):
+        if overwrite:
+            raise NotImplementedError
         subprocess.run(
             ['7z', 'x', f'-p{password}', '-ba', '-spe', f'-o{dest}', '--',
              str(path)],
@@ -92,7 +94,9 @@ class unzip:
         ]
 
     @staticmethod
-    def extract(path, dest, password=None):
+    def extract(path, dest, password=None, overwrite=False):
+        if overwrite:
+            raise NotImplementedError
         subprocess.run(
             ['unzip', '-d', dest, path],
             check=True)
@@ -121,7 +125,9 @@ class unrar:
         ))
 
     @staticmethod
-    def extract(path, dest, password=None):
+    def extract(path, dest, password=None, overwrite=False):
+        if overwrite:
+            raise NotImplementedError
         subprocess.run(
             ['unrar', 'x', path, dest],
             check=True)
@@ -164,7 +170,9 @@ class innoextract:
         return contents
 
     @staticmethod
-    def extract(path, dest, password=None):
+    def extract(path, dest, password=None, overwrite=False):
+        if overwrite:
+            raise NotImplementedError
         subprocess.run(
             ['innoextract', '--gog', '--extract', '--output-dir', dest, path],
             check=True)
@@ -198,11 +206,16 @@ class gnu_tar:
         return proc.stdout.decode().splitlines()
 
     @staticmethod
-    def extract(path, dest, password=None):
-        subprocess.run(
-            ['tar', 'xf', path, '--force-local', f'--one-top-level={dest}',
-             '--keep-old-files'],
-            check=True)
+    def extract(path, dest, password=None, overwrite=False):
+        args = [
+            'tar', 'xf', path, '--force-local', f'--one-top-level={dest}',
+        ]
+        if overwrite:
+            args.append('--overwrite')
+        else:
+            args.append('--keep-old-files')
+
+        subprocess.run(args, check=True)
 
     @staticmethod
     def volumes(path, password=''):
@@ -221,7 +234,9 @@ class gzip:
         return [path.with_suffix('').name]
 
     @staticmethod
-    def extract(path, dest, password=None):
+    def extract(path, dest, password=None, overwrite=False):
+        if overwrite:
+            raise NotImplementedError
         target = dest / path.with_suffix('').name
         with open(target, 'w') as handle:
             subprocess.run(
@@ -246,7 +261,9 @@ class xz:
         return [path.with_suffix('').name]
 
     @staticmethod
-    def extract(path, dest, password=None):
+    def extract(path, dest, password=None, overwrite=False):
+        if overwrite:
+            raise NotImplementedError
         target = dest / path.with_suffix('').name
         with open(target, 'w') as handle:
             subprocess.run(
@@ -271,7 +288,9 @@ class zstd:
         return [path.with_suffix('').name]
 
     @staticmethod
-    def extract(path, dest, password=None):
+    def extract(path, dest, password=None, overwrite=False):
+        if overwrite:
+            raise NotImplementedError
         subprocess.run(
             ['zstd', '-d', '--output-dir-flat', dest, '--', path],
             check=True)
@@ -293,7 +312,9 @@ class brotli:
         return [path.with_suffix('').name]
 
     @staticmethod
-    def extract(path, dest, password=None):
+    def extract(path, dest, password=None, overwrite=False):
+        if overwrite:
+            raise NotImplementedError
         subprocess.run(
             ['brotli', '-d', '--', path],
             check=True)
@@ -362,6 +383,9 @@ def main():
         '-l', dest='list', action='store_true',
         help='list contents')
     parser.add_argument(
+        '-f', '--force', action='store_true',
+        help='overwrite existing files/directories')
+    parser.add_argument(
         '--rm', action='store_true',
         help='remove archive after successful extraction')
     parser.add_argument(
@@ -390,7 +414,8 @@ def main():
             cls.extract(
                 volumes[0],
                 _build_dest(path, args.parent, args.child),
-                password)
+                password=password,
+                overwrite=args.force)
 
             if args.rm:
                 for path in volumes:
