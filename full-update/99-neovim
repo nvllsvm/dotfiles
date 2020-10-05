@@ -20,6 +20,9 @@ update_venv() {
     if ! python -c ''; then
         create_venv
     fi
+    if ! "$VENV/bin/pip" > /dev/null 2>&1; then
+        create_venv
+    fi
     . "$VENV/bin/activate"
     python -m pip install --quiet --upgrade $(pip freeze --all | cut -d = -f 1) 2> /dev/null
     # install after updating to ensure compatible deps exist for explicit pkgs
