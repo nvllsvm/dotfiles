@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import contextlib
 import functools
 import getpass
 import pathlib
@@ -73,6 +74,99 @@ class p7zip:
         else:
             volumes = [path]
         return volumes
+
+
+class udisksctl:
+    @staticmethod
+    @functools.lru_cache()
+    def check():
+        if not shutil.which('udisksctl'):
+            raise KeyError
+
+    @classmethod
+    def contents(cls, path):
+        with cls._loop_context(path) as device:
+            with cls._mount_context(device) as mount_path:
+                return sorted(
+                    str(path.relative_to(mount_path))
+                    for path in cls._child_paths(mount_path)
+                )
+
+    @classmethod
+    def extract(cls, path, dest, password=None, overwrite=False):
+        if overwrite:
+            raise NotImplementedError
+
+        with cls._loop_context(path) as device:
+            with cls._mount_context(device) as mount_path:
+                for path in pathlib.Path(mount_path).iterdir():
+                    newpath = dest.joinpath(
+                        path.relative_to(mount_path))
+                    shutil.copytree(path, newpath)
+
+    @staticmethod
+    def volumes(path, password=''):
+        return [path]
+
+    @staticmethod
+    @contextlib.contextmanager
+    def _loop_context(path):
+        proc = subprocess.run(
+            ['udisksctl', 'loop-setup', '--no-user-interaction',
+             '--read-only', '--file', path],
+            stdout=subprocess.PIPE,
+            check=True)
+        # strip trailing period
+        output = proc.stdout.decode().strip()
+        start = f'Mapped file {path} as '
+        if output.startswith(start) and output.endswith('.'):
+            device = output.replace(start, '', 1)[:-1]
+        else:
+            raise RuntimeError(f'udisksctl error: {output}')
+
+        try:
+            yield device
+        finally:
+            proc = subprocess.run(
+                ['udisksctl', 'loop-delete', '--no-user-interaction',
+                 '--block-device', device],
+                stdout=subprocess.DEVNULL,
+                check=True)
+
+    @staticmethod
+    @contextlib.contextmanager
+    def _mount_context(device):
+        proc = subprocess.run(
+            ['udisksctl', 'mount', '--no-user-interaction',
+             '--block-device', device],
+            stdout=subprocess.PIPE,
+            check=True)
+        output = proc.stdout.decode().strip()
+        start = f'Mounted {device} at '
+        if output.startswith(start):
+            path = output.replace(start, '', 1)
+        else:
+            raise RuntimeError(f'udisksctl error: {output}')
+
+        try:
+            yield path
+        finally:
+            subprocess.run(
+                ['udisksctl', 'unmount', '--no-user-interaction',
+                 '--block-device', device],
+                stdout=subprocess.DEVNULL,
+                check=True)
+
+    @staticmethod
+    def _child_paths(root):
+        stack = [pathlib.Path(root)]
+        paths = []
+        while stack:
+            for path in stack.pop().iterdir():
+                paths.append(path)
+                if path.is_dir():
+                    stack.append(path)
+        return paths
 
 
 class unzip:
@@ -366,6 +460,8 @@ def _get_class(path):
         cls = innoextract
     elif suffix == '.7z':
         cls = p7zip
+    elif suffix == '.iso':
+        cls = udisksctl
     else:
         raise NotImplementedError(path)
 
