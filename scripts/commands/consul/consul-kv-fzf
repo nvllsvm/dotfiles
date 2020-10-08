@@ -97,9 +97,10 @@ def main():
 
     consul = ConsulKV(args.url, verify=not(args.insecure))
     data = consul.get()
-    keys = set()
-    for key in data:
-        keys.add('/'.join(key.split('/')[:-1]))
+    keys = {
+        '/'.join(key.split('/')[:-1])
+        for key in data
+    }
 
     target = fzf(sorted(keys))
     if target is None:
