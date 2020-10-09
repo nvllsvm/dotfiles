@@ -1,9 +1,14 @@
 #!/usr/bin/env python
 import argparse
 import getpass
+import json
 import urllib.parse
 
 import httpx
+
+
+def _pretty_json(data):
+    return json.dumps(data, indent=2, sort_keys=True)
 
 
 class RabbitMQ:
@@ -49,6 +54,20 @@ class RabbitMQ:
         url = f'{self._url}/api/exchanges/{self._vhost}/{exchange}'
         response = self._client.delete(url)
         assert response.status_code in (201, 204, 404)
+
+    def exchange_binding_source(self, exchange):
+        exchange = self._quote(exchange)
+        url = f'{self._url}/api/exchanges/{self._vhost}/{exchange}/bindings/source'
+        response = self._client.get(url)
+        assert response.status_code == 200
+        return response.json()
+
+    def exchange_binding_destination(self, exchange):
+        exchange = self._quote(exchange)
+        url = f'{self._url}/api/exchanges/{self._vhost}/{exchange}/bindings/destination'
+        response = self._client.get(url)
+        assert response.status_code == 200
+        return response.json()
 
     def bind(self, exchange, queue, routing):
         exchange = self._quote(exchange)
@@ -103,6 +122,12 @@ class _Parser:
         rabbitmq.delete_exchange(exchange=args.exchange)
 
     @staticmethod
+    def describe_exchange(args):
+        rabbitmq = _Parser._setup_rabbitmq(args)
+        source = rabbitmq.exchange_binding_source(exchange=args.exchange)
+        print(_pretty_json(source))
+
+    @staticmethod
     def bind(args):
         rabbitmq = _Parser._setup_rabbitmq(args)
         rabbitmq.bind(
@@ -140,6 +165,10 @@ def main():
     delete_queue = subparsers.add_parser('delete-queue')
     delete_queue.set_defaults(func=_Parser.delete_queue)
     delete_queue.add_argument('queue')
+
+    describe_exchange = subparsers.add_parser('describe-exchange')
+    describe_exchange.set_defaults(func=_Parser.describe_exchange)
+    describe_exchange.add_argument('exchange')
 
     bind = subparsers.add_parser('bind')
     bind.set_defaults(func=_Parser.bind)
