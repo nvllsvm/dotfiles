@@ -17,6 +17,7 @@ sudo mount --bind ~ar /srv/nfs4/ar
 sudo mount --bind /storage /srv/nfs4/storage
 sudo mount --bind /storage/Audio /srv/nfs4/audio
 sudo mount --bind /storage/Video /srv/nfs4/video
+sudo systemctl restart nfs-server.service
 
 echo Starting systemd units ...
 systemctl --user enable --now git-repo-backup.timer
