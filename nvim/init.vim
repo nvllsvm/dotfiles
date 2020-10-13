@@ -126,6 +126,7 @@ let $FZF_DEFAULT_COMMAND = "fd --type file --ignore-file ~/.config/nvim/fzf_fd_i
 
 " deoplete
 let g:deoplete#enable_at_startup = 1
+call deoplete#custom#option('auto_complete', v:false)
 
 set omnifunc=syntaxcomplete#Complete
 
