@@ -1,44 +1,57 @@
 #!/usr/bin/env python3
 import argparse
-import pathlib
+import json
 import os
-
-import enzyme
+import pathlib
+import subprocess
 
 
 DEFAULT_LANGUAGES = {'eng', 'und', None}
 
 
+def mkv_info(path):
+    proc = subprocess.run(
+        ['mkvmerge', '-J', path],
+        stdout=subprocess.PIPE,
+        check=True)
+    return json.loads(proc.stdout)
+
+
 class MKVFile:
     def __init__(self, path):
         self.path = path
-        with self.path.open('rb') as handle:
-            self.metadata = enzyme.MKV(handle)
+        self.metadata = mkv_info(path)
 
     def subtitle_tracks(self, languages=None):
-        return self._language_tracks(self.metadata.subtitle_tracks, languages)
+        return [
+            track['id']
+            for track in self.metadata['tracks']
+            if track['type'] == 'subtitles'
+            and track['properties']['language'] in languages
+        ]
 
     def audio_tracks(self, languages=None):
-        return self._language_tracks(self.metadata.audio_tracks, languages)
+        return [
+            track['id']
+            for track in self.metadata['tracks']
+            if track['type'] == 'audio'
+            and track['properties']['language'] in languages
+        ]
 
     def video_tracks(self, languages=None):
-        return self._language_tracks(self.metadata.video_tracks, languages)
-
-    def _language_tracks(self, tracks, languages=None):
-        if languages is not None:
-            tracks = [
-                track
-                for track in tracks
-                if track.language in languages
-            ]
-        return tracks
+        return [
+            track['id']
+            for track in self.metadata['tracks']
+            if track['type'] == 'video'
+            and track['properties']['language'] in languages
+        ]
 
 
 def mkvmerge_tracks(path, include=None):
     args = ['mkvextract', path, 'tracks']
     if include:
         args += [
-            f'{track.number - 1}:{path}.track_{track.number - 1}'
+            f'{track}:{path}.track_{track}'
             for track in include
         ]
     os.execvp('mkvextract', args)
