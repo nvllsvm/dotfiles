@@ -37,7 +37,6 @@ import zipfile
 
 for name in [
         'arrow',
-        'enzyme',
         'httpx',
         'mutagen',
         'pkg_resources',
