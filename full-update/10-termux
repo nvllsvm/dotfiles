@@ -5,32 +5,5 @@ if ! command -v termux-info > /dev/null; then
     exit
 fi
 
-lf_update() {
-    XDG_DATA_DIR="${XDG_DATA_DIR:-$HOME/.local/share}"
-    INSTALL_DIR="${XDG_DATA_DIR}/lf/src"
-    BIN_DIR="$HOME/.local/bin"
-
-    if ! [ -d "$INSTALL_DIR" ]; then
-        mkdir -p "$(basename "$INSTALL_DIR")"
-        git clone https://github.com/gokcehan/lf "$INSTALL_DIR"
-    else
-        cd "$INSTALL_DIR"
-        git checkout master
-        git clean -fd
-        git pull
-    fi
-
-    cd "$INSTALL_DIR"
-    latest_version="$(git tag | sort --version-sort | tail -n 1)"
-    git checkout -q "$latest_version"
-    installed_version="$(lf -version || true)"
-    if [ "$installed_version" != "$latest_version" ]; then
-        go build -ldflags="-X main.gVersion=$latest_version" .
-        mv lf "${BIN_DIR}/lf"
-    fi
-}
-
 yes | pkg upgrade
 rm -rf ~/../usr/etc/motd
-
-lf_update
