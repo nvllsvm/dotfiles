@@ -74,6 +74,8 @@ unset host_dir
 
 path=(
     ~/.local/bin
+    "${DOTFILES}/scripts/hosts/${HOST}"
+    "${DOTFILES}"/scripts/terminal
     "$path[@]"
 )
 
@@ -96,23 +98,11 @@ for c in *; do
 done
 popd > /dev/null
 
-path=(
-    "${DOTFILES}"/scripts/terminal
-    "$path[@]"
-)
-
-host_scripts="${DOTFILES}/scripts/hosts/$HOST"
-if [ -d "$host_scripts" ]; then
-    path=("$host_scripts" "$path[@]")
-fi
-#
-# set last to make local take precedence
+# set ~/.local/bin/ to take path precedence
 path=(
     ~/.local/bin
     "$path[@]"
 )
-
-unset host_scripts
 
 all_commands() {
     autoload -Uz bashcompinit
