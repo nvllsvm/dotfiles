@@ -72,6 +72,11 @@ if [ -d "$host_dir/functions" ]; then
 fi
 unset host_dir
 
+path=(
+    ~/.local/bin
+    "$path[@]"
+)
+
 for plugin in $DOTFILES/zsh/plugins/*; do
     . "$plugin"
 done
