@@ -459,6 +459,10 @@ def _get_class(path):
     # zip (spanned)
     elif start.startswith(b'PK\x07\x08'):
         cls = unzip
+    # exe
+    elif start.startswith(b'MZ'):
+        # TODO: add additional innoextract validation
+        cls = innoextract
 
     else:
         suffixes = [suffix.lower() for suffix in path.suffixes]
@@ -475,8 +479,6 @@ def _get_class(path):
             cls = gzip
         elif suffix == '.xz':
             cls = xz
-        elif suffix == '.exe':
-            cls = innoextract
         elif suffix == '.iso':
             cls = udisksctl
         else:
