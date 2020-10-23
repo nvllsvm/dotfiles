@@ -438,32 +438,49 @@ def _build_dest(path, parent, child):
 
 
 def _get_class(path):
-    suffixes = [suffix.lower() for suffix in path.suffixes]
-    suffix = suffixes[-1]
-    if len(suffixes) > 1 and suffixes[-2] == '.tar':
-        cls = gnu_tar
-    elif suffix in ('.tar', '.tgz'):
-        cls = gnu_tar
-    elif suffix == '.zst':
-        cls = zstd
-    elif suffix == '.br':
-        cls = brotli
-    elif suffix == '.gz':
-        cls = gzip
-    elif suffix == '.xz':
-        cls = xz
-    elif suffix in ('.zip', '.pk3'):
-        cls = unzip
-    elif suffix == '.rar':
+    with open(path, 'rb') as f:
+        start = f.read(8)
+
+    # rar < 5.0
+    if start.startswith(b'Rar!\x1a\x07\x00'):
         cls = unrar
-    elif suffix == '.exe':
-        cls = innoextract
-    elif suffix == '.7z':
+    # rar >= 5.0
+    elif start.startswith(b'Rar!\x1a\x07\x01\x00'):
+        cls = unrar
+    # 7-zip
+    elif start.startswith(b"7z\xbc\xaf'\x1c"):
         cls = p7zip
-    elif suffix == '.iso':
-        cls = udisksctl
+    # zip
+    elif start.startswith(b'PK\x03\x04'):
+        cls = unzip
+    # zip (empty)
+    elif start.startswith(b'PK\x05\x06'):
+        cls = unzip
+    # zip (spanned)
+    elif start.startswith(b'PK\x07\x08'):
+        cls = unzip
+
     else:
-        raise NotImplementedError(path)
+        suffixes = [suffix.lower() for suffix in path.suffixes]
+        suffix = suffixes[-1]
+        if len(suffixes) > 1 and suffixes[-2] == '.tar':
+            cls = gnu_tar
+        elif suffix in ('.tar', '.tgz'):
+            cls = gnu_tar
+        elif suffix == '.zst':
+            cls = zstd
+        elif suffix == '.br':
+            cls = brotli
+        elif suffix == '.gz':
+            cls = gzip
+        elif suffix == '.xz':
+            cls = xz
+        elif suffix == '.exe':
+            cls = innoextract
+        elif suffix == '.iso':
+            cls = udisksctl
+        else:
+            raise NotImplementedError(path)
 
     cls.check()
     return cls
