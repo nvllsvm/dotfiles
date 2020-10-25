@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+set -e 
+if [ "$(hostname)" != 'apollo' ]; then
+    exit
+fi
+
+sudo rm /usr/lib/firmware/ath10k/QCA6174/hw3.0/board-2.bin
