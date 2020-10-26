@@ -47,7 +47,10 @@ def main():
         print(path)
         if args.remove:
             # use instead of shutil.rmtree to ensure nothing added since scan
-            path.rmdir()
+            try:
+                path.rmdir()
+            except FileNotFoundError:
+                pass
 
 
 if __name__ == '__main__':
