@@ -1,0 +1,15 @@
+configuration {
+	width: -50;
+	lines: 10;
+	font: "monospace 9";
+	bw: 2;
+	fixed-num-lines: true;
+	sidebar-mode: true;
+	hide-scrollbar: true;
+	dpi: 96;
+	click-to-exit: false;
+	color-normal: "#000000, #e4e4e4, argb:00000000, #555555, #eeeeee";
+	color-urgent: "#fdf6e3, #dc322f, #eee8d5, #dc322f, #fdf6e3";
+	color-active: "#fdf6e3, #268bd2, #eee8d5, #268bd2, #fdf6e3";
+	color-window: "#000000, #e4e4e4, #000000";
+}
