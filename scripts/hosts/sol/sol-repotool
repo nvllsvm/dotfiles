@@ -20,7 +20,7 @@ repotool_update() {
     vcs_pkgs=$(aur repo --database="$DATABASE" --list | cut -f1 | grep -E "$AURVCS" || true)
     if [ -n "$vcs_pkgs" ]; then
         # init vcs sync cache
-        aur sync "$vcs_pkgs" --no-ver-shallow --print --no-view
+        aur sync "$vcs_pkgs" --no-ver-argv --no-build --no-view
 
         mapfile -t git_outdated < <(aur vercmp-devel --database="$DATABASE" | cut -d: -f1)
         if [ ${#git_outdated[@]} -gt 0 ]; then
