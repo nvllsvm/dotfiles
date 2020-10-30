@@ -480,6 +480,7 @@ def _get_class(path):
         elif suffix == '.xz':
             cls = xz
         elif suffix == '.iso':
+            raise RuntimeError('iso support is fucked')
             cls = udisksctl
         else:
             raise NotImplementedError(path)
