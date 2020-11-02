@@ -1,0 +1,15 @@
+#!/bin/sh
+DEFAULT="$DOTFILES/termux/termux.properties.normal"
+
+show_help() {
+    echo 'usage: termux-load-settings [FILE]'
+}
+
+if [ $# -eq 0 ]; then
+    FILE="$DEFAULT"
+else
+    FILE="$1"
+fi
+
+ln -sf "$FILE" ~/.termux/termux.properties
+. ~/.base16_theme
