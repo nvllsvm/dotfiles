@@ -1,10 +1,10 @@
-if [ "$HOST" = 'termux' ]; then
-    # exec is broken in termux
-    return
-fi
-
 if [ -t 0 ] && [ -n "$SSH_TTY" ] && [ -z "$TMUX" ]; then
-    exec tmux-attach
+    if [ "$HOST" = 'termux' ]; then
+        # exec is broken in termux
+        tmux-attach
+    else
+        exec tmux-attach
+    fi
 fi
 
 if [ -f ~/.usesway ] && [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]; then
