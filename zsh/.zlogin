@@ -1,3 +1,8 @@
+if [ "$HOST" = 'termux' ]; then
+    # exec is broken in termux
+    return
+fi
+
 if [ -t 0 ] && [ -n "$SSH_TTY" ] && [ -z "$TMUX" ]; then
     exec tmux-attach
 fi
