@@ -7,6 +7,7 @@ trap restore_default EXIT INT TERM
 
 if [ $# -eq 1 ]; then
     ln -sf "$1" ~/.termux/termux.properties
-    termux-reload-settings
-    . ~/.base16_theme
 fi
+
+termux-reload-settings
+. ~/.base16_theme
