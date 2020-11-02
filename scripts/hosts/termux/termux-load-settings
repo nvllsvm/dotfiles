@@ -1,15 +1,12 @@
 #!/bin/sh
-DEFAULT="$DOTFILES/termux/termux.properties.normal"
-
-show_help() {
-    echo 'usage: termux-load-settings [FILE]'
+restore_default() {
+    ln -sf "$DOTFILES/termux/termux.properties.normal" ~/.termux/termux.properties
 }
 
-if [ $# -eq 0 ]; then
-    FILE="$DEFAULT"
-else
-    FILE="$1"
-fi
+trap restore_default EXIT INT TERM
 
-ln -sf "$FILE" ~/.termux/termux.properties
-. ~/.base16_theme
+if [ $# -eq 1 ]; then
+    ln -sf "$1" ~/.termux/termux.properties
+    termux-reload-settings
+    . ~/.base16_theme
+fi
