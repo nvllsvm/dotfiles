@@ -32,7 +32,7 @@ while [ $# -gt 0 ]; do
             ;;
         *)
             for arg in "$@"; do
-                run_script "$arg"
+                run_script "$UPDATE_DIR"/"$arg"
             done
             exit
             ;;
