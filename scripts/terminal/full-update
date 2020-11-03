@@ -1,12 +1,14 @@
 #!/usr/bin/env sh
 set -eu
 
+UPDATE_DIR="$DOTFILES/full-update"
+
 YELLOW='\033[1;33m'
 RESET_COLOR='\033[0m'
 
 run_script() {
-    printf '%bRunning %s ...%b\n' "$YELLOW" "$1" "$RESET_COLOR"
-    ./"$1"
+    printf '%bRunning %s ...%b\n' "$YELLOW" "${1##*/}" "$RESET_COLOR"
+    "$1"
 }
 
 show_help() {
@@ -17,12 +19,11 @@ usage: full-update [script ...]
     --list      list scripts and exit
 EOF
 }
-cd "$DOTFILES/full-update" || exit 1
 
 while [ $# -gt 0 ]; do
     case "$1" in
         --list)
-            ls | sort
+            find "$UPDATE_DIR" -type f -printf '%f\n' | sort -n
             exit
             ;;
         --help)
@@ -39,7 +40,7 @@ while [ $# -gt 0 ]; do
 done
 
 printf '%bfull-update - start %s%b\n' "$YELLOW" "$(date)" "$RESET_COLOR"
-for cmd in *; do
+for cmd in "$UPDATE_DIR"/*; do
     run_script "$cmd"
 done
 printf '%bfull-update - done %s%b\n' "$YELLOW" "$(date)" "$RESET_COLOR"
