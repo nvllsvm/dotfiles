@@ -28,6 +28,8 @@ systemctl --user enable --now sol-fix-permissions.timer
 systemctl --user enable --now sol-update-remotes.timer
 systemctl --user enable --now wasabi-sync.timer
 
+sudo wg-quick up home
+
 echo Starting Docker ...
 sudo systemctl start docker
 
