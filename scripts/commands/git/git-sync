@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+import argparse
+import pathlib
+import subprocess
+
+CODE_ROOT_DIR = pathlib.Path('~/code').expanduser()
+
+
+class Git:
+
+    @staticmethod
+    def clone(repository, directory):
+        subprocess.run(
+            ['git', 'clone', repository, directory],
+            check=True
+        )
+
+    @staticmethod
+    def fetch(directory):
+        subprocess.run(
+            ['git', '-C', str(directory), 'fetch', '--all'],
+            check=True)
+
+
+def _find_git_repos(root):
+    stack = [root]
+    while stack:
+        for path in stack.pop().iterdir():
+            if path.is_dir():
+                if path.name == '.git':
+                    yield path.parent.absolute()
+                else:
+                    stack.append(path)
+
+
+def main():
+    parser = argparse.ArgumentParser('git-aweber')
+    parser.add_argument('repo', nargs='?')
+    args = parser.parse_args()
+
+    if args.repo is None:
+        for repo_dir in _find_git_repos(pathlib.Path().absolute()):
+            print(repo_dir)
+            Git.fetch(repo_dir)
+    else:
+        host, path = args.repo.split(':')
+        repo_dir = CODE_ROOT_DIR / host / path
+
+        if repo_dir.exists():
+            Git.fetch(repo_dir)
+        else:
+            Git.clone(args.repo, repo_dir)
+
+
+if __name__ == '__main__':
+    main()
