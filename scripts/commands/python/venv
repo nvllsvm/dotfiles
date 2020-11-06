@@ -1,19 +1,27 @@
 #!/usr/bin/env python3
+import os
 import sys
 
 if sys.version_info.major < 3 or sys.version_info.minor < 8:
-    sys.stderr.write('error: requires at least Python 3.8 to run\n')
-    sys.exit(1)
+    virtual_env = os.environ.get('VIRTUAL_ENV')
+    if virtual_env:
+        virtual_env = virtual_env.rstrip('/') + '/'
+        os.environ['PATH'] = os.pathsep.join(
+            part
+            for part in os.environ['PATH'].split(os.pathsep)
+            if not part.startswith(virtual_env)
+        )
+        os.execvp(__file__, sys.argv)
+    else:
+        sys.stderr.write('error: requires at least Python 3.8 to run\n')
+        sys.exit(1)
 
 import argparse
 import hashlib
-import os
 import pathlib
 import shlex
 import shutil
 import subprocess
-
-import pkg_resources
 
 ENV_ROOT = pathlib.Path('~/.local/share/virtualenvs').expanduser()
 
@@ -61,7 +69,7 @@ def pyenv_versions():
         check=True)
     return sorted(
         (version.strip() for version in proc.stdout.decode().split()),
-        key=lambda v: pkg_resources.parse_version(v),
+        key=lambda v: tuple(int(i) for i in v.split('.')),
         reverse=True
     )
 
