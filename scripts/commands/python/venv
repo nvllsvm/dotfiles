@@ -3,7 +3,7 @@ import os
 import sys
 
 if sys.version_info.major < 3 or sys.version_info.minor < 8:
-    virtual_env = os.environ.get('VIRTUAL_ENV')
+    virtual_env = os.environ.pop('VIRTUAL_ENV')
     if virtual_env:
         virtual_env = virtual_env.rstrip('/') + '/'
         os.environ['PATH'] = os.pathsep.join(
