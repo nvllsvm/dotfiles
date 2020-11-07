@@ -4,6 +4,6 @@ if [ "$(hostname)" != 'sol' ]; then
     exit
 fi
 
-git-auto-update ~/Code/sol-docker
+git-auto-update ~/code/sol-docker
 sol-docker pull
 sol-repotool update

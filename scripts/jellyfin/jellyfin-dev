@@ -3,7 +3,7 @@ set -e
 
 JELLYFIN_DATA=~/.jellyfin_dev
 
-cd ~/Code/jellyfin
+cd ~/code/jellyfin
 
 rm -rf debug
 

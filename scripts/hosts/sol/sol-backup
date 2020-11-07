@@ -14,7 +14,7 @@ exec sudo rsync \
     --exclude .npm \
     --exclude .nuget \
     --exclude .rustup \
-    --exclude Code/sol-docker/volumes/jellyfin/cache \
-    --exclude Code/sol-docker/volumes/jellyfin/config/log \
-    --exclude Code/sol-docker/volumes/jellyfin/config/transcoding-temp \
+    --exclude code/sol-docker/volumes/jellyfin/cache \
+    --exclude code/sol-docker/volumes/jellyfin/config/log \
+    --exclude code/sol-docker/volumes/jellyfin/config/transcoding-temp \
     ~ar "$BACKUP_DIR"
