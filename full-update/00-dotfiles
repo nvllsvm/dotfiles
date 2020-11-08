@@ -21,7 +21,7 @@ update_repo() {
                 for source in $(find "$backup_root" -type f); do
                     target=${source#$backup_root}
                     if test -f "$target" || [ "$tag" != 'common' ]; then
-                        if ! sudo diff "$source" "$target" > /dev/null 2>&1 ; then
+                        if ! diff "$source" "$target" > /dev/null 2>&1 ; then
                             echo Syncing "$target"
                             sudo mkdir -p "$(dirname "$target")"
                             sudo cp "$source" "$target"
