@@ -9,7 +9,7 @@ else
             extract -l "$1"
             ;;
         *.mkv)
-            mkvmerge -J "$1" | jq --sort-keys --color-output
+            mkvmerge -J "$1" | jq --sort-keys --color-output '.tracks[].properties'
             ;;
         *)
             # set line count to avoid unnecessary page length.
