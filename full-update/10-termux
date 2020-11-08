@@ -6,4 +6,5 @@ if ! command -v termux-info > /dev/null; then
 fi
 
 yes | pkg upgrade
+yes | apt autoremove
 rm -rf ~/../usr/etc/motd
