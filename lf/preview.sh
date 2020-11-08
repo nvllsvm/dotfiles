@@ -3,7 +3,6 @@ set -e
 if [ -d "$1" ]; then
     cd "$1" || exit 1
     fd --color=always --maxdepth=1
-    exit
 else
     case "$1" in
         *.tar.*|*.rar|*.7z|*.zip|*.iso|*.zst|*.exe|*.pk3|*.tar|*.tgz|*.cbz)
