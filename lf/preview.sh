@@ -8,6 +8,9 @@ else
         *.tar.*|*.rar|*.7z|*.zip|*.iso|*.zst|*.exe|*.pk3|*.tar|*.tgz|*.cbz)
             extract -l "$1"
             ;;
+        *.flac|*.mp3|*.opus|*.wav|*.aac)
+            ffprobe -hide_banner -- "$1" 2>&1
+            ;;
         *.mkv)
             mkvmerge -J "$1" | jq --sort-keys --color-output '.tracks[].properties'
             ;;
