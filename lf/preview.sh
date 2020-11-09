@@ -7,6 +7,7 @@ else
     mimetype="$(xdg-mime query filetype "$1")"
     case "$mimetype" in
         application/java-archive|\
+        application/x-compressed-tar|\
         application/x-rar|\
         application/x-tar|\
         application/zip|\
