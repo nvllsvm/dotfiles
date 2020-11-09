@@ -4,15 +4,23 @@ if [ -d "$1" ]; then
     cd "$1" || exit 1
     fd --color=always --maxdepth=1
 else
-    case "$1" in
-        *.tar.*|*.rar|*.7z|*.zip|*.iso|*.zst|*.exe|*.pk3|*.tar|*.tgz|*.cbz)
-            extract -l "$1"
+    mimetype="$(xdg-mime query filetype "$1")"
+    case "$mimetype" in
+        application/java-archive|\
+        application/x-rar|\
+        application/x-tar|\
+        application/zip|\
+        application/zstd)
+            extract -l -- "$1"
             ;;
-        *.flac|*.mp3|*.opus|*.wav|*.aac)
+        audio/*|\
+        video/*)
             ffprobe -hide_banner -- "$1" 2>&1
             ;;
-        *.mkv)
-            mkvmerge -J "$1" | jq --sort-keys --color-output '.tracks[].properties'
+        image/*)
+            output="$(identify -- "$1")"
+            # strip filename
+            echo "${output#*"$1" }"
             ;;
         *)
             # set line count to avoid unnecessary page length.
