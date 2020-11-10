@@ -3,10 +3,13 @@ import argparse
 import contextlib
 import functools
 import getpass
+import io
+import os
 import pathlib
 import re
 import shutil
 import subprocess
+import zipfile
 
 
 class p7zip:
@@ -276,6 +279,85 @@ class innoextract:
         return [path]
 
 
+class gog_linux:
+    @staticmethod
+    def check():
+        pass
+
+    @classmethod
+    def contents(cls, path):
+        with cls._zipfile(path) as zf:
+            contents = set()
+            for zi in zf.infolist():
+                if target := cls._local_target(zi):
+                    contents.add(target)
+            return sorted(contents)
+
+    @classmethod
+    def extract(cls, path, dest, password=None, overwrite=False):
+        if overwrite:
+            raise NotImplementedError
+        with cls._zipfile(path) as zf:
+            for zi in zf.infolist():
+                if target := cls._local_target(zi):
+                    zi.filename = target
+                    zf.extract(zi, dest)
+
+    @staticmethod
+    def _local_target(zi):
+        if zi.filename.startswith('data/noarch/'):
+            if target := zi.filename[12:]:
+                return target
+
+    @staticmethod
+    def volumes(path, password=''):
+        return [path]
+
+    class _ZipFile(zipfile.ZipFile):
+        def _extract_member(self, member, targetpath, pwd):
+            # extract doesn't  set file metadta
+            if not isinstance(member, zipfile.ZipInfo):
+                member = self.getinfo(member)
+
+            targetpath = super()._extract_member(member, targetpath, pwd)
+
+            attr = member.external_attr >> 16
+            if attr != 0:
+                os.chmod(targetpath, attr)
+            return targetpath
+
+    @classmethod
+    @contextlib.contextmanager
+    def _zipfile(cls, path):
+        with open(path, 'rb') as f:
+            FILESIZE_RE = re.compile(r'filesizes="(\d+?)"')
+            OFFSET_RE = re.compile(r'offset=`head -n (\d+?) "\$0"')
+
+            beginning = f.read(10240).decode(errors="ignore")
+            offset_match = OFFSET_RE.search(beginning)
+            script_lines = int(offset_match.group(1))
+
+            # Read the number of lines to determine the script size
+            f.seek(0, io.SEEK_SET)
+            for line in range(0, script_lines):
+                f.readline()
+            script_size = f.tell()
+
+            # Read the script
+            f.seek(0, io.SEEK_SET)
+            script_bin = f.read(script_size)
+            script = script_bin.decode()
+
+            # Filesize is for the MojoSetup archive, not the actual game data
+            filesize_match = FILESIZE_RE.search(script)
+            filesize = int(filesize_match.group(1))
+
+            # Extract the game data archive
+            dataoffset = script_size + filesize
+            f.seek(dataoffset, io.SEEK_SET)
+            yield cls._ZipFile(f)
+
+
 class gnu_tar:
     @staticmethod
     @functools.lru_cache()
@@ -439,54 +521,54 @@ def _build_dest(path, parent, child):
 
 def _get_class(path):
     with open(path, 'rb') as f:
-        start = f.read(8)
+        start = f.read(10)
 
-    # rar < 5.0
-    if start.startswith(b'Rar!\x1a\x07\x00'):
-        cls = unrar
-    # rar >= 5.0
-    elif start.startswith(b'Rar!\x1a\x07\x01\x00'):
-        cls = unrar
-    # 7-zip
-    elif start.startswith(b"7z\xbc\xaf'\x1c"):
-        cls = p7zip
-    # zip
-    elif start.startswith(b'PK\x03\x04'):
-        cls = unzip
-    # zip (empty)
-    elif start.startswith(b'PK\x05\x06'):
-        cls = unzip
-    # zip (spanned)
-    elif start.startswith(b'PK\x07\x08'):
-        cls = unzip
-    # exe
-    elif start.startswith(b'MZ'):
-        # TODO: add additional innoextract validation
-        cls = innoextract
+        # rar < 5.0
+        if start.startswith(b'Rar!\x1a\x07\x00'):
+            return unrar
+        # rar >= 5.0
+        elif start.startswith(b'Rar!\x1a\x07\x01\x00'):
+            return unrar
+        # 7-zip
+        elif start.startswith(b"7z\xbc\xaf'\x1c"):
+            return p7zip
+        # zip
+        elif start.startswith(b'PK\x03\x04'):
+            return unzip
+        # zip (empty)
+        elif start.startswith(b'PK\x05\x06'):
+            return unzip
+        # zip (spanned)
+        elif start.startswith(b'PK\x07\x08'):
+            return unzip
+        # exe
+        elif start.startswith(b'MZ'):
+            # TODO: add additional innoextract validation
+            return innoextract
+        elif start.startswith(b'#!/bin/sh\n'):
+            f.seek(271)
+            if f.read(58) == b'# with modifications for mojosetup and GOG.com installer.\n':  # noqa: E501
+                return gog_linux
 
-    else:
-        suffixes = [suffix.lower() for suffix in path.suffixes]
-        suffix = suffixes[-1]
-        if len(suffixes) > 1 and suffixes[-2] == '.tar':
-            cls = gnu_tar
-        elif suffix in ('.tar', '.tgz'):
-            cls = gnu_tar
-        elif suffix == '.zst':
-            cls = zstd
-        elif suffix == '.br':
-            cls = brotli
-        elif suffix == '.gz':
-            cls = gzip
-        elif suffix == '.xz':
-            cls = xz
-        elif suffix == '.iso':
-            raise RuntimeError('iso support is fucked')
-            cls = udisksctl
-        else:
-            raise NotImplementedError(path)
+    suffixes = [suffix.lower() for suffix in path.suffixes]
+    suffix = suffixes[-1]
+    if len(suffixes) > 1 and suffixes[-2] == '.tar':
+        return gnu_tar
+    elif suffix in ('.tar', '.tgz'):
+        return gnu_tar
+    elif suffix == '.zst':
+        return zstd
+    elif suffix == '.br':
+        return brotli
+    elif suffix == '.gz':
+        return gzip
+    elif suffix == '.xz':
+        return xz
+    elif suffix == '.iso':
+        raise RuntimeError('iso support is fucked')
+        return udisksctl
 
-    cls.check()
-    return cls
+    raise NotImplementedError(path)
 
 
 def main():
@@ -517,6 +599,7 @@ def main():
     extracted = set()
     for path in args.archive:
         cls = _get_class(path)
+        cls.check()
         if args.list:
             contents = sorted(
                 cls.contents(path),
