@@ -299,9 +299,14 @@ class gog_linux:
             raise NotImplementedError
         with cls._zipfile(path) as zf:
             for zi in zf.infolist():
-                if target := cls._local_target(zi):
-                    zi.filename = target
+                if local_name := cls._local_target(zi):
+                    zi.filename = local_name
+                    target = dest.joinpath(local_name)
                     zf.extract(zi, dest)
+
+                    # extract doesn't set attrs
+                    if attr := zi.external_attr >> 16:
+                        os.chmod(target, attr)
 
     @staticmethod
     def _local_target(zi):
@@ -313,27 +318,14 @@ class gog_linux:
     def volumes(path, password=''):
         return [path]
 
-    class _ZipFile(zipfile.ZipFile):
-        def _extract_member(self, member, targetpath, pwd):
-            # extract doesn't  set file metadta
-            if not isinstance(member, zipfile.ZipInfo):
-                member = self.getinfo(member)
-
-            targetpath = super()._extract_member(member, targetpath, pwd)
-
-            attr = member.external_attr >> 16
-            if attr != 0:
-                os.chmod(targetpath, attr)
-            return targetpath
-
-    @classmethod
+    @staticmethod
     @contextlib.contextmanager
-    def _zipfile(cls, path):
+    def _zipfile(path):
         with open(path, 'rb') as f:
             FILESIZE_RE = re.compile(r'filesizes="(\d+?)"')
             OFFSET_RE = re.compile(r'offset=`head -n (\d+?) "\$0"')
 
-            beginning = f.read(10240).decode(errors="ignore")
+            beginning = f.read(10240).decode(errors='ignore')
             offset_match = OFFSET_RE.search(beginning)
             script_lines = int(offset_match.group(1))
 
@@ -355,7 +347,7 @@ class gog_linux:
             # Extract the game data archive
             dataoffset = script_size + filesize
             f.seek(dataoffset, io.SEEK_SET)
-            yield cls._ZipFile(f)
+            yield zipfile.ZipFile(f)
 
 
 class gnu_tar:
