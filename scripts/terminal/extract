@@ -347,7 +347,8 @@ class gog_linux:
             # Extract the game data archive
             dataoffset = script_size + filesize
             f.seek(dataoffset, io.SEEK_SET)
-            yield zipfile.ZipFile(f)
+            with zipfile.ZipFile(f) as zf:
+                yield zf
 
 
 class gnu_tar:
