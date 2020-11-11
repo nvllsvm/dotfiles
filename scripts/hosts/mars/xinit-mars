@@ -1,3 +1,4 @@
 #!/usr/bin/env sh
 chat &
 jellyfin-mpv-shim &
+kdeconnect-indicator &
