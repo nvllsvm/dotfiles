@@ -7,7 +7,10 @@ if [ -d "$BASE16_SHELL" ]; then
         . ~/.base16_theme
     fi
 
-    path=("$DOTFILES"/scripts/base16 "$path[@]")
+    path=(
+        "$DOTFILES"/scripts/base16
+        "$path[@]"
+    )
 else
     unset BASE16_SHELL
 fi

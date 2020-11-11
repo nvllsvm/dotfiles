@@ -23,7 +23,10 @@ if [ -d "$NVM_DIR" ]; then
         eval "alias $cmd='nvm-load && $cmd'"
     done
 
-    path=("${DOTFILES}/scripts/nodejs" "$path[@]")
+    path=(
+        "${DOTFILES}/scripts/nodejs"
+        "$path[@]"
+    )
 else
     unset NVM_DIR
 fi
