@@ -371,6 +371,7 @@ class gnu_tar:
         proc = subprocess.run(
             ['tar', 'tf', str(path), '--force-local'],
             stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             check=True)
         return proc.stdout.decode().splitlines()
 
@@ -538,12 +539,24 @@ def _build_dest(path, parent, child):
 
 
 def _get_class(path):
-    # TODO fix compress tar extraction (ex. tar.gz, tar.zstd)
+    # TODO this is inefficient if not a compressed tar
+    try:
+        if gnu_tar.contents(path):
+            return gnu_tar
+    except Exception:
+        pass
+
     with open(path, 'rb') as f:
         start = f.read(10)
 
+        # tar
+        if start.startswith(b'ustar\x0000'):
+            return gnu_tar
+        # tar
+        elif start.startswith(b'ustar  \x00'):
+            return gnu_tar
         # rar < 5.0
-        if start.startswith(b'Rar!\x1a\x07\x00'):
+        elif start.startswith(b'Rar!\x1a\x07\x00'):
             return unrar
         # rar >= 5.0
         elif start.startswith(b'Rar!\x1a\x07\x01\x00'):
@@ -576,6 +589,10 @@ def _get_class(path):
         elif start.startswith(b'MZ'):
             # TODO: add additional innoextract validation
             return innoextract
+        # iso9660 image
+        elif start.startswith(b'CD001'):
+            raise RuntimeError('iso support is fucked')
+            return udisksctl
         elif start.startswith(b'#!/bin/sh\n'):
             f.seek(271)
             if f.read(58) == b'# with modifications for mojosetup and GOG.com installer.\n':  # noqa: E501
@@ -583,15 +600,10 @@ def _get_class(path):
 
     suffixes = [suffix.lower() for suffix in path.suffixes]
     suffix = suffixes[-1]
-    if len(suffixes) > 1 and suffixes[-2] == '.tar':
-        return gnu_tar
-    elif suffix in ('.tar', '.tgz'):
-        return gnu_tar
-    elif suffix == '.br':
+
+    # ffs - brotli doesn't have a file signature
+    if suffix == '.br':
         return brotli
-    elif suffix == '.iso':
-        raise RuntimeError('iso support is fucked')
-        return udisksctl
 
     raise NotImplementedError(path)
 
