@@ -445,6 +445,31 @@ class xz:
         return [path]
 
 
+class lz4:
+    @staticmethod
+    @functools.lru_cache()
+    def check():
+        if not shutil.which('lz4'):
+            raise KeyError
+
+    @staticmethod
+    def contents(path):
+        return [path.with_suffix('').name]
+
+    @staticmethod
+    def extract(path, dest, password=None, overwrite=False):
+        args = ['lz4', '-d']
+        if overwrite:
+            args.append('-f')
+        target = dest / path.with_suffix('').name
+        args.extend(['--', path, target])
+        subprocess.run(args, stdin=subprocess.PIPE, check=True)
+
+    @staticmethod
+    def volumes(path, password=''):
+        return [path]
+
+
 class zstd:
     @staticmethod
     @functools.lru_cache()
@@ -534,6 +559,9 @@ def _get_class(path):
         # zip (spanned)
         elif start.startswith(b'PK\x07\x08'):
             return unzip
+        # lz4
+        elif start.startswith(b'\x04"M\x18'):
+            return lz4
         # exe
         elif start.startswith(b'MZ'):
             # TODO: add additional innoextract validation
