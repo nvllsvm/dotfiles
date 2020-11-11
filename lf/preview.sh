@@ -4,6 +4,10 @@ if [ -d "$1" ]; then
     cd "$1" || exit 1
     fd --color=always --maxdepth=1
 else
+    if ! command -v xdg-mime > /dev/null; then
+        bat -r :1024 --color=always --plain -- "$1"
+        exit
+    fi
     mimetype="$(xdg-mime query filetype "$1")"
     case "$mimetype" in
         application/java-archive|\
