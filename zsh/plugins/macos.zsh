@@ -18,8 +18,4 @@ if [[ $OSTYPE == darwin* ]]; then
         /usr/local/sbin
         "$path[@]"
     )
-
-    man() {
-        /usr/bin/man "$@" 2> /dev/null
-    }
 fi
