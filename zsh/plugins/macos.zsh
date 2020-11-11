@@ -14,8 +14,8 @@ if [[ $OSTYPE == darwin* ]]; then
         /usr/local/opt/curl-openssl/bin
         /usr/local/opt/file-formula/bin
         /usr/local/opt/sqlite/bin
+        /usr/local/opt/*/libexec/gnubin
         /usr/local/sbin
-        /usr/local/opt/*/libexec/gnubin "$path[@]"
         "$path[@]"
     )
 
