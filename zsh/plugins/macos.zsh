@@ -2,11 +2,12 @@ if [[ $OSTYPE == darwin* ]]; then
     export LANG=en_US.UTF-8
     export HOMEBREW_NO_ANALYTICS=1
 
-    manpath=(/usr/local/share/man /usr/share/man "$manpath[@]")
-    for pkg in coreutils diffutils findutils gawk gnu-sed gnu-tar grep; do
-        path=(/usr/local/opt/"${pkg}"/libexec/gnubin "$path[@]")
-        manpath=(/usr/local/opt/"${pkg}"/libexec/gnuman "$manpath[@]")
-    done
+    manpath=(
+        /usr/local/opt/*/libexec/gnuman
+        /usr/local/share/man
+        /usr/share/man
+        "$manpath[@]"
+    )
 
     path=(
         "$DOTFILES/scripts/macos"
@@ -14,6 +15,7 @@ if [[ $OSTYPE == darwin* ]]; then
         /usr/local/opt/file-formula/bin
         /usr/local/opt/sqlite/bin
         /usr/local/sbin
+        /usr/local/opt/*/libexec/gnubin "$path[@]"
         "$path[@]"
     )
 
