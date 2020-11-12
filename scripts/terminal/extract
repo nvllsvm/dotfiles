@@ -258,6 +258,7 @@ class innoextract:
         proc = subprocess.run(
             ['innoextract', '--gog', '--quiet', '--list', str(path)],
             stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             check=True)
 
         contents = []
@@ -540,6 +541,7 @@ def _build_dest(path, parent, child):
 
 def _get_class(path):
     # TODO this is inefficient if not a compressed tar
+    gnu_tar.check()
     try:
         if gnu_tar.contents(path):
             return gnu_tar
@@ -588,7 +590,12 @@ def _get_class(path):
         # exe
         elif start.startswith(b'MZ'):
             # TODO: add additional innoextract validation
-            return innoextract
+            innoextract.check()
+            try:
+                innoextract.contents(path)
+                return innoextract
+            except Exception:
+                pass
         # iso9660 image
         elif start.startswith(b'CD001'):
             raise RuntimeError('iso support is fucked')
