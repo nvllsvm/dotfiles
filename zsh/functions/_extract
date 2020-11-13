@@ -14,7 +14,7 @@ _extract() {
   # Global flags (i.e. ones not associated with a subcommand)
   _arguments \
     '(-h --help)'{-h,--help}'[show this help message and exit]' \
-    '-p=[parent directory to extract to]:' \
+    '-p=[parent directory to extract to]: :_files' \
     '-c[extract each archive to a unique child directory]' \
     '-l[list contents]' \
     '-f[force overwrite]' \

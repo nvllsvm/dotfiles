@@ -3,8 +3,25 @@ import argparse
 import collections
 import json
 import pathlib
+import sys
 
 import magic
+
+MIME_SUFFIXES = {
+    'image/gif': [
+        '.gif',
+    ],
+    'image/png': [
+        '.png'
+    ],
+    'image/jpeg': [
+        '.jpeg',
+        '.jpg',
+    ],
+    'image/webp': [
+        '.webp',
+    ],
+}
 
 
 def all_files(root):
@@ -21,6 +38,7 @@ def all_files(root):
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--check', action='store_true', default=False)
     parser.add_argument('path', default='.', nargs='?')
     args = parser.parse_args()
 
@@ -29,12 +47,31 @@ def main():
         mime = magic.from_file(str(path), mime=True)
         exts[mime].add(path)
 
+    if args.check:
+        missing = set()
+        invalid = collections.defaultdict(set)
+        for mime, paths in exts.items():
+            suffixes = MIME_SUFFIXES.get(mime)
+            if not suffixes:
+                missing.add(mime)
+                continue
+
+            for path in paths:
+                if path.suffix.lower() not in suffixes:
+                    invalid[mime].add(path)
+        exts = invalid
+        for mime in sorted(missing):
+            print(f'warning: suffix unknown for "{mime}"', file=sys.stderr)
+
     exts = {
         ext: sorted(str(p.resolve()) for p in paths)
         for ext, paths in exts.items()
     }
 
     print(json.dumps(exts, indent=2, sort_keys=True))
+
+    if args.check and exts:
+        sys.exit(1)
 
 
 if __name__ == '__main__':
