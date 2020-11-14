@@ -32,6 +32,6 @@ if command -v mpd-notifier > /dev/null; then
 fi
 
 autorandr --change --force
-udiskie --smart-tray &
+udiskie --tray &
 
 exec i3
