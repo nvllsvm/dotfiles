@@ -9,6 +9,7 @@ import pathlib
 import re
 import shutil
 import subprocess
+import sys
 import zipfile
 
 
@@ -41,7 +42,7 @@ class p7zip:
         )
         return [
             line.split(maxsplit=5)[-1]
-            for line in proc.stdout.decode().splitlines()
+            for line in proc.stdout.splitlines()
         ]
 
     @classmethod
@@ -91,7 +92,7 @@ class udisksctl:
         with cls._loop_context(path) as device:
             with cls._mount_context(device) as mount_path:
                 return sorted(
-                    str(path.relative_to(mount_path))
+                    bytes(path.relative_to(mount_path))
                     for path in cls._child_paths(mount_path)
                 )
 
@@ -187,7 +188,7 @@ class unzip:
             check=True)
         return [
             line.split(maxsplit=3)[-1]
-            for line in proc.stdout.decode().splitlines()
+            for line in proc.stdout.splitlines()
         ]
 
     @staticmethod
@@ -218,7 +219,7 @@ class unrar:
             check=True)
         return list(set(
             line.split(maxsplit=3)[-1]
-            for line in proc.stdout.decode().splitlines()
+            for line in proc.stdout.splitlines()
         ))
 
     @staticmethod
@@ -649,7 +650,9 @@ def main():
                 cls.contents(path),
                 key=lambda x: (x.lower(), x)
             )
-            print('\n'.join(contents))
+            # avoid errors with non-unicode file names
+            sys.stdout.buffer.write(b'\n'.join(contents) + b'\n')
+            sys.stdout.buffer.flush()
         else:
             if path in extracted:
                 continue
