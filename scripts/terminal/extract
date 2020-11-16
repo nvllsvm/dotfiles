@@ -256,6 +256,7 @@ class innoextract:
 
     @staticmethod
     def contents(path):
+        # safe to pass --gog flag to non-gog installers
         proc = subprocess.run(
             ['innoextract', '--gog', '--exclude-temp', '--quiet', '--list',
              str(path)],
@@ -273,6 +274,7 @@ class innoextract:
     def extract(path, dest, password=None, overwrite=False):
         if overwrite:
             raise NotImplementedError
+        # safe to pass --gog flag to non-gog installers
         subprocess.run(
             ['innoextract', '--gog', '--exclude-temp', '--extract',
              '--output-dir', dest, path],
