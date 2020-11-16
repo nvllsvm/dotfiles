@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+if command -v fwupdmgr > /dev/null; then
+    sudo fwupdmgr refresh --force
+fi
