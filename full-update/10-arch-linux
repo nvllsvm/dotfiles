@@ -28,6 +28,9 @@ fi
 log 'Updating packages'
 yay -Syu --noconfirm --devel
 
+log 'Looking for pacnew'
+sudo find /etc -name '*.pacnew' | sort
+
 log 'Updating file cache'
 sudo pkgfile --update > /dev/null
 
