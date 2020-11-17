@@ -28,8 +28,4 @@ for output, i in zip(sorted(secondary_outputs), range(10, 0, -1)):
     conn.command(f'workspace {i}; move workspace to {output}')
 
 conn.command(f'focus output {primary_output}')
-
-for workspace in conn.get_workspaces():
-    if workspace.output == primary_output:
-        conn.command(f'workspace {workspace.name}')
-        break
+conn.command('workspace 1')
