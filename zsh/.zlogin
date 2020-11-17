@@ -1,8 +1,5 @@
 if [ -t 0 ] && [ -n "$SSH_TTY" ] && [ -z "$TMUX" ]; then
-    if [[ $OSTYPE == darwin* ]]; then
-        # tmux occasionally hangs/gets-fucked in macos
-        return
-    elif [ "$HOST" = 'termux' ]; then
+    if [ "$HOST" = 'termux' ]; then
         # exec is broken in termux
         tmux-attach
         exit
