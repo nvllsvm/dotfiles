@@ -379,7 +379,7 @@ class gnu_tar:
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             check=True)
-        return proc.stdout.decode().splitlines()
+        return proc.stdout.splitlines()
 
     @staticmethod
     def extract(path, dest, password=None, overwrite=False):
