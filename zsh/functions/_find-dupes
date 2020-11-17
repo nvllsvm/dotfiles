@@ -1,0 +1,5 @@
+#compdef find-dupes
+_arguments : \
+    '(-u --unique)'{-u,--unique}'[]' \
+    '(-h --help)'{-h,--help}'[show this help message and exit]' \
+    '*:: :_files'
