@@ -1,7 +1,0 @@
-#!/usr/bin/env sh
-set -e
-
-if [ -x ~/.emacs.d/bin/doom ]; then
-    ~/.emacs.d/bin/doom sync
-    ~/.emacs.d/bin/doom upgrade
-fi
