@@ -105,14 +105,21 @@ def TempPath(**kwargs):
 
 def mkv_files(root):
     files = []
-    stack = [root]
-    while stack:
-        for path in stack.pop().iterdir():
-            if path.is_file() and path.suffix.lower() == '.mkv':
-                files.append(path)
-            elif path.is_dir():
-                stack.append(path)
-    return sorted(files)
+    if root.is_file():
+        files.append(root)
+    else:
+        stack = [root]
+        while stack:
+            for path in stack.pop().iterdir():
+                if path.is_file():
+                    files.append(path)
+                elif path.is_dir():
+                    stack.append(path)
+    return sorted(
+        f
+        for f in files
+        if f.suffix.lower() == '.mkv'
+    )
 
 
 def main():
