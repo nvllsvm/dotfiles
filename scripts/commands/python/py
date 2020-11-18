@@ -22,7 +22,7 @@ if ret is not None:
     if isinstance(ret, bytes):
         sys.stdout.buffer.write(ret)
     else:
-        print(ret)
+        print(ret, end='')
 EOF
         ;;
     *)
