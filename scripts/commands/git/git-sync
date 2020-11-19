@@ -2,6 +2,7 @@
 import argparse
 import pathlib
 import subprocess
+import sys
 
 CODE_ROOT_DIR = pathlib.Path('~/code').expanduser()
 
@@ -35,6 +36,7 @@ def _find_git_repos(root):
 
 def main():
     parser = argparse.ArgumentParser('git-aweber')
+    parser.add_argument('--show-dir', action='store_true')
     parser.add_argument('repo', nargs='?')
     args = parser.parse_args()
 
@@ -43,8 +45,11 @@ def main():
             print(repo_dir)
             Git.fetch(repo_dir)
     else:
-        host, path = args.repo.split(':')
+        host, path = args.repo.split(':', 1)
         repo_dir = CODE_ROOT_DIR / host / path
+        if args.show_dir:
+            print(repo_dir)
+            sys.exit()
 
         if repo_dir.exists():
             Git.fetch(repo_dir)
