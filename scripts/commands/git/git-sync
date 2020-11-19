@@ -45,7 +45,8 @@ def main():
             print(repo_dir)
             Git.fetch(repo_dir)
     else:
-        host, path = args.repo.split(':', 1)
+        host, path = args.repo.split(
+            ':' if ':' in args.repo else '/', 1)
         repo_dir = CODE_ROOT_DIR / host / path
         if args.show_dir:
             print(repo_dir)
