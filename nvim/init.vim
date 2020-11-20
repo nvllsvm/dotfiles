@@ -178,13 +178,14 @@ endfunction
 let g:markdown_enable_spell_checking = 0
 
 nnoremap <leader>z :Files<Cr>
+let $FZF_DEFAULT_OPTS = '--tiebreak=begin'
 
 nnoremap <leader>f :Ex<Cr>
 
 nnoremap <leader>n :bn<Cr>
 nnoremap <leader>p :bp<Cr>
 nnoremap <leader>D :bd<Cr>
-nnoremap <leader>3 :b#<Cr>
+nnoremap <leadr>3 :b#<Cr>
 nnoremap <leader>l :buffers<CR>:buffer<Space>
 
 let g:netrw_banner = 0
