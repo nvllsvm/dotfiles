@@ -178,7 +178,6 @@ endfunction
 let g:markdown_enable_spell_checking = 0
 
 nnoremap <leader>z :Files<Cr>
-let $FZF_DEFAULT_OPTS = '--tiebreak=begin'
 
 nnoremap <leader>f :Ex<Cr>
 
