@@ -6,8 +6,8 @@ function _AutoSave()
     endif
 endfunction
 
-autocmd InsertLeave * call _AutoSave()
-autocmd TextChanged * call _AutoSave()
+autocmd InsertLeave * nested call _AutoSave()
+autocmd TextChanged * nested call _AutoSave()
 
 command EnableAutoSave :let g:autosave_enabled = 1
 command DisableAutoSave :let g:autosave_enabled = 0
