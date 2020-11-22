@@ -38,7 +38,7 @@ def main():
         sys.exit(1)
 
     new_names = {}
-    for title, path in zip(titles, sorted(paths)):
+    for title, path in zip(titles, sorted(paths, key=lambda x: str(x).lower())):
         new_names[path] = title
 
     for path, new_name in new_names.items():
