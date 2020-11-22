@@ -625,7 +625,6 @@ def _get_class(path):
                 pass
         # iso9660 image
         elif start.startswith(b'CD001'):
-            raise RuntimeError('iso support is fucked')
             return udisksctl
         elif start.startswith(b'#!/bin/sh\n'):
             f.seek(271)
