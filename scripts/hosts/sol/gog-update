@@ -41,11 +41,19 @@ def main():
     after = files_to_mtime(GOG_DIR)
 
     for path in sorted(set([*before.keys(), *after.keys()])):
-        if path in before and path not in after:
-            print('Deleted:', path)
-        elif path not in before and path not in after:
+        try:
+            before_mtime = before[path]
+        except KeyError:
             print('New:', path)
-        elif before[path] != after[path]:
+            continue
+
+        try:
+            after_mtime = after[path]
+        except KeyError:
+            print('Deleted:', path)
+            continue
+
+        if before_mtime != after_mtime:
             print('Modified:', path)
 
 
