@@ -1,17 +1,53 @@
-#!/usr/bin/env sh
-set -e
+#!/usr/bin/env python3
+import pathlib
+import subprocess
 
-IMAGE=nvllsvm/lgogdownloader
-GOG_DIR=/storage/Games/PC/GOG.com
-CACHE_DIR=~/.cache/lgogdownloader
+CACHE_DIR = pathlib.Path('~/.cache/lgogdownloader').expanduser()
+CONFIG_DIR = pathlib.Path('~/.dotfiles/private/lgogdownloader').expanduser()
+GOG_DIR = pathlib.Path('/storage/Games/PC/GOG.com')
+IMAGE = 'nvllsvm/lgogdownloader'
 
-mkdir -p "$CACHE_DIR"
 
-exec podman run \
-    --rm \
-    --quiet \
-    -e HOME \
-    -v "$GOG_DIR":/downloads \
-    -v "$CACHE_DIR":/cache \
-    -v ~/.dotfiles/private/lgogdownloader:/config \
-    "$IMAGE" > /dev/null 2>&1
+def files_to_mtime(root):
+    stack = [root]
+    files = {}
+    while stack:
+        for path in stack.pop().iterdir():
+            if path.is_dir():
+                stack.append(path)
+            elif path.is_file():
+                files[str(path)] = path.stat().st_mtime
+    return files
+
+
+def run_lgogdownloader():
+    subprocess.run(
+        ['podman', 'run',
+         '--rm',
+         '--quiet',
+         '-e', 'HOME',
+         '-v', f'{GOG_DIR}:/downloads',
+         '-v', f'{CACHE_DIR}:/cache',
+         '-v', f'{CONFIG_DIR}:/config',
+         IMAGE],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=True)
+
+
+def main():
+    before = files_to_mtime(GOG_DIR)
+    run_lgogdownloader()
+    after = files_to_mtime(GOG_DIR)
+
+    for path in sorted(set([*before.keys(), *after.keys()])):
+        if path in before and path not in after:
+            print('Deleted:', path)
+        elif path not in before and path not in after:
+            print('New:', path)
+        elif before[path] != after[path]:
+            print('Modified:', path)
+
+
+if __name__ == '__main__':
+    main()
