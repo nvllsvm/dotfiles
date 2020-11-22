@@ -113,6 +113,23 @@ class udisksctl:
         return [path]
 
     @staticmethod
+    def _loop_info(device):
+        proc = subprocess.run(
+            ['udisksctl', 'info', '--block-device', device],
+            stdout=subprocess.PIPE,
+            check=True)
+        output = proc.stdout.decode().strip()
+        for line in output.splitlines():
+            if line.startswith('    MountPoints:'):
+                mount_point = line.split(maxsplit=1)[1]
+            elif line.startswith('    BackingFile:'):
+                backing_file = line.split(maxsplit=1)[1]
+        return {
+            'backing_file': backing_file,
+            'mount_point': mount_point,
+        }
+
+    @staticmethod
     @contextlib.contextmanager
     def _loop_context(path):
         proc = subprocess.run(
@@ -131,7 +148,7 @@ class udisksctl:
         try:
             yield device
         finally:
-            proc = subprocess.run(
+            subprocess.run(
                 ['udisksctl', 'loop-delete', '--no-user-interaction',
                  '--block-device', device],
                 stdout=subprocess.DEVNULL,
@@ -143,14 +160,19 @@ class udisksctl:
         proc = subprocess.run(
             ['udisksctl', 'mount', '--no-user-interaction',
              '--block-device', device],
-            stdout=subprocess.PIPE,
-            check=True)
-        output = proc.stdout.decode().strip()
-        start = f'Mounted {device} at '
-        if output.startswith(start):
-            path = output.replace(start, '', 1)
+            stderr=subprocess.DEVNULL,
+            stdout=subprocess.PIPE)
+
+        if proc.returncode:
+            mount_info = udisksctl._loop_info(device)
+            path = mount_info['mount_point']
         else:
-            raise RuntimeError(f'udisksctl error: {output}')
+            output = proc.stdout.decode().strip()
+            start = f'Mounted {device} at '
+            if output.startswith(start):
+                path = output.replace(start, '', 1)
+            else:
+                raise RuntimeError(f'udisksctl error: {output}')
 
         try:
             yield path
@@ -616,6 +638,9 @@ def _get_class(path):
     # ffs - brotli doesn't have a file signature
     if suffix == '.br':
         return brotli
+    # bchunk generates zero-prefixed iso
+    elif suffix == '.iso':
+        return udisksctl
 
     raise NotImplementedError(path)
 
