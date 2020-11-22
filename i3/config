@@ -163,6 +163,6 @@ bindsym XF86MonBrightnessDown exec --no-startup-id set-backlight dec
 bindsym XF86MonBrightnessUp exec --no-startup-id set-backlight inc
 
 bindsym $mod+backslash exec --no-startup-id i3-scratchpad-alacritty todo.md notes todo.md
-bindsym $mod+n exec --no-startup-id alacritty --command zsh -ic notes
+bindsym $mod+n exec --no-startup-id i3-scratchpad-alacritty notes notes
 
 exec_always --no-startup-id i3-autoscratchpad
