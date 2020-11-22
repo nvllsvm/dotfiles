@@ -46,6 +46,9 @@ repotool_add() {
     done
     aur sync --no-view --no-confirm --no-ver --database="$DATABASE" -- ${packages_and_deps} || true
     sudo pacsync "$DATABASE" > /dev/null
+    for i in "${@}"; do
+        pacman -Si "sol/$i" >&2 || true
+    done
 }
 
 repotool_remove() {
@@ -62,7 +65,7 @@ sync_nullsum() {
 
 usage() {
     cat << EOF
-usage: repotool.sh (add|remove|update)
+usage: sol-repotool (add|remove|update)
 EOF
 }
 
