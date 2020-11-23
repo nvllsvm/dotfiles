@@ -1,0 +1,6 @@
+[Unit]
+Description=Run harmonize-library
+
+[Service]
+ExecStart=zsh -ic harmonize-library
+SyslogIdentifier=harmonize-library
