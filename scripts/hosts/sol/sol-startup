@@ -22,6 +22,7 @@ sudo systemctl restart nfs-server.service
 echo Starting systemd units ...
 systemctl --user enable --now git-repo-backup.timer
 systemctl --user enable --now gog-update.timer
+systemctl --user enable --now harmonize-library-update.timer
 systemctl --user enable --now mbsync.timer
 systemctl --user enable --now retroarch-rom-sync.timer
 systemctl --user enable --now sol-fix-permissions.timer
