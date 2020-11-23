@@ -125,6 +125,7 @@ endfunction
 let g:markdown_enable_spell_checking = 0
 
 nnoremap <leader>z :Files<Cr>
+nnoremap <leader>r :Rg<Cr>
 
 nnoremap <leader>f :Ex<Cr>
 
