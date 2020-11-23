@@ -3,7 +3,9 @@ import argparse
 import asyncio
 import os
 import pathlib
+import signal
 import subprocess
+import sys
 
 
 def all_files(root):
@@ -106,6 +108,10 @@ def sizeof_fmt(num):
     raise RuntimeError
 
 
+def _sigint_handler(*_):
+    sys.exit(130)
+
+
 async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-s', '--strip', action='store_true')
@@ -151,4 +157,5 @@ async def main():
 
 
 if __name__ == '__main__':
+    signal.signal(signal.SIGINT, _sigint_handler)
     asyncio.run(main())

@@ -44,10 +44,14 @@ repotool_add() {
             packages_and_deps="$packages_and_deps $i $(echo "$i" | aur depends 2>/dev/null | cut -f2 | sort | comm -12 - <(aur pkglist | sort))"
         fi
     done
-    aur sync --no-view --no-confirm --no-ver --database="$DATABASE" -- ${packages_and_deps} || true
+    if [ -n "$packages_and_deps" ]; then
+        aur sync --no-view --no-confirm --no-ver --database="$DATABASE" -- ${packages_and_deps} || true
+    fi
     sudo pacsync "$DATABASE" > /dev/null
     for i in "${@}"; do
-        pacman -Si "sol/$i" >&2 || true
+        if ! [ -f "$i" ]; then
+            pacman -Si "sol/$i" >&2 || true
+        fi
     done
 }
 
