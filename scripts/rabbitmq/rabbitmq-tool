@@ -80,6 +80,42 @@ class RabbitMQ:
             })
         assert response.status_code in (201, 204)
 
+    def list_exchanges(self):
+        response = self._client.get(f'{self._url}/api/exchanges/{self._vhost}')
+        assert response.status_code == 200
+        return response.json()
+
+    def list_queues(self):
+        response = self._client.get(f'{self._url}/api/queues/{self._vhost}')
+        assert response.status_code == 200
+        return response.json()
+
+    def describe_queue(self, queue):
+        response = self._client.get(f'{self._url}/api/queues/{self._vhost}/{queue}')
+        assert response.status_code == 200
+        return response.json()
+
+    def describe_exchange(self, exchange):
+        response = self._client.get(f'{self._url}/api/exchanges/{self._vhost}/{exchange}')
+        assert response.status_code == 200
+        return response.json()
+
+    def create_user(self, username, password, tags):
+        response = self._client.put(
+            f'{self._url}/api/users/{username}',
+            json={'password': password, 'tags': tags})
+        assert response.status_code == 201
+
+    def permit_user(self, username, configure, read, write):
+        response = self._client.put(
+            f'{self._url}/api/permissions/{self._vhost}/{username}',
+            json={'configure': configure, 'read': read, 'write': write})
+        assert response.status_code == 201
+
+    def delete_user(self, username):
+        response = self._client.delete(f'{self._url}/api/users/{username}')
+        assert response.status_code in (204, 404)
+
     @staticmethod
     def _quote(value):
         return urllib.parse.quote(value, safe='')
@@ -112,6 +148,28 @@ class _Parser:
             durable=args.durable)
 
     @staticmethod
+    def create_user(args):
+        rabbitmq = _Parser._setup_rabbitmq(args)
+        rabbitmq.create_user(
+            username=args.usern,
+            password=args.passw,
+            tags=args.tags)
+
+    @staticmethod
+    def permit_user(args):
+        rabbitmq = _Parser._setup_rabbitmq(args)
+        rabbitmq.permit_user(
+            username=args.usern,
+            configure=args.configure,
+            read=args.read,
+            write=args.write)
+
+    @staticmethod
+    def delete_user(args):
+        rabbitmq = _Parser._setup_rabbitmq(args)
+        rabbitmq.delete_user(username=args.usern)
+
+    @staticmethod
     def delete_queue(args):
         rabbitmq = _Parser._setup_rabbitmq(args)
         rabbitmq.delete_queue(queue=args.queue)
@@ -124,7 +182,13 @@ class _Parser:
     @staticmethod
     def describe_exchange(args):
         rabbitmq = _Parser._setup_rabbitmq(args)
-        source = rabbitmq.exchange_binding_source(exchange=args.exchange)
+        source = rabbitmq.describe_exchange(exchange=args.exchange)
+        print(_pretty_json(source))
+
+    @staticmethod
+    def describe_queue(args):
+        rabbitmq = _Parser._setup_rabbitmq(args)
+        source = rabbitmq.describe_queue()
         print(_pretty_json(source))
 
     @staticmethod
@@ -134,6 +198,16 @@ class _Parser:
             exchange=args.exchange,
             queue=args.queue,
             routing=args.routing)
+
+    @staticmethod
+    def list_exchanges(args):
+        rabbitmq = _Parser._setup_rabbitmq(args)
+        print(_pretty_json(rabbitmq.list_exchanges()))
+
+    @staticmethod
+    def list_queues(args):
+        rabbitmq = _Parser._setup_rabbitmq(args)
+        print(_pretty_json(rabbitmq.list_queues()))
 
 
 def main():
@@ -158,6 +232,23 @@ def main():
     create_queue.add_argument('--dlx')
     create_queue.add_argument('queue')
 
+    create_user = subparsers.add_parser('create-user')
+    create_user.set_defaults(func=_Parser.create_user)
+    create_user.add_argument('--tags', default='')
+    create_user.add_argument('usern')
+    create_user.add_argument('passw')
+
+    permit_user = subparsers.add_parser('permit-user')
+    permit_user.set_defaults(func=_Parser.permit_user)
+    permit_user.add_argument('--configure', default='.*')
+    permit_user.add_argument('--read', default='.*')
+    permit_user.add_argument('--write', default='.*')
+    permit_user.add_argument('usern')
+
+    delete_user = subparsers.add_parser('delete-user')
+    delete_user.set_defaults(func=_Parser.delete_user)
+    delete_user.add_argument('usern')
+
     delete_exchange = subparsers.add_parser('delete-exchange')
     delete_exchange.set_defaults(func=_Parser.delete_exchange)
     delete_exchange.add_argument('exchange')
@@ -169,6 +260,16 @@ def main():
     describe_exchange = subparsers.add_parser('describe-exchange')
     describe_exchange.set_defaults(func=_Parser.describe_exchange)
     describe_exchange.add_argument('exchange')
+
+    describe_queue = subparsers.add_parser('describe-queue')
+    describe_queue.set_defaults(func=_Parser.describe_queue)
+    describe_queue.add_argument('queue')
+
+    list_exchanges = subparsers.add_parser('list-exchanges')
+    list_exchanges.set_defaults(func=_Parser.list_exchanges)
+
+    list_queues = subparsers.add_parser('list-queues')
+    list_queues.set_defaults(func=_Parser.list_queues)
 
     bind = subparsers.add_parser('bind')
     bind.set_defaults(func=_Parser.bind)
