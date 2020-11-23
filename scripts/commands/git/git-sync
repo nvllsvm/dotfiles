@@ -47,7 +47,7 @@ def main():
     else:
         host, path = args.repo.split(
             ':' if ':' in args.repo else '/', 1)
-        repo_dir = CODE_ROOT_DIR / host / path
+        repo_dir = CODE_ROOT_DIR / host.lower() / path.lower()
         if args.show_dir:
             print(repo_dir)
             sys.exit()
