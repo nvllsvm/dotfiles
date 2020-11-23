@@ -53,7 +53,7 @@ if [ -n "$LMK" ]; then
     wait
 else
     unset TMUX
-    LMK=1 tmux -L lmk-$$ -f /dev/null \
+    LMK=1 tmux -S "${TMPDIR:-/tmp}"/lmk-$$ -f /dev/null \
         unbind -a ';' \
         set-option -g terminal-overrides '*:smcup@:rmcup@' ';' \
         set-option -g status off ';' \
