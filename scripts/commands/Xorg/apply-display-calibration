@@ -28,7 +28,21 @@ while true; do
             exit
             ;;
         *)
-            if [ $# -ne 0 ]; then
+            if [ $# -eq 1 ]; then
+                PROFILE="$1"
+            elif [ $# -eq 0 ]; then
+                case "$(hostname)" in
+                    "phobos")
+                        PROFILE="$DOTFILES/icc/xps13_phobos.icc"
+                        ;;
+                    "apollo")
+                        PROFILE="$DOTFILES/icc/surface_go.icc"
+                        ;;
+                    *)
+                        echo 'error: missing profile' >&2
+                        exit 1
+                esac
+            else
                 show_help
                 echo error: unknown arguments >&2
                 exit 1
@@ -40,12 +54,4 @@ done
 
 clear_existing_calibration
 
-case "$(hostname)" in
-    "phobos")
-        dispwin -d1 "$DOTFILES/icc/xps13_phobos.icc"
-        ;;
-    "apollo")
-        dispwin -d1 "$DOTFILES/icc/surface_go.icc"
-        ;;
-    *)
-esac
+dispwin -d1 "$PROFILE"
