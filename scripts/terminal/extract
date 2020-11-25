@@ -647,7 +647,7 @@ def _get_class(path):
     if suffix == '.br':
         return brotli
     # bchunk generates zero-prefixed iso
-    elif suffix == '.iso':
+    elif suffix in ('.iso', '.img'):
         return udisksctl
 
     raise NotImplementedError(path)
