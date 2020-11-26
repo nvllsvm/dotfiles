@@ -31,26 +31,11 @@ while true; do
             if [ $# -eq 1 ]; then
                 PROFILE="$1"
             elif [ $# -eq 0 ]; then
-                case "$(hostname)" in
-                    "mars")
-                        case "$(xrandr-primary-output)" in
-                            DisplayPort-0)
-                                PROFILE="$DOTFILES/icc/DisplayPort-0 #1 2020-11-25 18-29 2.2 F-S XYZLUT+MTX.icc"
-                                ;;
-                            DisplayPort-1)
-                                PROFILE="$DOTFILES/icc/dell_u2412m_custom.icc"
-                                ;;
-                        esac
+                case "$(xrandr-edid "$(xrandr-primary-output)" | base64 -w0)" in
+                    # basement - dell u2412m
+                    AP///////wAQrHugUzg5MBEXAQSlNCB4Ou6Vo1RMmSYPUFShCACBQIGAqUCzANHAAQEBAQEBKDyAoHCwI0AwIDYABkQhAAAaAAAA/wBZTVlIMTM0TDA5OFMKAAAA/ABERUxMIFUyNDEyTQogAAAA/QAyPR5TEQAKICAgICAgAMk=)
+                        PROFILE="$DOTFILES/icc/dell_u2412m_custom.icc"
                         ;;
-                    "phobos")
-                        PROFILE="$DOTFILES/icc/xps13_phobos.icc"
-                        ;;
-                    "apollo")
-                        PROFILE="$DOTFILES/icc/surface_go.icc"
-                        ;;
-                    *)
-                        echo 'error: missing profile' >&2
-                        exit 1
                 esac
             else
                 show_help
@@ -64,4 +49,5 @@ done
 
 clear_existing_calibration
 
-dispwin -d1 "$PROFILE"
+echo "Profile: $PROFILE"
+dispwin -d1 "$PROFILE" 2> /dev/null
