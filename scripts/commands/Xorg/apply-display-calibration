@@ -36,6 +36,10 @@ while true; do
                         case "$(xrandr-primary-output)" in
                             DisplayPort-0)
                                 PROFILE="$DOTFILES/icc/DisplayPort-0 #1 2020-11-25 18-29 2.2 F-S XYZLUT+MTX.icc"
+                                ;;
+                            DisplayPort-1)
+                                PROFILE="$DOTFILES/icc/dell_u2412m_custom.icc"
+                                ;;
                         esac
                         ;;
                     "phobos")
