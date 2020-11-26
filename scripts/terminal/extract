@@ -576,13 +576,7 @@ def _build_dest(path, parent, child):
 
 
 def _get_class(path):
-    # TODO this is inefficient if not a compressed tar
-    gnu_tar.check()
-    try:
-        if gnu_tar.contents(path):
-            return gnu_tar
-    except Exception:
-        pass
+    suffixes = [suffix.lower() for suffix in path.suffixes]
 
     with open(path, 'rb') as f:
         start = f.read(10)
@@ -622,7 +616,10 @@ def _get_class(path):
             return xz
         # zstandard
         elif start.startswith(b'(\xb5/\xfd'):
-            return zstd
+            if suffixes[-2:] == ['.tar', '.zst']:
+                return gnu_tar
+            else:
+                return zstd
         # exe
         elif start.startswith(b'MZ'):
             # TODO: add additional innoextract validation
