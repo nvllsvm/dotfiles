@@ -610,10 +610,16 @@ def _get_class(path):
             return lz4
         # gzip
         elif start.startswith(b'\x1f\x8b'):
-            return gzip
+            if suffixes[-2:] == ['.tar', '.gz']:
+                return gnu_tar
+            else:
+                return gzip
         # xz
         elif start.startswith(b'\xfd7zXZ\x00'):
-            return xz
+            if suffixes[-2:] == ['.tar', '.xz']:
+                return gnu_tar
+            else:
+                return xz
         # zstandard
         elif start.startswith(b'(\xb5/\xfd'):
             if suffixes[-2:] == ['.tar', '.zst']:
