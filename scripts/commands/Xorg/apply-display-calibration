@@ -31,6 +31,7 @@ while true; do
             if [ $# -eq 1 ]; then
                 PROFILE="$1"
             elif [ $# -eq 0 ]; then
+                # xrandr-edid $(xrandr-primary-output) | base64 -w0
                 case "$(xrandr-edid "$(xrandr-primary-output)" | base64 -w0)" in
                     # basement - dell u2412m
                     AP///////wAQrHugUzg5MBEXAQSlNCB4Ou6Vo1RMmSYPUFShCACBQIGAqUCzANHAAQEBAQEBKDyAoHCwI0AwIDYABkQhAAAaAAAA/wBZTVlIMTM0TDA5OFMKAAAA/ABERUxMIFUyNDEyTQogAAAA/QAyPR5TEQAKICAgICAgAMk=)
