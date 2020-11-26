@@ -1,3 +1,2 @@
 #!/usr/bin/env sh
-dispwin -c
 pkill -9 picom
