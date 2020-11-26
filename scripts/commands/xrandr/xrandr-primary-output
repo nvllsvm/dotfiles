@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+xrandr | grep ' connected primary ' | awk '{print $1}'
