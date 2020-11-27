@@ -1,0 +1,19 @@
+# reload the rules by running:
+# udevadm hwdb --update
+
+# gpdwin 2
+evdev:input:b0003v258Ap6A99*
+ KEYBOARD_KEY_70039=esc       # capslock
+ KEYBOARD_KEY_70065=leftmeta  # menu
+
+# built in keyboards
+evdev:atkbd:dmi:*
+ KEYBOARD_KEY_3a=esc       # capslock
+
+# surface go type cover
+evdev:input:b0003v045Ep096F*
+ KEYBOARD_KEY_70039=esc       # capslock
+
+# logitech k400 plus
+evdev:input:b0003v046Dp404D*
+ KEYBOARD_KEY_70039=esc       # capslock
