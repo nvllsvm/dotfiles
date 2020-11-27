@@ -1,14 +1,14 @@
 #!/usr/bin/env sh
 VERBOSE=
-PROVISION=
+ALL=
 while [ $# -gt 0 ]; do
     case "$1" in
         -v)
             VERBOSE=1
             shift
             ;;
-        --provision)
-            PROVISION=1
+        --all)
+            ALL=1
             shift
             ;;
         *)
@@ -47,7 +47,7 @@ update_repo() {
         git auto-update "$dotfiles_root"
     fi
 
-    if [ -n "$PROVISION" ]; then
+    if [ -n "$ALL" ]; then
         printf "%bUpdating non-user files %s (%s)...%b\n" "$MAGENTA" "$1" "$dotfiles_root" "$RESET"
         if command -v sudo > /dev/null; then
             update_non_user "$dotfiles_root" common
