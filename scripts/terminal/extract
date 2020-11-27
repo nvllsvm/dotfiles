@@ -438,7 +438,7 @@ class gzip:
 
     @staticmethod
     def contents(path):
-        return [path.with_suffix('').name]
+        return [path.with_suffix('').name.encode()]
 
     @staticmethod
     def extract(path, dest, password=None, overwrite=False):
@@ -652,6 +652,9 @@ def _get_class(path):
     # bchunk generates zero-prefixed iso
     elif suffix in ('.iso', '.img'):
         return udisksctl
+    # some tars lack file signature
+    elif suffix == '.tar':
+        return gnu_tar
 
     raise NotImplementedError(path)
 
