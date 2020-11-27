@@ -8,8 +8,9 @@ MAGENTA='\033[1;35m'
 RESET='\033[0m'
 
 update_non_user() {
-    tag="$1"
-    backup_root="$2/non-user/$tag"
+    dotfiles_root="$1"
+    tag="$2"
+    backup_root="$dotfiles_root/non-user/$tag"
     if [ -d "$backup_root" ]; then
         for source in $(find "$backup_root" -type f); do
             target=${source#$backup_root}
@@ -27,18 +28,19 @@ update_non_user() {
 }
 
 update_repo() {
-    if [ -d "$2/.git" ]; then
-        printf "${MAGENTA}Updating $1 ($2)...${RESET}\n"
-        git auto-update "$2"
+    dotfiles_root="$2"
+    if [ -d "$dotfiles_root/.git" ]; then
+        printf "${MAGENTA}Updating $1 ($dotfiles_root)...${RESET}\n"
+        git auto-update "$dotfiles_root"
     fi
 
     # non-user files
     if command -v sudo > /dev/null; then
-        update_non_user common
-        update_non_user "$(hostname)"
+        update_non_user "$dotfiles_root" common
+        update_non_user "$dotfiles_root" "$(hostname)"
 
         if command -v pacman > /dev/null; then
-            update_non_user _archlinux
+            update_non_user "$dotfiles_root" _archlinux
         fi
     fi
 }
