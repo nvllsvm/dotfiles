@@ -168,6 +168,7 @@ class udisksctl:
     def _mount_context(device):
         proc = subprocess.run(
             ['udisksctl', 'mount', '--no-user-interaction',
+             '--options', 'ro',
              '--block-device', device],
             stderr=subprocess.DEVNULL,
             stdout=subprocess.PIPE)
