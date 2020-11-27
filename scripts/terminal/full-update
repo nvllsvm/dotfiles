@@ -41,6 +41,13 @@ done
 
 printf '%bfull-update - start %s%b\n' "$YELLOW" "$(date)" "$RESET_COLOR"
 for cmd in "$UPDATE_DIR"/*; do
-    run_script "$cmd"
+    case "$cmd" in
+        */00-dotfiles)
+            run_script "$cmd" --provision
+            ;;
+        *)
+            run_script "$cmd"
+            ;;
+    esac
 done
 printf '%bfull-update - done %s%b\n' "$YELLOW" "$(date)" "$RESET_COLOR"
