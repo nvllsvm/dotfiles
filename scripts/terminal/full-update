@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-set -eux
+set -eu
 
 UPDATE_DIR="$DOTFILES/full-update"
 
@@ -8,7 +8,7 @@ RESET_COLOR='\033[0m'
 
 run_script() {
     printf '%bRunning %s ...%b\n' "$YELLOW" "${1##*/}" "$RESET_COLOR"
-    "$1"
+    "$@"
 }
 
 show_help() {
