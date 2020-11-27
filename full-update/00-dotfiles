@@ -43,7 +43,7 @@ update_non_user() {
 update_repo() {
     dotfiles_root="$2"
     if [ -d "$dotfiles_root/.git" ]; then
-        printf "${MAGENTA}Updating $1 ($dotfiles_root)...${RESET}\n"
+        printf "%bUpdating %s (%s)...%b\n" "$MAGENTA" "$1" "$dotfiles_root" "$RESET"
         git auto-update "$dotfiles_root"
     fi
 
