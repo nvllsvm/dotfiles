@@ -7,6 +7,25 @@ fi
 MAGENTA='\033[1;35m'
 RESET='\033[0m'
 
+update_non_user() {
+    tag="$1"
+    backup_root="$2/non-user/$tag"
+    if [ -d "$backup_root" ]; then
+        for source in $(find "$backup_root" -type f); do
+            target=${source#$backup_root}
+            if test -f "$target" || [ "$tag" != 'common' ]; then
+                if ! diff "$source" "$target" > /dev/null 2>&1 ; then
+                    echo Syncing "$target"
+                    sudo mkdir -p "$(dirname "$target")"
+                    sudo cp "$source" "$target"
+                elif [ -n "$VERBOSE" ]; then
+                    echo Found "$tag" "$target"
+                fi
+            fi
+        done
+    fi
+}
+
 update_repo() {
     if [ -d "$2/.git" ]; then
         printf "${MAGENTA}Updating $1 ($2)...${RESET}\n"
@@ -15,23 +34,12 @@ update_repo() {
 
     # non-user files
     if command -v sudo > /dev/null; then
-        for tag in common $(hostname); do
-            backup_root="$2/non-user/$tag"
-            if [ -d "$backup_root" ]; then
-                for source in $(find "$backup_root" -type f); do
-                    target=${source#$backup_root}
-                    if test -f "$target" || [ "$tag" != 'common' ]; then
-                        if ! diff "$source" "$target" > /dev/null 2>&1 ; then
-                            echo Syncing "$target"
-                            sudo mkdir -p "$(dirname "$target")"
-                            sudo cp "$source" "$target"
-                        elif [ -n "$VERBOSE" ]; then
-                            echo Found "$tag" "$target"
-                        fi
-                    fi
-                done
-            fi
-        done
+        update_non_user common
+        update_non_user "$(hostname)"
+
+        if command -v pacman > /dev/null; then
+            update_non_user _archlinux
+        fi
     fi
 }
 
