@@ -31,9 +31,9 @@ while [ $# -gt 0 ]; do
             exit
             ;;
         *)
-            for arg in "$@"; do
-                run_script "$UPDATE_DIR"/"$arg"
-            done
+            script="$1"
+            shift
+            run_script "$UPDATE_DIR"/"$script" "$@"
             exit
             ;;
     esac
