@@ -26,7 +26,6 @@ update_non_user() {
     backup_root="$dotfiles_root/non-user/$tag"
     if [ -d "$backup_root" ]; then
         for source_file in $(find "$backup_root" -type f); do
-            echo $source_file
             target=${source_file#$backup_root}
             if test -f "$target" || [ "$tag" != 'common' ]; then
                 if ! sudo diff "$source_file" "$target" > /dev/null 2>&1 ; then
