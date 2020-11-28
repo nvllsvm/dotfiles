@@ -25,13 +25,14 @@ update_non_user() {
     tag="$2"
     backup_root="$dotfiles_root/non-user/$tag"
     if [ -d "$backup_root" ]; then
-        for source in $(find "$backup_root" -type f); do
-            target=${source#$backup_root}
+        for source_file in $(find "$backup_root" -type f); do
+            echo $source_file
+            target=${source_file#$backup_root}
             if test -f "$target" || [ "$tag" != 'common' ]; then
-                if ! sudo diff "$source" "$target" > /dev/null 2>&1 ; then
+                if ! sudo diff "$source_file" "$target" > /dev/null 2>&1 ; then
                     echo Syncing "$target"
                     sudo mkdir -p "$(dirname "$target")"
-                    sudo cp "$source" "$target"
+                    sudo cp "$source_file" "$target"
                 elif [ -n "$VERBOSE" ]; then
                     echo Found "$tag" "$target"
                 fi
