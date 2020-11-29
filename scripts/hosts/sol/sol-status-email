@@ -85,13 +85,12 @@ table tr.failure {
 </html>"""
 
 
-def send_html_email(content, from_email, to_email):
+def send_html_email(content, subject, from_email, to_email):
     args = [
         'mailx',
         '-M', 'text/html',
         '-A', from_email,
-        '-s', 'Report {}'.format(
-            datetime.datetime.now().strftime('%Y-%m-%d %H:%M')),
+        '-s', subject,
         to_email
     ]
     subprocess.run(args, input=content, text=True, check=True)
@@ -139,15 +138,26 @@ def main():
     template = jinja2.Template(TEMPLATE)
 
     units = []
+    success = True
     for unit in SYSTEM_UNITS:
-        units.append(unit_properties(unit))
+        properties = unit_properties(unit)
+        units.append(properties)
+        if ''.join(properties['Result']) != 'success':
+            success = False
     for unit in USER_UNITS:
-        units.append(unit_properties(unit, user=True))
+        properties = unit_properties(unit, user=True)
+        units.append(properties)
+        if ''.join(properties['Result']) != 'success':
+            success = False
+
     output = template.render(units=units)
+    subject = '{} Report {}'.format(
+        '✅' if success else '❌',
+        datetime.datetime.now().strftime('%Y-%m-%d %H:%M'))
     if args.dummy:
         print(output)
     else:
-        send_html_email(output, args.from_email, args.to_email)
+        send_html_email(output, subject, args.from_email, args.to_email)
         print('Sent')
 
 
