@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+# bundled jdk doesn't respect GDK_SCALE or other scaling config
+export STUDIO_JKD=/usr/lib/jvm/default
+exec /usr/bin/android-studio "$@"
