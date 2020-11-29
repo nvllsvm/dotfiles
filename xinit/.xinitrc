@@ -28,7 +28,7 @@ if command -v syncthingtray > /dev/null; then
 fi
 
 if command -v mpd-notifier > /dev/null; then
-    mpd-notifier --library ~/.config/mpd/library &
+    mpd-notifier &
 fi
 
 autorandr --change --force

@@ -11,6 +11,8 @@ import setproctitle
 
 _LOGGER = logging.getLogger('mpd-notifier')
 
+_ALBUMART_PATH = '/tmp/mpd-notifier_image'
+
 
 @contextlib.contextmanager
 def _mpd_client(*args, **kwargs):
@@ -33,9 +35,7 @@ def _mpd_client(*args, **kwargs):
         client.disconnect()
 
 
-def _run(client, library):
-    library = pathlib.Path(library)
-
+def _run(client):
     while True:
         status = client.status()
         client.idle()
@@ -55,11 +55,14 @@ def _run(client, library):
         if not current:
             continue
 
-        art_path = None
-        for path in library.joinpath(current['file']).parent.iterdir():
-            if path.name in ('cover.jpg', 'cover.png'):
-                art_path = path
-                break
+        # TODO cache this
+        albumart = client.albumart(current['file'])
+        if albumart:
+            art_path = _ALBUMART_PATH
+            with open(art_path, 'wb') as f:
+                f.write(albumart)
+        else:
+            art_path = None
 
         if new_status['state'] == 'pause':
             _dunstify(
@@ -93,7 +96,6 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--host', default='localhost')
     parser.add_argument('--port', type=int, default=6600)
-    parser.add_argument('--library', required=True)
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO, format='%(message)s')
@@ -102,7 +104,7 @@ def main():
         with _mpd_client(args.host, args.port) as client:
             client.timeout = 5
             try:
-                _run(client, args.library)
+                _run(client)
             except mpd.ConnectionError:
                 pass
 
