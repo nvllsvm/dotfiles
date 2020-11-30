@@ -14,6 +14,7 @@ else
         application/x-rar|\
         application/x-tar|\
         application/zip|\
+        application/gzip|\
         application/zstd)
             extract -l -- "$1"
             ;;
