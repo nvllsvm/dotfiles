@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 set -e
-IMAGE=nvllsvm/harmonize
+IMAGE=docker.io/nvllsvm/harmonize
 
 SOURCE=/storage/Audio/Library
 TARGET=/storage/Audio/Lossy_opus_128
