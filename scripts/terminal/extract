@@ -236,6 +236,37 @@ class unzip:
         return [path]
 
 
+class cabextract:
+    @staticmethod
+    @functools.lru_cache()
+    def check():
+        if not shutil.which('cabextract'):
+            raise KeyError
+
+    @staticmethod
+    def contents(path):
+        proc = subprocess.run(
+            ['cabextract', '--list', '--quiet', '--', path],
+            stdout=subprocess.PIPE,
+            check=True)
+        return [
+            line.split(maxsplit=6)[-1]
+            for line in proc.stdout.splitlines()[2:]
+        ]
+
+    @staticmethod
+    def extract(path, dest, password=None, overwrite=False):
+        if overwrite:
+            raise NotImplementedError
+        subprocess.run(
+            ['cabextract', '--quiet', '--directory', dest, '--', path],
+            check=True)
+
+    @staticmethod
+    def volumes(path, password=''):
+        return [path]
+
+
 class unrar:
     @staticmethod
     @functools.lru_cache()
@@ -606,6 +637,9 @@ def _get_class(path):
         # zip (spanned)
         elif start.startswith(b'PK\x07\x08'):
             return unzip
+        # microsoft cabinet file
+        elif start.startswith(b'MSCF'):
+            return cabextract
         # lz4
         elif start.startswith(b'\x04"M\x18'):
             return lz4
