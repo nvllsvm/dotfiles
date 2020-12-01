@@ -18,4 +18,9 @@ if [[ $OSTYPE == darwin* ]]; then
         /usr/local/sbin
         "$path[@]"
     )
+
+    fpath=(
+        /usr/local/opt/*/share/zsh/site-functions
+        "$fpath[@]"
+    )
 fi
