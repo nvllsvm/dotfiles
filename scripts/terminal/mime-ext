@@ -9,6 +9,9 @@ import sys
 import magic
 
 MIME_SUFFIXES = {
+    'application/x-bittorrent': [
+        '.torrent',
+    ],
     'application/pdf': [
         '.pdf',
     ],
@@ -51,6 +54,7 @@ def all_files(root):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--check', action='store_true', default=False)
+    parser.add_argument('--fix', action='store_true', default=False)
     parser.add_argument('path', default='.', nargs='?')
     args = parser.parse_args()
 
@@ -87,7 +91,19 @@ def main():
     print(json.dumps(exts, indent=2, sort_keys=True))
 
     if args.check and exts:
-        sys.exit(1)
+        if args.fix:
+            for mime, paths in exts.items():
+                suffix = MIME_SUFFIXES[mime][0]
+                for path in paths:
+                    sep_cnt = 0
+                    while True:
+                        target = pathlib.Path(f'{path}{sep_cnt * "_"}{suffix}')
+                        if not target.exists():
+                            break
+                        sep_cnt += 1
+                    pathlib.Path(path).rename(target)
+        else:
+            sys.exit(1)
 
 
 if __name__ == '__main__':
