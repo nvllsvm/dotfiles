@@ -22,6 +22,10 @@ while true; do
         -f)
             NOTE_FILE="$(fd -t f | fzf)"
             if [ -z "$NOTE_FILE" ]; then
+                NOTE_FILE="$(printf '' | fzf)"
+            fi
+
+            if [ -z "$NOTE_FILE" ]; then
                 exit
             else
                 exec notes "$NOTE_FILE"
@@ -36,6 +40,9 @@ NOTE_FILE=
 case $# in
     0)
         NOTE_FILE="$(srch)"
+        if [ -z "$NOTE_FILE" ]; then
+            NOTE_FILE="$(printf '' | fzf)"
+        fi
         if [ -z "$NOTE_FILE" ]; then
             exit
         fi
