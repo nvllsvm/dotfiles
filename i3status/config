@@ -9,8 +9,8 @@ order += "tztime local"
 
 volume master {
     device = "pulse"
-    format = "♪: %volume"
-    format_muted = "♪: muted (%volume)"
+    format = " %volume"
+    format_muted = " muted"
 }
 
 battery all {
