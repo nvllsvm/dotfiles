@@ -1,6 +1,16 @@
 #!/usr/bin/env sh
 set -e
 
+set_note_file() {
+    NOTE_FILE="$(srch)"
+    if [ -z "$NOTE_FILE" ]; then
+        NOTE_FILE="$(printf '' | fzf --print-query || true)"
+    fi
+    if [ -z "$NOTE_FILE" ]; then
+        exit
+    fi
+}
+
 NOTES_DIR="${NOTES_DIR:-$HOME/notes}"
 if ! [ -d "$NOTES_DIR" ]; then
     echo error: notes directory does not exist: \""$NOTES_DIR"\" >&2
@@ -20,16 +30,8 @@ while true; do
             exit
             ;;
         -f)
-            NOTE_FILE="$(fd -t f | fzf)"
-            if [ -z "$NOTE_FILE" ]; then
-                NOTE_FILE="$(printf '' | fzf)"
-            fi
-
-            if [ -z "$NOTE_FILE" ]; then
-                exit
-            else
-                exec notes "$NOTE_FILE"
-            fi 
+            set_note_file
+            exec notes "$NOTE_FILE"
             ;;
         *)
             break
@@ -39,13 +41,7 @@ done
 NOTE_FILE=
 case $# in
     0)
-        NOTE_FILE="$(srch)"
-        if [ -z "$NOTE_FILE" ]; then
-            NOTE_FILE="$(printf '' | fzf)"
-        fi
-        if [ -z "$NOTE_FILE" ]; then
-            exit
-        fi
+        set_note_file
         ;;
     1)
         NOTE_FILE="$1"
