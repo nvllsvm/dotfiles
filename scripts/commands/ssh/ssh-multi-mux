@@ -3,6 +3,7 @@
 Execute command on multiple SSH hosts
 """
 import argparse
+import getpass
 import signal
 import socket
 import sys
@@ -87,8 +88,15 @@ class _OutputMuxer:
 def main():
     parser = argparse.ArgumentParser(prog='ssh-multi-mux', description=__doc__)
     parser.add_argument('command')
+    parser.add_argument('--sudo', action='store_true')
     parser.add_argument('host', nargs='*')
     args = parser.parse_args()
+
+    if args.sudo:
+        password = getpass.getpass()
+        command = f"sudo -S -p '' {args.command}"
+    else:
+        command = args.command
 
     channels = {}
 
@@ -102,7 +110,10 @@ def main():
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(host)
-        _, stdout, __ = ssh.exec_command(args.command)
+        stdin, stdout, __ = ssh.exec_command(command)
+        if args.sudo:
+            stdin.write(password + '\n')
+            stdin.flush()
         channel = stdout.channel
         channel.setblocking(0)
         channels[host] = channel
