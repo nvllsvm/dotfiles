@@ -4,6 +4,6 @@ case "$(hostname)" in
         exec i3blocks -c "$DOTFILES/i3blocks/config_apollo" "$@"
         ;;
     *)
-        exec i3status -c "$DOTFILES/i3status/config" "$@"
+        exec i3status-rs "$@"
         ;;
 esac

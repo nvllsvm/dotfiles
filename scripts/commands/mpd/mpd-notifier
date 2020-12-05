@@ -2,6 +2,8 @@
 import argparse
 import contextlib
 import logging
+import os
+import pathlib
 import subprocess
 import time
 
@@ -93,14 +95,24 @@ def main():
     setproctitle.setproctitle('mpd-notifier')
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--host', default='localhost')
+    parser.add_argument('--host')
     parser.add_argument('--port', type=int, default=6600)
     args = parser.parse_args()
+
+    mpd_host = args.host
+    if mpd_host is None:
+        runtime_dir = os.environ['XDG_RUNTIME_DIR']
+        if runtime_dir:
+            socket = pathlib.Path(runtime_dir) / 'mpd' / 'socket'
+            if socket.exists():
+                mpd_host = str(socket)
+    if mpd_host is None:
+        mpd_host = 'localhost'
 
     logging.basicConfig(level=logging.INFO, format='%(message)s')
 
     while True:
-        with _mpd_client(args.host, args.port) as client:
+        with _mpd_client(mpd_host, args.port) as client:
             client.timeout = 5
             try:
                 _run(client)
