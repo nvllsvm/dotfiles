@@ -2,6 +2,10 @@ theme = "native"
 icons = "awesome"
 
 [[block]]
+block = "battery"
+driver = "upower"
+
+[[block]]
 block = "sound"
 device_kind = "source"
 max_vol = 100
