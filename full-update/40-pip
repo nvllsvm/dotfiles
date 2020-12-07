@@ -14,5 +14,5 @@ fi
 
 ood_packages="$(pip list --outdated --format=freeze)"
 if [ -n "${ood_packages}" ]; then
-    pip install --user --upgrade $ood_packages
+    pip install --user --upgrade $(echo "${ood_packages}" | cut -d = -f 1)
 fi
