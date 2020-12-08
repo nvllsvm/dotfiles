@@ -1,0 +1,9 @@
+[Unit]
+Description=Run sol-update-pacman-mirrorlist
+
+[Timer]
+OnCalendar=Wed *-* 5:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

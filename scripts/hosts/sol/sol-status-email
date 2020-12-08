@@ -22,6 +22,7 @@ USER_UNITS = {
     'gog-update.service',
     'mbsync.service',
     'sol-fix-permissions.service',
+    'sol-update-pacman-mirrorlist.service',
     'sol-update-remotes.service',
     'vdirsyncer.service',
     'wasabi-sync.service',
