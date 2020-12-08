@@ -1,12 +1,36 @@
 #!/usr/bin/env sh
+CONF="${TMPDIR:-/tmp}/i3status-rs"
+cat > "$CONF" << EOF
+theme = "native"
+icons = "awesome"
+EOF
+
 case "$(hostname)" in
-    apollo)
-        exec i3blocks -c "$DOTFILES/i3blocks/config_apollo" "$@"
-        ;;
-    mars)
-        exec i3status-rs "$@"
-        ;;
-    *)
-        exec i3status -c "$DOTFILES/i3status/config"
+    phobos)
+        cat >> "$CONF" << EOF
+[[block]]
+block = "battery"
+EOF
         ;;
 esac
+
+cat >> "$CONF" << EOF
+[[block]]
+block = "sound"
+device_kind = "source"
+max_vol = 100
+on_click = "toggle-source-mute"
+
+[[block]]
+block = "sound"
+device_kind = "sink"
+max_vol = 100
+on_click = "set-volume --toggle-mute"
+
+[[block]]
+block = "time"
+interval = 30
+format = "%F %R"
+EOF
+
+exec i3status-rs "$CONF"
