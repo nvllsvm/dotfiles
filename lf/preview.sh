@@ -4,7 +4,11 @@ if [ -d "$1" ]; then
     cd "$1" || exit 1
     fd --color=always --maxdepth=1
 else
-    mimetype="$(file --brief --mime-type "$1")"
+    if command -v xdg-mime > /dev/null; then
+        mimetype="$(xdg-mime query filetype "$1")"
+    else
+        mimetype="$(file --brief --mime-type "$1")"
+    fi
     case "$mimetype" in
         application/java-archive|\
         application/x-7z-compressed|\
