@@ -26,6 +26,7 @@ systemctl --user enable --now harmonize-library.timer
 systemctl --user enable --now mbsync.timer
 systemctl --user enable --now retroarch-rom-sync.timer
 systemctl --user enable --now sol-fix-permissions.timer
+systemctl --user enable --now sol-update-pacman-mirrorlist.timer
 systemctl --user enable --now sol-update-remotes.timer
 systemctl --user enable --now wasabi-sync.timer
 
