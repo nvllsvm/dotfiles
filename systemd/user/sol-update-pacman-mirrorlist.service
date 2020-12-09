@@ -1,6 +1,0 @@
-[Unit]
-Description=Run sol-update-pacman-mirrorlist
-
-[Service]
-ExecStart=zsh -ic pacman-update-mirrors
-SyslogIdentifier=sol-update-pacman-mirrorlist
