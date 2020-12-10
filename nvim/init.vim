@@ -18,6 +18,7 @@ set mouse=a
 " line numbers
 set number
 set relativenumber
+nmap <C-n> :set number!<CR>:set relativenumber!<CR>
 
 " case insensitive search
 set ignorecase
