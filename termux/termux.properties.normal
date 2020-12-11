@@ -3,11 +3,11 @@ extra-keys = [ \
      {key: '|'}, \
      {key: '/', popup: BACKSLASH}, \
      {key: '$', popup: '*'}, \
-     {key: '~'}, \
+     {key: '~', popup: APOSTROPHE}, \
      {key: 'UP'}, \
      {key: '_'}, \
      {key: '-'}, \
-     {key: '"'} \
+     {key: '"', popup: QUOTE} \
  ], \
  [ \
      {key: 'TAB'}, \
