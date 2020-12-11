@@ -1,8 +1,8 @@
 extra-keys = [ \
  [ \
      {key: '|'}, \
-     {key: '/'}, \
-     {key: '$'}, \
+     {key: '/', popup: BACKSLASH}, \
+     {key: '$', popup: '*'}, \
      {key: '~'}, \
      {key: 'UP'}, \
      {key: '_'}, \
@@ -16,7 +16,7 @@ extra-keys = [ \
      {key: 'LEFT'}, \
      {key: 'DOWN'}, \
      {key: 'RIGHT'}, \
-     {key: ':'}, \
+     {key: ':', popup: ';'}, \
      {key: 'ESC'} \
  ] \
 ]
