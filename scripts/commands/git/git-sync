@@ -8,7 +8,6 @@ CODE_ROOT_DIR = pathlib.Path('~/code').expanduser()
 
 
 class Git:
-
     @staticmethod
     def clone(repository, directory):
         subprocess.run(
@@ -35,7 +34,7 @@ def _find_git_repos(root):
 
 
 def main():
-    parser = argparse.ArgumentParser('git-aweber')
+    parser = argparse.ArgumentParser('git-sync')
     parser.add_argument('--show-dir', action='store_true')
     parser.add_argument('repo', nargs='?')
     args = parser.parse_args()
