@@ -18,7 +18,7 @@ set mouse=a
 " line numbers
 set number
 set relativenumber
-nmap <C-n> :set number!<CR>:set relativenumber!<CR>
+nmap <silent> <C-n> :set number!<CR>:set relativenumber!<CR>
 
 " case insensitive search
 set ignorecase
@@ -35,7 +35,7 @@ set foldmethod=syntax
 set nowrap
 
 set cursorline
-nmap <C-c> :set cursorcolumn!<CR>
+nmap <silent> <C-c> :set cursorcolumn!<CR>
 
 set hidden
 
