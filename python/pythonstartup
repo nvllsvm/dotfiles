@@ -8,6 +8,7 @@ import contextlib
 import datetime
 import distutils
 import distutils.util
+import enum
 import getpass
 import glob
 import gzip
