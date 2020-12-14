@@ -10,6 +10,8 @@ else
         mimetype="$(file --brief --mime-type "$1")"
     fi
     case "$mimetype" in
+        application/epub+zip|\
+        application/gzip|\
         application/java-archive|\
         application/x-7z-compressed|\
         application/x-cd-image|\
@@ -18,7 +20,6 @@ else
         application/x-rar|\
         application/x-tar|\
         application/zip|\
-        application/gzip|\
         application/zstd)
             extract -l -- "$1"
             ;;
