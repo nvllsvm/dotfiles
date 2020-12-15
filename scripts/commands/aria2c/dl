@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+aria2c -x 16 -j 20 --split 20 "$URL"
