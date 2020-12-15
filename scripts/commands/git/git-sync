@@ -45,17 +45,19 @@ def main():
             Git.fetch(repo_dir)
     else:
         if ':' in args.repo:
-            host, path = args.repo.split(':')
+            repo = args.repo
+            host, path = repo.split(':')
         else:
             host = 'github'
             path = args.repo
+            repo = f'{host}:{path}'
         repo_dir = CODE_ROOT_DIR / host.lower() / path.lower()
         if args.show_dir:
             print(repo_dir)
             sys.exit()
 
         if not repo_dir.exists():
-            Git.clone(args.repo, repo_dir)
+            Git.clone(repo, repo_dir)
 
 
 if __name__ == '__main__':
