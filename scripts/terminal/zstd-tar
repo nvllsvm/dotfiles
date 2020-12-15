@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-set -eu
+set -e
 
 zstd_compress() {
     # -T0 uses number of cores, not threads
@@ -12,20 +12,27 @@ if [ "$1" = '--keep' ]; then
     shift
 fi
 
-if [ $# -ne 1 ]; then
+if [ $# -eq 0 ]; then
+    echo 'usage: zstd-tar [--kee] PATH [PATH..]' >&2
     exit 1
 fi
 
-SOURCE="$(realpath "$1")"
-DEST="$(basename "$SOURCE").tar.zst"
+process() {
+    SOURCE="$(realpath "$1")"
+    DEST="$(basename "$SOURCE").tar.zst"
 
-if [ -f "$SOURCE" ]; then
-    tar cf - -C "$(dirname "$SOURCE")" "$(basename "$SOURCE")" | zstd_compress -o "$DEST"
-elif [ -d "$SOURCE" ]; then
-    find "$SOURCE" -printf '%P\0' | tar cf - -C "$SOURCE" --no-recursion --verbatim-files-from --null -T - | zstd_compress -o "$DEST"
-else
-    exit 1
-fi
-if [ -n "$RM" ]; then
-    rm -rf "$SOURCE"
-fi
+    if [ -f "$SOURCE" ]; then
+        tar cf - -C "$(dirname "$SOURCE")" "$(basename "$SOURCE")" | zstd_compress -o "$DEST"
+    elif [ -d "$SOURCE" ]; then
+        find "$SOURCE" -printf '%P\0' | tar cf - -C "$SOURCE" --no-recursion --verbatim-files-from --null -T - | zstd_compress -o "$DEST"
+    else
+        exit 1
+    fi
+    if [ -n "$RM" ]; then
+        rm -rf "$SOURCE"
+    fi
+}
+
+for path in "$@"; do
+    process "$path"
+done
