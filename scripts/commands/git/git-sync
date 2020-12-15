@@ -51,9 +51,7 @@ def main():
             print(repo_dir)
             sys.exit()
 
-        if repo_dir.exists():
-            Git.fetch(repo_dir)
-        else:
+        if not repo_dir.exists():
             Git.clone(args.repo, repo_dir)
 
 
