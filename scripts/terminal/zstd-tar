@@ -21,6 +21,8 @@ process() {
     SOURCE="$(realpath "$1")"
     DEST="$(basename "$SOURCE").tar.zst"
 
+    echo "Processing $SOURCE"
+
     if [ -f "$SOURCE" ]; then
         tar cf - -C "$(dirname "$SOURCE")" "$(basename "$SOURCE")" | zstd_compress -o "$DEST"
     elif [ -d "$SOURCE" ]; then
