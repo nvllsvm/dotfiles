@@ -19,6 +19,7 @@ else
         application/x-iso9660-image|\
         application/x-rar|\
         application/x-tar|\
+        application/x-zstd-compressed-tar|\
         application/zip|\
         application/zstd)
             extract -l -- "$1"
