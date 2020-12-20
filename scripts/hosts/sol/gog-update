@@ -24,7 +24,6 @@ def run_lgogdownloader():
     subprocess.run(
         ['podman', 'run',
          '--rm',
-         '--quiet',
          '-e', 'HOME',
          '-v', f'{GOG_DIR}:/downloads',
          '-v', f'{CACHE_DIR}:/cache',
