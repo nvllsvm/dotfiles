@@ -6,6 +6,7 @@ import json
 import pathlib
 import sys
 
+# package: python-magic
 import magic
 
 MIME_SUFFIXES = {
