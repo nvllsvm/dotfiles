@@ -6,7 +6,7 @@ icons = "awesome"
 EOF
 
 case "$(hostname)" in
-    phobos)
+    deimos|phobos)
         cat >> "$CONF" << EOF
 [[block]]
 block = "battery"
