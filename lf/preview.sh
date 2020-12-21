@@ -16,6 +16,7 @@ else
         application/x-7z-compressed|\
         application/x-cd-image|\
         application/x-compressed-tar|\
+        application/x-dosexec|\
         application/x-iso9660-image|\
         application/x-rar|\
         application/x-tar|\

@@ -328,8 +328,8 @@ class innoextract:
             check=True)
 
         contents = []
-        for line in proc.stdout.decode().splitlines():
-            _, name, _ = line.split('"', 2)
+        for line in proc.stdout.splitlines():
+            _, name, _ = line.split(b'"', 2)
             contents.append(name)
         return contents
 

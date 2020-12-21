@@ -41,7 +41,7 @@ def main():
         files.update(all_files(path))
 
     by_size = collections.defaultdict(set)
-    for path in files:
+    for path in sorted(files):
         by_size[path.stat().st_size].add(path)
 
     hashes = collections.defaultdict(set)
