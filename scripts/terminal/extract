@@ -360,7 +360,7 @@ class gog_linux:
             for zi in zf.infolist():
                 if target := cls._local_target(zi):
                     contents.add(target)
-            return sorted(contents)
+            return sorted(c.encode() for c in contents)
 
     @classmethod
     def extract(cls, path, dest, password=None, overwrite=False):

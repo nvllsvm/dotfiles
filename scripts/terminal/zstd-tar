@@ -1,6 +1,17 @@
 #!/usr/bin/env sh
 set -e
 
+show_help() {
+    cat << EOF
+usage: zstd-tar [OPTIONS] PATH [PATH..]
+
+arguments:
+    --fast      compression level 3 (default 22)
+    --help      show help and exit
+    --keep      do not remove source files after successful archiving
+EOF
+}
+
 zstd_compress() {
     # -T0 uses number of cores, not threads
     if [ -n "$FAST" ]; then
@@ -23,13 +34,18 @@ while [ $# -gt 0 ]; do
             FAST=1
             shift
             ;;
+        --help)
+            show_help
+            exit
+            ;;
         *)
             break
     esac
 done
 
 if [ $# -eq 0 ]; then
-    echo 'usage: zstd-tar [--kee] PATH [PATH..]' >&2
+    show_help >&2
+    echo "\nerror: no path specified" >&2
     exit 1
 fi
 
