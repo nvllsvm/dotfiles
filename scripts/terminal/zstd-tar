@@ -3,14 +3,30 @@ set -e
 
 zstd_compress() {
     # -T0 uses number of cores, not threads
-    zstd -f "-T$(nproc)" --ultra -22 "$@"
+    if [ -n "$FAST" ]; then
+        LEVEL=3
+    else
+        LEVEL=22
+    fi
+    zstd -f "-T$(nproc)" --ultra "-${LEVEL}" "$@"
 }
 
 RM=1
-if [ "$1" = '--keep' ]; then
-    RM=
-    shift
-fi
+FAST=
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --keep)
+            RM=
+            shift
+            ;;
+        --fast)
+            FAST=1
+            shift
+            ;;
+        *)
+            break
+    esac
+done
 
 if [ $# -eq 0 ]; then
     echo 'usage: zstd-tar [--kee] PATH [PATH..]' >&2

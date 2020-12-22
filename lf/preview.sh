@@ -13,11 +13,13 @@ else
         application/epub+zip|\
         application/gzip|\
         application/java-archive|\
+        application/vnd.rar|\
         application/x-7z-compressed|\
         application/x-cd-image|\
         application/x-compressed-tar|\
         application/x-dosexec|\
         application/x-iso9660-image|\
+        application/x-ms-dos-executable|\
         application/x-rar|\
         application/x-tar|\
         application/x-zstd-compressed-tar|\

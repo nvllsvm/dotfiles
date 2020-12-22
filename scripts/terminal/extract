@@ -672,7 +672,7 @@ def _get_class(path):
             return lz4
         # gzip
         elif start.startswith(b'\x1f\x8b'):
-            if suffixes[-2:] == ['.tar', '.gz']:
+            if suffixes[-2] == '.tar':
                 return gnu_tar
             else:
                 try:
@@ -682,13 +682,13 @@ def _get_class(path):
                     return gzip
         # xz
         elif start.startswith(b'\xfd7zXZ\x00'):
-            if suffixes[-2:] == ['.tar', '.xz']:
+            if suffixes[-2:] == '.tar':
                 return gnu_tar
             else:
                 return xz
         # zstandard
         elif start.startswith(b'(\xb5/\xfd'):
-            if suffixes[-2:] == ['.tar', '.zst']:
+            if suffixes[-2] == '.tar':
                 return gnu_tar
             else:
                 return zstd
@@ -701,6 +701,14 @@ def _get_class(path):
                 return innoextract
             except Exception:
                 pass
+
+            unzip.check()
+            try:
+                unzip.contents(path)
+                return unzip
+            except Exception:
+                pass
+
         # iso9660 image
         elif start.startswith(b'CD001'):
             return udisksctl
