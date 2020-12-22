@@ -13,12 +13,12 @@ EOF
 }
 
 zstd_compress() {
-    # -T0 uses number of cores, not threads
     if [ -n "$FAST" ]; then
         LEVEL=3
     else
         LEVEL=22
     fi
+    # use nproc since -T0 uses number of cores, not threads
     zstd -f "-T$(nproc)" --ultra "-${LEVEL}" "$@"
 }
 
