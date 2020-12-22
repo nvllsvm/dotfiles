@@ -22,6 +22,24 @@ zstd_compress() {
     zstd -f "-T$(nproc)" --ultra "-${LEVEL}" "$@"
 }
 
+process() {
+    SOURCE="$(realpath "$1")"
+    DEST="$(basename "$SOURCE").tar.zst"
+
+    echo "Processing $SOURCE"
+
+    if [ -f "$SOURCE" ]; then
+        tar cf - -C "$(dirname "$SOURCE")" "$(basename "$SOURCE")" | zstd_compress -o "$DEST"
+    elif [ -d "$SOURCE" ]; then
+        find "$SOURCE" -printf '%P\0' | tar cf - -C "$SOURCE" --no-recursion --verbatim-files-from --null -T - | zstd_compress -o "$DEST"
+    else
+        exit 1
+    fi
+    if [ -n "$RM" ]; then
+        rm -rf "$SOURCE"
+    fi
+}
+
 RM=1
 FAST=
 while [ $# -gt 0 ]; do
@@ -45,27 +63,9 @@ done
 
 if [ $# -eq 0 ]; then
     show_help >&2
-    echo "\nerror: no path specified" >&2
+    printf '\nerror: no path specified\n' >&2
     exit 1
 fi
-
-process() {
-    SOURCE="$(realpath "$1")"
-    DEST="$(basename "$SOURCE").tar.zst"
-
-    echo "Processing $SOURCE"
-
-    if [ -f "$SOURCE" ]; then
-        tar cf - -C "$(dirname "$SOURCE")" "$(basename "$SOURCE")" | zstd_compress -o "$DEST"
-    elif [ -d "$SOURCE" ]; then
-        find "$SOURCE" -printf '%P\0' | tar cf - -C "$SOURCE" --no-recursion --verbatim-files-from --null -T - | zstd_compress -o "$DEST"
-    else
-        exit 1
-    fi
-    if [ -n "$RM" ]; then
-        rm -rf "$SOURCE"
-    fi
-}
 
 for path in "$@"; do
     process "$path"
