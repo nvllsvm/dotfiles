@@ -1,5 +1,11 @@
 #!/usr/bin/env sh
 set -e
+default_preview() {
+    # set line count to avoid unnecessary page length.
+    # 1024 is overkill, but using $(tput lines) is not reliable.
+    bat -r :1024 --color=always --plain -- "$1"
+}
+
 if [ -d "$1" ]; then
     cd "$1" || exit 1
     fd --color=always --maxdepth=1
@@ -27,6 +33,10 @@ else
         application/zstd)
             extract -l -- "$1"
             ;;
+        audio/x-mod)
+            # xdg-mime reports go.mod files as this
+            default_preview "$1"
+            ;;
         audio/*|\
         video/*)
             ffprobe -hide_banner -- "$1" 2>&1
@@ -37,8 +47,6 @@ else
             echo "${output#*"$1" }"
             ;;
         *)
-            # set line count to avoid unnecessary page length.
-            # 1024 is overkill, but using $(tput lines) is not reliable.
-            bat -r :1024 --color=always --plain -- "$1"
+            default_preview "$1"
     esac
 fi
