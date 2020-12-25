@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # - trims leading+trailing whitespace from input strings
 # - perform multiple base64 decode passes for nested encoding
+# - use clipboard if no arguments
 import base64
 import sys
 import subprocess
