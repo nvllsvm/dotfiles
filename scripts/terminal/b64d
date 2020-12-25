@@ -1,0 +1,36 @@
+#!/usr/bin/env python
+# - trims leading+trailing whitespace from input strings
+# - perform multiple base64 decode passes for nested encoding
+import base64
+import sys
+import subprocess
+
+
+def maybe_base64_decode(value):
+    try:
+        while True:
+            if not value:
+                return value
+            value = base64.b64decode(value)
+    except Exception:
+        return value
+
+
+if len(sys.argv) == 1:
+    proc = subprocess.run(
+        ['cbpaste'],
+        stdout=subprocess.PIPE,
+        check=True)
+    data = proc.stdout.decode()
+elif len(sys.argv) == 2:
+    data = sys.argv[1]
+else:
+    raise NotImplementedError
+
+data = data.strip().encode()
+
+result = maybe_base64_decode(data)
+if result == data:
+    raise ValueError('cannot decode')
+
+sys.stdout.buffer.write(result)
