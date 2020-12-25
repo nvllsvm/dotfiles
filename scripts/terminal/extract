@@ -106,6 +106,7 @@ class udisksctl:
                 mount_path = pathlib.Path(mount_path)
                 shutil.copytree(mount_path, dest, dirs_exist_ok=True)
 
+        dest.chmod(0o755)
         for path in cls._child_paths(dest):
             if path.is_dir():
                 path.chmod(0o755)
