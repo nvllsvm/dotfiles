@@ -668,7 +668,9 @@ def _get_class(path):
             return lz4
         # gzip
         elif start.startswith(b'\x1f\x8b'):
-            if suffixes[-2] == '.tar':
+            if suffixes[-1] == '.tgz':
+                return gnu_tar
+            elif suffixes[-2] == '.tar':
                 return gnu_tar
             else:
                 try:
