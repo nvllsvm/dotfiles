@@ -32,10 +32,23 @@ MIME_SUFFIXES = {
         '.jpeg',
         '.jpg',
     ],
+    'image/tiff': [
+        '.tiff',
+    ],
     'image/webp': [
         '.webp',
     ],
+    'image/x-canon-cr2': [
+        '.cr2',
+    ],
+    'video/3gpp': [
+        '.3gp',
+    ],
+    'video/mp4': [
+        '.mp4',
+    ],
 }
+
 
 ALL_SUFFIXES = set(itertools.chain(*[v for v in MIME_SUFFIXES.values()]))
 
