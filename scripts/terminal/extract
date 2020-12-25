@@ -103,19 +103,14 @@ class udisksctl:
 
         with cls._loop_context(path) as device:
             with cls._mount_context(device) as mount_path:
-                # shutil.copytree undesirably copies the read-only attributes
-                # from the mount point.
                 mount_path = pathlib.Path(mount_path)
-                stack = [mount_path]
-                while stack:
-                    for path in stack.pop().iterdir():
-                        target = dest.joinpath(path.relative_to(mount_path))
-                        if path.is_dir():
-                            target.mkdir(parents=True, exist_ok=True)
-                            stack.append(path)
-                        else:
-                            target.parent.mkdir(parents=True, exist_ok=True)
-                            shutil.copyfile(path, target)
+                shutil.copytree(mount_path, dest, dirs_exist_ok=True)
+
+        for path in cls._child_paths(dest):
+            if path.is_dir():
+                path.chmod(0o755)
+            else:
+                path.chmod(0o644)
 
     @staticmethod
     def volumes(path, password=''):
