@@ -40,8 +40,9 @@ class p7zip:
             stdout=subprocess.PIPE,
             check=True
         )
+        # strip date+time as they may blank
         return [
-            line.split(maxsplit=5)[-1]
+            line[20:].split(maxsplit=3)[-1]
             for line in proc.stdout.splitlines()
         ]
 
