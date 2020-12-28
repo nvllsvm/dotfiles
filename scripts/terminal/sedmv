@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
+set -eu
 pattern="$1"
 shift
 for f in "$@"; do
