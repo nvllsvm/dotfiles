@@ -1,7 +1,25 @@
 set hidden
 map <c-n> :set relativenumber!
-map <tab> :set nopreview; set ratios 1
-map w
 set previewer ~/.config/lf/preview.sh
 map i $~/.config/lf/preview.sh $f | less -R
+
+# working dir - blue
+# selected file - white
 set promptfmt "\033[34;1m%w\033[0m\033[1m%f\033[0m"
+
+# by default, w starts a shell as a child of lf.
+# unbind it as zsh's cd integration should be preferred.
+map w
+
+# preview toggle
+cmd showpreview &{{
+    lf -remote "send $id set ratios 1:2:3"
+    lf -remote "send $id set preview"
+    lf -remote "send $id map <tab> nopreview"
+}}
+cmd nopreview &{{
+    lf -remote "send $id set nopreview"
+    lf -remote "send $id set ratios 1"
+    lf -remote "send $id map <tab> showpreview"
+}}
+map <tab> nopreview
