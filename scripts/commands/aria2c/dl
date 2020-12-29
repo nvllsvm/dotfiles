@@ -1,2 +1,11 @@
 #!/usr/bin/env sh
-aria2c -x 16 -j 20 --split 20 "$@"
+download() {
+    aria2c -x 16 -j 20 --split 20 "$@"
+}
+if [ $# -eq 0 ]; then
+    download "$(cbpaste)"
+else
+    for link in "$@"; do
+        download "$link"
+    done
+fi
