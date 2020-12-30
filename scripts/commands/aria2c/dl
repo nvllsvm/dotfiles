@@ -1,6 +1,17 @@
 #!/usr/bin/env sh
 download() {
-    aria2c -x 16 -j 20 --split 20 "$@"
+    case "$1" in
+        https://www.youtube.com*|\
+        https://youtube.com*)
+            youtube-dl "$1"
+            ;;
+        magnet:*|\
+        *torrent)
+            torrent "$1"
+            ;;
+        *)
+            aria2c -x 16 -j 20 --split 20 "$@"
+    esac
 }
 if [ $# -eq 0 ]; then
     download "$(cbpaste)"
