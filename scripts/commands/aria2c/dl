@@ -5,10 +5,6 @@ download() {
         https://youtube.com*)
             youtube-dl "$1"
             ;;
-        magnet:*|\
-        *torrent)
-            torrent "$1"
-            ;;
         *)
             aria2c -x 16 -j 20 --split 20 "$@"
     esac
