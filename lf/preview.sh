@@ -19,6 +19,7 @@ else
         application/epub+zip|\
         application/gzip|\
         application/java-archive|\
+        application/vnd.comicbook+zip|\
         application/vnd.rar|\
         application/x-7z-compressed|\
         application/x-cd-image|\
