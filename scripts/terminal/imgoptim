@@ -115,8 +115,10 @@ def _sigint_handler(*_):
 async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-s', '--strip', action='store_true')
-    parser.add_argument('-m', '--mime', action='append', default=[],
-                        choices=['image/gif', 'image/jpeg', 'image/png'])
+    parser.add_argument(
+        '--mime', action='append', default=[],
+        choices=['image/gif', 'image/jpeg', 'image/png'],
+        help='mimetypes to process. may be specified more than once.')
     parser.add_argument('path', nargs='+', type=pathlib.Path)
     args = parser.parse_args()
 
