@@ -115,6 +115,8 @@ def _sigint_handler(*_):
 async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-s', '--strip', action='store_true')
+    parser.add_argument('-m', '--mime', action='append', default=[],
+                        choices=['image/gif', 'image/jpeg', 'image/png'])
     parser.add_argument('path', nargs='+', type=pathlib.Path)
     args = parser.parse_args()
 
@@ -132,6 +134,9 @@ async def main():
             mimetype = determine_mime(f)
         except (FileNotFoundError, IsADirectoryError):
             # broken symlink can cause this
+            continue
+
+        if args.mime and mimetype not in args.mime:
             continue
 
         if func := _MIME_OPTIMIZATIONS.get(mimetype):
