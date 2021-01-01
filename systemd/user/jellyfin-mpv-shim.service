@@ -1,0 +1,9 @@
+[Unit]
+Description=jellyfin-mpv-shim
+
+[Service]
+ExecStart=/usr/bin/jellyfin-mpv-shim
+SyslogIdentifier=jellyfin-mpv-shim
+
+[Install]
+WantedBy=default.target
