@@ -5,13 +5,20 @@ BOOT=/boot
 ROOT_DEV="$(findmnt -o SOURCE -n "$BOOT")"
 ROOT_UUID="$(lsblk -dno UUID "$ROOT_DEV")"
 
-rm -rf \
-    "$BOOT/arch" \
-    "$BOOT/shellx64.efi"
+TMPDIR=""
+cleanup() {
+    umount -f --lazy "$TMPDIR" || true
+    rm -rf "$TMPDIR" || true
+}
+trap cleanup EXIT INT TERM
 
-7z x -ba -o"$BOOT" "$1" \
-    arch \
-    shellx64.efi
+TMPDIR="$(mktemp -d)"
+mount -o loop "$ISO" "$TMPDIR"
+
+for f in arch shellx64.efi; do
+    rm -rf "${BOOT:?}/${f}"
+    cp -r "${TMPDIR}/${f}" "${BOOT}/${f}"
+done
 
 cat > "$BOOT/loader/entries/arch_install.conf" << EOF
 title   Arch Linux install medium (x86_64, UEFI)
