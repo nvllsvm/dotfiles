@@ -3,6 +3,7 @@ import argparse
 import pathlib
 import subprocess
 import sys
+import urllib.parse
 
 CODE_ROOT_DIR = pathlib.Path('~/code').expanduser()
 
@@ -44,19 +45,32 @@ def main():
             print(repo_dir)
             Git.fetch(repo_dir)
     else:
-        if ':' in args.repo:
-            repo = args.repo
-            host, path = repo.split(':')
+        parsed = urllib.parse.urlparse(args.repo)
+        if parsed.scheme in ('http', 'https'):
+            # TODO: parse .ssh/config for HostName
+            if parsed.netloc in ('www.github.com', 'github.com'):
+                host = 'github'
+            else:
+                raise NotImplementedError(f'unhandled netloc: {parsed.netloc}')
+        elif parsed.scheme:
+            host = parsed.scheme
         else:
             host = 'github'
-            path = args.repo
-            repo = f'{host}:{path}'
+
+        path = parsed.path.strip('/')
+        if host == 'github':
+            parts = path.split('/')
+            if len(parts) < 2:
+                raise RuntimeError('invalid github url')
+            path = '/'.join(parts[0:2])
+
         repo_dir = CODE_ROOT_DIR / host.lower() / path.lower()
         if args.show_dir:
             print(repo_dir)
             sys.exit()
 
         if not repo_dir.exists():
+            repo = f'{host}:{path}'
             Git.clone(repo, repo_dir)
 
 
