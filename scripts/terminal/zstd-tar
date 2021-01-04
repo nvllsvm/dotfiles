@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 set -e
 
 show_help() {
@@ -9,6 +9,7 @@ arguments:
     --fast      compression level 3 (default 22)
     --help      show help and exit
     --keep      do not remove source files after successful archiving
+    -n NUM      number to process in parallel
 EOF
 }
 
@@ -39,9 +40,9 @@ process() {
         rm -rf "$SOURCE"
     fi
 }
-
 RM=1
 FAST=
+PARALLEL=
 while [ $# -gt 0 ]; do
     case "$1" in
         --keep)
@@ -56,6 +57,11 @@ while [ $# -gt 0 ]; do
             show_help
             exit
             ;;
+        -n)
+            PARALELL="$2"
+            shift
+            shift
+            ;;
         *)
             break
     esac
@@ -67,6 +73,11 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
-for path in "$@"; do
-    process "$path"
-done
+if [ -n "$PARALELL" ]; then
+    env_parallel.bash
+    printf '%s\0' "$@" | env_parallel -0 -P "$PARALLEL" process
+else
+    for path in "$@"; do
+        process "$path"
+    done
+fi
