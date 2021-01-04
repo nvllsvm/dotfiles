@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 set -e
 
 show_help() {
@@ -14,7 +14,7 @@ EOF
 }
 
 zstd_compress() {
-    if [ -n "$FAST" ]; then
+    if [ "$ZSTD_TAR_FAST" = '1' ]; then
         LEVEL=3
     else
         LEVEL=22
@@ -36,21 +36,21 @@ process() {
     else
         exit 1
     fi
-    if [ -n "$RM" ]; then
+    if [ "$ZSTD_TAR_RM" = '1' ]; then
         rm -rf "$SOURCE"
     fi
 }
-RM=1
-FAST=
+ZSTD_TAR_RM="${ZSTD_TAR_RM:-1}"
+ZSTD_TAR_FAST="${ZSTD_TAR_FAST:-0}"
 PARALLEL=
 while [ $# -gt 0 ]; do
     case "$1" in
         --keep)
-            RM=
+            ZSTD_TAR_RM=0
             shift
             ;;
         --fast)
-            FAST=1
+            ZSTD_TAR_FAST=1
             shift
             ;;
         --help)
@@ -58,7 +58,7 @@ while [ $# -gt 0 ]; do
             exit
             ;;
         -n)
-            PARALELL="$2"
+            PARALLEL="$2"
             shift
             shift
             ;;
@@ -66,6 +66,8 @@ while [ $# -gt 0 ]; do
             break
     esac
 done
+export ZSTD_TAR_RM
+export ZSTD_TAR_FAST
 
 if [ $# -eq 0 ]; then
     show_help >&2
@@ -73,9 +75,8 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
-if [ -n "$PARALELL" ]; then
-    env_parallel.bash
-    printf '%s\0' "$@" | env_parallel -0 -P "$PARALLEL" process
+if [ -n "$PARALLEL" ]; then
+    printf '%s\0' "$@" | parallel -0 -P "$PARALLEL" zstd-tar
 else
     for path in "$@"; do
         process "$path"
