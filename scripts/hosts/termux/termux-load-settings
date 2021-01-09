@@ -5,7 +5,7 @@ restore_default() {
 
 trap restore_default EXIT INT TERM
 
-if [ $# -eq 1 ]; then
+if [ -f "$1" ]; then
     ln -sf "$1" ~/.termux/termux.properties
 fi
 
