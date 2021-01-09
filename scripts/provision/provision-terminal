@@ -76,30 +76,21 @@ if [[ $osname == Linux* ]]; then
             #lf \
         yay -Syu --needed --noconfirm \
             aria2 \
-            aspell-en \
             bind-tools \
-            buildah \
             dash \
-            direnv \
             fd \
-            fuse2 \
             fzf \
             htop \
-            intel-ucode \
             jq \
             moreutils \
             neovim \
             openssh \
             p7zip \
             pkgfile \
-            podman \
             python \
-            reflector \
             ripgrep \
             rsync \
             shellcheck \
-            sshfs \
-            sshuttle \
             tmux \
             tmux-xpanes
     fi
