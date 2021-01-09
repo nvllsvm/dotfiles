@@ -112,11 +112,7 @@ autocmd! BufWritePost * Neomake
 autocmd BufWritePost * call system("lmk")
 
 let base16colorspace=256
-if !empty(glob("~/.base16_theme"))
-    execute "colorscheme " . system("basename $(readlink ~/.base16_theme) .sh")
-else
-    colorscheme base16-default-dark
-endif
+colorscheme base16-default-dark
 
 inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
 function! s:my_cr_function() abort
