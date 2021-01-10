@@ -303,6 +303,58 @@ class unrar:
         ]
 
 
+class unace:
+    @staticmethod
+    @functools.lru_cache()
+    def check():
+        if not shutil.which('unace'):
+            raise KeyError
+
+    @staticmethod
+    def contents(path):
+        proc = subprocess.run(
+            ['unace', 'l', path],
+            stdout=subprocess.PIPE,
+            check=True)
+
+        magic_string = b'Date    Time     Packed      Size  Ratio  File'
+        lines = None
+        for line in proc.stdout.splitlines():
+            line = line.strip()
+            if lines is not None:
+                lines.append(line)
+            elif line.startswith(magic_string):
+                lines = []
+
+        if lines[-1].startswith(b'listed:'):
+            lines = lines[:-1]
+        else:
+            raise RuntimeError('unable to parse unace output')
+
+        return sorted(set(
+            line.split(maxsplit=5)[-1]
+            for line in lines
+            if line
+        ))
+
+    @staticmethod
+    def extract(path, dest, password=None, overwrite=False):
+        args = ['unace', 'e']
+        if overwrite:
+            args.append('-o')
+        if password:
+            raise NotImplementedError
+        dest = str(dest)
+        if not dest.endswith('/'):
+            dest += '/'
+        args.extend([path, dest])
+        subprocess.run(args, check=True)
+
+    @staticmethod
+    def volumes(path, password=''):
+        return [path]
+
+
 class innoextract:
     @staticmethod
     @functools.lru_cache()
@@ -722,6 +774,9 @@ def _get_class(path):
     # ffs - brotli doesn't have a file signature
     if suffix == '.br':
         return brotli
+    # unable to find magic number
+    elif suffix == '.ace':
+        return unace
     # bchunk generates zero-prefixed iso
     elif suffix in ('.iso', '.img'):
         return udisksctl

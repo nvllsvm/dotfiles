@@ -22,6 +22,7 @@ else
         application/vnd.comicbook+zip|\
         application/vnd.rar|\
         application/x-7z-compressed|\
+        application/x-ace|\
         application/x-cd-image|\
         application/x-compressed-tar|\
         application/x-dosexec|\
