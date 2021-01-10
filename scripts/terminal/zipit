@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+source="$1"
+target="$(basename "$source")".zip
+
+if [ -d "$source" ]; then
+    cd "$source" || exit 1
+    zip "$target" -r .
+    mv "$target" ..
+    cd ..
+    rm -r "$source"
+else
+    zip "$target" "$source"
+    rm "$source"
+fi
