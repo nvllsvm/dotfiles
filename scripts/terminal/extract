@@ -304,6 +304,8 @@ class unrar:
 
 
 class unace:
+    # note: unace command seems to expect file to end with `.ace`
+
     @staticmethod
     @functools.lru_cache()
     def check():
