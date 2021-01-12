@@ -6,6 +6,7 @@ import concurrent.futures
 import configparser
 import contextlib
 import datetime
+import difflib
 import distutils
 import distutils.util
 import enum
