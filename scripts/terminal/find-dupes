@@ -38,7 +38,11 @@ def main():
 
     files = set()
     for path in args.path:
-        files.update(all_files(path))
+        path = pathlib.Path(path)
+        if path.is_dir():
+            files.update(all_files(path))
+        else:
+            files.add(path)
 
     by_size = collections.defaultdict(set)
     for path in sorted(files):
