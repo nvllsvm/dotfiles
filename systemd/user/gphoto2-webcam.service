@@ -1,6 +1,0 @@
-[Unit]
-Description=Run gphoto2-webcam
-
-[Service]
-ExecStart=/bin/sh -c 'gphoto2 --stdout --capture-movie | ffmpeg -hide_banner -loglevel quiet -i - -vcodec rawvideo -pix_fmt yuv420p -threads 0 -f v4l2 /dev/video1'
-SyslogIdentifier=gphoto2-webcam
