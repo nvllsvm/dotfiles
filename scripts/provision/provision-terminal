@@ -17,7 +17,7 @@ link_file() {
 
 zsh_command() {
     echo -e "\033[1;33mNow running $@ \033[0m..."
-    zsh -c "$@"
+    "$@"
 }
 
 mkdir -p ~/.config
@@ -105,12 +105,11 @@ if [[ $osname == Darwin* ]]; then
     zsh_command '$DOTFILES/scripts/commands/pyenv/pyenv-update'
     zsh_command 'pyenv global 3.7.3'
 fi
-zsh_command '$DOTFILES/scripts/commands/pip/pip-update'
+
+full-update
 
 pip install flake8
 pip install speedtest-cli
-
-zsh_command nvim-update
 
 if [ "$(hostname)" = 'sol' ]; then
     link_file systemd ~/.config/systemd
