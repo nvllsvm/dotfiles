@@ -99,6 +99,23 @@ def pyenv_bin(version):
     return proc.stdout.decode().strip()
 
 
+ENVRC = """\
+if ! [ -f "{activate_path}" ]; then
+    echo "error: must reset virtualenv" >&2
+    exit 1
+fi
+
+. "{activate_path}"
+
+# prevent direnv from warning about prompt export failure
+unset PS1
+
+# export PIP_USER even though it's disabled in pip.conf.
+# tox doesn't seem to respect the venv's pip.conf
+export PIP_USER=0
+"""
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--prune', action=_PruneAction)
@@ -154,18 +171,7 @@ def main():
 
     env_folder.joinpath('.parent').symlink_to(cwd)
     activate_path = shlex.quote(str(env_folder.joinpath('bin/activate')))
-    cwd_envrc.write_text('\n'.join([
-        f'if ! [ -f {activate_path} ]; then',
-        '    echo "error: must reset virtualenv" >&2',
-        '    exit 1',
-        'fi',
-        f'. {activate_path}',
-        "# prevent direnv from warning about prompt export failure",
-        "unset PS1",
-        "# export PIP_USER even though it's disabled in pip.conf",
-        "# tox doesn't seem to respect the venv's pip.conf",
-        "export PIP_USER=0\n"
-    ]))
+    cwd_envrc.write_text(ENVRC.format(activate_path=activate_path))
     shutil.copyfile(cwd_envrc, env_folder.joinpath('.envrc'))
     env_folder.joinpath('pip.conf').write_text('[global]\nuser = false')
 
