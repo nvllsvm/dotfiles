@@ -2,3 +2,4 @@
 set-desktop-themes --dpi 96 --large
 paswitch "$(pactl list sinks | grep .hdmi-surround$ | awk '{print $2}')"
 picom -b
+systemctl start --user xow.service
