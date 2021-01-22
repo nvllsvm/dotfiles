@@ -1,3 +1,4 @@
 #!/usr/bin/env sh
 set-desktop-themes --dpi 96 --large
-paswitch 'alsa_output.pci-0000_0c_00.1.hdmi-stereo-extra4'
+paswitch "$(pactl list sinks | grep .hdmi-surround$ | awk '{print $2}')"
+picom -b
