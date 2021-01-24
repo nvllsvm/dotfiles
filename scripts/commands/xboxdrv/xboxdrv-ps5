@@ -1,0 +1,33 @@
+#!/usr/bin/env sh
+DEV_ID="$(grep -Pzo '.*Vendor=054c Product=0ce6(.*\n)*' /proc/bus/input/devices | grep --text -m 1 event | tr '=' ' ' | awk '{print $3}')"
+if [ -z "$DEV_ID" ]; then
+    echo 'error: no device found' >&2
+    exit 1
+fi
+EVDEV="/dev/input/${DEV_ID}"
+exec xboxdrv \
+    --verbose \
+    --evdev "$EVDEV" \
+    --evdev-absmap ABS_HAT0X=DPAD_X \
+    --evdev-absmap ABS_HAT0Y=DPAD_Y \
+    --evdev-absmap ABS_RX=X2 \
+    --evdev-absmap ABS_RY=Y2 \
+    --evdev-absmap ABS_RZ=RT \
+    --evdev-absmap ABS_X=X1 \
+    --evdev-absmap ABS_Y=Y1 \
+    --evdev-absmap ABS_Z=LT \
+    --evdev-keymap BTN_EAST=B \
+    --evdev-keymap BTN_MODE=GUIDE \
+    --evdev-keymap BTN_NORTH=Y \
+    --evdev-keymap BTN_SELECT=BACK \
+    --evdev-keymap BTN_SOUTH=A \
+    --evdev-keymap BTN_START=START \
+    --evdev-keymap BTN_THUMBL=TL \
+    --evdev-keymap BTN_THUMBR=TR \
+    --evdev-keymap BTN_TL=LB \
+    --evdev-keymap BTN_TR=RB \
+    --evdev-keymap BTN_WEST=X \
+    --axismap -Y1=Y1 \
+    --axismap -Y2=Y2 \
+    --mimic-xpad \
+    "$@"
