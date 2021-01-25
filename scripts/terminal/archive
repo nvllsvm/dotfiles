@@ -1,0 +1,141 @@
+#!/usr/bin/env python3
+# TODO write to temp file
+# TODO parallel processing
+import argparse
+import pathlib
+import shutil
+import subprocess
+
+
+def _all_paths(root):
+    stack = [root]
+    paths = {root}
+    while stack:
+        for path in stack.pop().iterdir():
+            paths.add(path)
+            if path.is_dir():
+                stack.append(path)
+    return paths
+
+
+def create_zip(paths, dest, cwd):
+    proc = subprocess.Popen(
+        ['zip',
+         '-9',  # maximum compression
+         '-nw',  # treat wildcards as regular characters
+         '-@',  # read paths from stdin
+         dest],
+        cwd=cwd,
+        stdin=subprocess.PIPE)
+    proc.communicate(b'\n'.join(bytes(p) for p in paths))
+    proc.wait()
+    if proc.returncode != 0:
+        raise RuntimeError('exit code {proc.returncode}')
+    optimize_zip(dest)
+
+
+def create_epub(paths, dest, cwd):
+    def _path_rank(x):
+        if x == 'mimetype':
+            rank = 0
+        elif x.startswith('META-INF/') or x == 'META-INF':
+            rank = 1
+        elif x.startswith('OEBPS/') or x == 'OEBPS':
+            rank = 2
+        else:
+            rank = 3
+        return rank, x
+
+    paths = sorted(
+        (str(path.relative_to(cwd)) for path in paths),
+        key=_path_rank
+    )
+
+    proc = subprocess.Popen(
+        ['zip',
+         '-9',  # maximum compression
+         '-nw',  # treat wildcards as regular characters
+         '-X',  # prevents EpubCheck error
+         '-@',  # read paths from stdin
+         dest],
+        cwd=cwd,
+        stdin=subprocess.PIPE)
+    proc.communicate(b'\n'.join(p.encode() for p in paths))
+    proc.wait()
+    if proc.returncode != 0:
+        raise RuntimeError('exit code {proc.returncode}')
+    optimize_zip(dest)
+
+
+def create_zstd_tar(paths, dest, cwd):
+    tar_proc = subprocess.Popen(
+        ['tar', 'cf', '-', '-C', cwd, '--no-recursion',
+         '--verbatim-files-from', '--null', '-T', '-'],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE)
+    zstd_proc = subprocess.Popen(
+        ['zstd', '-f', '-T32', '--ultra', '-22', '-o', dest],
+        stdin=tar_proc.stdout)
+    tar_proc.stdin.write(b'\0'.join(
+        bytes(p.relative_to(cwd))
+        for p in paths
+        if p != cwd
+    ))
+    tar_proc.stdin.close()
+    tar_proc.wait()
+    zstd_proc.wait()
+    assert tar_proc.returncode == zstd_proc.returncode == 0
+
+
+def optimize_zip(path):
+    subprocess.run(
+        ['advzip', '--recompress', '--iter=20', '--shrink-insane', path],
+        check=True)
+
+
+_formats = {
+    'epub': {
+        'func': create_epub,
+        'suffix': '.epub',
+    },
+    'zip': {
+        'func': create_zip,
+        'suffix': '.zip',
+    },
+    'zstd-tar': {
+        'func': create_zstd_tar,
+        'suffix': '.tar.zst'
+    },
+}
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--rm', default=False, action='store_true')
+    parser.add_argument('-f', '--format', choices=_formats, default='zstd-tar')
+    parser.add_argument('--suffix')
+    parser.add_argument('--fast', default=False, action='store_true')
+    parser.add_argument('source', type=pathlib.Path, nargs='+')
+    args = parser.parse_args()
+
+    for source in args.source:
+        source = source.absolute()
+
+        if source.is_dir():
+            cwd = source
+            paths = _all_paths(source)
+        else:
+            cwd = source.parent
+            paths = [source]
+
+        f = _formats[args.format]
+        suffix = args.suffix or f['suffix']
+
+        dest = str(pathlib.Path(source.name).absolute()) + suffix
+        f['func'](paths, dest, cwd)
+        if args.rm:
+            shutil.rmtree(source)
+
+
+if __name__ == '__main__':
+    main()
