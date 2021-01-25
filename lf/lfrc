@@ -5,7 +5,7 @@ map i $~/.config/lf/preview.sh $f | less -R
 
 # working dir - blue
 # selected file - white
-set promptfmt "\033[34;1m%w\033[0m\033[1m%f\033[0m"
+set promptfmt "\033[34;1m%w/\033[0m\033[1m%f\033[0m"
 
 # by default, w starts a shell as a child of lf.
 # unbind it as zsh's cd integration should be preferred.

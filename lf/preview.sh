@@ -20,6 +20,7 @@ else
         application/gzip|\
         application/java-archive|\
         application/vnd.comicbook+zip|\
+        application/vnd.ms-cab-compressed|\
         application/vnd.rar|\
         application/x-7z-compressed|\
         application/x-ace|\
