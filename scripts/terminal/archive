@@ -117,7 +117,7 @@ def create_zstd_tar(paths, dest, cwd):
 
 def optimize_zip(path):
     subprocess.run(
-        ['advzip', '--recompress', '--iter=20', '--shrink-insane', path],
+        ['advzip', '--recompress', '--shrink-insane', path],
         check=True)
 
 
