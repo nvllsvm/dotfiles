@@ -102,7 +102,7 @@ def create_zstd_tar(paths, dest, cwd):
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE)
     zstd_proc = subprocess.Popen(
-        ['zstd', '-f', '-T32', '--ultra', '-22', '-o', dest],
+        ['zstd', '-f', '-T0', '--ultra', '-22', '-o', dest],
         stdin=tar_proc.stdout)
     tar_proc.stdin.write(b'\0'.join(
         bytes(p.relative_to(cwd))
