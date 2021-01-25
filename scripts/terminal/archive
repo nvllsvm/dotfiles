@@ -41,6 +41,9 @@ def _all_paths(root):
 
 
 def create_zip(paths, dest, cwd):
+    # zip cli thinks existing file means
+    dest.unlink()
+
     proc = subprocess.Popen(
         ['zip',
          '-9',  # maximum compression
@@ -57,6 +60,9 @@ def create_zip(paths, dest, cwd):
 
 
 def create_epub(paths, dest, cwd):
+    # zip cli thinks existing file means
+    dest.unlink()
+
     def _path_rank(x):
         if x == 'mimetype':
             rank = 0
