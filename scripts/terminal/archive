@@ -1,11 +1,32 @@
 #!/usr/bin/env python3
-# TODO write to temp file
 import argparse
 import concurrent.futures
+import contextlib
 import pathlib
 import shutil
 import subprocess
 import sys
+import tempfile
+
+
+@contextlib.contextmanager
+def TempPath(**kwargs):
+    """Wrapper around tempfile.NamedTemporaryFile which returns a path object
+
+    Unlike tempfile.NamedTemporaryFile, the FileNotFoundError exception is not
+    raised if the file is deleted before the context closes.
+
+    :rtype: pathlib.Path
+    """
+    with tempfile.NamedTemporaryFile(**kwargs, delete=False) as tmp:
+        temp_path = pathlib.Path(tmp.name)
+        try:
+            yield temp_path
+        finally:
+            try:
+                temp_path.unlink()
+            except FileNotFoundError:
+                pass
 
 
 def _all_paths(root):
@@ -123,10 +144,17 @@ def process(source, archive_format, suffix, remove):
     f = _formats[archive_format]
     suffix = suffix or f['suffix']
 
-    dest = str(pathlib.Path(source.name).absolute()) + suffix
-    f['func'](paths, dest, cwd)
+    dest = pathlib.Path(source.name + suffix).absolute()
+    with TempPath(dir=dest.parent, suffix=suffix) as tmp:
+        f['func'](paths, tmp, cwd)
+        print(dest)
+        tmp.rename(dest)
+
     if remove:
-        shutil.rmtree(source)
+        if source.is_dir():
+            shutil.rmtree(source)
+        else:
+            source.unlink()
 
 
 def main():
