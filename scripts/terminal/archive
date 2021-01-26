@@ -2,6 +2,7 @@
 import argparse
 import concurrent.futures
 import contextlib
+import multiprocessing
 import pathlib
 import shutil
 import subprocess
@@ -163,12 +164,22 @@ def process(source, archive_format, suffix, remove):
             source.unlink()
 
 
+def _num_procs(value):
+    value = int(value)
+    if value == 0:
+        return multiprocessing.cpu_count()
+    elif value > 0:
+        return value
+    else:
+        raise argparse.ArgumentError('invalid num_procs')
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--rm', default=False, action='store_true')
     parser.add_argument('-f', '--format', choices=_formats, default='zstd-tar')
     parser.add_argument('--suffix')
-    parser.add_argument('-n', '--num-procs', type=int, default=1)
+    parser.add_argument('-n', '--num-procs', type=_num_procs, default=1)
     parser.add_argument('--fast', default=False, action='store_true')
     parser.add_argument('source', type=pathlib.Path, nargs='+')
     args = parser.parse_args()
