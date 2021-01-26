@@ -816,6 +816,9 @@ def main():
 
     extracted = set()
     for path in args.archive:
+        if path in extracted:
+            continue
+
         cls = _get_class(path)
         cls.check()
         if args.list:
@@ -827,9 +830,6 @@ def main():
             sys.stdout.buffer.write(b'\n'.join(contents) + b'\n')
             sys.stdout.buffer.flush()
         else:
-            if path in extracted:
-                continue
-
             volumes = cls.volumes(path, password)
 
             cls.extract(
