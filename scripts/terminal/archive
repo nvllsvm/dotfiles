@@ -41,13 +41,15 @@ def _all_paths(root):
     return paths
 
 
-def create_zip(paths, dest, cwd):
+def create_zip(paths, dest, cwd, fast=False):
+    level = '-0' if fast else '-9'
+
     # zip cli thinks existing file means
     dest.unlink()
 
     proc = subprocess.Popen(
         ['zip',
-         '-9',  # maximum compression
+         level,
          '-nw',  # treat wildcards as regular characters
          '-@',  # read paths from stdin
          dest],
@@ -57,10 +59,13 @@ def create_zip(paths, dest, cwd):
     proc.wait()
     if proc.returncode != 0:
         raise RuntimeError('exit code {proc.returncode}')
-    optimize_zip(dest)
+    if not fast:
+        optimize_zip(dest)
 
 
-def create_epub(paths, dest, cwd):
+def create_epub(paths, dest, cwd, fast=False):
+    level = '-0' if fast else '-9'
+
     # zip cli thinks existing file means
     dest.unlink()
 
@@ -82,7 +87,7 @@ def create_epub(paths, dest, cwd):
 
     proc = subprocess.Popen(
         ['zip',
-         '-9',  # maximum compression
+         level,
          '-nw',  # treat wildcards as regular characters
          '-X',  # prevents EpubCheck error
          '-@',  # read paths from stdin
@@ -93,17 +98,20 @@ def create_epub(paths, dest, cwd):
     proc.wait()
     if proc.returncode != 0:
         raise RuntimeError('exit code {proc.returncode}')
-    optimize_zip(dest)
+    if not fast:
+        optimize_zip(dest)
 
 
-def create_zstd_tar(paths, dest, cwd):
+def create_zstd_tar(paths, dest, cwd, fast=False):
+    level = '-1' if fast else '-22'
+
     tar_proc = subprocess.Popen(
         ['tar', 'cf', '-', '-C', cwd, '--no-recursion',
          '--verbatim-files-from', '--null', '-T', '-'],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE)
     zstd_proc = subprocess.Popen(
-        ['zstd', '-f', '-T0', '--ultra', '-22', '-o', dest],
+        ['zstd', '-f', '-T0', '--ultra', level, '-o', dest],
         stdin=tar_proc.stdout)
     tar_proc.stdin.write(b'\0'.join(
         bytes(p.relative_to(cwd))
@@ -138,7 +146,7 @@ _formats = {
 }
 
 
-def process(source, archive_format, suffix, remove):
+def process(source, archive_format, suffix, remove, fast=False):
     source = source.absolute()
 
     if source.is_dir():
@@ -153,7 +161,7 @@ def process(source, archive_format, suffix, remove):
 
     dest = pathlib.Path(source.name + suffix).absolute()
     with TempPath(dir=dest.parent, suffix=suffix) as tmp:
-        f['func'](paths, tmp, cwd)
+        f['func'](paths, tmp, cwd, fast)
         print(dest)
         tmp.rename(dest)
 
@@ -186,7 +194,8 @@ def main():
 
     with concurrent.futures.ProcessPoolExecutor(max_workers=args.num_procs) as executor:  # noqa: E501
         futures = [
-            executor.submit(process, source, args.format, args.suffix, args.rm)
+            executor.submit(
+                process, source, args.format, args.suffix, args.rm, args.fast)
             for source in args.source
         ]
 
