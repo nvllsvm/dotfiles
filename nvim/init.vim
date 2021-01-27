@@ -1,6 +1,5 @@
 let g:python3_host_prog=glob('~/.config/nvim/python3_env/bin/python')
 
-let g:deoplete#sources#jedi#python_path=system("python")
 let g:deoplete#sources#jedi#ignore_errors=1
 let g:deoplete#sources#jedi#show_docstring=1
 
