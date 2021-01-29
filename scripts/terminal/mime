@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+if command -v xdg-mime > /dev/null; then
+    xdg-mime query filetype "$1"
+else
+    file --brief --mime-type "$1"
+fi

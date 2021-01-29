@@ -69,11 +69,17 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--check', action='store_true', default=False)
     parser.add_argument('--fix', action='store_true', default=False)
-    parser.add_argument('path', default='.', nargs='?')
+    parser.add_argument('path',
+                        type=pathlib.Path, default=pathlib.Path(), nargs='?')
     args = parser.parse_args()
 
     exts = collections.defaultdict(set)
-    for path in all_files(args.path):
+    if args.path.is_dir():
+        paths = all_files(args.path)
+    else:
+        paths = [args.path]
+
+    for path in paths:
         mime = magic.from_file(str(path), mime=True)
         exts[mime].add(path)
 
