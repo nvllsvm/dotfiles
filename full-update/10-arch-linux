@@ -25,6 +25,9 @@ if ! command -v yay > /dev/null 2>&1; then
     rm -rf /tmp/yay-install
     cd -
 fi
+log 'Removing bullshit gcr-prompter 🖕'
+sudo rm -f /usr/lib/gcr-prompter
+
 log 'Updating packages'
 yay -Syu --noconfirm --devel
 
