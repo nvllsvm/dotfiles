@@ -42,6 +42,12 @@ def _all_paths(root):
 
 
 def create_zip(paths, dest, cwd, fast=False):
+    paths = sorted(
+        path.relative_to(cwd)
+        for path in paths
+        if str(path) != '.'
+    )
+
     level = '-0' if fast else '-9'
 
     # zip cli thinks existing file means
