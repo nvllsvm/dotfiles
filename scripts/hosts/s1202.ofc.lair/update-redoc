@@ -1,0 +1,37 @@
+#!/usr/bin/env sh
+set -e
+
+usage() {
+cat << EOF
+usage: update-redoc FILE
+EOF
+}
+
+TMPFILE=''
+cleanup() {
+    rm -f "$TMPFILE"
+}
+
+trap cleanup EXIT INT
+TMPFILE="$(mktemp)"
+
+if [ $# -ne 1 ]; then
+    usage >&2
+    echo 'error: unexpected or missing argument(s)' >&2
+    exit 1
+elif [ "$1" = '--help' ] || [ "$1" = '-h' ]; then
+    usage
+    exit
+fi
+
+curl -s https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js > "$TMPFILE"
+
+if ! [ -f "$1" ]; then
+    mv "$TMPFILE" "$1"
+    echo 'Created new file'
+elif ! diff "$1" "$TMPFILE" > /dev/null; then
+    mv "$TMPFILE" "$1"
+    echo 'Replaced with new version redoc'
+else
+    echo 'Already up-to-date'
+fi
