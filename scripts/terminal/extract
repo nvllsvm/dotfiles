@@ -707,14 +707,18 @@ def _get_class(path):
         elif start.startswith(b"7z\xbc\xaf'\x1c"):
             return p7zip
         # zip
-        elif start.startswith(b'PK\x03\x04'):
-            return unzip
         # zip (empty)
-        elif start.startswith(b'PK\x05\x06'):
-            return unzip
         # zip (spanned)
-        elif start.startswith(b'PK\x07\x08'):
-            return unzip
+        elif \
+                start.startswith(b'PK\x03\x04') or \
+                start.startswith(b'PK\x05\x06') or \
+                start.startswith(b'PK\x07\x08'):
+            try:
+                # better handling of weird filenames, multipart
+                p7zip.check()
+                return p7zip
+            except KeyError:
+                return unzip
         # microsoft cabinet file
         elif start.startswith(b'MSCF'):
             return cabextract
