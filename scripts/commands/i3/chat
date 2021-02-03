@@ -5,4 +5,3 @@ launch() {
 launch element-desktop --hidden
 launch signal-desktop --start-in-tray
 launch slack --startup
-launch discord --start-minimized
