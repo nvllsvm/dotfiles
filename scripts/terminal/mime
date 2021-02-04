@@ -1,6 +1,16 @@
 #!/usr/bin/env sh
-if command -v xdg-mime > /dev/null; then
-    xdg-mime query filetype "$1"
+get_mime() {
+    if command -v xdg-mime > /dev/null; then
+        xdg-mime query filetype "$1"
+    else
+        file --brief --mime-type "$1"
+    fi
+}
+
+if [ $# -gt 1 ]; then
+    for i in "$@"; do
+        printf '%s\t%s\n' "$(get_mime "$i")" "$i"
+    done
 else
-    file --brief --mime-type "$1"
+    get_mime "$1"
 fi
