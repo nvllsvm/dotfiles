@@ -175,7 +175,8 @@ if [ "$CONTAINER_CMD" = 'docker' ] && [ -n "$COMPOSE" ]; then
 fi
 
 if [ -n "$PULL" ]; then
-    "$CONTAINER_CMD" pull -q "$image" > /dev/null
+    run_args+=('--pull' 'always')
+    dind_args+=('--pull' 'always')
 fi
 
 cleanup() {
@@ -190,10 +191,6 @@ run_args+=('--name' "$app_container_name")
 
 if [ -n "$DIND" ]; then
     DIND_IMAGE='docker:dind'
-    if [ -n "$PULL" ]; then
-        "$CONTAINER_CMD" pull -q "$DIND_IMAGE" > /dev/null
-    fi
-
     "$CONTAINER_CMD" run \
         --rm \
         --privileged \

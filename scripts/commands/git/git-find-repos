@@ -10,4 +10,9 @@ case $# in
         echo 'error: unknown arguments' >&2
         exit 1
 esac
-exec find "$SEARCH_DIR" -type d -name .git -printf "%h\n";
+
+if command -v fd > /dev/null; then
+    exec fd --base-directory "$SEARCH_DIR" -uu -t d '^\.git$' "$SEARCH_DIR" -X printf '%s\n' '{//}'
+else
+    exec find "$SEARCH_DIR" -type d -name .git -printf "%h\n";
+fi
