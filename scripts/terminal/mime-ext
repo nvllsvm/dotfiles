@@ -47,6 +47,9 @@ MIME_SUFFIXES = {
     'video/mp4': [
         '.mp4',
     ],
+    'text/html': [
+        '.html',
+    ],
 }
 
 

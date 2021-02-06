@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 # bundled jdk doesn't respect GDK_SCALE or other scaling config
-export STUDIO_JDK=/usr/lib/jvm/default
+#export STUDIO_JDK=/usr/lib/jvm/default
 
 # built-in dpi detection doesnt. fucking. work.
 # https://intellij-support.jetbrains.com/hc/en-us/articles/360007994999-HiDPI-configuration
