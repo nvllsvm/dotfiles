@@ -3,11 +3,11 @@ set -e
 
 show_help() {
     cat << EOF
-usage: apk-release-tool APK KEY
+usage: apk-release-tool APK (KEY)
 
 Positional Arguments:
     APK     unsigned apk
-    KEY     key to sign with
+    KEY     key to sign with (default: ~/.android/debug.keystore)
 EOF
 }
 
@@ -18,13 +18,20 @@ while true; do
             exit
             ;;
         *)
-            if [ $# -ne 2 ]; then
-                show_help >&2
-                echo error: missing required arguments >&2
-                exit 1
-            fi
-            UNSIGNED_APK="$1"
-            RELEASE_KEY="$2"
+            case $# in
+                1)
+                    UNSIGNED_APK="$1"
+                    RELEASE_KEY=~/.android/debug.keystore
+                    ;;
+                2)
+                    UNSIGNED_APK="$1"
+                    RELEASE_KEY="$2"
+                    ;;
+                *)
+                    show_help >&2
+                    echo error: missing required arguments >&2
+                    exit 1
+            esac
             break
     esac
 done
