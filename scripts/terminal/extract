@@ -40,11 +40,14 @@ class p7zip:
             stdout=subprocess.PIPE,
             check=True
         )
-        # strip date+time as they may blank
-        return [
-            line[20:].split(maxsplit=3)[-1]
-            for line in proc.stdout.splitlines()
-        ]
+        contents = []
+        for line in proc.stdout.splitlines():
+            # strip date+time as they may blank
+            attrs, size, comp_size, name = line[20:].split(maxsplit=3)
+            if attrs == b'D....':
+                name += b'/'
+            contents.append(name)
+        return contents
 
     @classmethod
     def volumes(cls, path, password=''):
