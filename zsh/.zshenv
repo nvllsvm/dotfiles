@@ -9,5 +9,7 @@ for plugin in "$DOTFILES"/zsh/plugins/*/.zshenv(N); do
 done
 
 zshenv_host="$DOTFILES/zsh/hosts/$HOST/.zshenv"
-[[ -r "$zshenv_host" ]] && . "$zshenv_host"
+if [[ -r "$zshenv_host" ]]; then
+    . "$zshenv_host"
+fi
 unset zshenv_host
