@@ -2,5 +2,5 @@
 Description=Run git-repo-backup
 
 [Service]
-ExecStart=zsh -ic git-host-backup
+ExecStart=git-host-backup
 SyslogIdentifier=git-repo-backup

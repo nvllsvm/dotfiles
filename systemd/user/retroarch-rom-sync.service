@@ -1,6 +1,0 @@
-[Unit]
-Description=Run retroarch-rom-sync
-
-[Service]
-ExecStart=zsh -ic retroarch-rom-sync
-SyslogIdentifier=retroarch-rom-sync

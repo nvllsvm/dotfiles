@@ -2,5 +2,5 @@
 Description=Run sol-fix-permissions
 
 [Service]
-ExecStart=zsh -ic sol-fix-permissions
+ExecStart=sol-fix-permissions
 SyslogIdentifier=sol-fix-permissions

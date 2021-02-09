@@ -2,5 +2,5 @@
 Description=Run gog-update
 
 [Service]
-ExecStart=zsh -ic gog-update
+ExecStart=gog-update
 SyslogIdentifier=gog-update
