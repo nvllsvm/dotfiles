@@ -1,4 +1,3 @@
-. ~/.dotfiles/private/zsh/.zshrc || true
 alias n=notes
 alias l='notes ledger.journal'
 alias p='notes pending.md'
