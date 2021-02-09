@@ -79,7 +79,7 @@ path=(
     "$path[@]"
 )
 
-for plugin in $DOTFILES/zsh/plugins/*; do
+for plugin in "$DOTFILES"/zsh/plugins/*/.zshrc(N); do
     . "$plugin"
 done
 

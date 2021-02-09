@@ -1,5 +1,3 @@
-export NVM_DIR=~/.local/share/nvm
-
 if [ -d "$NVM_DIR" ]; then
     # holy fuck - nvm.sh nearly triples shell startup time
     # lazy load it!
@@ -22,11 +20,4 @@ if [ -d "$NVM_DIR" ]; then
     for cmd in "$_nvm_load[@]"; do
         eval "alias $cmd='nvm-load && $cmd'"
     done
-
-    path=(
-        "${DOTFILES}/scripts/nodejs"
-        "$path[@]"
-    )
-else
-    unset NVM_DIR
 fi
