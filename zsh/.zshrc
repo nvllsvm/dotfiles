@@ -46,9 +46,6 @@ RPROMPT="$prompt_current_dir"
 # hide when start typing
 setopt TRANSIENT_RPROMPT
 
-typeset -U path
-typeset -U manpath
-
 bindkey -v
 
 KEYTIMEOUT=1
@@ -72,13 +69,6 @@ if [ -d "$host_dir/functions" ]; then
 fi
 unset host_dir
 
-path=(
-    ~/.local/bin
-    "${DOTFILES}/scripts/hosts/${HOST}"
-    "${DOTFILES}"/scripts/terminal
-    "$path[@]"
-)
-
 for plugin in "$DOTFILES"/zsh/plugins/*/.zshrc(N); do
     . "$plugin"
 done
@@ -89,20 +79,6 @@ zsh_reload_comp() {
     rm -f ~/.zcompdump
     zsh -ic "echo -n"
 }
-
-pushd "$DOTFILES/scripts/commands" > /dev/null
-for c in *; do
-    if command -v "$c" > /dev/null; then
-        path=("$DOTFILES/scripts/commands/$c" "$path[@]")
-    fi
-done
-popd > /dev/null
-
-# set ~/.local/bin/ to take path precedence
-path=(
-    ~/.local/bin
-    "$path[@]"
-)
 
 all_commands() {
     autoload -Uz bashcompinit
