@@ -1,8 +1,13 @@
 if [[ $OSTYPE == darwin* ]]; then
     # ugh - Apple overrides PATH in /etc/zprofile
     # disable that bullshit and update PATH here
+    # (normally runs: eval `/usr/libexec/path_helper -s`)
     setopt no_global_rcs
-    eval `/usr/libexec/path_helper -s`
+    path=(
+        "$path[@]"
+        /usr/local/bin
+        /Library/Apple/usr/bin
+    )
 
     export LANG=en_US.UTF-8
     export HOMEBREW_NO_ANALYTICS=1
