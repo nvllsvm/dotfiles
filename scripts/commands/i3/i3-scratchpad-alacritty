@@ -9,7 +9,7 @@ show_scratchpad() {
 }
 
 if ! show_scratchpad; then
-    i3-msg "exec --no-startup-id alacritty --class i3-scratchpad --title ${TITLE} --command zsh -ic '$*'"
+    i3-msg "exec --no-startup-id alacritty --class i3-scratchpad --title ${TITLE} --command $*"
     # wait for the window to show
     while true; do
         if show_scratchpad; then
