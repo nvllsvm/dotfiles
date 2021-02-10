@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import pathlib
+import sys
 
 
 def iter_dirs(root):
@@ -16,6 +17,8 @@ def iter_dirs(root):
                     stack.append(path)
                 else:
                     other.add(path)
+        except PermissionError as e:
+            print(e, file=sys.stderr)
         except FileNotFoundError:
             pass
 
