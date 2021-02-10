@@ -22,7 +22,6 @@ echo "Video device: ${VIDEO_DEVICE}"
 echo 'Setting video device to NTSC'
 v4l2-ctl -d "$VIDEO_DEVICE" -s ntsc
 
-echo "$DEST"
 echo "Recording to ${DEST}"
 ffmpeg \
     -f alsa -i "$ALSA_DEVICE" \
