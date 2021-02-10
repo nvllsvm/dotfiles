@@ -28,5 +28,5 @@ ffmpeg \
     -f video4linux2 -i "$VIDEO_DEVICE" \
     -t 02:10:00 \
     -c:v ffv1 \
-    -c:a copy \
+    -c:a flac \
     "$DEST"
