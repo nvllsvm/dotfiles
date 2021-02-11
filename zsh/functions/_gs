@@ -1,6 +1,8 @@
 #compdef gs
 zmodload zsh/mapfile
 
+# escape : characters
 arr=("${(f@)mapfile[$HOME/.cache/gs]//:/\:}")
+# remove empty element
 arr=($arr)
 _describe 'history' arr
