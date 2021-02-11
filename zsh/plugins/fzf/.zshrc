@@ -6,7 +6,6 @@ if command -v fzf > /dev/null; then
         echo -n "${(q)item} "
       done
       local ret=$?
-      echo
       return $ret
     }
 
