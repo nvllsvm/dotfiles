@@ -1,5 +1,6 @@
 #compdef gs
 zmodload zsh/mapfile
 
-hist=(${(f)mapfile[~/.cache/gs]})
-_describe 'history' hist 
+arr=("${(f@)mapfile[$HOME/.cache/gs]//:/\:}")
+arr=($arr)
+_describe 'history' arr
