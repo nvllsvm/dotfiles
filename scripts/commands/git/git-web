@@ -14,16 +14,17 @@ get_ssh_hostname() {
 }
 
 if [ -n "$1" ]; then
-    cd "$1"
+    url="$1"
+else
+    for remote in upstream origin; do
+        url="$(git remote get-url "$remote" 2> /dev/null || true)"
+        if [ -n "$url" ]; then
+            break
+        fi
+    done
+    url=''
 fi
 
-url=''
-for remote in upstream origin; do
-    url="$(git remote get-url "$remote" 2> /dev/null || true)"
-    if [ -n "$url" ]; then
-        break
-    fi
-done
 
 if [ -z "$url" ]; then
     echo error: cannot determine remote 2> /dev/null
