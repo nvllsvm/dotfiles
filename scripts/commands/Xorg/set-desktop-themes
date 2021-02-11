@@ -130,7 +130,9 @@ EOF
 
 hsetroot -solid "$(xrdb -query | grep '\*background' | awk '{print $2}')"
 
-i3 restart > /dev/null 2>&1 || true
+if pidof i3 > /dev/null; then
+    i3 restart > /dev/null 2>&1 || true
+fi
 
 pkill -9 dunst || true
 dunst \
@@ -141,5 +143,7 @@ dunst \
 
 if [ -d ~/.config/sway ]; then
     base16-sway-colors > ~/.config/sway/colors
+fi
+if pidof sway > /dev/null; then
     swaymsg reload
 fi
