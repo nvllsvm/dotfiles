@@ -65,7 +65,7 @@ def main():
         elif parsed.scheme:
             host = parsed.scheme
         else:
-            host = 'github'
+            parser.error('missing git host')
 
         repo_dir = CODE_ROOT_DIR / host.lower() / path.lower()
         if args.show_dir:
