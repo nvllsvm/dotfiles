@@ -26,36 +26,48 @@ async def decode_ape(source, fd):
     proc = await asyncio.create_subprocess_exec(
         'mac', source, '-', '-d',
         stdout=fd)
-    await proc.wait()
-    if proc.returncode != 0:
-        raise DecodeError()
+
+    async def result():
+        await proc.wait()
+        if proc.returncode != 0:
+            raise DecodeError()
+    return result()
 
 
 async def decode_wv(source, fd):
     proc = await asyncio.create_subprocess_exec(
         'wvunpack', '-d', source, '-', '-d',
         stdout=fd)
-    await proc.wait()
-    if proc.returncode != 0:
-        raise DecodeError()
+
+    async def result():
+        await proc.wait()
+        if proc.returncode != 0:
+            raise DecodeError()
+    return result()
 
 
 async def decode_flac(source, fd):
     proc = await asyncio.create_subprocess_exec(
         'flac', '-csd', source,
         stdout=fd)
-    await proc.wait()
-    if proc.returncode != 0:
-        raise DecodeError()
+
+    async def result():
+        await proc.wait()
+        if proc.returncode != 0:
+            raise DecodeError()
+    return result()
 
 
 async def decode_wav(source, fd):
     proc = await asyncio.create_subprocess_exec(
         'cat', source,
         stdout=fd)
-    await proc.wait()
-    if proc.returncode != 0:
-        raise DecodeError()
+
+    async def result():
+        await proc.wait()
+        if proc.returncode != 0:
+            raise DecodeError()
+    return result()
 
 
 @contextlib.contextmanager
@@ -82,9 +94,12 @@ async def encode_flac(fd, dest):
     proc = await asyncio.create_subprocess_exec(
         'flac', '-s', '--best', '-V', '-f', '-o', dest, '-',
         stdin=fd)
-    await proc.wait()
-    if proc.returncode != 0:
-        raise EncodeError()
+
+    async def result():
+        await proc.wait()
+        if proc.returncode != 0:
+            raise DecodeError()
+    return result()
 
 
 class DecodeError(Exception):
@@ -108,14 +123,16 @@ async def reencode(source):
     }
 
     read, write = os.pipe()
+
+    decode = await decode_contexts[suffix](source, write)
+    os.close(write)
+
     with TempPath(dir=source.parent, suffix='.flac') as tmp:
-        decode = decode_contexts[suffix](source, write)
-        encode = encode_flac(read, tmp)
+        encode = await encode_flac(read, tmp)
+        os.close(read)
+
         await asyncio.gather(decode, encode)
-        os.close(write)
-        os.close(read)
-        os.close(write)
-        os.close(read)
+
         try:
             copy_tags(source, tmp)
         except Exception:
