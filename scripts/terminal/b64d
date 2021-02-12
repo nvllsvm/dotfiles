@@ -20,8 +20,9 @@ def maybe_base64_decode(value):
 if len(sys.argv) == 1:
     proc = subprocess.run(
         ['cbpaste'],
-        stdout=subprocess.PIPE,
-        check=True)
+        stdout=subprocess.PIPE)
+    if proc.returncode:
+        sys.exit(proc.returncode)
     data = proc.stdout.decode()
 elif len(sys.argv) == 2:
     data = sys.argv[1]
