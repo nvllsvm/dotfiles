@@ -98,7 +98,7 @@ async def encode_flac(fd, dest):
     async def result():
         await proc.wait()
         if proc.returncode != 0:
-            raise DecodeError()
+            raise EncodeError()
     return result()
 
 
