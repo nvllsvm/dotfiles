@@ -5,6 +5,7 @@ import logging
 import os
 import pathlib
 import subprocess
+import sys
 import time
 
 import mpd
@@ -57,11 +58,15 @@ def _run(client):
             continue
 
         # TODO cache this
-        albumart = client.albumart(current['file'])
+        try:
+            albumart = client.albumart(current['file'])
+        except Exception as e:
+            print(e, file=sys.stderr)
+            break
         if albumart:
             art_path = _ALBUMART_PATH
             with open(art_path, 'wb') as f:
-                f.write(albumart)
+                f.write(albumart['binary'])
         else:
             art_path = None
 
