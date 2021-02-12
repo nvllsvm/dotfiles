@@ -26,28 +26,36 @@ async def decode_ape(source, fd):
     proc = await asyncio.create_subprocess_exec(
         'mac', source, '-', '-d',
         stdout=fd)
-    return proc.wait()
+    await proc.wait()
+    if proc.returncode != 0:
+        raise DecodeError()
 
 
 async def decode_wv(source, fd):
     proc = await asyncio.create_subprocess_exec(
         'wvunpack', '-d', source, '-', '-d',
         stdout=fd)
-    return proc.wait()
+    await proc.wait()
+    if proc.returncode != 0:
+        raise DecodeError()
 
 
 async def decode_flac(source, fd):
     proc = await asyncio.create_subprocess_exec(
         'flac', '-csd', source,
         stdout=fd)
-    return proc.wait()
+    await proc.wait()
+    if proc.returncode != 0:
+        raise DecodeError()
 
 
 async def decode_wav(source, fd):
     proc = await asyncio.create_subprocess_exec(
         'cat', source,
         stdout=fd)
-    return proc.wait()
+    await proc.wait()
+    if proc.returncode != 0:
+        raise DecodeError()
 
 
 @contextlib.contextmanager
@@ -74,7 +82,17 @@ async def encode_flac(fd, dest):
     proc = await asyncio.create_subprocess_exec(
         'flac', '-s', '--best', '-V', '-f', '-o', dest, '-',
         stdin=fd)
-    return proc.wait()
+    await proc.wait()
+    if proc.returncode != 0:
+        raise EncodeError()
+
+
+class DecodeError(Exception):
+    """Raised when an error occurs while decoding audio"""
+
+
+class EncodeError(Exception):
+    """Raised when an error occurs while encoding audio"""
 
 
 async def reencode(source):
@@ -90,10 +108,13 @@ async def reencode(source):
     }
 
     read, write = os.pipe()
-    decode = await decode_contexts[suffix](source, write)
-    os.close(write)
     with TempPath(dir=source.parent, suffix='.flac') as tmp:
-        encode = await encode_flac(read, tmp)
+        decode = decode_contexts[suffix](source, write)
+        encode = encode_flac(read, tmp)
+        await asyncio.gather(decode, encode)
+        os.close(write)
+        os.close(read)
+        os.close(write)
         os.close(read)
         try:
             copy_tags(source, tmp)
@@ -101,8 +122,6 @@ async def reencode(source):
             pass
         source.unlink()
         tmp.rename(source.with_suffix('.flac'))
-        await encode
-        await decode
 
 
 def all_files(root):
@@ -129,7 +148,7 @@ async def run(paths, max_procs=None):
 
     pending = set()
     while paths or pending:
-        for i in range(max_procs):
+        for i in range(max_procs - len(pending)):
             if not paths:
                 break
             pending.add(asyncio.create_task(reencode(paths.pop())))
