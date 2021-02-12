@@ -127,18 +127,15 @@ async def run(paths, max_procs=None):
         if path.suffix.lower() in ('.flac', '.ape', '.wav', '.wv')
     ]
 
-    # start max_procs number futures
-    pending = []
-    for i in range(max_procs):
-        if not paths:
-            break
-        pending.append(reencode(paths.pop()))
+    pending = set()
+    while paths or pending:
+        for i in range(max_procs):
+            if not paths:
+                break
+            pending.add(asyncio.create_task(reencode(paths.pop())))
 
-    while pending:
         _, pending = await asyncio.wait(
             pending, return_when=asyncio.FIRST_COMPLETED)
-        if paths:
-            pending.add(reencode(paths.pop()))
 
     errors = []
 
