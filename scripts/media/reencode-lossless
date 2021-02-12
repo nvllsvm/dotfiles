@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 import argparse
-import concurrent.futures
+import asyncio
 import contextlib
 import logging
+import os
 import pathlib
-import subprocess
 import tempfile
 
 import mutagen
@@ -22,84 +22,32 @@ def copy_tags(source, target):
     metadata_target.save()
 
 
-@contextlib.contextmanager
-def decode_ape_to_stdout(path):
-    """Decode a FLAC file to stdout
-
-    Decodes through any errors.
-
-    :param pathlib.Path path: The FLAC file path
-    """
-    process = subprocess.Popen(
-        ['mac', path, '-', '-d'],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-    yield process.stdout
-    process.wait()
-    # Decode errors may are non-fatal, but may indicate a problem
-    stderr = process.stderr.read()
-    if process.returncode:
-        raise subprocess.CalledProcessError(
-            process.returncode,
-            process.args,
-            stderr=stderr
-        )
+async def decode_ape(source, fd):
+    proc = await asyncio.create_subprocess_exec(
+        'mac', source, '-', '-d',
+        stdout=fd)
+    return proc.wait()
 
 
-@contextlib.contextmanager
-def decode_wv_to_stdout(path):
-    process = subprocess.Popen(
-        ['wvunpack', '-d', path, '-'],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-    yield process.stdout
-    process.wait()
-    # Decode errors may are non-fatal, but may indicate a problem
-    stderr = process.stderr.read()
-    if process.returncode:
-        raise subprocess.CalledProcessError(
-            process.returncode,
-            process.args,
-            stderr=stderr
-        )
+async def decode_wv(source, fd):
+    proc = await asyncio.create_subprocess_exec(
+        'wvunpack', '-d', source, '-', '-d',
+        stdout=fd)
+    return proc.wait()
 
 
-@contextlib.contextmanager
-def pipe_wave_to_stdout(path):
-    process = subprocess.Popen(
-        ['cat', path],
-        stdout=subprocess.PIPE
-    )
-    yield process.stdout
+async def decode_flac(source, fd):
+    proc = await asyncio.create_subprocess_exec(
+        'flac', '-csd', source,
+        stdout=fd)
+    return proc.wait()
 
 
-@contextlib.contextmanager
-def decode_flac(path):
-    """Decode a FLAC file
-
-    Decodes through any errors.
-
-    :param pathlib.Path path: The FLAC file path
-    """
-    process = subprocess.Popen(
-        ['flac', '-csd', path],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-    yield process.stdout
-    process.wait()
-    # Decode errors may are non-fatal, but may indicate a problem
-    stderr = process.stderr.read()
-    if process.returncode:
-        raise subprocess.CalledProcessError(
-            process.returncode,
-            process.args,
-            stderr=stderr
-        )
-    if stderr:
-        LOGGER.warning('Decode "%s" "%s"', path, stderr)
+async def decode_wav(source, fd):
+    proc = await asyncio.create_subprocess_exec(
+        'cat', source,
+        stdout=fd)
+    return proc.wait()
 
 
 @contextlib.contextmanager
@@ -122,35 +70,39 @@ def TempPath(**kwargs):
                 pass
 
 
-def reencode(source):
+async def encode_flac(fd, dest):
+    proc = await asyncio.create_subprocess_exec(
+        'flac', '-s', '--best', '-V', '-f', '-o', dest, '-',
+        stdin=fd)
+    return proc.wait()
+
+
+async def reencode(source):
     LOGGER.info('Processing %s', source)
 
     suffix = source.suffix.lower()
 
     decode_contexts = {
         '.flac': decode_flac,
-        '.ape': decode_ape_to_stdout,
-        '.wv': decode_wv_to_stdout,
-        '.wav': pipe_wave_to_stdout
+        '.ape': decode_ape,
+        '.wv': decode_wv,
+        '.wav': decode_wav
     }
 
-    with decode_contexts[suffix](source) as decode:
-        with TempPath(dir=source.parent, suffix='.flac') as tmp:
-            encode = subprocess.Popen(
-                ['flac', '-s', '--best', '-V', '-f', '-o', tmp, '-'],
-                stdin=decode,
-                stdout=subprocess.DEVNULL
-            )
-            encode.wait()
-            if encode.returncode:
-                raise subprocess.CalledProcessError(
-                    encode.returncode, encode.args)
-            try:
-                copy_tags(source, tmp)
-            except Exception:
-                pass
-            source.unlink()
-            tmp.rename(source.with_suffix('.flac'))
+    read, write = os.pipe()
+    decode = await decode_contexts[suffix](source, write)
+    os.close(write)
+    with TempPath(dir=source.parent, suffix='.flac') as tmp:
+        encode = await encode_flac(read, tmp)
+        os.close(read)
+        try:
+            copy_tags(source, tmp)
+        except Exception:
+            pass
+        source.unlink()
+        tmp.rename(source.with_suffix('.flac'))
+        await encode
+        await decode
 
 
 def all_files(root):
@@ -163,6 +115,35 @@ def all_files(root):
             elif path.is_dir():
                 stack.append(path)
     return files
+
+
+async def run(paths, max_procs=None):
+    if max_procs is None:
+        max_procs = os.cpu_count()
+
+    paths = [
+        path
+        for path in paths
+        if path.suffix.lower() in ('.flac', '.ape', '.wav', '.wv')
+    ]
+
+    # start max_procs number futures
+    pending = []
+    for i in range(max_procs):
+        if not paths:
+            break
+        pending.append(reencode(paths.pop()))
+
+    while pending:
+        _, pending = await asyncio.wait(
+            pending, return_when=asyncio.FIRST_COMPLETED)
+        if paths:
+            pending.add(reencode(paths.pop()))
+
+    errors = []
+
+    for path in sorted(errors):
+        LOGGER.error('Error %s', path)
 
 
 def main():
@@ -181,22 +162,7 @@ def main():
         else:
             paths.add(path)
 
-    with concurrent.futures.ProcessPoolExecutor() as pool:
-        future_to_path = {
-            pool.submit(reencode, path): path
-            for path in sorted(paths)
-            if path.suffix.lower() in ('.flac', '.ape', '.wav', '.wv')
-        }
-        errors = []
-        for future in concurrent.futures.as_completed(future_to_path):
-            try:
-                future.result()
-            except Exception as e:
-                LOGGER.exception(e)
-                errors.append(future_to_path[future])
-
-    for path in sorted(errors):
-        LOGGER.error('Error %s', path)
+    asyncio.run(run(paths))
 
 
 if __name__ == '__main__':

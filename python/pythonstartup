@@ -5,6 +5,7 @@ import collections
 import concurrent.futures
 import configparser
 import contextlib
+import copy
 import datetime
 import difflib
 import distutils
