@@ -14,7 +14,7 @@ if command -v git > /dev/null; then
 
         if git sync "$target"; then
             echo "$target" | sort -u - ~/.cache/gs | tr '[:upper:]' '[:lower:]' | sponge ~/.cache/gs
-            cd "$(git sync --show-dir "$@")"
+            cd "$(git sync --show-dir "$target")"
         fi
     }
 
