@@ -13,10 +13,8 @@ if command -v git > /dev/null; then
         esac
 
         if git sync "$target"; then
-            echo "$1" | sort -u - ~/.cache/gs | tr '[:upper:]' '[:lower:]' | sponge ~/.cache/gs
-            if [ $# -gt 0 ]; then
-                cd "$(git sync --show-dir "$@")"
-            fi
+            echo "$target" | sort -u - ~/.cache/gs | tr '[:upper:]' '[:lower:]' | sponge ~/.cache/gs
+            cd "$(git sync --show-dir "$@")"
         fi
     }
 
