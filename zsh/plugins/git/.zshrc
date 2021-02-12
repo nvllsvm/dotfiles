@@ -5,7 +5,7 @@ if command -v git > /dev/null; then
                 target="$(fzf < ~/.cache/gs)"
                 ;;
             1)
-                target = "$1"
+                target="$1"
                 ;;
             *)
                 echo 'error: unexpected arguments' >&2
