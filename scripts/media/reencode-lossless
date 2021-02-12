@@ -163,6 +163,8 @@ async def run(paths, max_procs=None):
         if path.suffix.lower() in ('.flac', '.ape', '.wav', '.wv')
     ]
 
+    errors = []
+
     pending = set()
     while paths or pending:
         for i in range(max_procs - len(pending)):
@@ -170,10 +172,15 @@ async def run(paths, max_procs=None):
                 break
             pending.add(asyncio.create_task(reencode(paths.pop())))
 
-        _, pending = await asyncio.wait(
+        done, pending = await asyncio.wait(
             pending, return_when=asyncio.FIRST_COMPLETED)
 
-    errors = []
+        for result in done:
+            try:
+                result.result()
+            except Exception as e:
+                LOGGER.exception(e)
+                errors.append(str(e))
 
     for path in sorted(errors):
         LOGGER.error('Error %s', path)
