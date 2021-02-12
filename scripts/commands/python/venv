@@ -62,18 +62,6 @@ def python_bin_exists(python_bin):
     return True
 
 
-def pyenv_versions():
-    proc = subprocess.run(
-        ['pyenv', 'versions', '--bare'],
-        stdout=subprocess.PIPE,
-        check=True)
-    return sorted(
-        (version.strip() for version in proc.stdout.decode().split()),
-        key=lambda v: tuple(int(i) for i in v.split('.')),
-        reverse=True
-    )
-
-
 def create_virtualenv(python_bin, path):
     if shutil.which('virtualenv'):
         subprocess.run(
@@ -85,18 +73,6 @@ def create_virtualenv(python_bin, path):
             [str(python_bin), '-m', 'venv', str(path)],
             stdout=subprocess.DEVNULL,
             check=True)
-
-
-def pyenv_bin(version):
-    env = os.environ.copy()
-    env['PYENV_VERSION'] = version
-    proc = subprocess.run(
-        ['pyenv', 'which', 'python'],
-        env=env,
-        stdout=subprocess.PIPE,
-        check=True
-    )
-    return proc.stdout.decode().strip()
 
 
 ENVRC = """\
@@ -120,34 +96,16 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--prune', action=_PruneAction)
     parser.add_argument('-d', '--delete', action='store_true')
-    parser.add_argument('-l', '--list', action='store_true')
-    parser.add_argument('version', nargs='?')
+    parser.add_argument('bin', nargs='?')
     args = parser.parse_args()
 
     if not shutil.which('direnv'):
         parser.error('direnv is not installed')
         parser.exit(1)
 
-    os.environ.pop('PYENV_VERSION', None)
     os.environ.pop('VIRTUAL_ENV', None)
 
-    if args.list:
-        # TODO: include non-pyenv versions
-        for version in sorted(pyenv_versions()):
-            print(version)
-        parser.exit()
-    elif args.version:
-        if 'PYENV_ROOT' not in os.environ:
-            parser.error('pyenv not available')
-            parser.exit(1)
-        for pyenv_version in pyenv_versions():
-            if pyenv_version.startswith(args.version):
-                python_bin = pyenv_bin(pyenv_version)
-                break
-        else:
-            python_bin = f'python{args.version}'
-    else:
-        python_bin = 'python'
+    python_bin = args.bin or 'python'
 
     if not python_bin_exists(python_bin):
         parser.error('version not available')
