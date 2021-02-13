@@ -19,6 +19,12 @@ fi
 echo "Alsa device:  ${ALSA_DEVICE}" 
 echo "Video device: ${VIDEO_DEVICE}" 
 
+echo 'Setting video device to NTSC'
+v4l2-ctl -d "$VIDEO_DEVICE" -s ntsc
+
+echo 'Setting input to S-Video'
+v4l2-ctl -d "$VIDEO_DEVICE" --set-input 1
+
 ffplay -f alsa -i "$ALSA_DEVICE" -nodisp 2> /dev/null &
 ffplay -f video4linux2 -i "$VIDEO_DEVICE" 2> /dev/null
 wait
