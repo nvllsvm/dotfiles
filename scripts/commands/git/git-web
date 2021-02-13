@@ -22,7 +22,6 @@ else
             break
         fi
     done
-    url=''
 fi
 
 
