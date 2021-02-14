@@ -40,6 +40,9 @@ else
             # xdg-mime reports go.mod files as this
             default_preview "$1"
             ;;
+        audio/x-mpegurl)
+            default_preview "$1"
+            ;;
         audio/*|\
         video/*)
             ffprobe -hide_banner -- "$1" 2>&1
