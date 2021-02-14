@@ -1,5 +1,6 @@
 if command -v git > /dev/null; then
     gs() {
+        touch ~/.cache/gs
         case $# in
             0)
                 target="$(fzf < ~/.cache/gs)"
@@ -23,6 +24,4 @@ if command -v git > /dev/null; then
             cd "$(git sync --show-dir "$target")"
         fi
     }
-
-    alias g='git s'
 fi
