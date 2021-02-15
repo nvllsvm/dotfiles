@@ -123,10 +123,13 @@ class exiv2:
             stderr=subprocess.PIPE,
             stdout=subprocess.PIPE)
         stdout, stderr = await proc.communicate()
+
+        # Exif.Image.Orientation not present in file 
         if proc.returncode == 1 and not stderr:
             return None
         elif proc.returncode != 0:
             raise SubprocessError
+
         _, _, _, value = stdout.decode().split(maxsplit=3)
         value = value.strip()
         if value != '(0)':
