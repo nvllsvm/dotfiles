@@ -120,14 +120,14 @@ class exiv2:
     async def get_orientation(cls, path):
         proc = await asyncio.create_subprocess_exec(
             'exiv2', '--key', 'Exif.Image.Orientation', '--', path,
+            stderr=subprocess.PIPE,
             stdout=subprocess.PIPE)
-        result, _ = await proc.communicate()
-        if proc.returncode == 1:
+        stdout, stderr = await proc.communicate()
+        if proc.returncode == 1 and not stderr:
             return None
         elif proc.returncode != 0:
             raise SubprocessError
-        key, key_type, value, _ = result.decode().split(maxsplit=3)
-        _, _, _, value = result.decode().split(maxsplit=3)
+        _, _, _, value = stdout.decode().split(maxsplit=3)
         value = value.strip()
         if value != '(0)':
             return cls.EXIF_ORIENTATION[value.strip()]
