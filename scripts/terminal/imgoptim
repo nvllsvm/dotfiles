@@ -1,11 +1,33 @@
 #!/usr/bin/env python
 import argparse
 import asyncio
+import contextlib
 import os
 import pathlib
 import signal
 import subprocess
 import sys
+import tempfile
+
+
+@contextlib.contextmanager
+def TempPath(**kwargs):
+    """Wrapper around tempfile.NamedTemporaryFile which returns a path object
+
+    Unlike tempfile.NamedTemporaryFile, the FileNotFoundError exception is not
+    raised if the file is deleted before the context closes.
+
+    :rtype: pathlib.Path
+    """
+    with tempfile.NamedTemporaryFile(**kwargs, delete=False) as tmp:
+        temp_path = pathlib.Path(tmp.name)
+        try:
+            yield temp_path
+        finally:
+            try:
+                temp_path.unlink()
+            except FileNotFoundError:
+                pass
 
 
 def all_files(root):
@@ -20,9 +42,10 @@ def all_files(root):
     return sorted(files)
 
 
-async def optimize_jpeg(path, strip=False):
+async def optimize_jpeg(source, dest, strip=False):
     args = [
         'jpegoptim', '--quiet', '--all-progressive',
+        '--force', '--stdout',
     ]
 
     if strip:
@@ -30,44 +53,98 @@ async def optimize_jpeg(path, strip=False):
     else:
         args.append('--strip-none')
 
-    args.extend(['--', path])
-    proc = await asyncio.create_subprocess_exec(*args)
-    await proc.wait()
+    args.extend(['--', source])
+    proc = await asyncio.create_subprocess_exec(
+        *args,
+        stdout=subprocess.PIPE)
+    stdout, _ = await proc.communicate()
+    if proc.returncode != 0:
+        raise SubprocessError
+
+    dest.write_bytes(stdout)
+
+    # lossless rotation is not always possible - use EXIF instead
+    if strip:
+        orientation = await exiv2.get_orientation(source)
+
+        # 1 is the default, "correct" orientation
+        if orientation and orientation != 1:
+            await exiv2.set_orientation(dest, orientation)
 
 
-async def optimize_png(path, strip=False):
+async def optimize_png(source, dest, strip=False):
     args = [
-        'oxipng', '--quiet', '--zopfli', '--opt', 'max'
+        'oxipng', '--quiet', '--zopfli', '--opt', 'max', '--out', dest,
     ]
 
     if strip:
         args.extend(['--strip', 'safe'])
 
-    args.extend(['--', path])
+    args.extend(['--', source])
     proc = await asyncio.create_subprocess_exec(*args)
     await proc.wait()
+    if proc.returncode != 0:
+        raise SubprocessError
 
 
-async def optimize_gif(path, strip=False):
+async def optimize_gif(source, dest, strip=False):
     args = [
         'gifsicle', '--output=-', '--same-loopcount', '--same-delay',
-        '--no-warnings', '--optimize=3'
+        '--no-warnings', '--optimize=3', '--output', dest,
     ]
 
     if strip:
         args.extend(['--no-comments', '--no-names', '--no-extensions'])
 
-    args.extend(['--', path])
-    proc = await asyncio.create_subprocess_exec(
-        *args,
-        stdout=subprocess.PIPE)
-    result, _ = await proc.communicate()
+    args.extend(['--', source])
+    proc = await asyncio.create_subprocess_exec(*args)
+    await proc.wait()
     if proc.returncode != 0:
-        return
-    # optimized results can be larger than the original.
-    # not sure why
-    if path.stat().st_size > len(result):
-        path.write_bytes(result)
+        raise SubprocessError
+
+
+class exiv2:
+
+    EXIF_ORIENTATION = {
+        'top, left': 1,
+        'top, right': 2,
+        'bottom, right': 3,
+        'bottom, left': 4,
+        'left, top': 5,
+        'right, top': 6,
+        'right, bottom': 7,
+        'left, bottom': 8,
+    }
+
+    @classmethod
+    async def get_orientation(cls, path):
+        proc = await asyncio.create_subprocess_exec(
+            'exiv2', '--key', 'Exif.Image.Orientation', '--', path,
+            stdout=subprocess.PIPE)
+        result, _ = await proc.communicate()
+        if proc.returncode == 1:
+            return None
+        elif proc.returncode != 0:
+            raise SubprocessError
+        key, key_type, value, _ = result.decode().split(maxsplit=3)
+        _, _, _, value = result.decode().split(maxsplit=3)
+        value = value.strip()
+        if value != '(0)':
+            return cls.EXIF_ORIENTATION[value.strip()]
+
+    @staticmethod
+    async def set_orientation(path, orientation):
+        proc = await asyncio.create_subprocess_exec(
+            'exiv2', '--Modify', f'set Exif.Image.Orientation {orientation}',
+            'mo', path,
+            stdout=subprocess.PIPE)
+        result, _ = await proc.communicate()
+        if proc.returncode != 0:
+            raise SubprocessError
+
+
+class SubprocessError(Exception):
+    """Raised when an error occurs in a subprocess"""
 
 
 _MIME_OPTIMIZATIONS = {
@@ -145,15 +222,20 @@ async def main():
             before = f.stat().st_size
             before_total += before
 
-            await func(f, strip=args.strip)
+            with TempPath(dir=f.parent) as temp_path:
+                await func(f, temp_path, strip=args.strip)
 
-            after = f.stat().st_size
-            after_total += after
+                after = temp_path.stat().st_size
 
-            if diff := format_diff(before, after):
-                s = f'{diff:>6}%'
-            else:
-                s = 7 * '-'
+                if after < before:
+                    after_total += after
+                    temp_path.rename(f)
+                    diff = format_diff(before, after)
+                else:
+                    after_total += before
+                    diff = None
+
+            s = f'{diff:>6}%' if diff else 7 * '-'
             print(f'{s}  {f}')
 
     if before_total:
