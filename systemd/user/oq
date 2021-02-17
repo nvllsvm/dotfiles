@@ -1,0 +1,14 @@
+[0;4mNEXT                       [0m[0;4m LEFT         [0m[0;4m LAST                       [0m[0;4m PASSED      [0m[0;4m UNIT                     [0m[0;4m ACTIVATES                  [0m
+Wed 2021-02-17 00:33:34 EST 3min 23s left Wed 2021-02-17 00:18:34 EST 11min ago    vdirsyncer.timer          vdirsyncer.service         
+Wed 2021-02-17 00:58:54 EST 28min left    Wed 2021-02-17 00:28:54 EST 1min 16s ago git-repo-backup.timer     git-repo-backup.service    
+Wed 2021-02-17 00:58:54 EST 28min left    Wed 2021-02-17 00:28:54 EST 1min 16s ago mbsync.timer              mbsync.service             
+Wed 2021-02-17 04:00:00 EST 3h 29min left Tue 2021-02-16 04:00:28 EST 20h ago      sol-status-email.timer    sol-status-email.service   
+Thu 2021-02-18 00:00:00 EST 23h left      Wed 2021-02-17 00:00:15 EST 29min ago    gog-update.timer          gog-update.service         
+Thu 2021-02-18 00:00:00 EST 23h left      Wed 2021-02-17 00:00:15 EST 29min ago    harmonize-library.timer   harmonize-library.service  
+Thu 2021-02-18 00:00:00 EST 23h left      Wed 2021-02-17 00:00:15 EST 29min ago    sol-fix-permissions.timer sol-fix-permissions.service
+Thu 2021-02-18 00:00:00 EST 23h left      Wed 2021-02-17 00:00:15 EST 29min ago    sol-update-check.timer    sol-update-check.service   
+Thu 2021-02-18 00:00:00 EST 23h left      Wed 2021-02-17 00:00:15 EST 29min ago    sol-update-remotes.timer  sol-update-remotes.service 
+Thu 2021-02-18 00:00:00 EST 23h left      Wed 2021-02-17 00:00:15 EST 29min ago    wasabi-sync.timer         wasabi-sync.service        
+
+[0;1;39m10 timers listed.[0m
+Pass --all to see loaded but inactive timers, too.
