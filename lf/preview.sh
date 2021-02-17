@@ -31,6 +31,7 @@ else
         application/x-ms-dos-executable|\
         application/x-rar|\
         application/x-tar|\
+        application/x-xz-compressed-tar|\
         application/x-zstd-compressed-tar|\
         application/zip|\
         application/zstd)
