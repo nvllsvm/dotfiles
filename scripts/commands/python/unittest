@@ -1,9 +1,2 @@
-#!/usr/bin/env sh
-set -e
-if [ "$1" = '--cov' ]; then
-    shift
-    coverage run -m unittest "$@"
-    coverage report
-else
-    python -m unittest "$@"
-fi
+#!/usr/bin/env python
+import unittest.__main__
