@@ -4,6 +4,9 @@ if command -v git > /dev/null; then
         case $# in
             0)
                 target="$(fzf < ~/.cache/gs)"
+                if [ -z "$target" ]; then
+                    return 130
+                fi
                 ;;
             1)
                 target="$1"
