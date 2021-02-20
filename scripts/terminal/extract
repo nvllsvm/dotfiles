@@ -42,8 +42,10 @@ class p7zip:
         )
         contents = []
         for line in proc.stdout.splitlines():
-            # strip date+time as they may blank
-            attrs, size, comp_size, name = line[20:].split(maxsplit=3)
+            # - date+time may be blank
+            # - size may be blank
+            attrs = line[20:25]
+            name = line[53:]
             if attrs == b'D....':
                 name += b'/'
             contents.append(name)
