@@ -10,7 +10,11 @@ download() {
     esac
 }
 if [ $# -eq 0 ]; then
-    download "$(cbpaste)"
+    if [ -t 0 ]; then
+        download "$(cbpaste)"
+    else
+        download "$(urlextract)"
+    fi
 else
     for link in "$@"; do
         download "$link"
