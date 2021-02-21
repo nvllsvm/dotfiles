@@ -74,10 +74,12 @@ mode "resize" {
 bindsym $mod+r mode "resize"
 
 bar {
-    status_command    i3status
+    status_command    i3-custom-status
     position          top
     workspace_buttons yes
     tray_output       primary
+    separator_symbol  "   "
+
 
     colors {
         background $color_bg
@@ -106,19 +108,18 @@ hide_edge_borders vertical
 for_window [class="dosbox-staging"] fullscreen
 for_window [class=".*Foliate.*" title="^Open.*"] floating disable
 for_window [class="okular"] floating disable
-for_window [title="desktop-launcher"] floating enable
 
 bindsym $mod+b bar mode toggle
 bindsym $mod+m move position center
 
 bindsym $mod+Return exec --no-startup-id alacritty
-bindsym $mod+space exec --no-startup-id alacritty --command=desktop-launcher --title=desktop-launcher
+bindsym $mod+space exec --no-startup-id desktop-launcher
 bindsym ctrl+$mod+space exec --no-startup-id rofimoji --skin-tone neutral
 bindsym $mod+Escape exec --no-startup-id swaylock -f
 
 bindsym $mod+Shift+s exec --no-startup-id flameshot gui
 
-bindsym XF86AudioMute exec --no-startup-id set-volume --toggle-mute
+bindsym XF86AudioMute exec --no-startjj-id set-volume --toggle-mute
 bindsym XF86AudioLowerVolume exec --no-startup-id set-volume --unmute --decrease 5
 bindsym XF86AudioRaiseVolume exec --no-startup-id set-volume --unmute --increase 5
 
