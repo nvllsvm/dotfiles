@@ -2,5 +2,5 @@
 Description=Run mbsync
 
 [Service]
-ExecStart=mbsync -a
+ExecStart=zsh -lc 'mbsync -a'
 SyslogIdentifier=mbsync

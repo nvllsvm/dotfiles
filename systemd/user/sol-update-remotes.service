@@ -2,5 +2,5 @@
 Description=Run sol-update-remotes
 
 [Service]
-ExecStart=sol-update-remotes
+ExecStart=zsh -lc sol-update-remotes
 SyslogIdentifier=sol-update-remotes

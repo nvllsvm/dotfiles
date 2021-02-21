@@ -2,5 +2,5 @@
 Description=Run wasabi-sync
 
 [Service]
-ExecStart=wasabi-sync
+ExecStart=zsh -lc wasabi-sync
 SyslogIdentifier=wasabi-sync
