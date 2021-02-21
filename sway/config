@@ -114,7 +114,7 @@ bindsym $mod+m move position center
 
 bindsym $mod+Return exec --no-startup-id alacritty
 bindsym $mod+space exec --no-startup-id desktop-launcher
-bindsym ctrl+$mod+space exec --no-startup-id rofimoji --skin-tone neutral
+bindsym ctrl+$mod+space exec --no-startup-id rofimoji --skin-tone neutral --selector wofi
 bindsym $mod+Escape exec --no-startup-id swaylock -f
 
 bindsym $mod+Shift+s exec --no-startup-id flameshot gui
