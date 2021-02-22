@@ -4,8 +4,8 @@ if [[ $OSTYPE == darwin* ]]; then
     # (normally runs: eval `/usr/libexec/path_helper -s`)
     setopt no_global_rcs
     path=(
-        "$path[@]"
         /usr/local/bin
+        "$path[@]"
         /Library/Apple/usr/bin
     )
 
