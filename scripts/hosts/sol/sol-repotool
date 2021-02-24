@@ -64,11 +64,7 @@ repotool_remove() {
 }
 
 sync_nullsum() {
-    cp /var/cache/pacman/sol/sol.db.tar \
-       /var/cache/pacman/sol/sol.db
-    cp /var/cache/pacman/sol/sol.files.tar \
-       /var/cache/pacman/sol/sol.files
-    rsync -av --progress --delete /var/cache/pacman/sol/ nullsum.net:~/r/arch/x86_64
+    rsync -av --progress --delete /var/cache/pacman/sol/ nullsum.net:~/srv/repo/arch/x86_64
 }
 
 usage() {
