@@ -12,26 +12,25 @@ if ! [ -f "$DATABASE_FILE" ]; then
 fi
 
 repotool_update() {
-    rm -rf ~/.cache/aurutils/sync/
     sudo pacsync "$DATABASE" > /dev/null
 
     aur sync --no-view --no-confirm --database="$DATABASE" --no-ver --upgrades
 
     vcs_pkgs=$(aur repo --database="$DATABASE" --list | cut -f1 | grep -E "$AURVCS" || true)
     if [ -n "$vcs_pkgs" ]; then
-        # init vcs sync cache
         aur sync "$vcs_pkgs" --no-ver-argv --no-build --no-view
-
-        mapfile -t git_outdated < <(aur vercmp-devel --database="$DATABASE" | cut -d: -f1)
-        if [ ${#git_outdated[@]} -gt 0 ]; then
-            repotool_remove "${git_outdated[@]}"
-            repotool_add "${git_outdated[@]}"
-        fi
+        for vcs_pkg in $vcs_pkgs; do
+            repo_ver="$(aur repo --database "$DATABASE" --list | grep -P "^$vcs_pkg\t")"
+            current_ver="$(aur srcver ~/.cache/aurutils/sync/"$vcs_pkg")"
+            ood="$(printf '%s' "$repo_ver" | aur vercmp -p <(printf '%s' "$current_ver"))"
+            if [ -n "$ood" ]; then
+                repotool_add "$vcs_pkg"
+            fi
+        done
     fi
 
     sudo pacsync "$DATABASE" > /dev/null
     paccache --remove --keep 1 --cachedir "$DATABASE_DIR"
-    rm -rf ~/.cache/aurutils/sync/
 }
 
 repotool_add() {
