@@ -52,6 +52,11 @@ def main():
             # use instead of shutil.rmtree to ensure nothing added since scan
             try:
                 path.rmdir()
+            except PermissionError as e:
+                print(e, file=sys.stderr)
+            except OSError:
+                # directory not empty
+                pass
             except FileNotFoundError:
                 pass
 
