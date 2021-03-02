@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import json
 import os
 import sys
 
@@ -75,6 +76,27 @@ def create_virtualenv(python_bin, path):
             check=True)
 
 
+def upgrade_virtualenv(path):
+    pip = pathlib.Path(path) / 'bin/pip'
+    env = {
+        'PIP_USER': '0'
+    }
+    proc = subprocess.run(
+        [pip, 'list', '--format', 'json'],
+        stdout=subprocess.PIPE,
+        env=env,
+        check=True)
+    installed = json.loads(proc.stdout.decode())
+
+    names = [package['name'] for package in installed]
+
+    subprocess.run(
+        [pip, 'install', '--upgrade', *names],
+        stdout=subprocess.DEVNULL,
+        env=env,
+        check=True)
+
+
 ENVRC = """\
 if ! [ -f "{activate_path}" ]; then
     echo "error: must reset virtualenv" >&2
@@ -126,6 +148,7 @@ def main():
         parser.exit()
 
     create_virtualenv(python_bin, env_folder)
+    upgrade_virtualenv(env_folder)
 
     env_folder.joinpath('.parent').symlink_to(cwd)
     activate_path = shlex.quote(str(env_folder.joinpath('bin/activate')))
