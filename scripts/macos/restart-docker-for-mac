@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+# Because Docker for Mac is a heap of unstable shit
+
+osascript -e 'quit app "Docker"'
+open -a Docker
+
+while ! docker info > /dev/null 2>&1; do
+    printf "."
+    sleep 1
+done
+echo
