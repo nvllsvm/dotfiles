@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-set -e
+set -ex
 
 show_help() {
     cat << EOF
@@ -36,8 +36,7 @@ while true; do
     esac
 done
 
-ALIGNED_APK=$(echo "${UNSIGNED_APK}" | sed 's/-unsigned\.apk$/-aligned.apk/')
 RELEASE_APK=$(echo "${UNSIGNED_APK}" | sed 's/-unsigned\.apk$/.apk/')
 
-apksigner sign --ks "${RELEASE_KEY}" --out "${RELEASE_APK}" "${ALIGNED_APK}"
+apksigner sign --ks "${RELEASE_KEY}" --out "${RELEASE_APK}" "${UNSIGNED_APK}"
 apksigner verify "${RELEASE_APK}"
