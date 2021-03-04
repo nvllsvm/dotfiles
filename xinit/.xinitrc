@@ -31,10 +31,6 @@ if command -v mpd-notifier > /dev/null; then
     mpd-notifier &
 fi
 
-if command -v blueman-tray > /dev/null; then
-    blueman-tray &
-fi
-
 autorandr --change --force
 udiskie --tray &
 
