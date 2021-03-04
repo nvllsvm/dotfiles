@@ -35,6 +35,8 @@ def run_lgogdownloader():
 
 
 def main():
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
     before = files_to_mtime(GOG_DIR)
     run_lgogdownloader()
     after = files_to_mtime(GOG_DIR)
