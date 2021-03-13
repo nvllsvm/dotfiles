@@ -1,2 +1,2 @@
 #!/data/data/com.termux/files/usr/bin/zsh
-printf '- %s' "$*" >> ~/notes/todo.md
+printf '- %s\n' "$*" >> ~/notes/todo.md
