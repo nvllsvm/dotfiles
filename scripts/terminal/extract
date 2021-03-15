@@ -282,10 +282,7 @@ class unrar:
             ['unrar', 'vb', '-v', path],
             stdout=subprocess.PIPE,
             check=True)
-        return list(set(
-            line.split(maxsplit=3)[-1]
-            for line in proc.stdout.splitlines()
-        ))
+        return set(proc.stdout.splitlines())
 
     @staticmethod
     def extract(path, dest, password=None, overwrite=False):
@@ -383,10 +380,18 @@ class innoextract:
             stderr=subprocess.PIPE,
             check=True)
 
-        contents = []
+        contents = set()
+        listing_files = False
         for line in proc.stdout.splitlines():
-            _, name, _ = line.split(b'"', 2)
-            contents.append(name)
+            if line == b'----------- ---------  ---------- -----  ----':
+                listing_files = not listing_files
+            elif listing_files:
+                name = line.split(maxsplit=4)[-1]
+                contents.add(name)
+            elif line.startswith(b' - '):
+                _, name, _ = line.split(b'"', 2)
+                contents.add(name)
+
         return contents
 
     @staticmethod
