@@ -6,7 +6,8 @@ if [ -z "$DEV_ID" ]; then
 fi
 EVDEV="/dev/input/${DEV_ID}"
 exec xboxdrv \
-    --verbose \
+    --quiet \
+    --silent \
     --evdev "$EVDEV" \
     --evdev-absmap ABS_HAT0X=DPAD_X \
     --evdev-absmap ABS_HAT0Y=DPAD_Y \
