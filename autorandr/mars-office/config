@@ -6,7 +6,7 @@ output HDMI-A-0
 off
 output DisplayPort-0
 crtc 0
-mode 3440x1440
+mode 1920x1200
 pos 0x0
 primary
-rate 143.92
+rate 59.95
