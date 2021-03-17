@@ -111,6 +111,9 @@ unset PS1
 # export PIP_USER even though it's disabled in pip.conf.
 # tox doesn't seem to respect the venv's pip.conf
 export PIP_USER=0
+
+# zsh-only. fixes virtualenv in PATH not taking precedence
+command -v rehash >/dev/null && rehash
 """
 
 
