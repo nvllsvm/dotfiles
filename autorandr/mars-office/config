@@ -7,7 +7,7 @@ off
 output DisplayPort-0
 crtc 0
 gamma 0.909:0.909:0.909
-mode 1920x1200
+mode 3440x1440
 pos 0x0
 primary
-rate 59.95
+rate 143.92
