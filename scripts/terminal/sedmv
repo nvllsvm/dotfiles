@@ -5,6 +5,6 @@ shift
 for f in "$@"; do
     new="$(printf %s "$f" | sed "$pattern")"
     if [ "$new" != "$f" ]; then
-        mv "$f" "$new"
+        mv --no-clobber "$f" "$new"
     fi
 done
