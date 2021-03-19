@@ -576,6 +576,33 @@ class pigz:
         return [path]
 
 
+class bzip2:
+    @staticmethod
+    @functools.lru_cache()
+    def check():
+        if not shutil.which('bzip2'):
+            raise KeyError
+
+    @staticmethod
+    def contents(path):
+        return [path.with_suffix('').name.encode()]
+
+    @staticmethod
+    def extract(path, dest, password=None, overwrite=False):
+        if overwrite:
+            raise NotImplementedError
+        target = dest / path.with_suffix('').name
+        with open(target, 'w') as handle:
+            subprocess.run(
+                ['bzip2', '-d', '-c', '--', path],
+                stdout=handle,
+                check=True)
+
+    @staticmethod
+    def volumes(path, password=''):
+        return [path]
+
+
 class xz:
     @staticmethod
     @functools.lru_cache()
@@ -747,6 +774,12 @@ def _get_class(path):
                     return pigz
                 except KeyError:
                     return gzip
+        # bzip2
+        elif start.startswith(b'BZh'):
+            if suffixes[-2] == '.tar':
+                return gnu_tar
+            else:
+                return bzip2
         # xz
         elif start.startswith(b'\xfd7zXZ\x00'):
             if suffixes[-2] == '.tar':
