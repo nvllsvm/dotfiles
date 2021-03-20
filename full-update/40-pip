@@ -13,7 +13,7 @@ pip() {
 
 if ! [ -x "$(command -v pip)" ] || [ "$(pip list | grep -c -e '^pip ' -e '^setuptools ' -e '^wheel ')" != '3' ]; then
     python -m ensurepip --user --default-pip
-    pip install --user --upgrade --force-reinstall pip setuptools wheel
+    pip install --quiet --user --upgrade --force-reinstall pip setuptools wheel
 fi
 
 ood_packages="$(pip list --outdated --format=freeze)"
