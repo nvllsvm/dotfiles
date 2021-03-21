@@ -124,7 +124,7 @@ class exiv2:
             stdout=subprocess.PIPE)
         stdout, stderr = await proc.communicate()
 
-        # Exif.Image.Orientation not present in file 
+        # Exif.Image.Orientation not present in file
         if proc.returncode == 1 and not stderr:
             return None
         elif proc.returncode != 0:
@@ -192,6 +192,51 @@ def _sigint_handler(*_):
     sys.exit(130)
 
 
+async def _process(func, path, strip):
+    before = path.stat().st_size
+
+    with TempPath(dir=path.parent) as temp_path:
+        await func(path, temp_path, strip=strip)
+        temp_path.rename(path)
+
+    after = path.stat().st_size
+    return path, before, after
+
+
+class Executor:
+    def __init__(self, max_workers=None):
+        self.max_workers = \
+            os.cpu_count() if max_workers is None else max_workers
+        self._queued = []
+        self._pending = set()
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, *args):
+        return
+
+    def submit(self, func, *args, **kwargs):
+        self._queued.append((func, args, kwargs))
+
+    def _fill(self):
+        for _ in range(self.max_workers - len(self._pending)):
+            if not self._queued:
+                return
+            func, args, kwargs = self._queued.pop()
+            self._pending.add(asyncio.create_task(func(*args, **kwargs)))
+
+    async def as_completed(self):
+        while self._queued or self._pending:
+            self._fill()
+
+            done, self._pending = await asyncio.wait(
+                self._pending, return_when=asyncio.FIRST_COMPLETED)
+
+            for result in done:
+                yield result
+
+
 async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-s', '--strip', action='store_true')
@@ -211,35 +256,32 @@ async def main():
 
     before_total = 0
     after_total = 0
-    for f in sorted(files):
-        try:
-            mimetype = determine_mime(f)
-        except (FileNotFoundError, IsADirectoryError):
-            # broken symlink can cause this
-            continue
 
-        if args.mime and mimetype not in args.mime:
-            continue
+    async with Executor() as executor:
+        for f in sorted(files):
+            try:
+                mimetype = determine_mime(f)
+            except (FileNotFoundError, IsADirectoryError):
+                # broken symlink can cause this
+                continue
 
-        if func := _MIME_OPTIMIZATIONS.get(mimetype):
-            before = f.stat().st_size
-            before_total += before
+            if args.mime and mimetype not in args.mime:
+                continue
 
-            with TempPath(dir=f.parent) as temp_path:
-                await func(f, temp_path, strip=args.strip)
+            if func := _MIME_OPTIMIZATIONS.get(mimetype):
+                executor.submit(_process, func, f, args.strip)
 
-                after = temp_path.stat().st_size
-
-                if after < before:
-                    after_total += after
-                    temp_path.rename(f)
-                    diff = format_diff(before, after)
-                else:
-                    after_total += before
-                    diff = None
+        async for result in executor.as_completed():
+            path, before, after = result.result()
+            if after < before:
+                after_total += after
+                diff = format_diff(before, after)
+            else:
+                after_total += before
+                diff = None
 
             s = f'{diff:>6}%' if diff else 7 * '-'
-            print(f'{s}  {f}')
+            print(f'{s}  {path}')
 
     if before_total:
         if diff := format_diff(before_total, after_total):
