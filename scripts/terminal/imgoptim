@@ -5,7 +5,6 @@ import contextlib
 import os
 import pathlib
 import signal
-import subprocess
 import sys
 import tempfile
 
@@ -56,7 +55,7 @@ async def optimize_jpeg(source, dest, strip=False):
     args.extend(['--', source])
     proc = await asyncio.create_subprocess_exec(
         *args,
-        stdout=subprocess.PIPE)
+        stdout=asyncio.subprocess.PIPE)
     stdout, _ = await proc.communicate()
     if proc.returncode != 0:
         raise SubprocessError
@@ -120,8 +119,8 @@ class exiv2:
     async def get_orientation(cls, path):
         proc = await asyncio.create_subprocess_exec(
             'exiv2', '--key', 'Exif.Image.Orientation', '--', path,
-            stderr=subprocess.PIPE,
-            stdout=subprocess.PIPE)
+            stderr=asyncio.subprocess.PIPE,
+            stdout=asyncio.subprocess.PIPE)
         stdout, stderr = await proc.communicate()
 
         # Exif.Image.Orientation not present in file
@@ -140,7 +139,7 @@ class exiv2:
         proc = await asyncio.create_subprocess_exec(
             'exiv2', '--Modify', f'set Exif.Image.Orientation {orientation}',
             'mo', path,
-            stdout=subprocess.PIPE)
+            stdout=asyncio.subprocess.PIPE)
         result, _ = await proc.communicate()
         if proc.returncode != 0:
             raise SubprocessError
