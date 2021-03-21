@@ -208,11 +208,14 @@ class AsyncExecutor:
             os.cpu_count() if max_pending is None else max_pending
         self._queued = []
         self._pending = set()
-        self._started = False
 
     def submit(self, func, *args, **kwargs):
         self._queued.append((func, args, kwargs))
-        if self._started:
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            pass
+        else:
             self._fill()
 
     async def as_completed(self):
@@ -224,14 +227,6 @@ class AsyncExecutor:
 
             for result in done:
                 yield result
-
-    async def __aenter__(self):
-        self._started = True
-        self._fill()
-        return self
-
-    async def __aexit__(self, *args):
-        self._started = False
 
     def _fill(self):
         for _ in range(self.max_pending - len(self._pending)):
