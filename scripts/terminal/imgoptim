@@ -278,6 +278,7 @@ async def main():
 
     async for result in executor.as_completed():
         path, before, after = result.result()
+        before_total += before
         if after < before:
             after_total += after
             diff = format_diff(before, after)
