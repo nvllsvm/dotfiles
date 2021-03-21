@@ -153,37 +153,45 @@ def all_files(root):
     return files
 
 
-async def run(paths, max_procs=None):
-    if max_procs is None:
-        max_procs = os.cpu_count()
-
-    paths = [
-        path
-        for path in paths
-        if path.suffix.lower() in ('.flac', '.ape', '.wav', '.wv')
-    ]
-
+async def run(executor):
     errors = []
+    async for result in executor.as_completed():
+        try:
+            result.result()
+        except Exception as e:
+            LOGGER.exception(e)
+            errors.append(str(e))
 
-    pending = set()
-    while paths or pending:
-        for i in range(max_procs - len(pending)):
-            if not paths:
-                break
-            pending.add(asyncio.create_task(reencode(paths.pop())))
+    for error in sorted(errors):
+        LOGGER.error('Error %s', error)
 
-        done, pending = await asyncio.wait(
-            pending, return_when=asyncio.FIRST_COMPLETED)
 
-        for result in done:
-            try:
-                result.result()
-            except Exception as e:
-                LOGGER.exception(e)
-                errors.append(str(e))
+class Executor:
+    def __init__(self, max_workers=None):
+        self.max_workers = \
+            os.cpu_count() if max_workers is None else max_workers
+        self._queued = []
+        self._pending = set()
 
-    for path in sorted(errors):
-        LOGGER.error('Error %s', path)
+    def submit(self, func, *args, **kwargs):
+        self._queued.append((func, args, kwargs))
+
+    def _fill(self):
+        for _ in range(self.max_workers - len(self._pending)):
+            if not self._queued:
+                return
+            func, args, kwargs = self._queued.pop()
+            self._pending.add(asyncio.create_task(func(*args, **kwargs)))
+
+    async def as_completed(self):
+        while self._queued or self._pending:
+            self._fill()
+
+            done, self._pending = await asyncio.wait(
+                self._pending, return_when=asyncio.FIRST_COMPLETED)
+
+            for result in done:
+                yield result
 
 
 def main():
@@ -202,7 +210,12 @@ def main():
         else:
             paths.add(path)
 
-    asyncio.run(run(paths))
+    executor = Executor()
+    for path in paths:
+        if path.suffix.lower() in ('.flac', '.ape', '.wav', '.wv'):
+            executor.submit(reencode, path)
+
+    asyncio.run(run(executor))
 
 
 if __name__ == '__main__':
