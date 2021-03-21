@@ -209,22 +209,12 @@ class Executor:
             os.cpu_count() if max_workers is None else max_workers
         self._queued = []
         self._pending = set()
-
-    async def __aenter__(self):
-        return self
-
-    async def __aexit__(self, *args):
-        return
+        self._started = False
 
     def submit(self, func, *args, **kwargs):
         self._queued.append((func, args, kwargs))
-
-    def _fill(self):
-        for _ in range(self.max_workers - len(self._pending)):
-            if not self._queued:
-                return
-            func, args, kwargs = self._queued.pop()
-            self._pending.add(asyncio.create_task(func(*args, **kwargs)))
+        if self._started:
+            self._fill()
 
     async def as_completed(self):
         while self._queued or self._pending:
@@ -235,6 +225,21 @@ class Executor:
 
             for result in done:
                 yield result
+
+    async def __aenter__(self):
+        self._started = True
+        self._fill()
+        return self
+
+    async def __aexit__(self, *args):
+        self._started = False
+
+    def _fill(self):
+        for _ in range(self.max_workers - len(self._pending)):
+            if not self._queued:
+                return
+            func, args, kwargs = self._queued.pop()
+            self._pending.add(asyncio.create_task(func(*args, **kwargs)))
 
 
 async def main():
@@ -257,31 +262,31 @@ async def main():
     before_total = 0
     after_total = 0
 
-    async with Executor() as executor:
-        for f in sorted(files):
-            try:
-                mimetype = determine_mime(f)
-            except (FileNotFoundError, IsADirectoryError):
-                # broken symlink can cause this
-                continue
+    executor = Executor()
+    for f in sorted(files):
+        try:
+            mimetype = determine_mime(f)
+        except (FileNotFoundError, IsADirectoryError):
+            # broken symlink can cause this
+            continue
 
-            if args.mime and mimetype not in args.mime:
-                continue
+        if args.mime and mimetype not in args.mime:
+            continue
 
-            if func := _MIME_OPTIMIZATIONS.get(mimetype):
-                executor.submit(_process, func, f, args.strip)
+        if func := _MIME_OPTIMIZATIONS.get(mimetype):
+            executor.submit(_process, func, f, args.strip)
 
-        async for result in executor.as_completed():
-            path, before, after = result.result()
-            if after < before:
-                after_total += after
-                diff = format_diff(before, after)
-            else:
-                after_total += before
-                diff = None
+    async for result in executor.as_completed():
+        path, before, after = result.result()
+        if after < before:
+            after_total += after
+            diff = format_diff(before, after)
+        else:
+            after_total += before
+            diff = None
 
-            s = f'{diff:>6}%' if diff else 7 * '-'
-            print(f'{s}  {path}')
+        s = f'{diff:>6}%' if diff else 7 * '-'
+        print(f'{s}  {path}')
 
     if before_total:
         if diff := format_diff(before_total, after_total):
