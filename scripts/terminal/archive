@@ -5,7 +5,6 @@ import contextlib
 import os
 import pathlib
 import shutil
-import subprocess
 import sys
 import tempfile
 
@@ -41,7 +40,7 @@ def _all_paths(root):
     return paths
 
 
-def create_zip(paths, dest, cwd, fast=False):
+async def create_zip(paths, dest, cwd, fast=False):
     paths = sorted(
         path.relative_to(cwd)
         for path in paths
@@ -53,23 +52,24 @@ def create_zip(paths, dest, cwd, fast=False):
     # zip cli thinks existing file means
     dest.unlink()
 
-    proc = subprocess.Popen(
-        ['zip',
-         level,
-         '-nw',  # treat wildcards as regular characters
-         '-@',  # read paths from stdin
-         dest],
+    proc = await asyncio.create_subprocess_exec(
+        'zip',
+        level,
+        '-nw',  # treat wildcards as regular characters
+        '-@',  # read paths from stdin
+        dest,
         cwd=cwd,
-        stdin=subprocess.PIPE)
-    proc.communicate(b'\n'.join(bytes(p) for p in paths))
-    proc.wait()
+        stdin=asyncio.subprocess.PIPE)
+    proc.stdin.write(b'\n'.join(bytes(p) for p in paths))
+    proc.stdin.close()
+    await proc.wait()
     if proc.returncode != 0:
         raise RuntimeError('exit code {proc.returncode}')
     if not fast:
-        optimize_zip(dest)
+        await optimize_zip(dest)
 
 
-def create_epub(paths, dest, cwd, fast=False):
+async def create_epub(paths, dest, cwd, fast=False):
     level = '-0' if fast else '-9'
 
     # zip cli thinks existing file means
@@ -91,21 +91,22 @@ def create_epub(paths, dest, cwd, fast=False):
         key=_path_rank
     )
 
-    proc = subprocess.Popen(
-        ['zip',
-         level,
-         '-nw',  # treat wildcards as regular characters
-         '-X',  # prevents EpubCheck error
-         '-@',  # read paths from stdin
-         dest],
+    proc = await asyncio.create_subprocess_exec(
+        'zip',
+        level,
+        '-nw',  # treat wildcards as regular characters
+        '-X',  # prevents EpubCheck error
+        '-@',  # read paths from stdin
+        dest,
         cwd=cwd,
-        stdin=subprocess.PIPE)
-    proc.communicate(b'\n'.join(p.encode() for p in paths))
-    proc.wait()
+        stdin=asyncio.subprocess.PIPE)
+    proc.stdin.write(b'\n'.join(bytes(p) for p in paths))
+    proc.stdin.close()
+    await proc.wait()
     if proc.returncode != 0:
         raise RuntimeError('exit code {proc.returncode}')
     if not fast:
-        optimize_zip(dest)
+        await optimize_zip(dest)
 
 
 async def create_zstd_tar(paths, dest, cwd, fast=False):
@@ -136,10 +137,11 @@ async def create_zstd_tar(paths, dest, cwd, fast=False):
     assert tar_proc.returncode == zstd_proc.returncode == 0
 
 
-def optimize_zip(path):
-    subprocess.run(
-        ['advzip', '--recompress', '--shrink-insane', path],
-        check=True)
+async def optimize_zip(path):
+    proc = await asyncio.create_subprocess_exec(
+        'advzip', '--recompress', '--shrink-insane', path)
+    await proc.wait()
+    assert proc.returncode == 0
 
 
 _formats = {
