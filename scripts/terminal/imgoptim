@@ -182,9 +182,9 @@ def format_diff(before, after):
 def sizeof_fmt(num):
     for unit in ['B', 'KB', 'MB', 'GB', 'TB', 'PB']:
         if abs(num) < 1024.0:
-            return f'{num:.1f}{unit}'
+            break
         num /= 1024.0
-    raise RuntimeError
+    return f'{num:.1f}{unit}'
 
 
 def _sigint_handler(*_):

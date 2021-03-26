@@ -279,7 +279,7 @@ class unrar:
     @staticmethod
     def contents(path):
         proc = subprocess.run(
-            ['unrar', 'vb', '-v', path],
+            ['unrar', 'vb', '-v', '--', path],
             stdout=subprocess.PIPE,
             check=True)
         return set(proc.stdout.splitlines())
@@ -289,13 +289,14 @@ class unrar:
         if overwrite:
             raise NotImplementedError
         subprocess.run(
-            ['unrar', 'x', path, dest],
+            ['unrar', 'x', '-idc', '-idd', '-idn', '-idp', '-idq',
+             '--', path, dest],
             check=True)
 
     @staticmethod
     def volumes(path, password=''):
         proc = subprocess.run(
-            ['unrar', 'vt', '-v', path],
+            ['unrar', 'vt', '-v', '--', path],
             stdout=subprocess.PIPE,
             check=True)
         return [
@@ -863,6 +864,8 @@ def main():
 
     extracted = set()
     for path in args.archive:
+        path = path.absolute()
+
         if path in extracted:
             continue
 
