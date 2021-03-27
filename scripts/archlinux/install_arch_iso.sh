@@ -1,5 +1,10 @@
 #!/usr/bin/env sh
-set -eux
+set -eu
+if [ "$(id -u)" != '0' ]; then
+    echo 'error: must run as root' >&2
+    exit 1
+fi
+
 ISO="$1"
 BOOT=/boot
 ROOT_DEV="$(findmnt -o SOURCE -n "$BOOT")"
@@ -12,19 +17,21 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
+set -x
+
 TMPDIR="$(mktemp -d)"
-mount -o loop "$ISO" "$TMPDIR"
+mount -o ro -o loop "$ISO" "$TMPDIR"
 
 for f in arch shellx64.efi; do
     rm -rf "${BOOT:?}/${f}"
     cp -r "${TMPDIR}/${f}" "${BOOT}/${f}"
 done
 
-cat > "$BOOT/loader/entries/arch_install.conf" << EOF
+cat > "${BOOT}/loader/entries/arch_install.conf" << EOF
 title   Arch Linux install medium (x86_64, UEFI)
 linux   /arch/boot/x86_64/vmlinuz-linux
 initrd  /arch/boot/intel-ucode.img
 initrd  /arch/boot/amd-ucode.img
 initrd  /arch/boot/x86_64/initramfs-linux.img
-options archisobasedir=arch archisodevice=/dev/disk/by-uuid/$ROOT_UUID
+options archisobasedir=arch archisodevice=/dev/disk/by-uuid/${ROOT_UUID}
 EOF
