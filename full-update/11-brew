@@ -5,6 +5,9 @@ if [ "$(uname)" != 'Darwin' ]; then
     exit
 fi
 
+# user=true in my global conf fucks up some brew package installations
+export PIP_USER=0
+
 if ! command -v brew > /dev/null; then
     /usr/bin/ruby -e "$(curl --compressed -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 fi
