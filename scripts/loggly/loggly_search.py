@@ -51,12 +51,10 @@ def main():
         args.subdomain, args.token, args.query, args.start, args.end,
         args.order)
 
-    events = []
-    for event in event_iter:
-        events.append(event)
-        if args.limit and len(events) >= args.limit:
+    for i, event in enumerate(event_iter):
+        print(json.dumps(event))
+        if args.limit and i == args.limit:
             break
-    print(json.dumps(events, indent=2, sort_keys=True))
 
 
 if __name__ == '__main__':
