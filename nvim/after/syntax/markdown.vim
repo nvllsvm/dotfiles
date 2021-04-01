@@ -4,6 +4,10 @@ syntax case match
 syn match mkdDue /due:\d\d\d\d-\d\d-\d\d/ containedin=htmlH[1-6],mkdNonListItemBlock,mkdListItemLine
 hi def link mkdDue Todo
 
+" goal
+syn match mkdGoal /goal:\d\d\d\d-\d\d-\d\d/ containedin=htmlH[1-6],mkdNonListItemBlock,mkdListItemLine
+hi def link mkdGoal Todo
+
 " todo
 syn match mkdTodo /TODO:\?/ containedin=htmlH[1-6],mkdNonListItemBlock,mkdListItemLine
 hi def link mkdTodo Todo
