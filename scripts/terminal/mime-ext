@@ -13,6 +13,9 @@ MIME_SUFFIXES = {
     'application/x-bittorrent': [
         '.torrent',
     ],
+    'application/x-rar': [
+        '.rar',
+    ],
     'application/pdf': [
         '.pdf',
     ],
@@ -113,7 +116,7 @@ def main():
 
     print(json.dumps(exts, indent=2, sort_keys=True))
 
-    if args.check and exts:
+    if (args.check or args.fix) and exts:
         if args.fix:
             for mime, paths in exts.items():
                 suffix = MIME_SUFFIXES[mime][0]
