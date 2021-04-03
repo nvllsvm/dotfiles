@@ -1,39 +1,82 @@
 #!/usr/bin/env sh
-export STEAM_COMPAT_DATA_PATH="$HOME/.steam/proton"
-STEAMAPPS_COMMON=~/.steam/steam/steamapps/common
-PROTON_BASE="$STEAMAPPS_COMMON/$(ls "$STEAMAPPS_COMMON" | grep '^Proton' | sort --version-sort | tail -n 1)"
-PROTON_PREFIX="$STEAM_COMPAT_DATA_PATH/pfx"
-mkdir -p "$STEAM_COMPAT_DATA_PATH"
+set -e
+
 show_help() {
     cat << EOF
-usage: proton-steam [--show-prefix] PROGRAM [ARG ...]
+usage: proton-steam --prefix PATH PROGRAM [ARG ...]
     --help          show help and exit
-    --show-prefix   show proton prefix path and exit
+    --prefix PATH   use a custom prefix path
+    --system        use the system's proton
     --version       show program's version and exit
 EOF
 }
 
-
-case "$1" in
-    --help)
-        show_help
-        exit
-        ;;
-    --show-prefix)
-        echo "$PROTON_PREFIX"
-        exit
-        ;;
-    --version)
-        sed 's/.*\sproton-//' "$PROTON_BASE"/version
-        exit
-        ;;
-    *)
-        ;;
-esac
+USE_SYSTEM_PROTON=
+SHOW_VERSION=
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --)
+            break
+            ;;
+        --help)
+            show_help
+            exit
+            ;;
+        --prefix)
+            STEAM_COMPAT_DATA_PATH="$(realpath "$2")"
+            export STEAM_COMPAT_DATA_PATH
+            mkdir -p "$STEAM_COMPAT_DATA_PATH"
+            shift
+            shift
+            ;;
+        --system)
+            USE_SYSTEM_PROTON=1
+            shift
+            ;;
+        --version)
+            SHOW_VERSION=1
+            shift
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
 
 if [ $# -eq 0 ]; then
     show_help >&2
     exit 1
 fi
 
-exec "$PROTON_BASE"/proton run "$@"
+if [ -z "$STEAM_COMPAT_DATA_PATH" ]; then
+    echo 'error: --prefix must be specified' >&2
+    exit 1
+fi
+
+system_proton() {
+    exec "$(which -a "${0##*/}" | grep -m 1 -v "^$0$")" "$@"
+}
+
+steam_proton() {
+    STEAMAPPS_COMMON=~/.steam/steam/steamapps/common
+    PROTON_BASE="$STEAMAPPS_COMMON/$(find "$STEAMAPPS_COMMON" -maxdepth 1 -mindepth 1 -printf '%P\n' | grep '^Proton' | sort --version-sort | tail -n 1)"
+    exec "$PROTON_BASE"/proton run "$@"
+}
+
+proton_run() {
+    if [ -n "$USE_SYSTEM_PROTON" ]; then
+        system_proton "$@"
+    else
+        steam_proton "$@"
+    fi
+}
+
+if [ -n "$SHOW_VERSION" ]; then
+    # initialize/upgrade prefix
+    proton_run echo
+
+    cat "$STEAM_COMPAT_DATA_PATH"/version
+    exit
+fi
+
+proton_run "$@"
