@@ -38,7 +38,7 @@ while true; do
                 # xrandr-edid $(xrandr-primary-output) | base64 -w0
                 case "$(xrandr-edid "$(xrandr-primary-output)" | base64 -w0)" in
                     # basement - dell u2412m
-                    AP///////wAQrHugUzg5MBEXAQSlNCB4Ou6Vo1RMmSYPUFShCACBQIGAqUCzANHAAQEBAQEBKDyAoHCwI0AwIDYABkQhAAAaAAAA/wBZTVlIMTM0TDA5OFMKAAAA/ABERUxMIFUyNDEyTQogAAAA/QAyPR5TEQAKICAgICAgAMk=)
+                    AP///////wAQrHugU0RKMBEXAQSlNCB4Ou6Vo1RMmSYPUFShCACBQIGAqUCzANHAAQEBAQEBKDyAoHCwI0AwIDYABkQhAAAaAAAA/wBZTVlIMTM0TDBKRFMKAAAA/ABERUxMIFUyNDEyTQogAAAA/QAyPR5TEQAKICAgICAgAI8=)
                         PROFILE="$DOTFILES/icc/U2412M #1 2020-11-30 19-46 D6500 sRGB F-S XYZLUT+MTX.icc"
                         ;;
                     # other desk - dell u2412m
