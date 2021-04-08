@@ -1,3 +1,0 @@
-#!/usr/bin/env sh
-RFC="$1"
-curl https://tools.ietf.org/rfc/rfc${RFC}.txt | less
