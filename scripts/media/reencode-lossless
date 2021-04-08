@@ -36,7 +36,7 @@ async def decode_ape(source, fd):
 
 async def decode_wv(source, fd):
     proc = await asyncio.create_subprocess_exec(
-        'wvunpack', '-d', source, '-',
+        'wvunpack', '-q', source, '-o', '-',
         stdout=fd)
 
     async def result():
@@ -202,6 +202,7 @@ class AsyncExecutor:
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('-n', dest='numprocs', metavar='NUMPROCS', type=int)
     parser.add_argument('path', type=pathlib.Path, nargs='+')
     args = parser.parse_args()
 
@@ -216,7 +217,7 @@ def main():
         else:
             paths.add(path)
 
-    executor = AsyncExecutor()
+    executor = AsyncExecutor(max_pending=args.numprocs)
     for path in paths:
         if path.suffix.lower() in ('.flac', '.ape', '.wav', '.wv'):
             executor.submit(reencode, path)
