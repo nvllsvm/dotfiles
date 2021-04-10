@@ -109,6 +109,18 @@ async def create_epub(paths, dest, cwd, fast=False):
         await optimize_zip(dest)
 
 
+async def create_zstd(paths, dest, cwd, fast=False):
+    level = '-1' if fast else '-22'
+
+    if len(paths) != 1:
+        raise RuntimeError
+
+    zstd_proc = await asyncio.create_subprocess_exec(
+        'zstd', '-f', '-T0', '--ultra', level, '-o', dest, -- paths[0])
+    await zstd_proc.wait()
+    assert zstd_proc.returncode == 0
+
+
 async def create_zstd_tar(paths, dest, cwd, fast=False):
     level = '-1' if fast else '-22'
 
@@ -152,6 +164,10 @@ _formats = {
     'zip': {
         'func': create_zip,
         'suffix': '.zip',
+    },
+    'zstd': {
+        'func': create_zstd,
+        'suffix': '.zst'
     },
     'zstd-tar': {
         'func': create_zstd_tar,
