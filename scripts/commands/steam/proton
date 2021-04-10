@@ -4,13 +4,15 @@ set -e
 show_help() {
     cat << EOF
 usage: proton-steam --prefix PATH PROGRAM [ARG ...]
-    --help          show help and exit
-    --prefix PATH   use a custom prefix path
-    --system        use the system's proton
-    --version       show program's version and exit
+    --help              show help and exit
+    --prefix PATH       use a custom prefix path
+    --system            use the system's proton
+    --proton VERSION    use specific version of proton
+    --version           show program's version and exit
 EOF
 }
 
+USE_PROTON_VERSION=
 USE_SYSTEM_PROTON=
 SHOW_VERSION=
 while [ $# -gt 0 ]; do
@@ -26,6 +28,11 @@ while [ $# -gt 0 ]; do
             STEAM_COMPAT_DATA_PATH="$(realpath "$2")"
             export STEAM_COMPAT_DATA_PATH
             mkdir -p "$STEAM_COMPAT_DATA_PATH"
+            shift
+            shift
+            ;;
+        --proton)
+            USE_PROTON_VERSION="$2"
             shift
             shift
             ;;
@@ -59,7 +66,11 @@ system_proton() {
 
 steam_proton() {
     STEAMAPPS_COMMON=~/.steam/steam/steamapps/common
-    PROTON_BASE="$STEAMAPPS_COMMON/$(find "$STEAMAPPS_COMMON" -maxdepth 1 -mindepth 1 -printf '%P\n' | grep '^Proton' | sort --version-sort | tail -n 1)"
+    if [ -n "$USE_PROTON_VERSION" ]; then
+        PROTON_BASE="$STEAMAPPS_COMMON/Proton $USE_PROTON_VERSION"
+    else
+        PROTON_BASE="$STEAMAPPS_COMMON/$(find "$STEAMAPPS_COMMON" -maxdepth 1 -mindepth 1 -printf '%P\n' | grep '^Proton' | sort --version-sort | tail -n 1)"
+    fi
     exec "$PROTON_BASE"/proton run "$@"
 }
 
