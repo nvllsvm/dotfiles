@@ -4,16 +4,14 @@ set -e
 show_help() {
     cat << EOF
 usage: proton-steam --prefix PATH PROGRAM [ARG ...]
-    --help              show help and exit
-    --prefix PATH       use a custom prefix path
-    --system            use the system's proton
-    --proton VERSION    use specific version of proton
-    --version           show program's version and exit
+    --help          show help and exit
+    --prefix PATH   use a custom prefix path
+    --use VERSION   use specific version of proton
+    --version       show program's version and exit
 EOF
 }
 
 USE_PROTON_VERSION=
-USE_SYSTEM_PROTON=
 SHOW_VERSION=
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -31,13 +29,9 @@ while [ $# -gt 0 ]; do
             shift
             shift
             ;;
-        --proton)
+        --use)
             USE_PROTON_VERSION="$2"
             shift
-            shift
-            ;;
-        --system)
-            USE_SYSTEM_PROTON=1
             shift
             ;;
         --version)
@@ -75,7 +69,7 @@ steam_proton() {
 }
 
 proton_run() {
-    if [ -n "$USE_SYSTEM_PROTON" ]; then
+    if [ "$USE_PROTON_VERSION" = 'system' ]; then
         system_proton "$@"
     else
         steam_proton "$@"
