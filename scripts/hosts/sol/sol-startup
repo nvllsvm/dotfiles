@@ -37,3 +37,6 @@ podman system migrate || true
 
 sol-docker down --remove-orphans
 sol-docker up -d
+
+echo Starting wireguard ...
+sudo wg-quick up sol
