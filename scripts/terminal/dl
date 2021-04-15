@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+download() {
+    case "$1" in
+        https://www.youtube.com*|\
+        https://youtube.com*)
+            youtube-dl "$1"
+            ;;
+        *)
+            aria2c -x 16 -j 20 --split 20 "$@"
+    esac
+}
+if [ $# -eq 0 ]; then
+    if [ -t 0 ]; then
+        download "$(cbpaste)"
+    else
+        download "$(urlextract)"
+    fi
+else
+    for link in "$@"; do
+        download "$link"
+    done
+fi
