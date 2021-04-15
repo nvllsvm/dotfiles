@@ -6,7 +6,11 @@ download() {
             youtube-dl "$1"
             ;;
         *)
-            aria2c -x 16 -j 20 --split 20 "$@"
+            if command -v aria2c > /dev/null; then
+                aria2c -x 16 -j 20 --split 20 "$@"
+            elif command -v curl > /dev/null; then
+                curl -O "$@"
+            fi
     esac
 }
 if [ $# -eq 0 ]; then
