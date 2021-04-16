@@ -196,9 +196,12 @@ async def _process(func, path, strip):
 
     with TempPath(dir=path.parent) as temp_path:
         await func(path, temp_path, strip=strip)
-        temp_path.rename(path)
 
-    after = path.stat().st_size
+        after = temp_path.stat().st_size
+
+        if after < before:
+            temp_path.rename(path)
+
     return path, before, after
 
 
