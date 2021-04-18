@@ -1,12 +1,9 @@
-output DP2
+output DP-1
 off
-output VIRTUAL1
+output DP-2
 off
-output DP1
-off
-output eDP1
+output eDP-1
 crtc 0
-gamma 0.909:0.909:0.833
 mode 1600x900
 pos 0x0
 primary

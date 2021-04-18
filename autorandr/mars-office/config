@@ -6,7 +6,6 @@ output HDMI-A-0
 off
 output DisplayPort-0
 crtc 0
-gamma 0.909:0.909:0.909
 mode 3440x1440
 pos 0x0
 primary
