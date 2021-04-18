@@ -17,7 +17,7 @@ if [ -f ~/.usesway ] && [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]; then
 fi
 
 case "$HOST" in
-    apollo|deimos|mars|phobos)
+    deimos|mars|phobos)
         if [ -z "$DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ] && [ -z "$(pidof Xorg)" ]; then
             exec startx
         fi
