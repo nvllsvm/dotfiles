@@ -1,15 +1,23 @@
 #!/usr/bin/env sh
 set -e
 
+STEAMAPPS_COMMON=~/.steam/steam/steamapps/common
+
 show_help() {
     cat << EOF
 usage: proton-steam --prefix PATH PROGRAM [ARG ...]
     --help          show help and exit
+    --list          list installed versions an exit
     --prefix PATH   use a custom prefix path
     --use VERSION   use specific version of proton
     --version       show program's version and exit
 EOF
 }
+
+list_versions() {
+    find "$STEAMAPPS_COMMON" -mindepth 1 -maxdepth 1 -name 'Proton *' -exec basename {} \; | awk '{print $2}' | sort --version-sort
+}
+
 
 USE_PROTON_VERSION=
 SHOW_VERSION=
@@ -20,6 +28,10 @@ while [ $# -gt 0 ]; do
             ;;
         --help)
             show_help
+            exit
+            ;;
+        --list)
+            list_versions
             exit
             ;;
         --prefix)
@@ -54,28 +66,6 @@ if [ -z "$STEAM_COMPAT_DATA_PATH" ]; then
     exit 1
 fi
 
-system_proton() {
-    exec "$(which -a "${0##*/}" | grep -m 1 -v "^$0$")" "$@"
-}
-
-steam_proton() {
-    STEAMAPPS_COMMON=~/.steam/steam/steamapps/common
-    if [ -n "$USE_PROTON_VERSION" ]; then
-        PROTON_BASE="$STEAMAPPS_COMMON/Proton $USE_PROTON_VERSION"
-    else
-        PROTON_BASE="$STEAMAPPS_COMMON/$(find "$STEAMAPPS_COMMON" -maxdepth 1 -mindepth 1 -printf '%P\n' | grep '^Proton' | sort --version-sort | tail -n 1)"
-    fi
-    exec "$PROTON_BASE"/proton run "$@"
-}
-
-proton_run() {
-    if [ "$USE_PROTON_VERSION" = 'system' ]; then
-        system_proton "$@"
-    else
-        steam_proton "$@"
-    fi
-}
-
 if [ -n "$SHOW_VERSION" ]; then
     # initialize/upgrade prefix
     proton_run echo
@@ -84,4 +74,9 @@ if [ -n "$SHOW_VERSION" ]; then
     exit
 fi
 
-proton_run "$@"
+if [ -n "$USE_PROTON_VERSION" ]; then
+    PROTON_BASE="$STEAMAPPS_COMMON/Proton $USE_PROTON_VERSION"
+else
+    PROTON_BASE="$STEAMAPPS_COMMON/$(find "$STEAMAPPS_COMMON" -maxdepth 1 -mindepth 1 -printf '%P\n' | grep '^Proton' | sort --version-sort | tail -n 1)"
+fi
+exec "$PROTON_BASE"/proton run "$@"
