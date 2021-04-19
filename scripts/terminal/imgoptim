@@ -274,7 +274,13 @@ async def main():
             executor.submit(_process, func, f, args.strip)
 
     async for result in executor.as_completed():
-        path, before, after = result.result()
+        try:
+            path, before, after = result.result()
+        except SubprocessError as e:
+            # TODO give this a competent error message
+            print('error', file=sys.stderr)
+            continue
+            
         before_total += before
         if after < before:
             after_total += after
