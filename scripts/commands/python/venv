@@ -82,7 +82,7 @@ def upgrade_virtualenv(path):
         'PIP_USER': '0'
     }
     proc = subprocess.run(
-        [pip, 'list', '--format', 'json'],
+        [pip, '--disable-pip-version-check', 'list', '--format', 'json'],
         stdout=subprocess.PIPE,
         env=env,
         check=True)
@@ -91,7 +91,7 @@ def upgrade_virtualenv(path):
     names = [package['name'] for package in installed]
 
     subprocess.run(
-        [pip, 'install', '--upgrade', *names],
+        [pip, '--disable-pip-version-check', 'install', '--upgrade', *names],
         stdout=subprocess.DEVNULL,
         env=env,
         check=True)
