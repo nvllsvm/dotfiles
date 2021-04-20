@@ -9,7 +9,6 @@ import sys
 import time
 
 import mpd
-import setproctitle
 
 _LOGGER = logging.getLogger('mpd-notifier')
 
@@ -97,8 +96,6 @@ def _dunstify(text, icon=None):
 
 
 def main():
-    setproctitle.setproctitle('mpd-notifier')
-
     parser = argparse.ArgumentParser()
     parser.add_argument('--host')
     parser.add_argument('--port', type=int, default=6600)
