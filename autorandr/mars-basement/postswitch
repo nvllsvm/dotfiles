@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-picom -b
 set-desktop-themes --dpi 96
 paswitch 'alsa_output.pci-0000_0d_00.4.analog-stereo'
+apply-display-calibration
 i3-move-ws
