@@ -1,3 +1,2 @@
 #!/usr/bin/env sh
-SIZE_BYTES="$(docker inspect "$1" | jq '.[].Size')"
-numfmt --to=iec "$SIZE_BYTES"
+docker inspect "$1" | jq '.[].Size' | xargs numfmt --to=iec
