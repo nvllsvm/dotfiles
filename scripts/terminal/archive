@@ -69,6 +69,28 @@ async def create_zip(paths, dest, cwd, fast=False):
         await optimize_zip(dest)
 
 
+async def create_7z(paths, dest, cwd, fast=False):
+    paths = sorted(
+        path.relative_to(cwd)
+        for path in paths
+        if str(path) != '.'
+    )
+
+    # 7z barfs on existing file
+    dest.unlink()
+
+    proc = await asyncio.create_subprocess_exec(
+        '7z',
+        'a',
+        '--',
+        dest,
+        *paths,
+        cwd=cwd)
+    await proc.wait()
+    if proc.returncode != 0:
+        raise RuntimeError('exit code {proc.returncode}')
+
+
 async def create_epub(paths, dest, cwd, fast=False):
     level = '-0' if fast else '-9'
 
@@ -157,6 +179,10 @@ async def optimize_zip(path):
 
 
 _formats = {
+    '7z': {
+        'func': create_7z,
+        'suffix': '.7z',
+    },
     'epub': {
         'func': create_epub,
         'suffix': '.epub',
