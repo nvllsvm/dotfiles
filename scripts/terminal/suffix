@@ -1,0 +1,27 @@
+#!/usr/bin/env python
+import argparse
+import collections
+import pathlib
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-r', '--recursive', action='store_true')
+    parser.add_argument('path', default='.', nargs='?')
+    args = parser.parse_args()
+
+    root = pathlib.Path(args.path)
+
+    suffixes = collections.Counter()
+    for path in root.iterdir():
+        if not path.is_file():
+            continue
+        if suffix := path.suffix:
+            suffixes[path.suffix] += 1
+
+    for suffix, count in sorted(suffixes.items(), key=lambda k: k):
+        print(suffix, count)
+
+
+if __name__ == '__main__':
+    main()
