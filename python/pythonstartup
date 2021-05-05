@@ -12,6 +12,8 @@ import datetime
 import difflib
 import distutils
 import distutils.util
+import email
+import email.message
 import enum
 import getpass
 import glob
