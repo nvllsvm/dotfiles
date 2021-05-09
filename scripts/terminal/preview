@@ -6,7 +6,10 @@ default_preview() {
     bat -r :1024 --color=always --plain -- "$1"
 }
 
-if [ -d "$1" ]; then
+if [ $# -eq 0 ]; then
+    echo 'error: missing argument' >&2
+    exit 1
+elif [ -d "$1" ]; then
     cd "$1" || exit 1
     fd --color=always --maxdepth=1
 else
