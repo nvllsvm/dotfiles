@@ -38,5 +38,9 @@ done
 
 RELEASE_APK=$(echo "${UNSIGNED_APK}" | sed 's/-unsigned\.apk$/.apk/')
 
+zipalign -p -f -v 4 "${UNSIGNED_APK}" aligned.apk
+zipalign -c -v 4 aligned.apk
+mv aligned.apk "${UNSIGNED_APK}"
+
 apksigner sign --ks "${RELEASE_KEY}" --out "${RELEASE_APK}" "${UNSIGNED_APK}"
 apksigner verify "${RELEASE_APK}"
