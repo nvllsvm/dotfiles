@@ -1,6 +1,6 @@
 set hidden
 map <c-n> :set relativenumber!
-set previewer ~/.config/lf/preview.sh
+set previewer preview
 map i $~/.config/lf/preview.sh $f | less -R
 
 # working dir - blue
