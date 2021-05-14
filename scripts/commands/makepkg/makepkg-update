@@ -1,24 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import pathlib
-import re
 import subprocess
 
-proc = subprocess.run(
-    ['makepkg', '--geninteg'],
-    stdout=subprocess.PIPE,
-    check=True)
-
-results = proc.stdout.decode().strip()
-print(results)
-
-path = pathlib.Path('PKGBUILD')
-
-pkgbuild = path.read_text()
-
-hashtype = results.split('=')[0].strip()
-pkgbuild = re.sub(
-    fr'{hashtype}[a-zA-Z0-9\'\s\n=\(]*\)', results, pkgbuild, 1)
-path.write_text(pkgbuild)
+subprocess.run(['updpkgsums'], check=True)
 
 proc = subprocess.run(
     ['makepkg', '--printsrcinfo'],
