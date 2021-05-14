@@ -9,7 +9,7 @@ download() {
             if command -v aria2c > /dev/null; then
                 aria2c -x 16 -j 20 --split 20 "$@"
             elif command -v curl > /dev/null; then
-                curl -O "$@"
+                curl -L -O "$@"
             fi
     esac
 }
