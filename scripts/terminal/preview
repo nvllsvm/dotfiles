@@ -51,6 +51,10 @@ else
         video/*)
             ffprobe -hide_banner -- "$1" 2>&1
             ;;
+        image/x-canon-cr2|\
+        image/x-canon-cr3)
+            exiftool "$1"
+            ;;
         image/*)
             output="$(identify -- "$1")"
             # strip filename
