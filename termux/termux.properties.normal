@@ -1,3 +1,5 @@
+soft-keyboard-toggle-behavior = enable
+bell-character = ignore
 extra-keys = [ \
  [ \
      {key: '|'}, \
@@ -20,5 +22,3 @@ extra-keys = [ \
      {key: 'ESC'} \
  ] \
 ]
-
-bell-character = ignore
