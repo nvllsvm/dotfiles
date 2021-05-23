@@ -117,7 +117,7 @@ async def create_epub(paths, dest, cwd, fast=False):
         'zip',
         level,
         '-nw',  # treat wildcards as regular characters
-        '-X',  # prevents EpubCheck error
+        '-X',  # exclude extra file attributes, prevents EpubCheck error
         '-@',  # read paths from stdin
         dest,
         cwd=cwd,
@@ -143,7 +143,7 @@ async def create_zstd(paths, dest, cwd, fast=False):
     assert zstd_proc.returncode == 0
 
 
-async def create_zstd_tar(paths, dest, cwd, fast=False):
+async def create_tar_zstd(paths, dest, cwd, fast=False):
     level = '-1' if fast else '-22'
 
     read, write = os.pipe()
@@ -187,6 +187,10 @@ _formats = {
         'func': create_epub,
         'suffix': '.epub',
     },
+    'tar-zstd': {
+        'func': create_tar_zstd,
+        'suffix': '.tar.zst'
+    },
     'zip': {
         'func': create_zip,
         'suffix': '.zip',
@@ -194,10 +198,6 @@ _formats = {
     'zstd': {
         'func': create_zstd,
         'suffix': '.zst'
-    },
-    'zstd-tar': {
-        'func': create_zstd_tar,
-        'suffix': '.tar.zst'
     },
 }
 
