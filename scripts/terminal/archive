@@ -35,7 +35,7 @@ def _all_paths(root):
     while stack:
         for path in stack.pop().iterdir():
             paths.add(path)
-            if path.is_dir():
+            if path.is_dir() and not path.is_symlink():
                 stack.append(path)
     return paths
 
@@ -138,7 +138,8 @@ async def create_zstd(paths, dest, cwd, fast=False):
         raise RuntimeError
 
     zstd_proc = await asyncio.create_subprocess_exec(
-        'zstd', '-f', '-T0', '--ultra', level, '-o', dest, -- paths[0])
+        'zstd', '--quiet', '-f', '-T0', '--ultra', level, '-o', dest,
+        '--', paths[0])
     await zstd_proc.wait()
     assert zstd_proc.returncode == 0
 
@@ -156,7 +157,7 @@ async def create_tar_zstd(paths, dest, cwd, fast=False):
     os.close(write)
 
     zstd_proc = await asyncio.create_subprocess_exec(
-        'zstd', '-f', '-T0', '--ultra', level, '-o', dest,
+        'zstd', '--quiet', '-f', '-T0', '--ultra', level, '-o', dest,
         stdin=read)
     os.close(read)
 
@@ -275,7 +276,7 @@ class AsyncExecutor:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--rm', default=False, action='store_true')
-    parser.add_argument('-f', '--format', choices=_formats, default='zstd-tar')
+    parser.add_argument('-f', '--format', choices=_formats, default='tar-zstd')
     parser.add_argument('--suffix')
     parser.add_argument('-n', '--num-procs', type=_num_procs, default=1)
     parser.add_argument('--fast', default=False, action='store_true')
