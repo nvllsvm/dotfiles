@@ -56,6 +56,7 @@ async def create_zip(paths, dest, cwd, fast=False):
         'zip',
         level,
         '-nw',  # treat wildcards as regular characters
+        '-X',  # exclude extra file attributes, prevents EpubCheck error
         '-@',  # read paths from stdin
         dest,
         cwd=cwd,
