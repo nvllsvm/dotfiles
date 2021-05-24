@@ -40,7 +40,14 @@ def _all_paths(root):
     return paths
 
 
-async def create_zip(paths, dest, cwd, fast=False):
+async def create_zip(path, dest, fast=False):
+    if path.is_dir():
+        cwd = path
+        paths = _all_paths(path)
+    else:
+        cwd = path.parent
+        paths = (path,)
+
     paths = sorted(
         path.relative_to(cwd)
         for path in paths
@@ -70,7 +77,14 @@ async def create_zip(paths, dest, cwd, fast=False):
         await optimize_zip(dest)
 
 
-async def create_7z(paths, dest, cwd, fast=False):
+async def create_7z(path, dest, fast=False):
+    if path.is_dir():
+        cwd = path
+        paths = _all_paths(path)
+    else:
+        cwd = path.parent
+        paths = (path,)
+
     paths = sorted(
         path.relative_to(cwd)
         for path in paths
@@ -92,7 +106,14 @@ async def create_7z(paths, dest, cwd, fast=False):
         raise RuntimeError('exit code {proc.returncode}')
 
 
-async def create_epub(paths, dest, cwd, fast=False):
+async def create_epub(path, dest, fast=False):
+    if path.is_dir():
+        cwd = path
+        paths = _all_paths(path)
+    else:
+        cwd = path.parent
+        paths = (path,)
+
     level = '-0' if fast else '-9'
 
     # zip cli thinks existing file means
@@ -132,11 +153,13 @@ async def create_epub(paths, dest, cwd, fast=False):
         await optimize_zip(dest)
 
 
-async def create_zstd(paths, dest, cwd, fast=False):
-    level = '-1' if fast else '-22'
-
-    if len(paths) != 1:
+async def create_zstd(path, dest, fast=False):
+    if path.is_dir():
         raise RuntimeError
+    else:
+        paths = (path,)
+
+    level = '-1' if fast else '-22'
 
     zstd_proc = await asyncio.create_subprocess_exec(
         'zstd', '--quiet', '-f', '-T0', '--ultra', level, '-o', dest,
@@ -145,7 +168,14 @@ async def create_zstd(paths, dest, cwd, fast=False):
     assert zstd_proc.returncode == 0
 
 
-async def create_tar_zstd(paths, dest, cwd, fast=False):
+async def create_tar_zstd(path, dest, fast=False):
+    if path.is_dir():
+        cwd = path
+        paths = _all_paths(path)
+    else:
+        cwd = path.parent
+        paths = (path,)
+
     level = '-1' if fast else '-22'
 
     read, write = os.pipe()
@@ -207,19 +237,12 @@ _formats = {
 async def process(source, archive_format, suffix, remove, fast=False):
     source = source.absolute()
 
-    if source.is_dir():
-        cwd = source
-        paths = _all_paths(source)
-    else:
-        cwd = source.parent
-        paths = [source]
-
     f = _formats[archive_format]
     suffix = suffix or f['suffix']
 
     dest = pathlib.Path(source.name + suffix).absolute()
     with TempPath(dir=dest.parent, suffix=suffix) as tmp:
-        await f['func'](paths, tmp, cwd, fast)
+        await f['func'](source, tmp, fast)
         print(dest)
         tmp.rename(dest)
 
