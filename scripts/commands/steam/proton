@@ -35,9 +35,9 @@ while [ $# -gt 0 ]; do
             exit
             ;;
         --prefix)
-            STEAM_COMPAT_DATA_PATH="$(realpath "$2")"
+            mkdir -p -- "$2"
+            STEAM_COMPAT_DATA_PATH="$(realpath -- "$2")"
             export STEAM_COMPAT_DATA_PATH
-            mkdir -p "$STEAM_COMPAT_DATA_PATH"
             shift
             shift
             ;;
