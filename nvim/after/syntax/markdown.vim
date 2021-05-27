@@ -8,6 +8,10 @@ hi def link mkdDue Todo
 syn match mkdGoal /goal:\d\d\d\d-\d\d-\d\d/ containedin=htmlH[1-6],mkdNonListItemBlock,mkdListItemLine
 hi mkdGoal cterm=bold ctermfg=2
 
+" est
+syn match mkdEst /est:\d\d\d\d-\d\d-\d\d/ containedin=htmlH[1-6],mkdNonListItemBlock,mkdListItemLine
+hi mkdEst cterm=bold ctermfg=2
+
 " todo
 syn match mkdTodo /TODO:\?/ containedin=htmlH[1-6],mkdNonListItemBlock,mkdListItemLine
 hi def link mkdTodo Todo
