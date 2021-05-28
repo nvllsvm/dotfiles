@@ -13,30 +13,38 @@ import sys
 import zipfile
 
 
-class p7zip:
+class cli_7zip:
     _PART_RE = re.compile(r'(.*\.part)(\d+)(\.rar)$')
     _ALT_PART_RE = re.compile(r'(.*\.)(\d+)$')
 
-    @staticmethod
+    @classmethod
     @functools.lru_cache()
-    def check():
-        if not shutil.which('7z'):
-            raise KeyError
+    def check(cls):
+        cls._get_bin()
 
     @staticmethod
-    def extract(path, dest, password='', overwrite=False):
+    @functools.lru_cache()
+    def _get_bin():
+        if shutil.which('7zz'):
+            return '7zz'
+        elif shutil.which('7z'):
+            return '7z'
+        raise KeyError
+
+    @classmethod
+    def extract(cls, path, dest, password='', overwrite=False):
         if overwrite:
             raise NotImplementedError
         subprocess.run(
-            ['7z', 'x', f'-p{password}', '-ba', '-spe', f'-o{dest}', '--',
-             str(path)],
+            [cls._get_bin(), 'x', f'-p{password}', '-ba', '-spe', f'-o{dest}',
+             '--', str(path)],
             check=True
         )
 
-    @staticmethod
-    def contents(path):
+    @classmethod
+    def contents(cls, path):
         proc = subprocess.run(
-            ['7z', '-ba', 'l', '--', str(path)],
+            [cls._get_bin(), '-ba', 'l', '--', str(path)],
             stdout=subprocess.PIPE,
             check=True
         )
@@ -54,7 +62,7 @@ class p7zip:
     @classmethod
     def volumes(cls, path, password=''):
         result = subprocess.run(
-            ['7z', 'l', f'-p{password}', '--', str(path)],
+            [cls._get_bin(), 'l', f'-p{password}', '--', str(path)],
             stdout=subprocess.PIPE,
             check=True)
 
@@ -665,6 +673,7 @@ class zstd:
 
     @staticmethod
     def contents(path):
+        print(path)
         return [path.with_suffix('').name]
 
     @staticmethod
@@ -743,7 +752,7 @@ def _get_class(path):
             return unrar
         # 7-zip
         elif start.startswith(b"7z\xbc\xaf'\x1c"):
-            return p7zip
+            return cli_7zip
         # zip
         # zip (empty)
         # zip (spanned)
@@ -753,8 +762,8 @@ def _get_class(path):
                 start.startswith(b'PK\x07\x08'):
             try:
                 # better handling of weird filenames, multipart
-                p7zip.check()
-                return p7zip
+                cli_7zip.check()
+                return cli_7zip
             except KeyError:
                 return unzip
         # microsoft cabinet file
