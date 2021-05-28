@@ -111,8 +111,6 @@ class EncodeError(Exception):
 
 
 async def reencode(source):
-    LOGGER.info('Processing %s', source)
-
     suffix = source.suffix.lower()
 
     decode_contexts = {
@@ -127,6 +125,8 @@ async def reencode(source):
     decode = await decode_contexts[suffix](source, write)
     os.close(write)
 
+    before = source.stat().st_size
+
     with TempPath(dir=source.parent, suffix='.flac') as tmp:
         encode = await encode_flac(read, tmp)
         os.close(read)
@@ -138,7 +138,11 @@ async def reencode(source):
         except Exception:
             pass
         source.unlink()
-        tmp.rename(source.with_suffix('.flac'))
+        dest = source.with_suffix('.flac')
+        tmp.rename(dest)
+
+    after = dest.stat().st_size
+    return source, before, after
 
 
 def all_files(root):
@@ -153,14 +157,52 @@ def all_files(root):
     return files
 
 
+def format_diff(before, after):
+    diff = ((before - after) / before) * 100
+    if diff:
+        diff = '{:.2f}'.format(diff)
+        if not float(diff):
+            diff = f'<{diff}'
+    return diff
+
+
+def sizeof_fmt(num):
+    for unit in ['B', 'KB', 'MB', 'GB', 'TB', 'PB']:
+        if abs(num) < 1024.0:
+            break
+        num /= 1024.0
+    return f'{num:.1f}{unit}'
+
+
 async def run(executor):
     errors = []
+
+    before_total = 0
+    after_total = 0
+
     async for result in executor.as_completed():
         try:
-            result.result()
+            source, before, after = result.result()
         except Exception as e:
             LOGGER.exception(e)
             errors.append(str(e))
+
+        before_total += before
+        if after < before:
+            after_total += after
+            diff = format_diff(before, after)
+        else:
+            after_total += before
+            diff = None
+
+        s = f'{diff:>6}%' if diff else 7 * '-'
+        print(f'{s}  {source}')
+
+    if before_total:
+        if diff := format_diff(before_total, after_total):
+            print(f'Total: {diff}% ({sizeof_fmt(before_total - after_total)})')
+        else:
+            print('Total: -')
 
     for error in sorted(errors):
         LOGGER.error('Error %s', error)
