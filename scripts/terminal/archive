@@ -32,11 +32,13 @@ def TempPath(**kwargs):
 def _all_paths(root):
     stack = [root]
     paths = {root}
-    while stack:
-        for path in stack.pop().iterdir():
-            paths.add(path)
-            if path.is_dir() and not path.is_symlink():
-                stack.append(path)
+
+    if root.is_dir() and not root.is_symlink():
+        while stack:
+            for path in stack.pop().iterdir():
+                paths.add(path)
+                if path.is_dir() and not path.is_symlink():
+                    stack.append(path)
     return paths
 
 
@@ -218,17 +220,20 @@ async def process(source, archive_format, suffix, remove, fast=False):
     f = _formats[archive_format]
     suffix = suffix or f['suffix']
 
+    before = sum(path.stat().st_size for path in _all_paths(source))
     dest = pathlib.Path(source.name + suffix).absolute()
     with TempPath(dir=dest.parent, suffix=suffix) as tmp:
         await f['func'](source, tmp, fast)
-        print(dest)
         tmp.rename(dest)
+    after = dest.stat().st_size
 
     if remove:
         if source.is_dir():
             shutil.rmtree(source)
         else:
             source.unlink()
+
+    return dest, before, after
 
 
 def _num_procs(value):
@@ -275,6 +280,44 @@ class AsyncExecutor:
             self._pending.add(asyncio.create_task(func(*args, **kwargs)))
 
 
+class SizeDiffPrinter:
+    def __init__(self):
+        self._before_total = 0
+        self._after_total = 0
+
+    @staticmethod
+    def format_diff(before, after):
+        diff = ((before - after) / before) * 100
+        if diff:
+            diff = '{:.2f}'.format(diff)
+            if not float(diff):
+                diff = f'<{diff}'
+        return diff
+
+    @staticmethod
+    def sizeof_fmt(num):
+        for unit in ['B', 'KB', 'MB', 'GB', 'TB', 'PB']:
+            if abs(num) < 1024.0:
+                break
+            num /= 1024.0
+        return f'{num:.1f}{unit}'
+
+    def print(self, before, after, name):
+        self._before_total += before
+        self._after_total += after
+        diff = self.format_diff(before, after)
+
+        s = f'{diff:>6}%' if diff else 7 * '-'
+        print(f'{s}  {name}')
+
+    def print_total(self):
+        if diff := self.format_diff(self._before_total, self._after_total):
+            fmt = self.sizeof_fmt(self._before_total - self._after_total)
+            print(f'Total: {diff}% ({fmt})')
+        else:
+            print('Total: -')
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--rm', default=False, action='store_true')
@@ -291,11 +334,14 @@ def main():
             executor.submit(
                 process, source, args.format, args.suffix, args.rm, args.fast)
 
+        size_diff_printer = SizeDiffPrinter()
         async for future in executor.as_completed():
             try:
-                future.result()
+                dest, before, after = future.result()
             except Exception as e:
                 print(e, file=sys.stderr)
+            size_diff_printer.print(before, after, dest)
+        size_diff_printer.print_total()
 
     asyncio.run(run(args))
 
