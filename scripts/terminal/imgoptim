@@ -170,23 +170,6 @@ def determine_mime(path):
             return 'image/gif'
 
 
-def format_diff(before, after):
-    diff = ((before - after) / before) * 100
-    if diff:
-        diff = '{:.2f}'.format(diff)
-        if not float(diff):
-            diff = f'<{diff}'
-    return diff
-
-
-def sizeof_fmt(num):
-    for unit in ['B', 'KB', 'MB', 'GB', 'TB', 'PB']:
-        if abs(num) < 1024.0:
-            break
-        num /= 1024.0
-    return f'{num:.1f}{unit}'
-
-
 def _sigint_handler(*_):
     sys.exit(130)
 
@@ -198,9 +181,10 @@ async def _process(func, path, strip):
         await func(path, temp_path, strip=strip)
 
         after = temp_path.stat().st_size
-
         if after < before:
             temp_path.rename(path)
+        else:
+            after = before
 
     return path, before, after
 
@@ -239,6 +223,45 @@ class AsyncExecutor:
             self._pending.add(asyncio.create_task(func(*args, **kwargs)))
 
 
+class SizeDiffPrinter:
+
+    def __init__(self):
+        self._before_total = 0
+        self._after_total = 0
+
+    @staticmethod
+    def format_diff(before, after):
+        diff = ((before - after) / before) * 100
+        if diff:
+            diff = '{:.2f}'.format(diff)
+            if not float(diff):
+                diff = f'<{diff}'
+        return diff
+
+    @staticmethod
+    def sizeof_fmt(num):
+        for unit in ['B', 'KB', 'MB', 'GB', 'TB', 'PB']:
+            if abs(num) < 1024.0:
+                break
+            num /= 1024.0
+        return f'{num:.1f}{unit}'
+
+    def print(self, before, after, name):
+        self._before_total += before
+        self._after_total += after
+        diff = self.format_diff(before, after)
+
+        s = f'{diff:>6}%' if diff else 7 * '-'
+        print(f'{s}  {name}')
+
+    def print_total(self):
+        if diff := self.format_diff(self._before_total, self._after_total):
+            fmt = self.sizeof_fmt(self._before_total - self._after_total)
+            print(f'Total: {diff}% ({fmt})')
+        else:
+            print('Total: -')
+
+
 async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-s', '--strip', action='store_true')
@@ -256,9 +279,6 @@ async def main():
         else:
             files.update(all_files(path))
 
-    before_total = 0
-    after_total = 0
-
     executor = AsyncExecutor()
     for f in sorted(files):
         try:
@@ -273,30 +293,18 @@ async def main():
         if func := _MIME_OPTIMIZATIONS.get(mimetype):
             executor.submit(_process, func, f, args.strip)
 
+    size_diff_printer = SizeDiffPrinter()
     async for result in executor.as_completed():
         try:
             path, before, after = result.result()
-        except SubprocessError as e:
+        except SubprocessError:
             # TODO give this a competent error message
             print('error', file=sys.stderr)
             continue
-            
-        before_total += before
-        if after < before:
-            after_total += after
-            diff = format_diff(before, after)
-        else:
-            after_total += before
-            diff = None
 
-        s = f'{diff:>6}%' if diff else 7 * '-'
-        print(f'{s}  {path}')
+        size_diff_printer.print(before, after, path)
 
-    if before_total:
-        if diff := format_diff(before_total, after_total):
-            print(f'Total: {diff}% ({sizeof_fmt(before_total - after_total)})')
-        else:
-            print('Total: -')
+    size_diff_printer.print_total()
 
 
 if __name__ == '__main__':
