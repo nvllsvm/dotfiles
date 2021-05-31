@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 import pathlib
 import subprocess
+import shutil
+import sys
+
+if not shutil.which('updpkgsums'):
+    subprocess.run(['yay', '-S', '--noconfirm', 'pacman-contrib'], check=True)
 
 subprocess.run(['updpkgsums'], check=True)
 
