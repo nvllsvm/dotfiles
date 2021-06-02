@@ -1,2 +1,4 @@
 #!/usr/bin/env sh
-find ~/.local/bin -xtype l -exec rm {} \;
+if [ -d ~/.local/bin ]; then
+    find ~/.local/bin -xtype l -exec rm {} \;
+fi
