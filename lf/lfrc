@@ -23,3 +23,4 @@ cmd nopreview &{{
     lf -remote "send $id map <tab> showpreview"
 }}
 map <tab> nopreview
+set autoquit
