@@ -1,6 +1,6 @@
 ### arch linux
 UUID=a8e2fafd-997f-44a1-95b8-736230790c99 /         	ext4      	rw,relatime,data=ordered	0 1
 UUID=AC83-3AB5 /boot vfat rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro 0 2
-UUID=1AFA75CDFA75A5A3 /mnt/windows ntfs noauto,x-systemd.automount,x-systemd.mount-timeout=10,timeo=14,x-systemd.idle-timeout=1min,noatime,user 0 0
+UUID=22507E51507E2BA3 /mnt/windows ntfs noauto,x-systemd.automount,x-systemd.mount-timeout=10,timeo=14,x-systemd.idle-timeout=1min,noatime,user 0 0
 
 sol.nullsum.lan:/srv/nfs4 /mnt/sol nfs _netdev,noauto,x-systemd.automount,x-systemd.mount-timeout=10,timeo=14,x-systemd.idle-timeout=1min,noatime 0 0

@@ -839,6 +839,9 @@ def _get_class(path):
     # bchunk generates zero-prefixed iso
     elif suffix in ('.iso', '.img'):
         return udisksctl
+    # some mdf are also iso
+    elif suffix == '.mdf':
+        return udisksctl
     # some tars lack file signature
     elif suffix == '.tar':
         return gnu_tar
