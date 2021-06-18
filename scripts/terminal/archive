@@ -312,6 +312,7 @@ class SizeDiffPrinter:
     def __init__(self):
         self._before_total = 0
         self._after_total = 0
+        self._printed = False
 
     @staticmethod
     def format_diff(before, after):
@@ -331,6 +332,7 @@ class SizeDiffPrinter:
         return f'{num:.1f}{unit}'
 
     def print(self, before, after, name):
+        self._printed = True
         self._before_total += before
         self._after_total += after
         diff = self.format_diff(before, after)
@@ -339,11 +341,12 @@ class SizeDiffPrinter:
         print(f'{s}  {name}')
 
     def print_total(self):
-        if diff := self.format_diff(self._before_total, self._after_total):
-            fmt = self.sizeof_fmt(self._before_total - self._after_total)
-            print(f'Total: {diff}% ({fmt})')
-        else:
-            print('Total: -')
+        if self._printed:
+            if diff := self.format_diff(self._before_total, self._after_total):
+                fmt = self.sizeof_fmt(self._before_total - self._after_total)
+                print(f'Total: {diff}% ({fmt})')
+            else:
+                print('Total: -')
 
 
 def main():
