@@ -148,6 +148,30 @@ async def create_zstd(path, dest, fast=False):
     assert zstd_proc.returncode == 0
 
 
+async def create_tar(path, dest, fast=False):
+    if path.is_dir():
+        cwd = path
+        paths = _all_paths(path)
+    else:
+        cwd = path.parent
+        paths = (path,)
+
+    tar_proc = await asyncio.create_subprocess_exec(
+        'tar', 'cf', dest, '-C', cwd, '--no-recursion',
+        '--verbatim-files-from', '--null', '-T', '-',
+        stdin=asyncio.subprocess.PIPE)
+
+    tar_proc.stdin.write(b'\0'.join(
+        bytes(p.relative_to(cwd))
+        for p in paths
+        if p != cwd
+    ))
+    tar_proc.stdin.close()
+
+    await asyncio.gather(tar_proc.wait())
+    assert tar_proc.returncode == 0
+
+
 async def create_tar_zstd(path, dest, fast=False):
     if path.is_dir():
         cwd = path
@@ -198,6 +222,10 @@ _formats = {
     'epub': {
         'func': create_epub,
         'suffix': '.epub',
+    },
+    'tar': {
+        'func': create_tar,
+        'suffix': '.tar'
     },
     'tar-zstd': {
         'func': create_tar_zstd,
