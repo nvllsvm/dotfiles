@@ -98,7 +98,11 @@ def main():
     get_parser.add_argument('prefix', nargs='?')
 
     put_parser = subparsers.add_parser('put')
-    put_parser.add_argument(
+    put_parser.add_argument('key')
+    put_parser.add_argument('value')
+
+    import_parser = subparsers.add_parser('import')
+    import_parser.add_argument(
         'data', nargs='?', default=sys.stdin, type=argparse.FileType('r'))
 
     delete_parser = subparsers.add_parser('delete')
@@ -125,6 +129,8 @@ def main():
             }
         print(json.dumps(data, indent=2, sort_keys=True))
     elif args.command == 'put':
+        consul.put(args.key, args.value)
+    elif args.command == 'import':
         data = json.load(args.data)
 
         assert isinstance(data, dict)
