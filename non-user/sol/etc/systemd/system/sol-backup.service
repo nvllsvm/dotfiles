@@ -1,6 +1,0 @@
-[Unit]
-Description=Run sol-backup
-
-[Service]
-SyslogIdentifier=sol-backup
-ExecStart=/home/ar/.dotfiles/public/scripts/hosts/sol/sol-backup

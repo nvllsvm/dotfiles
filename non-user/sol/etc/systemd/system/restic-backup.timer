@@ -1,5 +1,5 @@
 [Unit]
-Description=Run sol-backup
+Description=Run restic-backup
 
 [Timer]
 OnCalendar=daily

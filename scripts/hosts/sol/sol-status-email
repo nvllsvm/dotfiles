@@ -11,8 +11,8 @@ SYSTEM_UNITS = {
     'fstrim.service',
     'logrotate.service',
     'man-db.service',
+    'restic-backup.service',
     'shadow.service',
-    'sol-backup.service',
     'systemd-tmpfiles-clean.service',
     'zfs-scrub@storage.service',
 }
