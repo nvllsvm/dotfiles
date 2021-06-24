@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 set-desktop-themes --dpi 96
-paswitch 'alsa_output.usb-Schiit_Audio_USB_Modi_Device-00.iec958-stereo'
+paswitch 'alsa_output.usb-Schiit_Audio_USB_Modi_Device-00.pro-output-0'
 apply-display-calibration
