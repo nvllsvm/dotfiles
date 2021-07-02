@@ -142,10 +142,6 @@ endfunction
 command IdentifyHighlightingGroup :call _IdentifyHighlightingGroup()
 
 lua << EOF
-require'lspconfig'.pyright.setup{}
-EOF
-
-lua << EOF
 vim.o.completeopt = "menuone,noselect"
 require'compe'.setup {
   enabled = true;
@@ -220,7 +216,7 @@ end
 
 -- Use a loop to conveniently call 'setup' on multiple servers and
 -- map buffer local keybindings when the language server attaches
-local servers = { "pyright", "rust_analyzer", "tsserver" }
+local servers = { "jedi_language_server", "rust_analyzer", "tsserver" }
 for _, lsp in ipairs(servers) do
   nvim_lsp[lsp].setup {
     on_attach = on_attach,
