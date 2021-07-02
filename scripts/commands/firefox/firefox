@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+set -e
+if [ $# -eq 0 ] && pidof firefox; then
+    exec i3-msg '[class="firefox"] focus'
+else
+    exec /usr/bin/firefox "$@"
+fi
