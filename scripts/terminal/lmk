@@ -60,5 +60,5 @@ else
         set-option -g destroy-unattached on ';' \
         set-option -g detach-on-destroy on ';' \
         new-session lmk "$@" ';' \
-        attach -r
+        attach
 fi
