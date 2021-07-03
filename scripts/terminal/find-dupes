@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import argparse
 import collections
+import hashlib
 import json
 import pathlib
-import subprocess
 
 
 def all_files(root):
@@ -19,11 +19,11 @@ def all_files(root):
 
 
 def sha256sum(path):
-    result = subprocess.run(
-        ['sha256sum', '--', str(path)],
-        check=True,
-        stdout=subprocess.PIPE)
-    return result.stdout.decode().split()[0]
+    hasher = hashlib.sha256()
+    with open(path, 'rb') as handle:
+        while data := handle.read(65536):
+            hasher.update(data)
+    return hasher.hexdigest()
 
 
 def _pretty_json(data):
