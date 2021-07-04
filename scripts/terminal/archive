@@ -243,15 +243,17 @@ _formats = {
 
 
 async def process(source, archive_format, suffix, remove, fast=False):
-    source = source.absolute()
+    formats = _formats[archive_format]
 
-    f = _formats[archive_format]
-    suffix = suffix or f['suffix']
+    source = source.absolute()
+    suffix = suffix or formats['suffix']
+    dest = pathlib.Path(source.name + suffix).absolute()
+    if dest.exists():
+        raise FileExistsError(dest)
 
     before = sum(path.stat().st_size for path in _all_paths(source))
-    dest = pathlib.Path(source.name + suffix).absolute()
     with TempPath(dir=dest.parent, suffix=suffix) as tmp:
-        await f['func'](source, tmp, fast)
+        await formats['func'](source, tmp, fast)
         tmp.rename(dest)
     after = dest.stat().st_size
 
@@ -360,6 +362,8 @@ def main():
     args = parser.parse_args()
 
     async def run(args):
+        has_error = False
+
         executor = AsyncExecutor(max_pending=args.num_procs)
         for source in args.source:
             executor.submit(
@@ -369,12 +373,17 @@ def main():
         async for future in executor.as_completed():
             try:
                 dest, before, after = future.result()
+            except FileExistsError as e:
+                print(f'error: file exists {e}', file=sys.stderr)
+                has_error = True
             except Exception as e:
                 print(e, file=sys.stderr)
-            size_diff_printer.print(before, after, dest)
+            else:
+                size_diff_printer.print(before, after, dest)
         size_diff_printer.print_total()
+        return has_error
 
-    asyncio.run(run(args))
+    sys.exit(1 if asyncio.run(run(args)) else 0)
 
 
 if __name__ == '__main__':
