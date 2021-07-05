@@ -375,9 +375,10 @@ def main():
                         help='remove source after success')
     group_format.add_argument(
         '-f', metavar='FORMAT', choices=_formats,
-        default='tar-zstd',
+        dest='format', default='tar-zstd',
         help='archive format: %(choices)s (default: %(default)s)')
-    parser.add_argument('-n', metavar='NUM', type=_num_procs, default=1,
+    parser.add_argument('-n', metavar='NUM', dest='num_procs',
+                        type=_num_procs, default=1,
                         help='number of parallel jobs (default: %(default)s)')
     group_format.add_argument(
         '--fast', default=False, action='store_true',
