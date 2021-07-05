@@ -367,15 +367,19 @@ class SizeDiffPrinter:
 
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        usage='%(prog)s [OPTIONS] source [source ...]')
+
+    group_format = parser.add_argument_group('format')
     parser.add_argument('--rm', default=False, action='store_true',
                         help='remove source after success')
-    parser.add_argument('-f', metavar='FORMAT', choices=_formats,
-                        default='tar-zstd',
-                        help='archive format: %(choices)s')
+    group_format.add_argument(
+        '-f', metavar='FORMAT', choices=_formats,
+        default='tar-zstd',
+        help='archive format: %(choices)s (default: %(default)s)')
     parser.add_argument('-n', metavar='NUM', type=_num_procs, default=1,
                         help='number of parallel jobs (default: %(default)s)')
-    parser.add_argument(
+    group_format.add_argument(
         '--fast', default=False, action='store_true',
         help='increase archiving speed at the expense of compression')
     parser.add_argument('source', type=lambda p: pathlib.Path(p).absolute(),
