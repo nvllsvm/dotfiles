@@ -21,9 +21,15 @@ def find_firefox_windows(is_private):
 conn = i3ipc.Connection()
 
 is_private = '--private-window' in sys.argv
-if (len(sys.argv) == 2 and is_private) or len(sys.argv) == 1:
-    if windows := find_firefox_windows(is_private):
-        windows[0].command('focus')
-        sys.exit()
+has_url = any(
+    not arg.startswith('-')
+    for arg in sys.argv[1:]
+)
 
-os.execvp('/usr/bin/firefox', sys.argv)
+if windows := find_firefox_windows(is_private):
+    window = windows[0]
+    window.command('focus')
+    if has_url:
+        os.execvp('/usr/bin/firefox', sys.argv)
+else:
+    os.execvp('/usr/bin/firefox', sys.argv)
