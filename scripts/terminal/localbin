@@ -1,0 +1,21 @@
+#!/usr/bin/env sh
+set -e
+if [ $# -ne 2 ]; then
+    echo 'usage: localbin EXECUTABLE NAME' >&2
+    exit 1
+fi
+mkdir -p ~/.local/bin
+
+TARGET="$(realpath "$1")"
+DIRNAME="$(dirname "$TARGET")"
+EXECUTABLE_NAME="$(basename "$TARGET")"
+LOCAL_NAME="$2"
+
+cat > "$DIRNAME"/.localbin << EOF
+#!/usr/bin/env sh
+cd "$DIRNAME" || exit 1
+exec ./"$EXECUTABLE_NAME" "\$@"
+EOF
+chmod +x "$DIRNAME"/.localbin
+
+ln -sf "$DIRNAME"/.localbin ~/.local/bin/"$LOCAL_NAME"
