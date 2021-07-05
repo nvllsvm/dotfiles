@@ -674,8 +674,7 @@ class zstd:
 
     @staticmethod
     def contents(path):
-        print(path)
-        return [path.with_suffix('').name]
+        return [path.with_suffix('').name.encode()]
 
     @staticmethod
     def extract(path, dest, password=None, overwrite=False):
@@ -775,9 +774,9 @@ def _get_class(path):
             return lz4
         # gzip
         elif start.startswith(b'\x1f\x8b'):
-            if suffixes[-1] == '.tgz':
+            if len(suffixes) >= 1 and suffixes[-1] == '.tgz':
                 return gnu_tar
-            elif suffixes[-2] == '.tar':
+            elif len(suffixes) >= 2 and suffixes[-2] == '.tar':
                 return gnu_tar
             else:
                 try:
@@ -787,19 +786,19 @@ def _get_class(path):
                     return gzip
         # bzip2
         elif start.startswith(b'BZh'):
-            if suffixes[-2] == '.tar':
+            if len(suffixes) >= 2 and [-2] == '.tar':
                 return gnu_tar
             else:
                 return bzip2
         # xz
         elif start.startswith(b'\xfd7zXZ\x00'):
-            if suffixes[-2] == '.tar':
+            if len(suffixes) >= 2 and [-2] == '.tar':
                 return gnu_tar
             else:
                 return xz
         # zstandard
         elif start.startswith(b'(\xb5/\xfd'):
-            if suffixes[-2] == '.tar':
+            if len(suffixes) >= 2 and [-2] == '.tar':
                 return gnu_tar
             else:
                 return zstd
@@ -828,24 +827,22 @@ def _get_class(path):
             if f.read(58) == b'# with modifications for mojosetup and GOG.com installer.\n':  # noqa: E501
                 return gog_linux
 
-    suffixes = [suffix.lower() for suffix in path.suffixes]
-    suffix = suffixes[-1]
-
-    # ffs - brotli doesn't have a file signature
-    if suffix == '.br':
-        return brotli
-    # unable to find magic number
-    elif suffix == '.ace':
-        return unace
-    # bchunk generates zero-prefixed iso
-    elif suffix in ('.iso', '.img'):
-        return udisksctl
-    # some mdf are also iso
-    elif suffix == '.mdf':
-        return udisksctl
-    # some tars lack file signature
-    elif suffix == '.tar':
-        return gnu_tar
+    if suffixes := [suffix.lower() for suffix in path.suffixes]:
+        # ffs - brotli doesn't have a file signature
+        if suffixes[-1] == '.br':
+            return brotli
+        # unable to find magic number
+        elif suffixes[-1] == '.ace':
+            return unace
+        # bchunk generates zero-prefixed iso
+        elif suffixes[-1] in ('.iso', '.img'):
+            return udisksctl
+        # some mdf are also iso
+        elif suffixes[-1] == '.mdf':
+            return udisksctl
+        # some tars lack file signature
+        elif suffixes[-1] == '.tar':
+            return gnu_tar
 
     raise NotImplementedError(path)
 
