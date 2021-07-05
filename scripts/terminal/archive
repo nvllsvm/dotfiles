@@ -39,7 +39,8 @@ def _all_paths(root):
                 paths.add(path)
                 if path.is_dir() and not path.is_symlink():
                     stack.append(path)
-    return paths
+    # needed for deterministic archives ex. tar
+    return sorted(paths)
 
 
 async def create_zip(path, dest, fast=False):
@@ -242,14 +243,28 @@ _formats = {
 }
 
 
-async def process(source, archive_format, suffix, remove, fast=False):
+def _build_dest(source, suffix):
+    increment = 0
+    while True:
+        dest = pathlib.Path(
+            ''.join([
+                source.name,
+                f'_{increment}' if increment else '',
+                suffix])).absolute()
+
+        if not dest.exists():
+            return dest.absolute()
+
+        increment += 1
+
+
+async def process(source, archive_format, remove, fast=False):
     formats = _formats[archive_format]
 
     source = source.absolute()
-    suffix = suffix or formats['suffix']
-    dest = pathlib.Path(source.name + suffix).absolute()
-    if dest.exists():
-        raise FileExistsError(dest)
+    suffix = formats['suffix']
+
+    dest = _build_dest(source, suffix)
 
     before = sum(path.stat().st_size for path in _all_paths(source))
     with TempPath(dir=dest.parent, suffix=suffix) as tmp:
@@ -353,21 +368,33 @@ class SizeDiffPrinter:
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--rm', default=False, action='store_true')
-    parser.add_argument('-f', '--format', choices=_formats, default='tar-zstd')
-    parser.add_argument('--suffix')
-    parser.add_argument('-n', '--num-procs', type=_num_procs, default=1)
-    parser.add_argument('--fast', default=False, action='store_true')
-    parser.add_argument('source', type=pathlib.Path, nargs='+')
+    parser.add_argument('--rm', default=False, action='store_true',
+                        help='remove source after success')
+    parser.add_argument('-f', metavar='FORMAT', choices=_formats,
+                        default='tar-zstd',
+                        help='archive format: %(choices)s')
+    parser.add_argument('-n', metavar='NUM', type=_num_procs, default=1,
+                        help='number of parallel jobs (default: %(default)s)')
+    parser.add_argument(
+        '--fast', default=False, action='store_true',
+        help='increase archiving speed at the expense of compression')
+    parser.add_argument('source', type=lambda p: pathlib.Path(p).absolute(),
+                        nargs='+')
     args = parser.parse_args()
 
     async def run(args):
         has_error = False
 
         executor = AsyncExecutor(max_pending=args.num_procs)
+
+        sources = []
         for source in args.source:
-            executor.submit(
-                process, source, args.format, args.suffix, args.rm, args.fast)
+            if source in sources:
+                continue
+            else:
+                sources.append(source)
+
+            executor.submit(process, source, args.format, args.rm, args.fast)
 
         size_diff_printer = SizeDiffPrinter()
         async for future in executor.as_completed():
