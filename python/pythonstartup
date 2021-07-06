@@ -15,6 +15,7 @@ import distutils.util
 import email
 import email.message
 import enum
+import fnmatch
 import getpass
 import glob
 import gzip
