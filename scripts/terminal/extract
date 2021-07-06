@@ -786,19 +786,19 @@ def _get_class(path):
                     return gzip
         # bzip2
         elif start.startswith(b'BZh'):
-            if len(suffixes) >= 2 and [-2] == '.tar':
+            if len(suffixes) >= 2 and suffixes[-2] == '.tar':
                 return gnu_tar
             else:
                 return bzip2
         # xz
         elif start.startswith(b'\xfd7zXZ\x00'):
-            if len(suffixes) >= 2 and [-2] == '.tar':
+            if len(suffixes) >= 2 and suffixes[-2] == '.tar':
                 return gnu_tar
             else:
                 return xz
         # zstandard
         elif start.startswith(b'(\xb5/\xfd'):
-            if len(suffixes) >= 2 and [-2] == '.tar':
+            if len(suffixes) >= 2 and suffixes[-2] == '.tar':
                 return gnu_tar
             else:
                 return zstd
