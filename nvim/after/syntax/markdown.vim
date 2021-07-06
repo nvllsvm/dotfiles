@@ -5,15 +5,15 @@ syn match mkdDue /due:\d\d\d\d-\d\d-\d\d/ containedin=htmlH[1-6],mkdNonListItemB
 hi def link mkdDue Todo
 
 " goal
-syn match mkdGoal /goal:\d\d\d\d-\d\d-\d\d/ containedin=htmlH[1-6],mkdNonListItemBlock,mkdListItemLine
+syn match mkdGoal /goal:\d\d\d\d-\d\d-\d\d/ containedin=htmlH[1-6],mkdNonListItemBlock,mkdListItemLine,mkdLink
 hi mkdGoal cterm=bold ctermfg=2
 
 " est
-syn match mkdEst /est:\d\d\d\d-\d\d-\d\d/ containedin=htmlH[1-6],mkdNonListItemBlock,mkdListItemLine
+syn match mkdEst /est:\d\d\d\d-\d\d-\d\d/ containedin=htmlH[1-6],mkdNonListItemBlock,mkdListItemLine,mkdLink
 hi mkdEst cterm=bold ctermfg=2
 
 " todo
-syn match mkdTodo /TODO:\?/ containedin=htmlH[1-6],mkdNonListItemBlock,mkdListItemLine
+syn match mkdTodo /TODO:\?/ containedin=htmlH[1-6],mkdNonListItemBlock,mkdListItemLine,mkdLink
 hi def link mkdTodo Todo
 hi Todo cterm=bold
 
