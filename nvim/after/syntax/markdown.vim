@@ -44,4 +44,5 @@ hi htmlH5 ctermfg=16
 " red
 hi htmlH6 ctermfg=1
 
+hi mkdURL ctermfg=8
 syntax case ignore
