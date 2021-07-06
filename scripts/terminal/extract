@@ -556,10 +556,12 @@ class gzip:
             raise NotImplementedError
         target = dest / path.with_suffix('').name
         with open(target, 'w') as handle:
-            subprocess.run(
-                ['gzip', '-d', '-c', '--', path],
-                stdout=handle,
-                check=True)
+            proc = await asyncio.create_subprocess_exec(
+                'gzip', '-d', '-c', '--', path,
+                stdout=handle)
+            await proc.wait()
+            if proc.returncode:
+                raise ProcessError(proc.returncode)
 
     @staticmethod
     async def volumes(path, password=''):
@@ -583,10 +585,12 @@ class pigz:
             raise NotImplementedError
         target = dest / path.with_suffix('').name
         with open(target, 'w') as handle:
-            subprocess.run(
-                ['pigz', '-d', '-c', '--', path],
-                stdout=handle,
-                check=True)
+            proc = await asyncio.create_subprocess_exec(
+                'pigz', '-d', '-c', '--', path,
+                stdout=handle)
+            await proc.wait()
+            if proc.returncode:
+                raise ProcessError(proc.returncode)
 
     @staticmethod
     async def volumes(path, password=''):
@@ -610,10 +614,12 @@ class bzip2:
             raise NotImplementedError
         target = dest / path.with_suffix('').name
         with open(target, 'w') as handle:
-            subprocess.run(
-                ['bzip2', '-d', '-c', '--', path],
-                stdout=handle,
-                check=True)
+            proc = await asyncio.create_subprocess_exec(
+                'bzip2', '-d', '-c', '--', path,
+                stdout=handle)
+            await proc.wait()
+            if proc.returncode:
+                raise ProcessError(proc.returncode)
 
     @staticmethod
     async def volumes(path, password=''):
@@ -637,10 +643,12 @@ class xz:
             raise NotImplementedError
         target = dest / path.with_suffix('').name
         with open(target, 'w') as handle:
-            subprocess.run(
-                ['xz', '-d', '-c', '--', path],
-                stdout=handle,
-                check=True)
+            proc = await asyncio.create_subprocess_exec(
+                'xz', '-d', '-c', '--', path,
+                stdout=handle)
+            await proc.wait()
+            if proc.returncode:
+                raise ProcessError(proc.returncode)
 
     @staticmethod
     async def volumes(path, password=''):
@@ -714,11 +722,15 @@ class brotli:
 
     @staticmethod
     async def extract(path, dest, password=None, overwrite=False):
+        args = ['brotli', '--decompress', '--stdout']
         if overwrite:
-            raise NotImplementedError
-        subprocess.run(
-            ['brotli', '-d', '--', path],
-            check=True)
+            args.append('--force')
+        args.extend(['--', path])
+
+        proc = await asyncio.create_subprocess_exec(*args)
+        await proc.wait()
+        if proc.returncode:
+            raise ProcessError(proc.returncode)
 
     @staticmethod
     async def volumes(path, password=''):
