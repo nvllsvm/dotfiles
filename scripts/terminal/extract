@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import asyncio
 import contextlib
 import functools
 import getpass
@@ -32,7 +33,7 @@ class cli_7zip:
         raise KeyError
 
     @classmethod
-    def extract(cls, path, dest, password='', overwrite=False):
+    async def extract(cls, path, dest, password='', overwrite=False):
         if overwrite:
             raise NotImplementedError
         subprocess.run(
@@ -43,7 +44,7 @@ class cli_7zip:
         )
 
     @classmethod
-    def contents(cls, path):
+    async def contents(cls, path):
         proc = subprocess.run(
             [cls._get_bin(), '-ba', 'l', '--', str(path)],
             stdout=subprocess.PIPE,
@@ -61,7 +62,7 @@ class cli_7zip:
         return contents
 
     @classmethod
-    def volumes(cls, path, password=''):
+    async def volumes(cls, path, password=''):
         result = subprocess.run(
             [cls._get_bin(), 'l', f'-p{password}', '--', str(path)],
             stdout=subprocess.PIPE,
@@ -103,7 +104,7 @@ class udisksctl:
             raise KeyError
 
     @classmethod
-    def contents(cls, path):
+    async def contents(cls, path):
         with cls._loop_context(path) as device:
             with cls._mount_context(device) as mount_path:
                 return sorted(
@@ -112,7 +113,7 @@ class udisksctl:
                 )
 
     @classmethod
-    def extract(cls, path, dest, password=None, overwrite=False):
+    async def extract(cls, path, dest, password=None, overwrite=False):
         if overwrite:
             raise NotImplementedError
 
@@ -129,7 +130,7 @@ class udisksctl:
                 path.chmod(0o644)
 
     @staticmethod
-    def volumes(path, password=''):
+    async def volumes(path, password=''):
         return [path]
 
     @staticmethod
@@ -224,7 +225,7 @@ class unzip:
             raise KeyError
 
     @staticmethod
-    def contents(path):
+    async def contents(path):
         proc = subprocess.run(
             ['unzip', '-qq', '-l', path],
             stdout=subprocess.PIPE,
@@ -235,7 +236,7 @@ class unzip:
         ]
 
     @staticmethod
-    def extract(path, dest, password=None, overwrite=False):
+    async def extract(path, dest, password=None, overwrite=False):
         if overwrite:
             raise NotImplementedError
         subprocess.run(
@@ -243,7 +244,7 @@ class unzip:
             check=True)
 
     @staticmethod
-    def volumes(path, password=''):
+    async def volumes(path, password=''):
         return [path]
 
 
@@ -255,7 +256,7 @@ class cabextract:
             raise KeyError
 
     @staticmethod
-    def contents(path):
+    async def contents(path):
         proc = subprocess.run(
             ['cabextract', '--list', '--quiet', '--', path],
             stdout=subprocess.PIPE,
@@ -266,7 +267,7 @@ class cabextract:
         ]
 
     @staticmethod
-    def extract(path, dest, password=None, overwrite=False):
+    async def extract(path, dest, password=None, overwrite=False):
         if overwrite:
             raise NotImplementedError
         subprocess.run(
@@ -274,7 +275,7 @@ class cabextract:
             check=True)
 
     @staticmethod
-    def volumes(path, password=''):
+    async def volumes(path, password=''):
         return [path]
 
 
@@ -286,7 +287,7 @@ class unrar:
             raise KeyError
 
     @staticmethod
-    def contents(path):
+    async def contents(path):
         proc = subprocess.run(
             ['unrar', 'vb', '-v', '--', path],
             stdout=subprocess.PIPE,
@@ -294,7 +295,7 @@ class unrar:
         return set(proc.stdout.splitlines())
 
     @staticmethod
-    def extract(path, dest, password=None, overwrite=False):
+    async def extract(path, dest, password=None, overwrite=False):
         if overwrite:
             raise NotImplementedError
         subprocess.run(
@@ -303,7 +304,7 @@ class unrar:
             check=True)
 
     @staticmethod
-    def volumes(path, password=''):
+    async def volumes(path, password=''):
         proc = subprocess.run(
             ['unrar', 'vt', '-v', '--', path],
             stdout=subprocess.PIPE,
@@ -325,7 +326,7 @@ class unace:
             raise KeyError
 
     @staticmethod
-    def contents(path):
+    async def contents(path):
         proc = subprocess.run(
             ['unace', 'l', path],
             stdout=subprocess.PIPE,
@@ -352,7 +353,7 @@ class unace:
         ))
 
     @staticmethod
-    def extract(path, dest, password=None, overwrite=False):
+    async def extract(path, dest, password=None, overwrite=False):
         args = ['unace', 'e']
         if overwrite:
             args.append('-o')
@@ -365,7 +366,7 @@ class unace:
         subprocess.run(args, check=True)
 
     @staticmethod
-    def volumes(path, password=''):
+    async def volumes(path, password=''):
         return [path]
 
 
@@ -381,7 +382,7 @@ class innoextract:
             raise KeyError
 
     @staticmethod
-    def contents(path):
+    async def contents(path):
         # safe to pass --gog flag to non-gog installers
         proc = subprocess.run(
             ['innoextract', '--gog', '--exclude-temp', '--quiet', '--list',
@@ -405,7 +406,7 @@ class innoextract:
         return contents
 
     @staticmethod
-    def extract(path, dest, password=None, overwrite=False):
+    async def extract(path, dest, password=None, overwrite=False):
         if overwrite:
             raise NotImplementedError
         # safe to pass --gog flag to non-gog installers
@@ -415,7 +416,7 @@ class innoextract:
             check=True)
 
     @staticmethod
-    def volumes(path, password=''):
+    async def volumes(path, password=''):
         return [path]
 
 
@@ -425,7 +426,7 @@ class gog_linux:
         pass
 
     @classmethod
-    def contents(cls, path):
+    async def contents(cls, path):
         with cls._zipfile(path) as zf:
             contents = set()
             for zi in zf.infolist():
@@ -434,7 +435,7 @@ class gog_linux:
             return sorted(c.encode() for c in contents)
 
     @classmethod
-    def extract(cls, path, dest, password=None, overwrite=False):
+    async def extract(cls, path, dest, password=None, overwrite=False):
         if overwrite:
             raise NotImplementedError
         with cls._zipfile(path) as zf:
@@ -455,7 +456,7 @@ class gog_linux:
                 return target
 
     @staticmethod
-    def volumes(path, password=''):
+    async def volumes(path, password=''):
         return [path]
 
     @staticmethod
@@ -507,16 +508,19 @@ class gnu_tar:
             raise KeyError
 
     @staticmethod
-    def contents(path):
-        proc = subprocess.run(
-            ['tar', 'tf', str(path), '--force-local'],
+    async def contents(path):
+        proc = await asyncio.create_subprocess_exec(
+            'tar', 'tf', str(path), '--force-local',
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            check=True)
-        return proc.stdout.splitlines()
+            stderr=subprocess.PIPE)
+        await proc.wait()
+        if proc.returncode:
+            raise ProcessError(proc.returncode)
+        stdout = await proc.stdout.read()
+        return stdout.splitlines()
 
     @staticmethod
-    def extract(path, dest, password=None, overwrite=False):
+    async def extract(path, dest, password=None, overwrite=False):
         args = [
             'tar', 'xf', path, '--force-local', f'--one-top-level={dest}',
         ]
@@ -525,10 +529,13 @@ class gnu_tar:
         else:
             args.append('--keep-old-files')
 
-        subprocess.run(args, check=True)
+        proc = await asyncio.create_subprocess_exec(*args)
+        await proc.wait()
+        if proc.returncode:
+            raise ProcessError(proc.returncode)
 
     @staticmethod
-    def volumes(path, password=''):
+    async def volumes(path, password=''):
         return [path]
 
 
@@ -540,11 +547,11 @@ class gzip:
             raise KeyError
 
     @staticmethod
-    def contents(path):
+    async def contents(path):
         return [path.with_suffix('').name.encode()]
 
     @staticmethod
-    def extract(path, dest, password=None, overwrite=False):
+    async def extract(path, dest, password=None, overwrite=False):
         if overwrite:
             raise NotImplementedError
         target = dest / path.with_suffix('').name
@@ -555,7 +562,7 @@ class gzip:
                 check=True)
 
     @staticmethod
-    def volumes(path, password=''):
+    async def volumes(path, password=''):
         return [path]
 
 
@@ -567,11 +574,11 @@ class pigz:
             raise KeyError
 
     @staticmethod
-    def contents(path):
+    async def contents(path):
         return [path.with_suffix('').name.encode()]
 
     @staticmethod
-    def extract(path, dest, password=None, overwrite=False):
+    async def extract(path, dest, password=None, overwrite=False):
         if overwrite:
             raise NotImplementedError
         target = dest / path.with_suffix('').name
@@ -582,7 +589,7 @@ class pigz:
                 check=True)
 
     @staticmethod
-    def volumes(path, password=''):
+    async def volumes(path, password=''):
         return [path]
 
 
@@ -594,11 +601,11 @@ class bzip2:
             raise KeyError
 
     @staticmethod
-    def contents(path):
+    async def contents(path):
         return [path.with_suffix('').name.encode()]
 
     @staticmethod
-    def extract(path, dest, password=None, overwrite=False):
+    async def extract(path, dest, password=None, overwrite=False):
         if overwrite:
             raise NotImplementedError
         target = dest / path.with_suffix('').name
@@ -609,7 +616,7 @@ class bzip2:
                 check=True)
 
     @staticmethod
-    def volumes(path, password=''):
+    async def volumes(path, password=''):
         return [path]
 
 
@@ -621,11 +628,11 @@ class xz:
             raise KeyError
 
     @staticmethod
-    def contents(path):
+    async def contents(path):
         return [path.with_suffix('').name.encode()]
 
     @staticmethod
-    def extract(path, dest, password=None, overwrite=False):
+    async def extract(path, dest, password=None, overwrite=False):
         if overwrite:
             raise NotImplementedError
         target = dest / path.with_suffix('').name
@@ -636,7 +643,7 @@ class xz:
                 check=True)
 
     @staticmethod
-    def volumes(path, password=''):
+    async def volumes(path, password=''):
         return [path]
 
 
@@ -648,11 +655,11 @@ class lz4:
             raise KeyError
 
     @staticmethod
-    def contents(path):
+    async def contents(path):
         return [path.with_suffix('').name]
 
     @staticmethod
-    def extract(path, dest, password=None, overwrite=False):
+    async def extract(path, dest, password=None, overwrite=False):
         args = ['lz4', '-d']
         if overwrite:
             args.append('-f')
@@ -661,7 +668,7 @@ class lz4:
         subprocess.run(args, stdin=subprocess.PIPE, check=True)
 
     @staticmethod
-    def volumes(path, password=''):
+    async def volumes(path, password=''):
         return [path]
 
 
@@ -673,19 +680,24 @@ class zstd:
             raise KeyError
 
     @staticmethod
-    def contents(path):
+    async def contents(path):
         return [path.with_suffix('').name.encode()]
 
     @staticmethod
-    def extract(path, dest, password=None, overwrite=False):
+    async def extract(path, dest, password=None, overwrite=False):
+        args = ['zstd', '-d', '--output-dir-flat', dest]
         if overwrite:
-            raise NotImplementedError
-        subprocess.run(
-            ['zstd', '-d', '--output-dir-flat', dest, '--', path],
-            check=True)
+            args.append('-f')
+
+        args.extend(['--', path])
+
+        proc = await asyncio.create_subprocess_exec(*args)
+        await proc.wait()
+        if proc.returncode:
+            raise ProcessError(proc.returncode)
 
     @staticmethod
-    def volumes(path, password=''):
+    async def volumes(path, password=''):
         return [path]
 
 
@@ -697,11 +709,11 @@ class brotli:
             raise KeyError
 
     @staticmethod
-    def contents(path):
+    async def contents(path):
         return [path.with_suffix('').name]
 
     @staticmethod
-    def extract(path, dest, password=None, overwrite=False):
+    async def extract(path, dest, password=None, overwrite=False):
         if overwrite:
             raise NotImplementedError
         subprocess.run(
@@ -709,7 +721,7 @@ class brotli:
             check=True)
 
     @staticmethod
-    def volumes(path, password=''):
+    async def volumes(path, password=''):
         return [path]
 
 
@@ -732,7 +744,7 @@ def _build_dest(path, parent, child):
     return dest
 
 
-def _get_class(path):
+async def _get_class(path):
     suffixes = [suffix.lower() for suffix in path.suffixes]
 
     with open(path, 'rb') as f:
@@ -807,14 +819,14 @@ def _get_class(path):
             # TODO: add additional innoextract validation
             innoextract.check()
             try:
-                innoextract.contents(path)
+                await innoextract.contents(path)
                 return innoextract
             except Exception:
                 pass
 
             unzip.check()
             try:
-                unzip.contents(path)
+                await unzip.contents(path)
                 return unzip
             except Exception:
                 pass
@@ -847,7 +859,11 @@ def _get_class(path):
     raise NotImplementedError(path)
 
 
-def main():
+class ProcessError(Exception):
+    """Process exited non-zero"""
+
+
+async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '-p', dest='parent', metavar='DIR', type=pathlib.Path,
@@ -879,20 +895,20 @@ def main():
         if path in extracted:
             continue
 
-        cls = _get_class(path)
+        cls = await _get_class(path)
         cls.check()
         if args.list:
             contents = sorted(
-                cls.contents(path),
+                await cls.contents(path),
                 key=lambda x: (x.lower(), x)
             )
             # avoid errors with non-unicode file names
             sys.stdout.buffer.write(b'\n'.join(contents) + b'\n')
             sys.stdout.buffer.flush()
         else:
-            volumes = cls.volumes(path, password)
+            volumes = await cls.volumes(path, password)
 
-            cls.extract(
+            await cls.extract(
                 volumes[0],
                 _build_dest(path, args.parent, args.child),
                 password=password,
@@ -905,4 +921,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())
