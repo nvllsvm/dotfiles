@@ -15,7 +15,7 @@ download() {
 }
 if [ $# -eq 0 ]; then
     if [ -t 0 ]; then
-        download "$(cbpaste)"
+        download "$(cbpaste 2> /dev/null)"
     else
         download "$(urlextract)"
     fi

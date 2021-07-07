@@ -568,6 +568,35 @@ class gzip:
         return [path]
 
 
+class pbzip2:
+    @staticmethod
+    @functools.lru_cache()
+    def check():
+        if not shutil.which('pbzip2'):
+            raise KeyError
+
+    @staticmethod
+    async def contents(path):
+        return [path.with_suffix('').name.encode()]
+
+    @staticmethod
+    async def extract(path, dest, password=None, overwrite=False):
+        if overwrite:
+            raise NotImplementedError
+        target = dest / path.with_suffix('').name
+        with open(target, 'w') as handle:
+            proc = await asyncio.create_subprocess_exec(
+                'pbzip2', '-d', '-c', '--', path,
+                stdout=handle)
+            await proc.wait()
+            if proc.returncode:
+                raise ProcessError(proc.returncode)
+
+    @staticmethod
+    async def volumes(path, password=''):
+        return [path]
+
+
 class pigz:
     @staticmethod
     @functools.lru_cache()
@@ -813,7 +842,11 @@ async def _get_class(path):
             if len(suffixes) >= 2 and suffixes[-2] == '.tar':
                 return gnu_tar
             else:
-                return bzip2
+                try:
+                    pbzip2.check()
+                    return pbzip2
+                except KeyError:
+                    return gzip
         # xz
         elif start.startswith(b'\xfd7zXZ\x00'):
             if len(suffixes) >= 2 and suffixes[-2] == '.tar':
