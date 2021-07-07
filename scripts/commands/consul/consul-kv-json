@@ -106,8 +106,8 @@ def main():
         'data', nargs='?', default=sys.stdin, type=argparse.FileType('r'))
 
     delete_parser = subparsers.add_parser('delete')
-    delete_parser.add_argument(
-        'data', nargs='?', default=sys.stdin, type=argparse.FileType('r'))
+    delete_parser.add_argument('key')
+    delete_parser.add_argument('-r', '--recursive', action='store_true')
 
     args = parser.parse_args()
 
@@ -138,16 +138,22 @@ def main():
             assert isinstance(value, str)
 
         for key, value in data.items():
+            print(f'put "{key}" "{value}"')
             consul.put(key, value)
     elif args.command == 'delete':
-        data = json.load(args.data)
+        consul.delete(args.key)
 
-        assert isinstance(data, list)
-        for key in data:
-            assert isinstance(key, str)
-
-        for key in data:
-            consul.delete(key)
+        if args.recursive:
+            data = consul.get()
+            prefix = args.key.rstrip('/')
+            keys = {
+                key
+                for key in data
+                if key.startswith(prefix)
+            }
+            for key in keys:
+                print(f'delete "{key}"')
+                consul.delete(key)
 
 
 if __name__ == '__main__':
