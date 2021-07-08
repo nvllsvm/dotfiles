@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/ul">
+    <glob pattern="*.ul"/>
+    <comment>Update List</comment>
+  </mime-type>
+</mime-info>
