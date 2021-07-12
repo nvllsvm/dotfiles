@@ -951,6 +951,7 @@ async def main():
             sys.stdout.buffer.write(b'\n'.join(contents) + b'\n')
             sys.stdout.buffer.flush()
         else:
+            print('Extracting', path)
             volumes = await cls.volumes(path, password)
 
             await cls.extract(

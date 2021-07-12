@@ -33,7 +33,8 @@ def _pretty_json(data):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-u', '--unique', action='store_true')
-    parser.add_argument('path', default=[''], nargs='*')
+    parser.add_argument('path', default=[''], nargs='*',
+                        type=lambda x: pathlib.Path(x).resolve().absolute())
     args = parser.parse_args()
 
     files = set()
