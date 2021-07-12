@@ -66,6 +66,7 @@ async def create_zip(path, dest, fast=False):
         '-nw',  # treat wildcards as regular characters
         '-X',  # exclude extra file attributes, prevents EpubCheck error
         '-@',  # read paths from stdin
+        '-q',  # quiet
         dest,
         cwd=cwd,
         stdin=asyncio.subprocess.PIPE)
@@ -124,6 +125,7 @@ async def create_epub(path, dest, fast=False):
         '-nw',  # treat wildcards as regular characters
         '-X',  # exclude extra file attributes, prevents EpubCheck error
         '-@',  # read paths from stdin
+        '-q',  # quiet
         dest,
         cwd=cwd,
         stdin=asyncio.subprocess.PIPE)
