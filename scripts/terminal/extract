@@ -37,7 +37,7 @@ class cli_7zip:
         if overwrite:
             raise NotImplementedError
         subprocess.run(
-            [cls._get_bin(), 'x', f'-p{password}', '-ba', '-spe', f'-o{dest}',
+            [cls._get_bin(), 'x', f'-p{password}', '-spe', f'-o{dest}',
              '--', str(path)],
             stdout=subprocess.DEVNULL,  # no quiet flag
             check=True
