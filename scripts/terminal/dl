@@ -1,4 +1,36 @@
 #!/usr/bin/env sh
+set -e
+
+usage() {
+    cat << EOF
+usage: dl [OPTIONS] url [url ...]
+
+optional arguments:
+    --help      show help and exit
+    --insecure  disable certificate validation
+EOF
+}
+
+DL_INSECURE=
+while [ $# -ge 1 ]; do
+    case "$1" in
+        --help)
+            usage
+            exit
+            ;;
+        --insecure)
+            DL_INSECURE=1
+            shift
+            ;;
+        -*)
+            echo 'error: unrecognized argument' >&2
+            exit 1
+            ;;
+        *)
+            break
+    esac
+done
+
 download() {
     case "$1" in
         https://www.youtube.com*|\
