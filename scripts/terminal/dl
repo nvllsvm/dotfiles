@@ -7,9 +7,17 @@ download() {
             ;;
         *)
             if command -v aria2c > /dev/null; then
-                aria2c -x 16 -j 20 --split 20 "$@"
+                if [ -n "$DL_INSECURE" ]; then
+                    aria2c --check-certificate=false -x 16 -j 20 --split 20 "$@"
+                else
+                    aria2c -x 16 -j 20 --split 20 "$@"
+                fi
             elif command -v curl > /dev/null; then
-                curl -L -O "$@"
+                if [ -n "$DL_INSECURE" ]; then
+                    curl --insecure -L -O "$@"
+                else
+                    curl -L -O "$@"
+                fi
             fi
     esac
 }
