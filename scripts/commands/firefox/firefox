@@ -14,7 +14,7 @@ def find_firefox_windows(is_private):
     return [
         item
         for item in conn.get_tree().find_named(pattern)
-        if item.window_role == 'browser'
+        if item.window_instance == 'Navigator'
     ]
 
 
