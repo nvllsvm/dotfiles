@@ -22,6 +22,7 @@ import gzip
 import hashlib
 import importlib
 import importlib.metadata
+import importlib.resources
 import io
 import ipaddress
 import itertools
