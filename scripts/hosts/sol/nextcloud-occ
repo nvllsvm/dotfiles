@@ -1,2 +1,0 @@
-#!/usr/bin/env sh
-exec sol-docker exec -T -u www-data nextcloud php /var/www/html/occ "$@"
