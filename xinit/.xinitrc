@@ -33,6 +33,6 @@ fi
 
 autorandr --change --force
 udiskie --tray &
-blueman-tray &
+blueman-applet &
 
 exec i3
