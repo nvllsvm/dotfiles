@@ -18,6 +18,7 @@ list_versions() {
     find "$STEAMAPPS_COMMON" -mindepth 1 -maxdepth 1 -name 'Proton *' -exec basename {} \; | awk '{print $2}' | sort --version-sort
 }
 
+export STEAM_COMPAT_CLIENT_INSTALL_PATH=~/.local/share/Steam
 
 USE_PROTON_VERSION=
 SHOW_VERSION=
@@ -74,7 +75,9 @@ if [ -n "$SHOW_VERSION" ]; then
     exit
 fi
 
-if [ -n "$USE_PROTON_VERSION" ]; then
+if [ "$USE_PROTON_VERSION" = 'system' ]; then
+    exec /usr/bin/proton run "$@"
+elif [ -n "$USE_PROTON_VERSION" ]; then
     PROTON_BASE="$STEAMAPPS_COMMON/Proton $USE_PROTON_VERSION"
 else
     PROTON_BASE="$STEAMAPPS_COMMON/$(find "$STEAMAPPS_COMMON" -maxdepth 1 -mindepth 1 -printf '%P\n' | grep '^Proton' | sort --version-sort | tail -n 1)"
