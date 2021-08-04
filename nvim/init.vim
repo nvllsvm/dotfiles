@@ -47,10 +47,6 @@ Plug 'dhruvasagar/vim-table-mode'
 
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
-
-Plug 'rust-lang/rust.vim'
-
-Plug 'rbgrouleff/bclose.vim'
 call plug#end()
 
 let $FZF_DEFAULT_COMMAND = "fd --type file --ignore-file ~/.config/nvim/fzf_fd_ignore"
