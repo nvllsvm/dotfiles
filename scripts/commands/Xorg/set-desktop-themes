@@ -7,13 +7,17 @@ show_help() {
     cat << EOF
 usage: set-desktop-themes [--help] [--dpi DPI] [--large]
 
-    --dpi DPI   scale theme to this DPI
-    --help      show help and exit
-    --large     use large fonts
+    --dpi DPI       scale theme to this DPI
+    --help          show help and exit
+    --medium-large  use medium-large fonts
+    --large         use large fonts
 EOF
 }
 
-while true; do
+LARGE=
+MEDIUM_LARGE=
+
+while [ $# -gt 0 ]; do
     case "$1" in
         --dpi)
             DPI="$2"
@@ -24,18 +28,20 @@ while true; do
             LARGE=1
             shift
             ;;
+        --medium-large)
+            MEDIUM_LARGE=1
+            shift
+            ;;
         --help)
             show_help
             exit
             ;;
         *)
-            if [ $# -ne 0 ]; then
-                echo error: unrecognized arguments >&2
-                exit 1
-            fi
-            break
+            echo error: unrecognized arguments >&2
+            exit 1
     esac
 done
+
 if [ -z "$DPI" ]; then
     . "$CURRENT_THEME"
 else
@@ -50,6 +56,9 @@ else
         if [ -n "$LARGE" ]; then
             DUNST_GEOMETRY=300x5-0+28
             FONT_SIZE=14
+        elif [ -n "$MEDIUM_LARGE" ]; then
+            DUNST_GEOMETRY=300x5-0+28
+            FONT_SIZE=12
         else
             DUNST_GEOMETRY=300x5-0+20
             FONT_SIZE=9
@@ -63,6 +72,9 @@ else
         if [ -n "$LARGE" ]; then
             DUNST_GEOMETRY=800x5-0+56
             FONT_SIZE=14
+        elif [ -n "$MEDIUM_LARGE" ]; then
+            DUNST_GEOMETRY=800x5-0+56
+            FONT_SIZE=12
         else
             DUNST_GEOMETRY=800x5-0+44
             FONT_SIZE=10
