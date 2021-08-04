@@ -35,7 +35,7 @@ download() {
     case "$1" in
         https://www.youtube.com*|\
         https://youtube.com*)
-            youtube-dl "$1"
+            yt-dlp "$1"
             ;;
         *)
             if command -v aria2c > /dev/null; then
