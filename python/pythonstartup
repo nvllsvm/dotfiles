@@ -167,6 +167,10 @@ def utcnow():
     return datetime.datetime.now().astimezone(datetime.timezone.utc)
 
 
+def timeshift(dt, *args, **kwargs):
+    return dt + datetime.timedelta(*args, **kwargs)
+
+
 def cbcopy(data):
     if not isinstance(data, bytes):
         data = data.encode()
