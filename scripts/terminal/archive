@@ -204,6 +204,31 @@ async def create_tar_gz(path, dest, fast=False):
     assert tar_proc.returncode == 0
 
 
+async def create_tar_xz(path, dest, fast=False):
+    if path.is_dir():
+        cwd = path
+        paths = _all_paths(path)
+    else:
+        cwd = path.parent
+        paths = (path,)
+
+    # TODO specify xz compression level
+    tar_proc = await asyncio.create_subprocess_exec(
+        'tar', 'czf', dest, '-C', cwd, '--no-recursion',
+        '--verbatim-files-from', '--null', '-T', '-',
+        stdin=asyncio.subprocess.PIPE)
+
+    tar_proc.stdin.write(b'\0'.join(
+        bytes(p.relative_to(cwd))
+        for p in paths
+        if p != cwd
+    ))
+    tar_proc.stdin.close()
+
+    await tar_proc.wait()
+    assert tar_proc.returncode == 0
+
+
 async def create_tar_zstd(path, dest, fast=False):
     if path.is_dir():
         cwd = path
@@ -262,6 +287,10 @@ _formats = {
     'tar-gz': {
         'func': create_tar_gz,
         'suffix': '.tar.gz'
+    },
+    'tar-xz': {
+        'func': create_tar_xz,
+        'suffix': '.tar.xz'
     },
     'tar-zstd': {
         'func': create_tar_zstd,
