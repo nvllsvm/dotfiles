@@ -1,0 +1,20 @@
+#!/usr/bin/env python
+import argparse
+
+import pint
+
+
+UNIT_REGISTRY = pint.UnitRegistry()
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('from_amount', type=lambda x: UNIT_REGISTRY[x])
+    parser.add_argument('to_unit', type=lambda x: UNIT_REGISTRY[x])
+    args = parser.parse_args()
+
+    print(args.from_amount.to(args.to_unit))
+
+
+if __name__ == '__main__':
+    main()
