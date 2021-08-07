@@ -22,6 +22,17 @@ setopt auto_pushd
 bindkey "^[[A" history-beginning-search-backward
 bindkey "^[[B" history-beginning-search-forward
 
+# Fixes up+down history completion in certain situations.
+# Replicate:
+#   1. ssh into a remote machine and launch tmux
+#   2. kill the session from the remote machine
+#   3. attempt using partial completion (enter `ls ` and press up)
+#
+add-zsh-hook precmd set_cursor_key_to_cursor
+set_cursor_key_to_cursor () {
+    printf '\e[?1l'
+}
+
 alias ls='ls --color=auto --group-directories-first'
 alias diff='diff --color=auto'
 
