@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
-set-desktop-themes --dpi 96
+set-desktop-themes --dpi 96 --medium-large
 
 apply-display-calibration
