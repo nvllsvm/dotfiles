@@ -28,6 +28,12 @@ bindkey "^[[B" history-beginning-search-forward
 #   2. kill the session from the remote machine
 #   3. attempt using partial completion (enter `ls ` and press up)
 #
+# ---
+# Notes:
+#
+# https://espterm.github.io/docs/VT100%20escape%20codes.html
+# `setcursor DECCKM      Set cursor key to cursor               ^[[?1l`
+#
 add-zsh-hook precmd set_cursor_key_to_cursor
 set_cursor_key_to_cursor () {
     printf '\e[?1l'
