@@ -103,6 +103,11 @@ gsettings set org.gnome.desktop.interface scaling-factor "$SCALING_FACTOR"
 gsettings set org.gnome.settings-daemon.plugins.xsettings overrides \
     "{'Gdk/WindowScalingFactor': <$SCALING_FACTOR>, 'Gtk/CursorThemeSize': <$CURSOR_SIZE>, 'Xft/DPI': <$((${DPI}*1024))>}"
 
+# set default base16 theme
+if ! [ -f ~/.base16_theme ]; then
+    ln -s ~/.local/share/base16-shell/scripts/base16-classic-dark.sh ~/.base16_theme
+fi
+
 # update xresources
 COLORS="$(base16-xresources)"
 BACKGROUND_COLOR="$(echo "$COLORS" | grep background | awk '{print substr($2, 2, 8)}')"
