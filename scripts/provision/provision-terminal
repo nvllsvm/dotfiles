@@ -84,7 +84,6 @@ if [[ $osname == Linux* ]]; then
             moreutils \
             neovim \
             openssh \
-            p7zip \
             pkgfile \
             python \
             ripgrep \
@@ -108,8 +107,10 @@ fi
 
 full-update
 
-pip install flake8
-pip install speedtest-cli
+pip install \
+    flake8 \
+    pint \
+    speedtest-cli
 
 if [ "$(hostname)" = 'sol' ]; then
     link_file systemd ~/.config/systemd
