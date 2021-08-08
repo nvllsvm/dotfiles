@@ -43,22 +43,23 @@ def main():
         '-r', dest='remove', action='store_true',
         help='remove the trees from disk'
     )
-    parser.add_argument('path', type=pathlib.Path, nargs='?', default='.')
+    parser.add_argument('path', type=pathlib.Path, nargs='*')
     args = parser.parse_args()
 
-    for path in reversed(sorted(empty_dirs(args.path))):
-        print(path)
-        if args.remove:
-            # use instead of shutil.rmtree to ensure nothing added since scan
-            try:
-                path.rmdir()
-            except PermissionError as e:
-                print(e, file=sys.stderr)
-            except OSError:
-                # directory not empty
-                pass
-            except FileNotFoundError:
-                pass
+    for parent_path in set(args.path):
+        for path in reversed(sorted(empty_dirs(parent_path))):
+            print(path)
+            if args.remove:
+                # use instead of shutil.rmtree to ensure nothing added since scan
+                try:
+                    path.rmdir()
+                except PermissionError as e:
+                    print(e, file=sys.stderr)
+                except OSError:
+                    # directory not empty
+                    pass
+                except FileNotFoundError:
+                    pass
 
 
 if __name__ == '__main__':
