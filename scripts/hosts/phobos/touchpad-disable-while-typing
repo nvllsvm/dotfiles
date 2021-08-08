@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 PROPERTY='libinput Disable While Typing Enabled'
 
 xinput list --id-only | while read id; do
