@@ -164,6 +164,8 @@ bindsym XF86AudioNext exec --no-startup-id mpd-control next
 
 bindsym XF86MonBrightnessDown exec --no-startup-id set-backlight dec
 bindsym XF86MonBrightnessUp exec --no-startup-id set-backlight inc
+bindsym XF86KbdBrightnessDown exec --no-startup-id set-keyboard-backlight dec
+bindsym XF86KbdBrightnessUp exec --no-startup-id set-keyboard-backlight inc
 
 bindsym $mod+backslash exec --no-startup-id i3-scratchpad-alacritty todo.md notes todo.md
 bindsym $mod+n exec --no-startup-id i3-scratchpad-alacritty notes notes

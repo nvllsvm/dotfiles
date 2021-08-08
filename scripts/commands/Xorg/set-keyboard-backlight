@@ -1,0 +1,36 @@
+#!/usr/bin/env sh
+DEV='/sys/class/leds/asus::kbd_backlight'
+CURRENT="$(cat "${DEV}/brightness")"
+
+usage() {
+    echo 'usage: set-keyboard-backlight (inc|dec)'
+}
+
+case $# in
+    0)
+        echo "$CURRENT"
+        exit
+        ;;
+    1)
+        case "$1" in
+            inc)
+                new_brightness="$((CURRENT + 1))"
+                echo "$new_brightness" > "${DEV}/brightness"
+                ;;
+            dec)
+                new_brightness="$((CURRENT - 1))"
+                if [ "$new_brightness" -ge 0 ]; then
+                    echo "$new_brightness" > "${DEV}/brightness"
+                fi
+                ;;
+            *)
+                usage >&2
+                echo 'error: unknown action' >&2
+                exit 1
+        esac
+        ;;
+    *)
+        usage >&2
+        echo 'error: unexpected arguments' >&2
+        exit 1
+esac
