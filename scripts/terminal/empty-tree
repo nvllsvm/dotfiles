@@ -46,11 +46,13 @@ def main():
     parser.add_argument('path', type=pathlib.Path, nargs='*')
     args = parser.parse_args()
 
-    for parent_path in set(args.path):
+    paths = sorted(set(args.path)) or [pathlib.Path()]
+
+    for parent_path in paths:
         for path in reversed(sorted(empty_dirs(parent_path))):
             print(path)
             if args.remove:
-                # use instead of shutil.rmtree to ensure nothing added since scan
+                # prefer over shutil.rmtree to ensure nothing added since scan
                 try:
                     path.rmdir()
                 except PermissionError as e:
