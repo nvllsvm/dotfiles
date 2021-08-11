@@ -19,5 +19,5 @@ evdev:input:b0003v046Dp404D*
  KEYBOARD_KEY_70039=esc       # capslock
 
 # asus flow x13 gv301qe
-evdev:name:Asus Keyboard:dmi:bvn*:bvr*:bd*:svnASUSTeKCOMPUTERINC.:pnROGFlowX13GV301QE_GV301QE*
+evdev:name:Asus Keyboard:dmi:bvn*:bvr*:bd*:svnASUSTeKCOMPUTERINC.:pnROGFlowX13GV301QE*
  KEYBOARD_KEY_70039=esc       	# capslock
