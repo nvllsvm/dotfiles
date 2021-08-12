@@ -168,6 +168,8 @@ bindsym XF86MonBrightnessUp exec --no-startup-id set-backlight inc
 bindsym XF86KbdBrightnessDown exec --no-startup-id set-keyboard-backlight dec
 bindsym XF86KbdBrightnessUp exec --no-startup-id set-keyboard-backlight inc
 
+bindsym XF86TouchpadToggle exec --no-startup-id toggle-touchpad-while-typing
+
 bindsym $mod+backslash exec --no-startup-id i3-scratchpad-alacritty todo.md notes todo.md
 bindsym $mod+n exec --no-startup-id i3-scratchpad-alacritty notes notes
 

@@ -1,0 +1,25 @@
+#!/usr/bin/env sh
+PROPERTY='libinput Disable While Typing Enabled'
+
+notify() {
+    dunstify \
+        --hints=string:x-dunst-stack-tag:toggle-touchpad-while-typing \
+        'Touchpad While Typing' "$@"
+}
+
+xinput list --id-only | while read id; do
+    value=$(xinput list-props "$id" | grep "$PROPERTY (" | awk '{print $NF}')
+
+    if [ -n "$value" ]; then
+        if [ "$value" = '0' ]; then
+            value=1
+            icon='🚫'
+        else
+            value=0
+            icon='✔'
+        fi
+        xinput --set-prop "$id" "$PROPERTY" $value
+        notify "$icon"
+    fi
+done
+
