@@ -20,6 +20,7 @@ evdev:input:b0003v046Dp404D*
 
 # asus flow x13 gv301qe
 evdev:name:Asus Keyboard:dmi:bvn*:bvr*:bd*:svnASUSTeKCOMPUTERINC.:pnROGFlowX13GV301QE*
- KEYBOARD_KEY_70039=esc       	# capslock
- KEYBOARD_KEY_ff31007c=f20    # x11 mic-mute
- KEYBOARD_KEY_ff310038=f21    # rog button
+ KEYBOARD_KEY_70039=esc         # capslock -> escape
+ KEYBOARD_KEY_70013=prog2       # fn+f9 -> program2
+ KEYBOARD_KEY_ff31007c=f20      # mic-mute -> mic-mute
+ KEYBOARD_KEY_ff310038=prog1    # rog button -> program1
