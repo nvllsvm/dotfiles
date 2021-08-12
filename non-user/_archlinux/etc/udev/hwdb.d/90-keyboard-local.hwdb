@@ -22,3 +22,4 @@ evdev:input:b0003v046Dp404D*
 evdev:name:Asus Keyboard:dmi:bvn*:bvr*:bd*:svnASUSTeKCOMPUTERINC.:pnROGFlowX13GV301QE*
  KEYBOARD_KEY_70039=esc       	# capslock
  KEYBOARD_KEY_ff31007c=f20    # x11 mic-mute
+ KEYBOARD_KEY_ff310038=f21    # rog button
