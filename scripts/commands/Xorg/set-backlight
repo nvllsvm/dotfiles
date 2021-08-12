@@ -34,4 +34,5 @@ esac
 dunstify \
     --hints=string:x-dunst-stack-tag:set-backlight \
     --hints=int:transient:1 \
-    "Backlight" "$(current_light)"
+    --hints=int:value:"$(current_light)" \
+    "Backlight"

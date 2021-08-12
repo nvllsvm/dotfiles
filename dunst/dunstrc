@@ -239,6 +239,7 @@
 [urgency_low]
     # IMPORTANT: colors have to be defined in quotation marks.
     # Otherwise the "#" and following would be interpreted as a comment.
+    highlight = "#aaaaaa"
     background = "#222222"
     foreground = "#888888"
     timeout = 10
@@ -246,6 +247,7 @@
     #icon = /path/to/icon
 
 [urgency_normal]
+    highlight = "#aaaaaa"
     background = "#000000"
     foreground = "#ffffff"
     timeout = 2
@@ -253,6 +255,7 @@
     #icon = /path/to/icon
 
 [urgency_critical]
+    highlight = "#aaaaaa"
     background = "#900000"
     foreground = "#ffffff"
     frame_color = "#ff0000"
