@@ -279,6 +279,47 @@ class cabextract:
         return [path]
 
 
+class xorriso:
+    @staticmethod
+    @functools.lru_cache()
+    def check():
+        if not shutil.which('xorriso'):
+            raise KeyError
+
+    @staticmethod
+    async def contents(path):
+        proc = subprocess.run(
+            ['xorriso', '-osirrox', 'on', '-indev', path, '-getfacl_r', '/'],
+            stdout=subprocess.PIPE,
+            check=True)
+        return {
+            line.removeprefix(b'# file: ').strip()
+            for line in proc.stdout.splitlines()
+            if line.startswith(b'# file: ')
+        }
+
+    @staticmethod
+    async def extract(path, dest, password=None, overwrite=False):
+        if overwrite:
+            raise NotImplementedError
+        subprocess.run(
+            ['unrar', 'x', '-idc', '-idd', '-idn', '-idp', '-idq',
+             '--', path, dest],
+            check=True)
+
+    @staticmethod
+    async def volumes(path, password=''):
+        proc = subprocess.run(
+            ['unrar', 'vt', '-v', '--', path],
+            stdout=subprocess.PIPE,
+            check=True)
+        return [
+            path.parent / line.split(maxsplit=1)[-1]
+            for line in proc.stdout.decode().splitlines()
+            if line.startswith('Archive: ')
+        ]
+
+
 class unrar:
     @staticmethod
     @functools.lru_cache()
@@ -878,7 +919,7 @@ async def _get_class(path):
 
         # iso9660 image
         elif start.startswith(b'CD001'):
-            return udisksctl
+            return xorriso
         elif start.startswith(b'#!/bin/sh\n'):
             f.seek(271)
             if f.read(58) == b'# with modifications for mojosetup and GOG.com installer.\n':  # noqa: E501
@@ -892,7 +933,9 @@ async def _get_class(path):
         elif suffixes[-1] == '.ace':
             return unace
         # bchunk generates zero-prefixed iso
-        elif suffixes[-1] in ('.iso', '.img'):
+        elif suffixes[-1] in '.iso':
+            return xorriso
+        elif suffixes[-1] == '.img':
             return udisksctl
         # some mdf are also iso
         elif suffixes[-1] == '.mdf':
