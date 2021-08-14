@@ -289,35 +289,48 @@ class xorriso:
     @staticmethod
     async def contents(path):
         proc = subprocess.run(
-            ['xorriso', '-osirrox', 'on', '-indev', path, '-getfacl_r', '/'],
+            ['xorriso', '-osirrox', 'on', '-indev', path,
+             '-find', '/', '-exec', 'lsdl'],
             stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
             check=True)
-        return {
-            line.removeprefix(b'# file: ').strip()
-            for line in proc.stdout.splitlines()
-            if line.startswith(b'# file: ')
-        }
+
+        parents = {}
+        for line in proc.stdout.splitlines():
+            name = line.split(b"'", maxsplit=1)[-1][:-1]\
+                .decode()\
+                .strip()\
+                .lstrip('/')
+            if not name:
+                continue
+            if line.startswith(b'd'):
+                parents.setdefault(name, set())
+            else:
+                parent = pathlib.Path(name).parent.name
+                parents.setdefault(parent, set())
+                parents[parent].add(name)
+
+        paths = set()
+        for parent, children in parents.items():
+            if children:
+                paths.update(child.encode() for child in children)
+            else:
+                paths.add(parent.encode() + b'/')
+        return paths
 
     @staticmethod
     async def extract(path, dest, password=None, overwrite=False):
         if overwrite:
             raise NotImplementedError
         subprocess.run(
-            ['unrar', 'x', '-idc', '-idd', '-idn', '-idp', '-idq',
-             '--', path, dest],
+            ['xorriso', '-osirrox', 'on', '-indev', path,
+             '-extract', '/', dest],
+            stderr=subprocess.DEVNULL,
             check=True)
 
     @staticmethod
     async def volumes(path, password=''):
-        proc = subprocess.run(
-            ['unrar', 'vt', '-v', '--', path],
-            stdout=subprocess.PIPE,
-            check=True)
-        return [
-            path.parent / line.split(maxsplit=1)[-1]
-            for line in proc.stdout.decode().splitlines()
-            if line.startswith('Archive: ')
-        ]
+        return [path]
 
 
 class unrar:
