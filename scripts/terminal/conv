@@ -9,7 +9,7 @@ UNIT_REGISTRY = pint.UnitRegistry()
 
 def _unit_argument(value):
     try:
-        UNIT_REGISTRY[value]
+        return UNIT_REGISTRY[value]
     except pint.errors.UndefinedUnitError as e:
         raise argparse.ArgumentTypeError(str(e))
 
