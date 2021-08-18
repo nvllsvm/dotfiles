@@ -36,21 +36,19 @@ if [[ $osname == Linux* ]]; then
     link_file zsh/.zlogin ~/.zlogin
 
     if command -v pacman 2> /dev/null; then
-        yay -S --noconfirm \
-            adwaita-qt \
+        yay -S --needed --noconfirm \
             alacritty \
             arandr \
             argyllcms \
-            blueberry \
+            blueman \
             dunst \
             firefox \
             foliate \
             gnome-settings-daemon \
-            gnome-themes-extra \
             hsetroot \
             i3-wm \
             i3lock \
-            i3status \
+            i3status-rust \
             kid3-qt \
             mpd \
             mpv \

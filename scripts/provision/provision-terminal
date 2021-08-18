@@ -84,6 +84,7 @@ if [[ $osname == Linux* ]]; then
             moreutils \
             neovim \
             openssh \
+            perl-image-exiftool \
             pkgfile \
             python \
             ripgrep \
