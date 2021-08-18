@@ -1,10 +1,10 @@
-output HDMI-1
+output HDMI-A-0
 off
-output DP-1
+output DisplayPort-0
 off
-output DP-2
+output DisplayPort-1
 off
-output eDP-1
+output eDP
 crtc 0
 mode 1920x1200
 pos 0x0
