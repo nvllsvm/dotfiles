@@ -1,4 +1,0 @@
-#!/usr/bin/env zsh
-. "${NVM_DIR}/nvm.sh"
-export NVM_SYMLINK_CURRENT=true
-exec nvm use stable

@@ -40,6 +40,9 @@ else
     cd "$INSTALL_DIR"
     git clean -fd
     git pull
-    . ./nvm.sh
-    nvm install node --latest-npm
 fi
+
+cd "$INSTALL_DIR"
+. ./nvm.sh
+nvm install node --latest-npm
+NVM_SYMLINK_CURRENT=true nvm use node
