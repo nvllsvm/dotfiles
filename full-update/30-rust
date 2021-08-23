@@ -1,7 +1,37 @@
 #!/usr/bin/env sh
 set -e
-if ! command -v rustup > /dev/null; then
+
+show_help() {
+    cat << EOF
+usage:
+    -f, --force     force installation
+    --help          show help and exit
+EOF
+}
+
+FORCE=
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -f|--force)
+            FORCE=1
+            shift
+            ;;
+        --help)
+            show_help
+            exit
+            ;;
+        *)
+            echo 'error: unknown argument(s)' >&2
+            exit 1
+    esac
+done
+
+if [ -z "$FORCE" ] && ! command -v rustup > /dev/null; then
     exit
 fi
 
-rustup update
+if ! command -v rustup > /dev/null; then
+    curl https://sh.rustup.rs | sh
+else
+    rustup update
+fi
