@@ -23,3 +23,7 @@ evdev:name:Asus Keyboard:dmi:bvn*:bvr*:bd*:svnASUSTeKCOMPUTERINC.:pnROGFlowX13GV
  KEYBOARD_KEY_70039=esc         # capslock -> escape
  KEYBOARD_KEY_ff31007c=f20      # mic-mute -> mic-mute
  KEYBOARD_KEY_ff310038=prog1    # rog button -> program1
+
+# thinkpad keyboard
+evdev:name:Lenovo ThinkPad Compact USB Keyboard with TrackPoint:dmi:bvn*:bvr*:bd*:svn*:pn*
+ KEYBOARD_KEY_70039=esc         # capslock -> escape
