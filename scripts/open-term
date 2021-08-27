@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+TARGET="$(basename "$0")"
+if [ "$(hostname)" = "$TARGET" ]; then
+    exec alacritty --title "$TARGET" --command zsh -ic tmux-attach
+else
+    exec alacritty --title "$TARGET" --command zsh -ic "ssh $TARGET"
+fi
