@@ -133,6 +133,7 @@ configuration {
 
 window {
     border: ${BORDER_WIDTH};
+    width: 50em;
 }
 
 listview {
@@ -147,7 +148,7 @@ listview {
     foreground:                     #ffffff;
     alternate-active-foreground:    #ffffff;
     selected-active-background:     #ffffff;
-    border-color:                   #eeeeee;
+    border-color:                   #555555;
     separatorcolor:                 #000000;
 }
 EOF
