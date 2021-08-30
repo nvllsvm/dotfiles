@@ -118,14 +118,38 @@ xrdb << EOF
 *font: xft:${FONT_NAME}:size=${FONT_SIZE}:antialias=true:dpi=${DPI}
 *boldFont:
 
-rofi.font:	${FONT_NAME} ${FONT_SIZE}
-rofi.dpi:	${DPI}
-rofi.bw:	${BORDER_WIDTH}
-
 Xft.dpi: ${DPI}
 
 Xcursor.size: ${CURSOR_SIZE}
 ${COLORS}
+EOF
+
+mkdir -p ~/.config/rofi
+cat > ~/.config/rofi/config.rasi << EOF
+configuration {
+    font: "${FONT_NAME} ${FONT_SIZE}";
+    dpi: ${DPI};
+}
+
+window {
+    border: ${BORDER_WIDTH};
+}
+
+listview {
+    scrollbar: false;
+}
+
+* {
+    background:                     #000000;
+    lightbg:                        #000000;
+    active-foreground:              #ffffff;
+    lightfg:                        #555555;
+    foreground:                     #ffffff;
+    alternate-active-foreground:    #ffffff;
+    selected-active-background:     #ffffff;
+    border-color:                   #eeeeee;
+    separatorcolor:                 #000000;
+}
 EOF
 
 xrandr --dpi "$DPI"
