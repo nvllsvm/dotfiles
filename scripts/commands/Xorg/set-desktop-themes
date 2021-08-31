@@ -125,6 +125,7 @@ ${COLORS}
 EOF
 
 mkdir -p ~/.config/rofi
+eval "$(base16-export)"
 cat > ~/.config/rofi/config.rasi << EOF
 configuration {
     dpi: ${DPI};
@@ -141,9 +142,9 @@ listview {
 }
 
 * {
-    background:                     #000000;
-    border-color:                   #555555;
-    foreground:                     #ffffff;
+    background:                     ${BASE16_BACKGROUND};
+    border-color:                   ${BASE16_COLOR19};
+    foreground:                     ${BASE16_FOREGROUND};
     lightbg:                        var(background);
     selected-normal-background:     var(border-color);
     selected-normal-foreground:     var(foreground);
