@@ -127,8 +127,8 @@ EOF
 mkdir -p ~/.config/rofi
 cat > ~/.config/rofi/config.rasi << EOF
 configuration {
-    font: "${FONT_NAME} ${FONT_SIZE}";
     dpi: ${DPI};
+    font: "${FONT_NAME} ${FONT_SIZE}";
 }
 
 window {
@@ -142,14 +142,12 @@ listview {
 
 * {
     background:                     #000000;
-    lightbg:                        #000000;
-    active-foreground:              #ffffff;
-    lightfg:                        #555555;
-    foreground:                     #ffffff;
-    alternate-active-foreground:    #ffffff;
-    selected-active-background:     #ffffff;
     border-color:                   #555555;
-    separatorcolor:                 #000000;
+    foreground:                     #ffffff;
+    lightbg:                        var(background);
+    selected-normal-background:     var(border-color);
+    selected-normal-foreground:     var(foreground);
+    separatorcolor:                 var(background);
 }
 EOF
 
