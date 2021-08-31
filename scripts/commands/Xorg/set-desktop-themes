@@ -169,7 +169,7 @@ colors:
     background: '0x${BACKGROUND_COLOR}'
 EOF
 
-hsetroot -solid "$(xrdb -query | grep '\*background' | awk '{print $2}')"
+hsetroot -solid "$BASE16_BACKGROUND"
 
 if pidof i3 > /dev/null; then
     i3 restart > /dev/null 2>&1 || true
