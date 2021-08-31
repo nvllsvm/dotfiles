@@ -108,10 +108,9 @@ if ! [ -f ~/.base16_theme ]; then
     ln -s ~/.local/share/base16-shell/scripts/base16-classic-dark.sh ~/.base16_theme
 fi
 
-# update xresources
-COLORS="$(base16-xresources)"
-BACKGROUND_COLOR="$(echo "$COLORS" | grep background | awk '{print substr($2, 2, 8)}')"
+eval "$(base16-export)"
 
+# update xresources
 xrdb << EOF
 *facename: ${FONT_NAME}
 *fontsize: ${FONT_SIZE}
@@ -121,11 +120,33 @@ xrdb << EOF
 Xft.dpi: ${DPI}
 
 Xcursor.size: ${CURSOR_SIZE}
-${COLORS}
+*color0: #${BASE16_COLOR0}
+*color1: #${BASE16_COLOR1}
+*color2: #${BASE16_COLOR2}
+*color3: #${BASE16_COLOR3}
+*color4: #${BASE16_COLOR4}
+*color5: #${BASE16_COLOR5}
+*color6: #${BASE16_COLOR6}
+*color7: #${BASE16_COLOR7}
+*color8: #${BASE16_COLOR8}
+*color9: #${BASE16_COLOR9}
+*color10: #${BASE16_COLOR10}
+*color11: #${BASE16_COLOR11}
+*color12: #${BASE16_COLOR12}
+*color13: #${BASE16_COLOR13}
+*color14: #${BASE16_COLOR14}
+*color15: #${BASE16_COLOR15}
+*color16: #${BASE16_COLOR16}
+*color17: #${BASE16_COLOR17}
+*color18: #${BASE16_COLOR18}
+*color19: #${BASE16_COLOR19}
+*color20: #${BASE16_COLOR20}
+*color21: #${BASE16_COLOR21}
+*foreground: #${BASE16_FOREGROUND}
+*background: #${BASE16_BACKGROUND}
 EOF
 
 mkdir -p ~/.config/rofi
-eval "$(base16-export)"
 cat > ~/.config/rofi/config.rasi << EOF
 configuration {
     dpi: ${DPI};
@@ -142,9 +163,9 @@ listview {
 }
 
 * {
-    background:                     ${BASE16_BACKGROUND};
-    border-color:                   ${BASE16_COLOR19};
-    foreground:                     ${BASE16_FOREGROUND};
+    background:                     #${BASE16_BACKGROUND};
+    border-color:                   #${BASE16_COLOR19};
+    foreground:                     #${BASE16_FOREGROUND};
     lightbg:                        var(background);
     selected-normal-background:     var(border-color);
     selected-normal-foreground:     var(foreground);
@@ -166,10 +187,10 @@ font:
   size: ${FONT_SIZE}
 colors:
   primary:
-    background: '0x${BACKGROUND_COLOR}'
+    background: '0x${BASE16_BACKGROUND}'
 EOF
 
-hsetroot -solid "$BASE16_BACKGROUND"
+hsetroot -solid "#${BASE16_BACKGROUND}"
 
 if pidof i3 > /dev/null; then
     i3 restart > /dev/null 2>&1 || true
@@ -183,7 +204,33 @@ dunst \
     -geometry "$DUNST_GEOMETRY" > /dev/null 2>&1 &
 
 if [ -d ~/.config/sway ]; then
-    base16-sway-colors > ~/.config/sway/colors
+    cat > ~/.config/sway/colors << EOF
+set \$color_00 #${BASE16_COLOR0}
+set \$color_01 #${BASE16_COLOR1}
+set \$color_02 #${BASE16_COLOR2}
+set \$color_03 #${BASE16_COLOR3}
+set \$color_04 #${BASE16_COLOR4}
+set \$color_05 #${BASE16_COLOR5}
+set \$color_06 #${BASE16_COLOR6}
+set \$color_07 #${BASE16_COLOR7}
+set \$color_08 #${BASE16_COLOR8}
+set \$color_09 #${BASE16_COLOR9}
+set \$color_10 #${BASE16_COLOR10}
+set \$color_11 #${BASE16_COLOR11}
+set \$color_12 #${BASE16_COLOR12}
+set \$color_13 #${BASE16_COLOR13}
+set \$color_14 #${BASE16_COLOR14}
+set \$color_15 #${BASE16_COLOR15}
+set \$color_16 #${BASE16_COLOR16}
+set \$color_17 #${BASE16_COLOR17}
+set \$color_18 #${BASE16_COLOR18}
+set \$color_19 #${BASE16_COLOR19}
+set \$color_20 #${BASE16_COLOR20}
+set \$color_21 #${BASE16_COLOR21}
+
+set \$color_fg #${BASE16_FOREGROUND}
+set \$color_bg #${BASE16_BACKGROUND}
+EOF
 fi
 if pidof sway > /dev/null; then
     swaymsg reload

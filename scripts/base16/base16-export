@@ -31,7 +31,7 @@ ATTRIBUTE_MAP = {
 }
 
 
-def base16_xresources(path):
+def base16_export(path):
     attributes = {}
     for line in path.read_text().split('\n'):
         line = line.strip()
@@ -50,7 +50,7 @@ def base16_xresources(path):
 
 
 def main():
-    parser = argparse.ArgumentParser('base16-xresources')
+    parser = argparse.ArgumentParser('base16-export')
     default = '~/.base16_theme'
     parser.add_argument(
         '--theme',
@@ -60,10 +60,10 @@ def main():
         help=f'(default: {default})'
     )
     args = parser.parse_args()
-    attributes = base16_xresources(args.theme)
+    attributes = base16_export(args.theme)
     print(
         '\n'.join(
-            f"export BASE16_{ATTRIBUTE_MAP[attribute]}='#{color}'"
+            f"export BASE16_{ATTRIBUTE_MAP[attribute]}='{color}'"
             for attribute, color in attributes.items()
         )
     )
