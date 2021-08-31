@@ -162,6 +162,10 @@ listview {
     scrollbar: false;
 }
 
+entry {
+    placeholder: "";
+}
+
 * {
     background:                     #${BASE16_BACKGROUND};
     border-color:                   #${BASE16_COLOR19};
