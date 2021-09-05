@@ -25,6 +25,7 @@ def copy_tags(source, target):
 async def decode_ape(source, fd):
     proc = await asyncio.create_subprocess_exec(
         'mac', source, '-', '-d',
+        stderr=asyncio.subprocess.DEVNULL,
         stdout=fd)
 
     async def result():
