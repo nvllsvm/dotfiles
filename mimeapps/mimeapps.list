@@ -12,6 +12,7 @@ audio/aac=mpv.desktop
 audio/flac=mpv.desktop
 audio/mp4=mpv.desktop
 audio/mpeg=mpv.desktop
+audio/x-ape=mpv.desktop
 audio/x-opus+ogg=mpv.desktop
 audio/x-wav=mpv.desktop
 image/bmp=org.nomacs.ImageLounge.desktop
