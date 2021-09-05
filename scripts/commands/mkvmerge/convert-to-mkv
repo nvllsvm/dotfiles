@@ -1,5 +1,11 @@
 #!/usr/bin/env sh
-set -e
 for f in "$@"; do
-    mkvmerge -o "$f".mkv "$f" && rm "$f"
+    mkvmerge -o "$f".mkv "$f"
+    ret=$?
+    if [ "$ret" -eq 0 ]; then
+        rm "$f"
+    else
+        echo "error ${ret}: ${f}" >&2
+        exit "$ret"
+    fi
 done
