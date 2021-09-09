@@ -162,10 +162,8 @@ def determine_mime(path):
         start = f.read(8)
         if start == b'\x89PNG\r\n\x1a\n':
             return 'image/png'
-        elif start[0:2] == b'\xff\xd8':
-            f.seek(-2, os.SEEK_END)
-            if f.read(2) == b'\xff\xd9':
-                return 'image/jpeg'
+        elif start[0:3] == b'\xff\xd8\xff':
+            return 'image/jpeg'
         elif start[0:6] in (b'GIF87a', b'GIF89a'):
             return 'image/gif'
 
