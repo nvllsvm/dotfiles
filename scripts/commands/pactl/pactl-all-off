@@ -1,0 +1,24 @@
+#!/usr/bin/env python
+import subprocess
+
+
+def cards():
+    proc = subprocess.run(
+        ['pactl', 'list', 'cards'],
+        stdout=subprocess.PIPE,
+        check=True)
+    return [
+        line.strip().split(maxsplit=1)[1]
+        for line in proc.stdout.decode().splitlines()
+        if line.startswith('\tName: ')
+    ]
+
+
+def set_profile(card_name, profile_name):
+    subprocess.run(
+        ['pactl', 'set-card-profile', card_name, profile_name],
+        check=True)
+
+
+for card_name in cards():
+    set_profile(card_name,  'off')

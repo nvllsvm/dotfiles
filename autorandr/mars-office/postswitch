@@ -1,13 +1,9 @@
 #!/usr/bin/env sh
 set-desktop-themes --dpi 96
 
-pactl set-card-profile alsa_card.pci-0000_0b_00.1 off
-pactl set-card-profile alsa_card.pci-0000_0d_00.4 off
-pactl set-card-profile alsa_card.usb-C-Media_Electronics_Inc._USB_Audio_Device-00 off
-
+pactl-all-off
 pactl set-card-profile alsa_card.usb-Schiit_Audio_USB_Modi_Device-00 pro-audio
 pactl set-card-profile alsa_card.usb-audio-technica_AT2020USB_-00 pro-audio
-
 pactl set-default-sink alsa_output.usb-Schiit_Audio_USB_Modi_Device-00.pro-output-0
 pactl set-default-source alsa_input.usb-audio-technica_AT2020USB_-00.pro-input-0
 

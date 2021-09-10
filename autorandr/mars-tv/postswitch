@@ -1,4 +1,7 @@
 #!/usr/bin/env sh
 set-desktop-themes --dpi 192 --large
+
+pactl-all-off
+
 picom -b
 systemctl restart --user xow.service
