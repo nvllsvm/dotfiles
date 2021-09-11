@@ -2,7 +2,7 @@
 set-desktop-themes --dpi 96
 
 pactl-all-off
-pactl set-card-profile alsa_card.usb-C-Media_Electronics_Inc._USB_Audio_Device-00 pro-audio
+pactl set-card-profile alsa_card.usb-C-Media_Electronics_Inc._USB_Audio_Device-00 output:analog-stereo
 
 apply-display-calibration
 i3-move-ws
