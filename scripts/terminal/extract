@@ -965,6 +965,27 @@ class ProcessError(Exception):
     """Process exited non-zero"""
 
 
+def format_contents(paths):
+    file_parents = set()
+    for path in paths:
+        is_file = not path.endswith(b'/')
+        if is_file:
+            parents = tuple(path.strip(b'/').split(b'/')[:-1])
+            file_parents.add(parents)
+
+    contents = set()
+
+    for path in paths:
+        if path.endswith(b'/'):
+            parts = tuple(path.strip(b'/').split(b'/'))
+            if parts not in file_parents:
+                contents.add(path)
+        else:
+            contents.add(path)
+
+    return sorted(contents, key=lambda x: (x.lower(), x))
+
+
 async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -1000,10 +1021,8 @@ async def main():
         cls = await _get_class(path)
         cls.check()
         if args.list:
-            contents = sorted(
-                await cls.contents(path),
-                key=lambda x: (x.lower(), x)
-            )
+            contents = format_contents(await cls.contents(path))
+
             # avoid errors with non-unicode file names
             sys.stdout.buffer.write(b'\n'.join(contents) + b'\n')
             sys.stdout.buffer.flush()
