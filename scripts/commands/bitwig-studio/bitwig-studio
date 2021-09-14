@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+exec pw-jack /usr/bin/bitwig-studio "$@"
