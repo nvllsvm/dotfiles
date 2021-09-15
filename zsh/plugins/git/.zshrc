@@ -3,7 +3,7 @@ if command -v git > /dev/null; then
         touch ~/.cache/gs
         case $# in
             0)
-                target="$(fzf < ~/.cache/gs)"
+                target="$(fzf --no-sort < ~/.cache/gs)"
                 if [ -z "$target" ]; then
                     return 130
                 fi
@@ -23,7 +23,7 @@ if command -v git > /dev/null; then
 
         if git sync "$target"; then
             print -s "gs $target"
-            echo "$target" | sort -u - ~/.cache/gs | tr '[:upper:]' '[:lower:]' | sponge ~/.cache/gs
+            echo "$target" | awk '!x[$0]++' - ~/.cache/gs | tr '[:upper:]' '[:lower:]' | sponge ~/.cache/gs
             cd "$(git sync --show-dir "$target")"
         fi
     }
