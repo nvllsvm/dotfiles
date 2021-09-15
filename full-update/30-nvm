@@ -45,4 +45,5 @@ fi
 cd "$INSTALL_DIR"
 . ./nvm.sh
 nvm install node --latest-npm
+npm install -g npm@latest
 NVM_SYMLINK_CURRENT=true nvm use node
