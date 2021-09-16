@@ -61,13 +61,8 @@ else
         image/x-canon-cr3)
             exiftool "$1"
             ;;
-        image/jpeg)
-            exiv2 "$1"
-            ;;
         image/*)
-            output="$(identify -- "$1")"
-            # strip filename
-            echo "${output#*"$1" }"
+            exiv2 "$1"
             ;;
         *)
             default_preview "$1"
