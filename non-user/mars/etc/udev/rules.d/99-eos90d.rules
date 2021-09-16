@@ -1,1 +1,0 @@
-SUBSYSTEMS=="usb", ACTION=="add", ENV{DEVTYPE}=="usb_device", ENV{ID_VENDOR_ID}=="04a9", ENV{ID_MODEL_ID}=="32ea", TAG+="systemd", ENV{SYSTEMD_USER_WANTS}+="gphoto2-webcam.service"
