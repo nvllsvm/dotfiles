@@ -63,8 +63,7 @@ if [ $# -eq 0 ]; then
 fi
 
 if [ -z "$STEAM_COMPAT_DATA_PATH" ]; then
-    echo 'error: --prefix must be specified' >&2
-    exit 1
+    export STEAM_COMPAT_DATA_PATH=~/.local/proton-pfx-"${USE_PROTON_VERSION}"
 fi
 
 if [ -n "$SHOW_VERSION" ]; then
