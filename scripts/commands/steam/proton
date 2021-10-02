@@ -63,7 +63,7 @@ if [ $# -eq 0 ]; then
 fi
 
 if [ -z "$STEAM_COMPAT_DATA_PATH" ]; then
-    export STEAM_COMPAT_DATA_PATH=~/.local/share/proton-pfx-"${USE_PROTON_VERSION}"
+    export STEAM_COMPAT_DATA_PATH=~/.local/share/proton-pfx-"${USE_PROTON_VERSION:-default}"
     mkdir -p "$STEAM_COMPAT_DATA_PATH"
 fi
 
