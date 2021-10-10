@@ -5,7 +5,7 @@ STEAMAPPS_COMMON=~/.steam/steam/steamapps/common
 
 show_help() {
     cat << EOF
-usage: proton-steam --prefix PATH PROGRAM [ARG ...]
+usage: proton --prefix PATH PROGRAM [ARG ...]
     --help          show help and exit
     --list          list installed versions an exit
     --prefix PATH   use a custom prefix path
