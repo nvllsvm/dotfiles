@@ -73,6 +73,14 @@ for name in [
         pass
 
 
+try:
+    import faker as _faker
+except ModuleNotFoundError:
+    pass
+else:
+    faker = _faker.Faker()
+
+
 def pp(*args, **kwargs):
     kwargs.setdefault('sort_dicts', True)
     return pprint.pp(*args, **kwargs)
