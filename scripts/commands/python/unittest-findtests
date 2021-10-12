@@ -32,13 +32,7 @@ def main():
     with contextlib.redirect_stdout(subprocess.DEVNULL):
         tests = find_tests(args.name)
 
-    parts = set()
-    for test in tests:
-        test_parts = []
-        for part in test.split('.'):
-            test_parts.append(part)
-            parts.add('.'.join(test_parts))
-    print('\n'.join(sorted(parts)))
+    print('\n'.join(sorted(tests)))
 
 
 if __name__ == '__main__':
