@@ -10,7 +10,7 @@ _unittest() {
         (tests)
             local -a unittests
             unittests=( $(unittest-findtests) )
-            _multi_parts . unittests
+            _multi_parts . unittests -i
         ;;
     esac
 }
