@@ -1,0 +1,16 @@
+#compdef unittest
+
+_unittest() {
+  local state
+
+  _arguments \
+    '1: :->aws_profile'\
+    '*: :->eb_name'
+
+  case $state in
+    (aws_profile) _arguments '1:profiles:($(unittest-findtests))' ;;
+              (*) compadd "$@" foo bar
+  esac
+}
+
+_unittest "$@"
