@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import argparse
+import contextlib
+import subprocess
 import unittest
 
 
@@ -7,7 +9,11 @@ def find_tests(name):
     tests = set()
     for suite in unittest.defaultTestLoader.discover(name):
         for case in suite:
-            for test in case:
+            try:
+                iter_case = iter(case)
+            except TypeError:
+                continue
+            for test in iter_case:
                 fullname = '.'.join([
                     test.__module__,
                     test.__class__.__qualname__,
@@ -22,7 +28,10 @@ def main():
     parser.add_argument('name', default='.', nargs='?')
     args = parser.parse_args()
 
-    tests = find_tests(args.name)
+    # redirect stdout to make loud imports stfu
+    with contextlib.redirect_stdout(subprocess.DEVNULL):
+        tests = find_tests(args.name)
+
     parts = set()
     for test in tests:
         test_parts = []
