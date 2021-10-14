@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+set-desktop-themes --dpi 96
+
+pactl-all-off
+pactl set-card-profile alsa_card.pci-0000_0b_00.1 output:hdmi-stereo
+
+apply-display-calibration
+i3-move-ws

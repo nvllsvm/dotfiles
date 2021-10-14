@@ -1,7 +1,0 @@
-#!/usr/bin/env sh
-set-desktop-themes --dpi 96 --large
-
-pactl-all-off
-
-picom -b
-systemctl restart --user xow.service
