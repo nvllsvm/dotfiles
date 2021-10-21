@@ -45,6 +45,7 @@ import string
 import subprocess
 import sys
 import tarfile
+import textwrap
 import time
 import unittest
 import unittest.mock
