@@ -1,3 +1,21 @@
+#!/usr/bin/env sh
+if [ -z "$FONT_SIZE" ]; then
+    FONT_SIZE="9"
+fi
+if [ -z "$FONT_NAME" ]; then
+    FONT_NAME="Monospace"
+fi
+if [ -z "$FRAME_WIDTH" ]; then
+    FRAME_WIDTH="3"
+fi
+if [ -z "$MAX_ICON_SIZE" ]; then
+    MAX_ICON_SIZE="64"
+fi
+if [ -z "$GEOMETRY" ]; then
+    GEOMETRY="300x5-0+40"
+fi
+
+cat > /tmp/dunstrc << EOF
 [global]
     ### Display ###
 
@@ -17,6 +35,8 @@
     # will be ignored.
     follow = mouse
 
+    font = '${FONT_NAME}' ${FONT_SIZE}
+
     # The geometry of the window:
     #   [{width}]x{height}[+/-{x}+/-{y}]
     # The geometry of the message window.
@@ -29,7 +49,7 @@
     # the top and down respectively.
     # The width can be negative.  In this case the actual width is the
     # screen width minus the width defined in within the geometry option.
-    geometry = "300x5-0+40"
+    geometry = "${GEOMETRY}"
 
     # Show how many messages are currently hidden (because of geometry).
     indicate_hidden = yes
@@ -61,7 +81,7 @@
 
     # Defines width in pixels of frame around the notification window.
     # Set to 0 to disable.
-    frame_width = 3
+    frame_width = ${FRAME_WIDTH}
 
     # Defines color of the frame around the notification window.
     frame_color = "#aaaaaa"
@@ -83,8 +103,6 @@
     idle_threshold = 0
 
     ### Text ###
-
-    font = 'DejaVu Sans Mono' 18
 
     # The spacing between lines.  If the height is smaller than the
     # font height, it will get raised to the font height.
@@ -156,7 +174,7 @@
     icon_position = left
 
     # Scale larger icons down to this size, set to 0 to disable
-    max_icon_size = 64
+    max_icon_size = ${MAX_ICON_SIZE}
 
     # Paths to default icons.
     icon_path = /dev/null
@@ -323,5 +341,4 @@
 [mpd-notifier]
     appname = mpd-notifier
     format = %b
-
-# vim: ft=cfg
+EOF

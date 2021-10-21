@@ -201,11 +201,15 @@ if pidof i3 > /dev/null; then
 fi
 
 pkill -9 dunst || true
-dunst \
-    -font "$FONT_NAME $FONT_SIZE" \
-    -frame_width "$BORDER_WIDTH" \
-    -max_icon_size "$DUNST_MAX_ICON_SIZE" \
-    -geometry "$DUNST_GEOMETRY" > /dev/null 2>&1 &
+
+FONT_NAME="${FONT_NAME}" \
+FONT_SIZE="${FONT_SIZE}" \
+FRAME_WIDTH="${FRAME_WIDTH}" \
+MAX_ICON_SIZE="${MAX_ICON_SIZE}" \
+GEOMETRY="${GEOMETRY}" \
+    dunst-build-config
+
+dunst -config /tmp/dunstrc 2>&1 &
 
 if [ -d ~/.config/sway ]; then
     cat > ~/.config/sway/colors << EOF
