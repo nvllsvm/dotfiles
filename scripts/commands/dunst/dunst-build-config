@@ -74,7 +74,7 @@ cat > /tmp/dunstrc << EOF
     progress_bar_height = 10
 
     # Set the frame width of the progress bar
-    progress_bar_frame_width = 0
+    progress_bar_frame_width = ${FRAME_WIDTH}
 
     # Set the minimum width for the progress bar
     progress_bar_min_width = 150
@@ -316,6 +316,7 @@ cat > /tmp/dunstrc << EOF
     # Otherwise the "#" and following would be interpreted as a comment.
     background = "#222222"
     foreground = "#888888"
+    highlight = "#888888"
     timeout = 10
     # Icon for notifications with low urgency, uncomment to enable
     #icon = /path/to/icon
@@ -323,7 +324,8 @@ cat > /tmp/dunstrc << EOF
 [urgency_normal]
     background = "#000000"
     foreground = "#ffffff"
-    timeout = 10
+    highlight = "#888888"
+    timeout = 2
     # Icon for notifications with normal urgency, uncomment to enable
     #icon = /path/to/icon
 
@@ -331,6 +333,7 @@ cat > /tmp/dunstrc << EOF
     background = "#900000"
     foreground = "#ffffff"
     frame_color = "#ff0000"
+    highlight = "#888888"
     timeout = 0
     # Icon for notifications with critical urgency, uncomment to enable
     #icon = /path/to/icon
