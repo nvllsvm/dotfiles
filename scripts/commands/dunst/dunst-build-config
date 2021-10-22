@@ -317,7 +317,7 @@ cat > /tmp/dunstrc << EOF
     background = "#222222"
     foreground = "#888888"
     highlight = "#888888"
-    timeout = 10
+    timeout = 2
     # Icon for notifications with low urgency, uncomment to enable
     #icon = /path/to/icon
 
