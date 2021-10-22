@@ -51,32 +51,40 @@ else
         BORDER_WIDTH=2
         CURSOR_SIZE=16
         DUNST_MAX_ICON_SIZE=64
+        DUNST_FRAME_WIDTH=2
         SCALING_FACTOR=1
 
         if [ -n "$LARGE" ]; then
-            DUNST_GEOMETRY=300x5-0+28
+            DUNST_WIDTH=300
+            DUNST_OFFSET=0x28
             FONT_SIZE=14
         elif [ -n "$MEDIUM_LARGE" ]; then
-            DUNST_GEOMETRY=300x5-0+28
+            DUNST_WIDTH=300
+            DUNST_OFFSET=0x28
             FONT_SIZE=12
         else
-            DUNST_GEOMETRY=300x5-0+20
+            DUNST_WIDTH=300
+            DUNST_OFFSET=0x20
             FONT_SIZE=9
         fi
     else
         BORDER_WIDTH=3
         CURSOR_SIZE=48
+        DUNST_FRAME_WIDTH=2
         DUNST_MAX_ICON_SIZE=128
         SCALING_FACTOR=2
 
         if [ -n "$LARGE" ]; then
-            DUNST_GEOMETRY=800x5-0+56
+            DUNST_WIDTH=800
+            DUNST_OFFSET=0x56
             FONT_SIZE=14
         elif [ -n "$MEDIUM_LARGE" ]; then
-            DUNST_GEOMETRY=800x5-0+56
+            DUNST_WIDTH=800
+            DUNST_OFFSET=0x56
             FONT_SIZE=12
         else
-            DUNST_GEOMETRY=800x5-0+44
+            DUNST_WIDTH=800
+            DUNST_OFFSET=0x44
             FONT_SIZE=10
         fi
     fi
@@ -86,7 +94,9 @@ else
 BORDER_WIDTH="$BORDER_WIDTH"
 CURSOR_SIZE="$CURSOR_SIZE"
 DPI="$DPI"
-DUNST_GEOMETRY="$DUNST_GEOMETRY"
+DUNST_WIDTH="$DUNST_WIDTH"
+DUNST_FRAME_WIDTH="$DUNST_FRAME_WIDTH"
+DUNST_OFFSET="$DUNST_OFFSET"
 DUNST_MAX_ICON_SIZE="$DUNST_MAX_ICON_SIZE"
 FONT_NAME="$FONT_NAME"
 FONT_SIZE="$FONT_SIZE"
@@ -204,9 +214,10 @@ pkill -9 dunst || true
 
 FONT_NAME="${FONT_NAME}" \
 FONT_SIZE="${FONT_SIZE}" \
-FRAME_WIDTH="${FRAME_WIDTH}" \
+FRAME_WIDTH="${DUNST_FRAME_WIDTH}" \
 MAX_ICON_SIZE="${MAX_ICON_SIZE}" \
-GEOMETRY="${GEOMETRY}" \
+WIDTH="${DUNST_WIDTH}" \
+OFFSET="${DUNST_OFFSET}" \
     dunst-build-config
 
 dunst -config /tmp/dunstrc 2>&1 &
