@@ -54,6 +54,7 @@ import urllib.request
 import uuid
 import zipfile
 import zlib
+import zoneinfo
 
 for name in [
         'arrow',
