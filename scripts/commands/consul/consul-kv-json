@@ -5,6 +5,7 @@ import base64
 import json
 import logging
 import os
+import shlex
 import ssl
 import sys
 import urllib.error
@@ -95,6 +96,7 @@ def main():
     subparsers = parser.add_subparsers(dest='command', required=True)
 
     get_parser = subparsers.add_parser('get')
+    get_parser.add_argument('--shell', action='store_true', default=False)
     get_parser.add_argument('prefix', nargs='?')
 
     put_parser = subparsers.add_parser('put')
@@ -127,7 +129,19 @@ def main():
                 for key, value in data.items()
                 if key.startswith(args.prefix)
             }
-        print(json.dumps(data, indent=2, sort_keys=True))
+        if args.shell:
+            for key, value in data.items():
+                if args.prefix:
+                    key = key.removeprefix(args.prefix)
+                if '/' in key:
+                    raise ValueError(f'invalid shell variable: {key}')
+                if value is None:
+                    value = ''
+                else:
+                    value = shlex.quote(value)
+                print(f'export {key}={value}')
+        else:
+            print(json.dumps(data, indent=2, sort_keys=True))
     elif args.command == 'put':
         consul.put(args.key, args.value)
     elif args.command == 'import':
