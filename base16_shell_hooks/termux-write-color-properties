@@ -1,0 +1,34 @@
+#!/usr/bin/env sh
+if ! command -v termux-reload-settings > /dev/null; then
+    exit
+fi
+
+eval "$(base16-export)"
+cat >> ~/.termux/color.properties << EOF
+background=#${BASE16_BACKGROUND}
+foreground=#${BASE16_FOREGROUND}
+cursor=#${BASE16_FOREGROUND}
+
+color0=#${BASE16_COLOR0}
+color1=#${BASE16_COLOR1}
+color2=#${BASE16_COLOR2}
+color3=#${BASE16_COLOR3}
+color4=#${BASE16_COLOR4}
+color5=#${BASE16_COLOR5}
+color6=#${BASE16_COLOR6}
+color7=#${BASE16_COLOR7}
+color9=#${BASE16_COLOR9}
+color8=#${BASE16_COLOR8}
+color10=#${BASE16_COLOR10}
+color11=#${BASE16_COLOR11}
+color12=#${BASE16_COLOR12}
+color13=#${BASE16_COLOR13}
+color14=#${BASE16_COLOR14}
+color15=#${BASE16_COLOR15}
+color16=#${BASE16_COLOR16}
+color17=#${BASE16_COLOR17}
+color18=#${BASE16_COLOR18}
+color19=#${BASE16_COLOR19}
+color20=#${BASE16_COLOR20}
+color21=#${BASE16_COLOR21}
+EOF
