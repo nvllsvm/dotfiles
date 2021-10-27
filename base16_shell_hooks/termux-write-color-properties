@@ -4,7 +4,7 @@ if ! command -v termux-reload-settings > /dev/null; then
 fi
 
 eval "$(base16-export)"
-cat >> ~/.termux/color.properties << EOF
+cat >> ~/.termux/colors.properties << EOF
 background=#${BASE16_BACKGROUND}
 foreground=#${BASE16_FOREGROUND}
 cursor=#${BASE16_FOREGROUND}
