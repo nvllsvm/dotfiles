@@ -7,5 +7,5 @@ if ! pidof i3lock; then
     i3lock -n -c 8c8cb8
     pkill -x onboard
     xset -dpms
-    killall -USR1 i3status
+    killall -USR1 i3status i3status-rs
 fi
