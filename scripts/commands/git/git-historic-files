@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-git log --pretty=format: --name-only --diff-filter=A | sort -u
+git log --pretty=format: --name-only --diff-filter=A | grep -v "^$" | sort -u
