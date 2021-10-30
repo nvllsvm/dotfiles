@@ -1,0 +1,34 @@
+#!/usr/bin/env sh
+MONITOR=eDP
+
+transform_matrix() {
+    xinput set-prop "$1" --type=float "Coordinate Transformation Matrix" $matrix
+}
+
+monitor-sensor \
+    | grep --line-buffered "Accelerometer orientation changed" \
+    | grep --line-buffered -o ": .*" \
+    | while read -r line; do
+        line="${line#??}"
+        if [ "$line" = "normal" ]; then
+            rotate=normal
+            matrix="0 0 0 0 0 0 0 0 0"
+        elif [ "$line" = "left-up" ]; then
+            rotate=left
+            matrix="0 -1 1 1 0 0 0 0 1"
+        elif [ "$line" = "right-up" ]; then
+            rotate=right
+            matrix="0 1 0 -1 0 1 0 0 1"
+        elif [ "$line" = "bottom-up" ]; then
+            rotate=inverted
+            matrix="-1 0 1 0 -1 1 0 0 1"
+        else
+            echo "Unknown rotation: $line"
+            continue
+        fi
+
+        echo $rotate
+        xrandr --output "$MONITOR" --rotate "$rotate"
+        transform_matrix 'ELAN9008:00 04F3:2C82'
+    done
+
