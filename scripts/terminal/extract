@@ -670,7 +670,11 @@ class pigz:
         target = dest / path.with_suffix('').name
         with open(target, 'w') as handle:
             proc = await asyncio.create_subprocess_exec(
-                'pigz', '-d', '-c', '--', path,
+                'pigz',
+                '-d',  # decompress
+                '-k',  # keep original file
+                '-c',  # write to stdout
+                '--', path,
                 stdout=handle)
             await proc.wait()
             if proc.returncode:
@@ -697,13 +701,15 @@ class pixz:
         if overwrite:
             raise NotImplementedError
         target = dest / path.with_suffix('').name
-        with open(target, 'w') as handle:
-            proc = await asyncio.create_subprocess_exec(
-                'pixz', '-d', '--', path,
-                stdout=handle)
-            await proc.wait()
-            if proc.returncode:
-                raise ProcessError(proc.returncode)
+        proc = await asyncio.create_subprocess_exec(
+            'pixz',
+            '-d',  # decompress
+            '-k',  # keep original input
+            '--', path,
+            target)
+        await proc.wait()
+        if proc.returncode:
+            raise ProcessError(proc.returncode)
 
     @staticmethod
     async def volumes(path, password=''):
