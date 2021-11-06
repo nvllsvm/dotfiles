@@ -53,6 +53,7 @@ def main():
             dest = path.with_suffix('.mkv')
             if dest.exists():
                 raise RuntimeError(f'file exists: {path}')
+            print(path)
             mkvmerge(dest, path)
             path.unlink()
         else:
