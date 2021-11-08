@@ -37,6 +37,7 @@ MIME_SUFFIXES = {
     ],
     'image/tiff': [
         '.tiff',
+        '.tif',
     ],
     'image/webp': [
         '.webp',
