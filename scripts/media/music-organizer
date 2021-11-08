@@ -179,7 +179,10 @@ def rename_extensions(path):
         if mime in MIME_SUFFIXES:
             if expected := MIME_SUFFIXES[mime]:
                 if f.suffix not in expected:
-                    safe_rename(f, f.stem + expected[0])
+                    if f.suffix.lower() in expected:
+                        safe_rename(f, f.stem + f.suffix.lower())
+                    else:
+                        safe_rename(f, f.stem + expected[0])
         else:
             LOGGER.error('Unhandled MIME: "%s" for "%s"', mime, f)
 
