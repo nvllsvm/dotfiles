@@ -181,6 +181,8 @@ def rename_extensions(path):
                 if f.suffix not in expected:
                     if f.suffix.lower() in expected:
                         safe_rename(f, f.stem + f.suffix.lower())
+                    elif mime == 'text/plain':
+                        LOGGER.error('Unhandled text/plain suffix: "%s"', f)
                     else:
                         safe_rename(f, f.stem + expected[0])
         else:
