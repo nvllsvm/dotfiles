@@ -1,7 +1,28 @@
 #!/usr/bin/env python3
 import argparse
+import logging
 import pathlib
 import sys
+import time
+
+LOGGER = logging.getLogger('rename-from-file')
+
+
+def setup_logging(name, level=logging.INFO):
+    logger = logging.getLogger()
+    logger.setLevel(level)
+
+    fmt = logging.Formatter('%(message)s')
+
+    sh = logging.StreamHandler()
+    sh.setLevel(level)
+    sh.setFormatter(fmt)
+    logger.addHandler(sh)
+
+    fh = logging.FileHandler(f'/tmp/{name}.{int(time.time())}.log')
+    fh.setLevel(level)
+    fh.setFormatter(fmt)
+    logger.addHandler(fh)
 
 
 def main():
@@ -12,6 +33,8 @@ def main():
     parser.add_argument('-d', '--dryrun', action='store_true')
     parser.add_argument('--type', choices=['f', 'd'], default='f')
     args = parser.parse_args()
+
+    setup_logging('rename-from-file')
 
     titles = [
         line.replace('/', '-')
@@ -31,10 +54,8 @@ def main():
                 paths.append(path)
 
     if len(paths) != len(titles):
-        print(
-            f'error: found {len(paths)} paths but only {len(titles)} titles',
-            file=sys.stderr
-        )
+        LOGGER.error(
+            'found %s paths but only %s titles', len(paths), len(titles))
         sys.exit(1)
 
     new_names = {}
@@ -43,9 +64,8 @@ def main():
 
     for path, new_name in new_names.items():
         target = path.with_name(new_name)
-        print(path.name)
-        print(target.name)
-        print()
+        LOGGER.info('source: "%s"', path.name)
+        LOGGER.info('target: "%s"', target.name)
         if not args.dryrun:
             path.rename(target)
 
