@@ -47,7 +47,7 @@ MIME_SUFFIXES = {
     ],
     'text/plain': [
         '.txt',
-        '.accurip'
+        '.accurip',
         '.cue',
         '.log',
         '.nfo',
