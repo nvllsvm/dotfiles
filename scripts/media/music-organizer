@@ -25,14 +25,33 @@ IMAGE_PREFIX = 'cover'
 
 CUE_EXT = ('.cue')
 
+# preferred suffix is first in list
 MIME_SUFFIXES = {
-    'application/pdf': '.pdf',
-    'audio/flac': '.flac',
-    'audio/mpeg': '.mp3',
-    'image/gif': '.gif',
-    'image/jpeg': '.jpg',
-    'image/png': '.png',
-    'text/plain': None,
+    'application/pdf': [
+        '.pdf',
+    ],
+    'audio/flac': [
+        '.flac',
+    ],
+    'audio/mpeg': [
+        '.mp3',
+    ],
+    'image/gif': [
+        '.gif',
+    ],
+    'image/jpeg': [
+        '.jpg',
+    ],
+    'image/png': [
+        '.png',
+    ],
+    'text/plain': [
+        '.txt',
+        '.accurip'
+        '.cue',
+        '.log',
+        '.nfo',
+    ],
 }
 
 
@@ -159,8 +178,8 @@ def rename_extensions(path):
         mime = magic.from_file(str(f), mime=True)
         if mime in MIME_SUFFIXES:
             if expected := MIME_SUFFIXES[mime]:
-                if expected != f.suffix:
-                    safe_rename(f, f.stem + expected)
+                if f.suffix not in expected:
+                    safe_rename(f, f.stem + expected[0])
         else:
             LOGGER.error('Unhandled MIME: "%s" for "%s"', mime, f)
 
