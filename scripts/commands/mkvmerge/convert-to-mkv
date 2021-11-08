@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import argparse
+import logging
 import pathlib
 import subprocess
-import sys
 
 EXTENSIONS = {
     '.avi',
@@ -10,6 +10,8 @@ EXTENSIONS = {
     '.mp4',
     '.webm',
 }
+
+LOGGER = logging.getLogger('convert-to-mkv')
 
 
 def all_files(root):
@@ -35,6 +37,10 @@ def main():
     parser.add_argument('path', nargs='+', type=pathlib.Path)
     args = parser.parse_args()
 
+    logging.basicConfig(
+        format='%(levelname)-8s %(message)s',
+        level=logging.INFO)
+
     paths = set()
     for path in args.path:
         path = path.absolute()
@@ -53,11 +59,11 @@ def main():
             dest = path.with_suffix('.mkv')
             if dest.exists():
                 raise RuntimeError(f'file exists: {path}')
-            print(path)
+            LOGGER.info('converting %s', path)
             mkvmerge(dest, path)
             path.unlink()
         else:
-            print(f'unrecognized extension: {path.suffix}', file=sys.stderr)
+            LOGGER.error('unrecognized extension: "%s"', path.suffix)
 
 
 if __name__ == '__main__':
