@@ -9,6 +9,7 @@ import string
 import subprocess
 
 import chardet
+import magic  # package: python-magic
 import mutagen.flac
 import mutagen.mp3
 
@@ -23,7 +24,16 @@ IMAGE_PREFIX = 'cover'
 
 CUE_EXT = ('.cue')
 
-RENAME_MAP = {'.jpeg': '.jpg'}
+MIME_SUFFIXES = {
+    'application/pdf': '.pdf',
+    'audio/flac': '.flac',
+    'audio/mpeg': '.mp3',
+    'image/gif': '.gif',
+    'image/jpeg': '.jpg',
+    'image/png': '.png',
+    'text/plain': None,
+}
+
 
 EXPECTED_TAGS = (
     'albumartist',
@@ -145,9 +155,13 @@ def fix_tracknumber(path, metadata):
 
 def rename_extensions(path):
     for f in {p for p in path.iterdir() if p.is_file()}:
-        suffix = f.suffix.lower()
-        suffix = RENAME_MAP.get(suffix, suffix)
-        safe_rename(f, f.stem + suffix)
+        mime = magic.from_file(str(f), mime=True)
+        if mime in MIME_SUFFIXES:
+            if expected := MIME_SUFFIXES[mime]:
+                if expected != f.suffix:
+                    safe_rename(f, f.stem + expected)
+        else:
+            LOGGER.error('Unhandled MIME: "%s" for "%s"', mime, f)
 
 
 def rename_from_tags(path, metadata):
