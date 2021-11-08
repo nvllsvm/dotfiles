@@ -7,6 +7,7 @@ import pathlib
 import stat
 import string
 import subprocess
+import tempfile
 
 import chardet
 import magic  # package: python-magic
@@ -225,13 +226,32 @@ def set_permissions(path):
         )
 
 
+def setup_logging(name, level=logging.INFO):
+    logger = logging.getLogger()
+    logger.setLevel(level)
+
+    fmt = logging.Formatter('%(levelname)s %(message)s')
+
+    sh = logging.StreamHandler()
+    sh.setLevel(level)
+    sh.setFormatter(fmt)
+    logger.addHandler(sh)
+
+    fh = logging.FileHandler(
+        filename=pathlib.Path(tempfile.gettempdir()) / f'{name}.log',
+        mode='w')
+    fh.setLevel(level)
+    fh.setFormatter(fmt)
+    logger.addHandler(fh)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('directory', type=pathlib.Path)
     parser.add_argument('-t', '--check-tags', action='store_true')
     args = parser.parse_args()
 
-    logging.basicConfig(format='%(levelname)s %(message)s', level=logging.INFO)
+    setup_logging('music-organizer')
 
     artists = set()
 
