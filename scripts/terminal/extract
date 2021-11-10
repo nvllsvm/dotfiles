@@ -1009,8 +1009,10 @@ def format_contents(paths):
     for path in paths:
         is_file = not path.endswith(b'/')
         if is_file:
-            parents = tuple(path.strip(b'/').split(b'/')[:-1])
-            file_parents.add(parents)
+            parent = []
+            for part in tuple(path.strip(b'/').split(b'/')[:-1]):
+                parent.append(part)
+                file_parents.add(tuple(parent))
 
     contents = set()
 
