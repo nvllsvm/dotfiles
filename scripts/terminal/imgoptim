@@ -222,9 +222,11 @@ class AsyncExecutor:
 
 
 class SizeDiffPrinter:
-    def __init__(self):
+    def __init__(self, num_items):
         self._before_total = 0
         self._after_total = 0
+        self._num_items = num_items
+        self._num_printed = 0
         self._printed = False
 
     @staticmethod
@@ -245,16 +247,16 @@ class SizeDiffPrinter:
         return f'{num:.1f}{unit}'
 
     def print(self, before, after, name):
-        self._printed = True
+        self._num_printed += 1
         self._before_total += before
         self._after_total += after
         diff = self.format_diff(before, after)
 
         s = f'{diff:>6}%' if diff else 7 * '-'
-        print(f'{s}  {name}')
+        print(f'({self._num_printed}/{self._num_items})\t{s}\t{name}')
 
     def print_total(self):
-        if self._printed:
+        if self._num_printed:
             if diff := self.format_diff(self._before_total, self._after_total):
                 fmt = self.sizeof_fmt(self._before_total - self._after_total)
                 print(f'Total: {diff}% ({fmt})')
@@ -293,6 +295,7 @@ async def main():
             files.update(all_files(path))
 
     executor = AsyncExecutor(max_pending=args.num_procs)
+    num_items = 0
     for f in sorted(files):
         try:
             mimetype = determine_mime(f)
@@ -304,9 +307,10 @@ async def main():
             continue
 
         if func := _MIME_OPTIMIZATIONS.get(mimetype):
+            num_items += 1
             executor.submit(_process, func, f, args.strip)
 
-    size_diff_printer = SizeDiffPrinter()
+    size_diff_printer = SizeDiffPrinter(num_items=num_items)
     async for result in executor.as_completed():
         try:
             path, before, after = result.result()
