@@ -1,7 +1,7 @@
 set hidden
 map <c-n> :set relativenumber!
 set previewer preview
-map i $preview $f | less -R
+map i $preview "$f" | less -R
 
 # working dir - blue
 # selected file - white
