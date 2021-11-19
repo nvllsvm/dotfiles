@@ -4,7 +4,7 @@ import os
 
 class AsyncExecutor:
     def __init__(self, max_pending=None):
-        self.max_pending = \
+        self._max_pending = \
             os.cpu_count() if max_pending is None else max_pending
         self._queued = []
         self._pending = set()
@@ -29,7 +29,7 @@ class AsyncExecutor:
                 yield result
 
     def _fill(self):
-        for _ in range(self.max_pending - len(self._pending)):
+        for _ in range(self._max_pending - len(self._pending)):
             if not self._queued:
                 return
             func, args, kwargs = self._queued.pop()
