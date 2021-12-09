@@ -15,3 +15,9 @@ fix_permissions /storage/Personal\ Creations
 fix_permissions /storage/Pictures
 fix_permissions /storage/Software
 fix_permissions /storage/Video
+
+echo "Processing /storage/Archival Dumps"
+chmod 755 /storage/Archival\ Dumps
+fd -t d --exact-depth=1 -0 . /storage/Archival\ Dumps | xargs -0 chmod 755
+fd -t d --min-depth=2 -0 . /storage/Archival\ Dumps | xargs -0 chmod 555
+fd -t f -0 . /storage/Archival\ Dumps | xargs -0 chmod 444
