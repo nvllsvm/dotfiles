@@ -29,9 +29,7 @@ has_url = any(
 if windows := find_firefox_windows(is_private):
     window = windows[0]
     window.command('focus')
-    print(windows)
     if has_url:
-        print(has_url)
         os.execvp('/usr/bin/firefox', sys.argv)
 else:
     os.execvp('/usr/bin/firefox', sys.argv)
