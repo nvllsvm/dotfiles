@@ -1,4 +1,9 @@
 #!/usr/bin/env sh
-if [ -d ~/.local/bin ]; then
-    find ~/.local/bin -xtype l -exec rm {} \;
-fi
+remove_broken_symlinks() {
+    if [ -d "$1" ]; then
+        find "$1" -xtype l -exec rm {} \;
+    fi
+}
+
+remove_broken_symlinks ~/.local/bin
+remove_broken_symlinks ~/.local/share/applications

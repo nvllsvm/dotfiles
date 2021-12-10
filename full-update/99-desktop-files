@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+set -e
+
+if ! [ -d ~/.local/share/applications ]; then
+    exit
+fi
+
+for f in "${DOTFILES}/desktop_files"/*; do
+    echo "$f"
+    rm -f ~/.local/share/applications/"$f"
+    ln -s "$f" ~/.local/share/applications
+done
