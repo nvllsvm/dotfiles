@@ -334,7 +334,8 @@ async def process(source, archive_format, remove, fast=False):
     dest = _build_dest(source, suffix)
 
     before = sum(path.stat().st_size for path in _all_paths(source))
-    with TempPath(dir=dest.parent, suffix=suffix) as tmp:
+    with TempPath(dir=dest.parent, prefix='.',
+                  suffix=source.name + '.tmp') as tmp:
         await formats['func'](source, tmp, fast)
         tmp.rename(dest)
     after = dest.stat().st_size
