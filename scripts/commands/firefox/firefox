@@ -1,8 +1,10 @@
 #!/usr/bin/env python
-import os
+import subprocess
 import sys
 
 import i3ipc
+
+FIREFOX_PATH = '/usr/bin/firefox'
 
 
 def find_firefox_windows(is_private):
@@ -26,10 +28,12 @@ has_url = any(
     for arg in sys.argv[1:]
 )
 
+args = [FIREFOX_PATH, *sys.argv[1:]]
+
 if windows := find_firefox_windows(is_private):
     window = windows[0]
     window.command('focus')
     if has_url:
-        os.execvp('/usr/bin/firefox', sys.argv)
+        subprocess.run(args)
 else:
-    os.execvp('/usr/bin/firefox', sys.argv)
+    subprocess.run(args)
