@@ -4,7 +4,7 @@ import sys
 
 import i3ipc
 
-FIREFOX_PATH = '/usr/bin/firefox'
+FIREFOX_PATH = '/usr/bin/firefox-developer-edition'
 
 
 def find_firefox_windows(is_private):
