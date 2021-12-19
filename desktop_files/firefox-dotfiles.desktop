@@ -2,5 +2,5 @@
 Name=Firefox
 Comment=Firefox
 Type=Application
-Exec=firefox %U
+Exec=firefox-developer-edition %U
 Icon=/usr/share/icons/hicolor/48x48/apps/firefox.png
