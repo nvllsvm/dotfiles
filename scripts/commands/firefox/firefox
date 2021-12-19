@@ -1,12 +1,10 @@
 #!/usr/bin/env python
-import pathlib
 import subprocess
 import sys
 
 import i3ipc
 
-NAME = pathlib.Path(sys.argv[0]).name
-FIREFOX_PATH = f'/usr/bin/{NAME}'
+FIREFOX_PATH = '/usr/bin/firefox-developer-edition'
 
 
 def find_firefox_windows(is_private):
