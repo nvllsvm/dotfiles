@@ -1,0 +1,4 @@
+*
+!/.gitignore
+!/firefox-dotfiles.desktop
+!/neovim-dotfiles.desktop
