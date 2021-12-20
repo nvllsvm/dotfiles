@@ -11,8 +11,11 @@ pip() {
     python -m pip "$@"
 }
 
-if ! [ -x "$(command -v pip)" ] || [ "$(pip list | grep -c -e '^pip ' -e '^setuptools ' -e '^wheel ')" != '3' ]; then
+if [ "$(python -m pip --version)" != "$(pip --version)" ]; then
     python -m ensurepip --user --default-pip
+fi
+
+if [ "$(pip list | grep -c -e '^pip ' -e '^setuptools ' -e '^wheel ')" != '3' ]; then
     pip install --quiet --user --upgrade --force-reinstall pip setuptools wheel
 fi
 
