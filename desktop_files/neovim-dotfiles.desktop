@@ -1,0 +1,5 @@
+[Desktop Entry]
+Name=Neovim (Alacritty)
+Comment=Neovim
+Type=Application
+Exec=alacritty --command zsh -ic "nvim %u"
