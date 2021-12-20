@@ -52,6 +52,11 @@ else
         audio/x-mpegurl)
             default_preview "$1"
             ;;
+        video/x-matroska)
+            mkv-preview "$1"
+            echo
+            ffprobe -hide_banner -- "$1" 2>&1
+            ;;
         audio/*|\
         video/*)
             ffprobe -hide_banner -- "$1" 2>&1
