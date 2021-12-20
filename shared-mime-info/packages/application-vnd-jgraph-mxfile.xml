@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+    <mime-type type="application/vnd.jgraph.mxfile">
+        <comment>diagrams.net</comment>
+        <glob-deleteall/>
+        <glob pattern="*.drawio"/>
+    </mime-type>
+</mime-info>
