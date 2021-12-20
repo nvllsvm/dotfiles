@@ -2,6 +2,7 @@
 application/epub+zip=com.github.johnfactotum.Foliate.desktop
 application/pdf=org.kde.okular.desktop
 application/vnd.comicbook+zip=org.kde.okular.desktop
+application/vnd.jgraph.mxfile=draw.io.desktop
 application/x-extension-htm=firefox-dotfiles.desktop
 application/x-extension-html=firefox-dotfiles.desktop
 application/x-extension-shtml=firefox-dotfiles.desktop
@@ -25,6 +26,7 @@ image/webp=org.nomacs.ImageLounge.desktop
 image/x-canon-cr2=org.nomacs.ImageLounge.desktop
 image/x-canon-cr3=org.nomacs.ImageLounge.desktop
 text/html=firefox-dotfiles.desktop
+text/plain=neovim-dotfiles.desktop
 video/mp4=mpv.desktop
 video/mpeg=mpv.desktop
 video/quicktime=mpv.desktop
