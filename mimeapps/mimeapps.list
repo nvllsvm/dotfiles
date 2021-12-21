@@ -18,6 +18,7 @@ audio/x-opus+ogg=mpv.desktop
 audio/x-wav=mpv.desktop
 image/bmp=org.nomacs.ImageLounge.desktop
 image/gif=org.nomacs.ImageLounge.desktop
+image/jp2=org.nomacs.ImageLounge.desktop
 image/jpeg=org.nomacs.ImageLounge.desktop
 image/png=org.nomacs.ImageLounge.desktop
 image/svg+xml=firefox-dotfiles.desktop
