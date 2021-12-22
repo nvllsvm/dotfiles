@@ -38,5 +38,9 @@ fi
 echo Updating python environment ...
 (update_venv)
 
+for d in ~/.config/nvim/plugged/*; do
+    git -C "$d" reset --hard HEAD
+done
+
 echo Updating plugins ...
 nvim -c 'PlugUpgrade | PlugUpdate! | PlugClean!' -c 'qa'
