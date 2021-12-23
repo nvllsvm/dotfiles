@@ -9,9 +9,9 @@ FIREFOX_PATH = '/usr/bin/firefox-developer-edition'
 
 def find_firefox_windows(is_private):
     if is_private:
-        pattern = r'.*Mozilla Firefox \(Private Browsing\)$'
+        pattern = r'.*Firefox Developer Edition \(Private Browsing\)$'
     else:
-        pattern = '.*Mozilla Firefox$'
+        pattern = '.*Firefox Developer Edition$'
 
     return [
         item
