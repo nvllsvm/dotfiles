@@ -11,6 +11,9 @@ if [ "$(realpath ~/.termux)" != "$DOTFILES/termux" ]; then
     ln -s "${DOTFILES}/termux" ~/.termux
 fi
 
+rm ~/storage
+ln -s /storage/emulated/0 ~/storage
+
 yes | pkg upgrade
 yes | apt autoremove
 rm -rf ~/../usr/etc/motd
