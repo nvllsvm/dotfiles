@@ -14,4 +14,28 @@ if command -v ssh; then
         rm -rf ~/.ssh
         ln -s "${DOTFILES_PRIVATE}/ssh/general" ~/.ssh
     fi
+    find -L ~/.ssh -type f -exec chmod 600 {} \;
+fi
+
+if command -v gpg; then
+    if ! [ -d ~/.gnupg ] || [ "$(realpath ~/.gnupg)" != "${DOTFILES_PRIVATE}/gnupg" ]; then
+        rm -rf ~/.ssh
+        ln -s "${DOTFILES_PRIVATE}/ssh/general" ~/.gnupg
+    fi
+    find -L ~/.gnupg -type d -exec chmod 700 {} \;
+    find -L ~/.gnupg -type f -exec chmod 600 {} \;
+fi
+
+if command -v docker; then
+    if ! [ -d ~/.docker ] || [ "$(realpath ~/.docker)" != "${DOTFILES_PRIVATE}/docker" ]; then
+        rm -rf ~/.docker
+        ln -s "${DOTFILES_PRIVATE}/docker" ~/.docker
+    fi
+fi
+
+if command -v android-studio > /dev/null || command -v adb > /dev/null ; then
+    if ! [ -d ~/.android ] || [ "$(realpath ~/.android)" != "${DOTFILES_PRIVATE}/android" ]; then
+        rm -rf ~/.android
+        ln -s "${DOTFILES_PRIVATE}/android" ~/.android
+    fi
 fi
