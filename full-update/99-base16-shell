@@ -9,5 +9,5 @@ if ! [ -d "$INSTALL_DIR" ]; then
 else
     cd "$INSTALL_DIR"
     git clean -fd
-    git pull
+    git pull -q
 fi
