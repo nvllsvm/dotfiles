@@ -11,8 +11,12 @@ if [ "$(realpath ~/.termux)" != "$DOTFILES/termux" ]; then
     ln -s "${DOTFILES}/termux" ~/.termux
 fi
 
-rm -f ~/storage
-ln -s /storage/emulated/0 ~/storage
+if [ -d ~/storage ]; then
+    ln -s /storage/emulated/0 ~/storage
+fi
+if [ -d ~/notes ]; then
+    ln -s ~/storage/syncthing/default/notes ~/notes
+fi
 
 yes | pkg upgrade
 yes | apt autoremove
