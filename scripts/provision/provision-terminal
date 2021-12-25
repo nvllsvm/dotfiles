@@ -3,18 +3,6 @@ set -e
 
 cd "$(dirname "$0")/../.."
 
-link_file() {
-    source_path="$PWD/$1"
-    target_path="$2"
-    echo -e "\033[1;33mLinking $1 \033[0m"
-    if ! [ -e "$source_path" ]; then
-        echo error: path $source_path does not exist. >&2
-        exit 1
-    fi
-    rm -rf "$target_path"
-    ln -sf "$source_path" "$target_path"
-}
-
 zsh_command() {
     echo -e "\033[1;33mNow running $@ \033[0m..."
     "$@"
@@ -23,7 +11,6 @@ zsh_command() {
 
 osname=$(uname)
 if [[ $osname == Darwin* ]]; then
-    zsh_command '$DOTFILES/scripts/commands/brew/brew-update'
     brew install \
         coreutils \
         curl \
@@ -96,17 +83,11 @@ if command -v termux-info > /dev/null; then
         zsh
 fi
 
-mkdir -p ~/.local/bin
-ln -sf "$(which dash)" "$HOME/.local/bin/sh"
-
-if [[ $osname == Darwin* ]]; then
-    zsh_command '$DOTFILES/scripts/commands/pyenv/pyenv-update'
-    zsh_command 'pyenv global 3.7.3'
+if command -v pip > /dev/null; then
+    pip install \
+        flake8 \
+        jedi-language-server \
+        pint \
+        speedtest-cli \
+        virtualenv
 fi
-
-full-update
-
-pip install \
-    flake8 \
-    pint \
-    speedtest-cli
