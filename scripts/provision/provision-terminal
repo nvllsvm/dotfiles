@@ -94,7 +94,19 @@ if [[ $osname == Linux* ]]; then
     fi
 
     if command -v termux-info > /dev/null; then
-        rm -f ~/../usr/etc/motd
+        pkg install \
+            dash \
+            fd \
+            fzf \
+            htop \
+            jq \
+            lf \
+            neovim \
+            openssh \
+            python \
+            ripgrep \
+            tmux \
+            zsh
     fi
 fi
 
