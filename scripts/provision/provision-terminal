@@ -98,6 +98,7 @@ fi
 if command -v termux-info > /dev/null; then
     pkg install \
         dash \
+        dnsutils \
         fd \
         fzf \
         htop \
