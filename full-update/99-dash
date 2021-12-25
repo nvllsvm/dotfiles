@@ -6,4 +6,4 @@ if ! command -v dash > /dev/null; then
 fi
 
 mkdir -p ~/.local/bin
-ln -sf "$(which dash)" ~/.local/bin
+ln -sf "$(command -v dash)" ~/.local/bin
