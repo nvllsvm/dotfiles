@@ -4,6 +4,11 @@ if [ "$(hostname)" != 'sol' ]; then
     exit
 fi
 
+if ! [ -d ~/.config/systemd ] || [ "$(realpath ~/.config/systemd)" != "${DOTFILES}/systemd" ]; then
+    rm -rf ~/.config/systemd
+    ln -sT "${DOTFILES}/systemd" ~/.config/systemd
+fi
+
 git-auto-update ~/code/sol-docker
 sol-docker pull
 sol-repotool update

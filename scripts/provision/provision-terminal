@@ -20,21 +20,9 @@ zsh_command() {
     "$@"
 }
 
-mkdir -p ~/.config
-
-link_file git ~/.config/git
-link_file nvim ~/.config/nvim
-link_file lf ~/.config/lf
-link_file tmux/.tmux.conf ~/.tmux.conf
-link_file zsh/.zshenv ~/.zshenv
-link_file zsh/.zshrc ~/.zshrc
-
-. ~/.zshenv
-. ~/.zshrc
 
 osname=$(uname)
 if [[ $osname == Darwin* ]]; then
-    link_file pip ~/Library/Application\ Support/pip
     zsh_command '$DOTFILES/scripts/commands/brew/brew-update'
     brew install \
         coreutils \
@@ -68,11 +56,7 @@ if [[ $osname == Darwin* ]]; then
 fi
 
 if [[ $osname == Linux* ]]; then
-    link_file pip ~/.config/pip
-
     if command -v pacman > /dev/null; then
-        link_file pacman ~/.config/pacman
-            #lf \
         yay -Syu --needed --noconfirm \
             aria2 \
             bind-tools \
@@ -126,7 +110,3 @@ pip install \
     flake8 \
     pint \
     speedtest-cli
-
-if [ "$(hostname)" = 'sol' ]; then
-    link_file systemd ~/.config/systemd
-fi
