@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+set -e
+
+if ! command -v tmux > /dev/null; then
+    exit
+fi
+
+if [ "$(realpath ~/.tmux.conf)" != "$DOTFILES/tmux/.tmux.conf" ]; then
+    echo "Linking configuration ..."
+    rm -rf ~/.tmux.conf
+    ln -s "${DOTFILES}/tmux/.tmux.config" ~/
+fi
