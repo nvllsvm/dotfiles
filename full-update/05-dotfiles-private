@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+set -e
+
+if ! [ -d "$DOTFILES_PRIVATE" ]; then
+    exit
+fi
+
+if command -v git; then
+    ln -sf "${DOTFILES_PRIVATE}/git/.gitconfig" ~/.gitconfig
+fi
+
+if command -v ssh; then
+    if ! [ -d ~/.ssh ] || [ "$(realpath ~/.ssh)" != "${DOTFILES_PRIVATE}/ssh/general" ]; then
+        rm -rf ~/.ssh
+        ln -s "${DOTFILES_PRIVATE}/ssh/general" ~/.ssh
+    fi
+fi
