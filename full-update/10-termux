@@ -11,11 +11,11 @@ if [ "$(realpath ~/.termux)" != "$DOTFILES/termux" ]; then
     ln -s "${DOTFILES}/termux" ~/.termux
 fi
 
-if [ -d ~/storage ]; then
+if ! [ -d ~/storage ]; then
     ln -s /storage/emulated/0 ~/storage
 fi
-if [ -d ~/notes ]; then
-    ln -s /storage/emulated/0/syncthing/default/notes ~/notes
+if ! [ -d ~/notes ]; then
+    ln -s /storage/emulated/0 ~/storage
 fi
 
 yes | pkg upgrade
