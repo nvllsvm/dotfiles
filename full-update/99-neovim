@@ -5,6 +5,11 @@ if ! command -v nvim > /dev/null; then
     exit
 fi
 
+if [ "$(realpath ~/.config/nvim)" != "$DOTFILES/nvim" ]; then
+    rm -rf ~/.config/nvim
+    ln -s "${DOTFILES}/nvim" ~/.config
+fi
+
 VENV=~/.config/nvim/python3_env
 export PIP_USER=0
 

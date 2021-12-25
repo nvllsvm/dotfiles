@@ -7,6 +7,11 @@ if ! command -v pip > /dev/null 2>&1; then
     exit
 fi
 
+if [ "$(realpath ~/.config/pip)" != "${DOTFILES}/pip" ]; then
+    rm -rf ~/.config/pip
+    ln -s "${DOTFILES}/pip" ~/.config
+fi
+
 pip() {
     python -m pip "$@"
 }
