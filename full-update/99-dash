@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+set -e
+
+if ! command -v dash > /dev/null; then
+    exit
+fi
+
+mkdir -p ~/.local/bin
+ln -sf "$(which dash)" ~/.local/bin
