@@ -15,7 +15,7 @@ if ! [ -d ~/storage ]; then
     ln -s /storage/emulated/0 ~/storage
 fi
 if ! [ -d ~/notes ]; then
-    ln -s /storage/emulated/0 ~/storage
+    ln -s ~/storage/syncthing/default/notes ~/notes
 fi
 
 yes | pkg upgrade
