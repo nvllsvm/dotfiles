@@ -5,6 +5,12 @@ if ! command -v termux-info > /dev/null; then
     exit
 fi
 
+if [ "$(realpath ~/.termux)" != "$DOTFILES/termux" ]; then
+    echo "Linking configuration ..."
+    rm -rf ~/.termux
+    ln -s "${DOTFILES}/termux" ~/.termux
+fi
+
 yes | pkg upgrade
 yes | apt autoremove
 rm -rf ~/../usr/etc/motd
