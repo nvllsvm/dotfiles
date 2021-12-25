@@ -5,5 +5,10 @@ if ! command -v dash > /dev/null; then
     exit
 fi
 
+actual="$(realpath "$(command -v dash)")"
+if [ "$actual" = "$(realpath ~/.local/bin/sh)" ]; then
+    exit
+fi
+
 mkdir -p ~/.local/bin
-ln -sf "$(command -v dash)" ~/.local/bin
+ln -sf "$actual" ~/.local/bin/sh
