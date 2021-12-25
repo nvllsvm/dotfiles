@@ -5,37 +5,37 @@ if ! [ -d "$DOTFILES_PRIVATE" ]; then
     exit
 fi
 
-if command -v git; then
-    ln -sf "${DOTFILES_PRIVATE}/git/.gitconfig" ~/.gitconfig
+if command -v git > /dev/null; then
+    ln -sfT "${DOTFILES_PRIVATE}/git/.gitconfig" ~/.gitconfig
 fi
 
-if command -v ssh; then
+if command -v ssh > /dev/null; then
     if ! [ -d ~/.ssh ] || [ "$(realpath ~/.ssh)" != "${DOTFILES_PRIVATE}/ssh/general" ]; then
         rm -rf ~/.ssh
-        ln -s "${DOTFILES_PRIVATE}/ssh/general" ~/.ssh
+        ln -sT "${DOTFILES_PRIVATE}/ssh/general" ~/.ssh
     fi
     find -L ~/.ssh -type f -exec chmod 600 {} \;
 fi
 
-if command -v gpg; then
+if command -v gpg > /dev/null; then
     if ! [ -d ~/.gnupg ] || [ "$(realpath ~/.gnupg)" != "${DOTFILES_PRIVATE}/gnupg" ]; then
         rm -rf ~/.ssh
-        ln -s "${DOTFILES_PRIVATE}/ssh/general" ~/.gnupg
+        ln -sT "${DOTFILES_PRIVATE}/ssh/general" ~/.gnupg
     fi
     find -L ~/.gnupg -type d -exec chmod 700 {} \;
     find -L ~/.gnupg -type f -exec chmod 600 {} \;
 fi
 
-if command -v docker; then
+if command -v docker > /dev/null; then
     if ! [ -d ~/.docker ] || [ "$(realpath ~/.docker)" != "${DOTFILES_PRIVATE}/docker" ]; then
         rm -rf ~/.docker
-        ln -s "${DOTFILES_PRIVATE}/docker" ~/.docker
+        ln -sT "${DOTFILES_PRIVATE}/docker" ~/.docker
     fi
 fi
 
 if command -v android-studio > /dev/null || command -v adb > /dev/null ; then
     if ! [ -d ~/.android ] || [ "$(realpath ~/.android)" != "${DOTFILES_PRIVATE}/android" ]; then
         rm -rf ~/.android
-        ln -s "${DOTFILES_PRIVATE}/android" ~/.android
+        ln -sT "${DOTFILES_PRIVATE}/android" ~/.android
     fi
 fi
