@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+set -e
+
+if ! command -v autorandr > /dev/null; then
+    exit
+fi
+
+if [ "$(realpath ~/.config/autorandr)" != "$DOTFILES/autorandr" ]; then
+    echo "Linking configuration ..."
+    rm -rf ~/.config/autorandr
+    ln -sT "${DOTFILES}/autorandr" ~/.config/autorandr
+fi

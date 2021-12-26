@@ -3,5 +3,5 @@ set -e
 
 if [ -d ~/.local/share/applications ]; then
     rm -rf ~/.local/share/applications
-    ln -s "${DOTFILES}/desktop_files" ~/.local/share/applications
+    ln -sT "${DOTFILES}/desktop_files" ~/.local/share/applications
 fi
