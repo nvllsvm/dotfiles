@@ -5,10 +5,6 @@ if ! [ -d "$DOTFILES_PRIVATE" ]; then
     exit
 fi
 
-ln -sfT "${DOTFILES}/zsh/.zlogin" ~/.zlogin
-ln -sfT "${DOTFILES}/zsh/.zshenv" ~/.zshenv
-ln -sfT "${DOTFILES}/zsh/.zshrc" ~/.zshrc
-
 if command -v git > /dev/null; then
     ln -sfT "${DOTFILES_PRIVATE}/git/.gitconfig" ~/.gitconfig
 fi

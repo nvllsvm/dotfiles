@@ -7,7 +7,7 @@ fi
 
 if [ "$(realpath ~/.config/nvim)" != "$DOTFILES/nvim" ]; then
     rm -rf ~/.config/nvim
-    ln -s "${DOTFILES}/nvim" ~/.config
+    ln -sT "${DOTFILES}/nvim" ~/.config/nvim
 fi
 
 VENV=~/.config/nvim/python3_env

@@ -3,5 +3,9 @@ if ! command -v zsh > /dev/null; then
     exit
 fi
 
+ln -sfT "${DOTFILES}/zsh/.zlogin" ~/.zlogin
+ln -sfT "${DOTFILES}/zsh/.zshenv" ~/.zshenv
+ln -sfT "${DOTFILES}/zsh/.zshrc" ~/.zshrc
+
 rm -f ~/.zcompdump
 zsh -ic 'echo -n'
