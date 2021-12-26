@@ -1,0 +1,27 @@
+#!/usr/bin/env sh
+set -e
+
+DEVICE="$1"
+DESTINATION="$2"
+
+if ! [ -f "$DEVICE" ]; then
+    cat >&2 << EOF
+usage: INFILE OUTDIR
+EOF
+    exit 1
+fi
+
+if [ -e "$DESTINATION" ]; then
+    echo 'error: destination exists' >&2
+    exit 1
+fi
+mkdir -p "$DESTINATION"
+
+echo 'Reading without retry ...'
+ddrescue --sector-size=2048 --verbose --no-scape "$DEVICE" "${DESTINATION}/disc.iso" "${DESTINATION}/rescue.log"
+
+echo 'Reading with retry ...'
+ddrescue --sector-size=2048 --verbose --idirect --retry-passes=5 "$DEVICE" "${DESTINATION}/disc.iso" "${DESTINATION}/rescue.log"
+
+echo 'Reading with retry and reversed ...'
+ddrescue --sector-size=2048 --verbose --idirect --retry-passes=5 --reverse "$DEVICE" "${DESTINATION}/disc.iso" "${DESTINATION}/rescue.log"
