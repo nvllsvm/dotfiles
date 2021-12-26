@@ -1,11 +1,13 @@
 #!/usr/bin/env sh
 if ! command -v zsh > /dev/null; then
-    exit
+    rm -rf ~/.zlogin
+    rm -rf ~/.zshenv
+    rm -rf ~/.zshrc
+else
+    ln -sfT "${DOTFILES}/zsh/.zlogin" ~/.zlogin
+    ln -sfT "${DOTFILES}/zsh/.zshenv" ~/.zshenv
+    ln -sfT "${DOTFILES}/zsh/.zshrc" ~/.zshrc
+
+    rm -f ~/.zcompdump
+    zsh -ic 'echo -n'
 fi
-
-ln -sfT "${DOTFILES}/zsh/.zlogin" ~/.zlogin
-ln -sfT "${DOTFILES}/zsh/.zshenv" ~/.zshenv
-ln -sfT "${DOTFILES}/zsh/.zshrc" ~/.zshrc
-
-rm -f ~/.zcompdump
-zsh -ic 'echo -n'

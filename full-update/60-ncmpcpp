@@ -2,11 +2,11 @@
 set -e
 
 if ! command -v ncmpcpp > /dev/null; then
-    exit
-fi
-
-if [ "$(realpath ~/.config/ncmpcpp)" != "$DOTFILES/ncmpcpp" ]; then
-    echo "Linking configuration ..."
     rm -rf ~/.config/ncmpcpp
-    ln -sT "${DOTFILES}/ncmpcpp" ~/.config/ncmpcpp
+else
+    if [ "$(realpath ~/.config/ncmpcpp)" != "$DOTFILES/ncmpcpp" ]; then
+        echo "Linking configuration ..."
+        rm -rf ~/.config/ncmpcpp
+        ln -sT "${DOTFILES}/ncmpcpp" ~/.config/ncmpcpp
+    fi
 fi

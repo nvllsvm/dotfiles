@@ -2,11 +2,11 @@
 set -e
 
 if ! command -v fc-list > /dev/null; then
-    exit
-fi
-
-if [ "$(realpath ~/.config/fontconfig)" != "$DOTFILES/fontconfig" ]; then
-    echo "Linking configuration ..."
     rm -rf ~/.config/fontconfig
-    ln -sT "${DOTFILES}/fontconfig" ~/.config/fontconfig
+else
+    if [ "$(realpath ~/.config/fontconfig)" != "$DOTFILES/fontconfig" ]; then
+        echo "Linking configuration ..."
+        rm -rf ~/.config/fontconfig
+        ln -sT "${DOTFILES}/fontconfig" ~/.config/fontconfig
+    fi
 fi

@@ -1,6 +1,0 @@
-#!/usr/bin/env sh
-if ! command -v pipx > /dev/null; then
-    exit
-fi
-
-pipx upgrade-all

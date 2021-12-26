@@ -12,4 +12,7 @@ if command -v update-mime-database > /dev/null; then
         ln -sf "$DOTFILES/shared-mime-info/packages" ~/.local/share/mime/packages
     fi
     update-mime-database ~/.local/share/mime
+else
+    rm -rf ~/.config/mimeapps.list
+    rm -rf ~/.local/share/mime
 fi

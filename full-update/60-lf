@@ -2,11 +2,11 @@
 set -e
 
 if ! command -v lf > /dev/null; then
-    exit
-fi
-
-if [ "$(realpath ~/.config/lf)" != "$DOTFILES/lf" ]; then
-    echo "Linking configuration ..."
     rm -rf ~/.config/lf
-    ln -s "${DOTFILES}/lf" ~/.config/lf
+else
+    if [ "$(realpath ~/.config/lf)" != "$DOTFILES/lf" ]; then
+        echo "Linking configuration ..."
+        rm -rf ~/.config/lf
+        ln -s "${DOTFILES}/lf" ~/.config/lf
+    fi
 fi

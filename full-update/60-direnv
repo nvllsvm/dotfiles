@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
 if ! command -v direnv > /dev/null; then
-    exit
-fi
-
-if [ -d ~/.local/share/direnv/allow ]; then
-    direnv prune
+    rm -rf ~/.local/share/direnv
+else
+    if [ -d ~/.local/share/direnv/allow ]; then
+        direnv prune
+    fi
 fi
