@@ -1,87 +1,46 @@
 #!/usr/bin/env bash
 set -e
 
-cd "$(dirname "$0")/../.."
-
-link_file() {
-    source_path="$PWD/$1"
-    target_path="$2"
-    echo -e "\033[1;33mLinking $1 \033[0m"
-    if ! [ -e "$source_path" ]; then
-        echo error: path $source_path does not exist. >&2
-        exit 1
-    fi
-    rm -rf "$target_path"
-    ln -sf "$source_path" "$target_path"
-}
-
-zsh_command() {
-    echo -e "\033[1;33mNow running $@ \033[0m..."
-    zsh -c "$@"
-}
-
-osname=$(uname)
-if [[ $osname == Linux* ]]; then
-    link_file dunst ~/.config/dunst
-    link_file environment.d ~/.config/environment.d
-    link_file fontconfig ~/.config/fontconfig
-    link_file i3 ~/.config/i3
-    link_file i3status ~/.config/i3status
-    link_file mimeapps/mimeapps.list ~/.config/mimeapps.list
-    link_file mpv ~/.config/mpv
-    link_file picom/picom.conf ~/.config/picom.conf
-    link_file rofi ~/.config/rofi
-    link_file rofimoji ~/.config/rofimoji
-    link_file xinit/.xinitrc ~/.xinitrc
-    link_file zsh/.zlogin ~/.zlogin
-
-    if command -v pacman 2> /dev/null; then
-        yay -S --needed --noconfirm \
-            alacritty \
-            arandr \
-            argyllcms \
-            blueman \
-            dunst \
-            firefox \
-            foliate \
-            gnome-settings-daemon \
-            hsetroot \
-            i3-wm \
-            i3lock \
-            i3status-rust \
-            kid3-qt \
-            mpd \
-            mpv \
-            ncmpcpp \
-            network-manager-applet \
-            networkmanager \
-            nomacs \
-            noto-fonts \
-            noto-fonts-cjk \
-            noto-fonts-emoji \
-            noto-fonts-extra \
-            pamixer \
-            pavucontrol \
-            picom \
-            rofi \
-            rofimoji \
-            syncthing \
-            transmission-remote-gtk \
-            ttf-dejavu-emojiless \
-            xclip \
-            xorg-server \
-            xorg-xdpyinfo \
-            xorg-xinit \
-            xorg-xinput \
-            xorg-xprop \
-            xss-lock
-    fi
-
-    systemctl --user enable syncthing
-    systemctl --user enable mpd
+if command -v yay 2> /dev/null; then
+    yay -S --needed --noconfirm \
+        alacritty \
+        arandr \
+        argyllcms \
+        blueman \
+        dunst \
+        firefox \
+        foliate \
+        gnome-settings-daemon \
+        hsetroot \
+        i3-wm \
+        i3lock \
+        i3status-rust \
+        kid3-qt \
+        mpd \
+        mpv \
+        ncmpcpp \
+        network-manager-applet \
+        networkmanager \
+        nomacs \
+        noto-fonts \
+        noto-fonts-cjk \
+        noto-fonts-emoji \
+        noto-fonts-extra \
+        pamixer \
+        pavucontrol \
+        picom \
+        rofi \
+        rofimoji \
+        syncthing \
+        transmission-remote-gtk \
+        ttf-dejavu-emojiless \
+        xclip \
+        xorg-server \
+        xorg-xdpyinfo \
+        xorg-xinit \
+        xorg-xinput \
+        xorg-xprop \
+        xss-lock
 fi
-
-link_file mpd ~/.config/mpd
-link_file ncmpcpp ~/.config/ncmpcpp
 
 pip install base16-shell-preview

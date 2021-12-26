@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+set -e
+
+if ! command -v rofi > /dev/null; then
+    exit
+fi
+
+if [ "$(realpath ~/.config/rofi)" != "$DOTFILES/rofi" ]; then
+    echo "Linking configuration ..."
+    rm -rf ~/.config/rofi
+    ln -sT "${DOTFILES}/rofi" ~/.config/rofi
+fi

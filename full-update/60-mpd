@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+set -e
+
+if ! command -v mpd > /dev/null; then
+    exit
+fi
+
+if [ "$(realpath ~/.config/mpd)" != "$DOTFILES/mpd" ]; then
+    echo "Linking configuration ..."
+    rm -rf ~/.config/mpd
+    ln -sT "${DOTFILES}/mpd" ~/.config/mpd
+fi

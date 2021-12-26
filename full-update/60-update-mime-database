@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 if command -v update-mime-database > /dev/null; then
-    ln -sf "$DOTFILES/mimeapps/mimeapps.list" ~/.config/mimeapps.list
+    ln -sfT "$DOTFILES/mimeapps/mimeapps.list" ~/.config/mimeapps.list
 
     if [ -d ~/.local/share/mime/packages ]; then
         if [ "$(readlink -f ~/.local/share/mime/packages)" != "$DOTFILES/shared-mime-info/packages" ]; then

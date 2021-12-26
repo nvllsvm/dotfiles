@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+set -e
+
+if ! command -v dunst > /dev/null; then
+    exit
+fi
+
+if [ "$(realpath ~/.config/dunst)" != "$DOTFILES/dunst" ]; then
+    echo "Linking configuration ..."
+    rm -rf ~/.config/dunst
+    ln -sT "${DOTFILES}/dunst" ~/.config/dunst
+fi

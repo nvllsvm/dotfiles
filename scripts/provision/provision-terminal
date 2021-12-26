@@ -1,17 +1,9 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env sh
 set -e
 
-cd "$(dirname "$0")/../.."
-
-zsh_command() {
-    echo -e "\033[1;33mNow running $@ \033[0m..."
-    "$@"
-}
-
-
-osname=$(uname)
-if [[ $osname == Darwin* ]]; then
+if command -v brew > /dev/null; then
     brew install \
+        bat \
         coreutils \
         curl \
         dash \
@@ -31,43 +23,39 @@ if [[ $osname == Darwin* ]]; then
         jq \
         kubectl \
         kubernetes-helm \
-        mpd \
-        ncmpcpp \
         neovim \
         openssh \
-        p7zip \
         ripgrep \
         stern \
         tmux \
         zsh
 fi
 
-if [[ $osname == Linux* ]]; then
-    if command -v pacman > /dev/null; then
-        yay -Syu --needed --noconfirm \
-            aria2 \
-            bind-tools \
-            dash \
-            fd \
-            fzf \
-            htop \
-            jq \
-            moreutils \
-            neovim \
-            openssh \
-            perl-image-exiftool \
-            pkgfile \
-            python \
-            ripgrep \
-            rsync \
-            tmux \
-            zsh
-    fi
-
+if command -v yay > /dev/null; then
+    yay -Syu --needed --noconfirm \
+        aria2 \
+        bat \
+        bind-tools \
+        dash \
+        fd \
+        fzf \
+        htop \
+        jq \
+        moreutils \
+        neovim \
+        openssh \
+        perl-image-exiftool \
+        pkgfile \
+        python \
+        ripgrep \
+        rsync \
+        tmux \
+        zsh
 fi
 
 if command -v termux-info > /dev/null; then
     pkg install \
+        bat \
         dash \
         dnsutils \
         fd \

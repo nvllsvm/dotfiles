@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+set -e
+
+if ! command -v xinit > /dev/null; then
+    exit
+fi
+
+if [ "$(realpath ~/.xinitrc)" != "$DOTFILES/xinit/.xinitrc" ]; then
+    echo "Linking configuration ..."
+    rm -rf ~/.xinitrc
+    ln -sT "${DOTFILES}/xinit/.xinitrc" ~/.xinitrc
+fi
