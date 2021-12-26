@@ -22,6 +22,11 @@ if [ -e "$OUTFILE" ] || [ -e "$LOGFILE" ]; then
 fi
 mkdir -p "$DESTINATION"
 
+# "authenticates" the drive. something to do with encryption, not sure.
+# doesn't work without doing this
+echo 'Running lsdvd ...'
+lsdvd -x "$DEVICE"
+
 echo 'Reading without retry ...'
 ddrescue --sector-size=2048 --verbose --no-scrape "$DEVICE" "${OUTFILE}" "${LOGFILE}"
 
