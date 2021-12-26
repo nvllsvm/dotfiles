@@ -1,8 +1,6 @@
 #!/usr/bin/env sh
 set -eu
 
-UPDATE_DIR="$DOTFILES/full-update"
-
 YELLOW='\033[1;33m'
 RESET_COLOR='\033[0m'
 
@@ -16,16 +14,11 @@ show_help() {
 usage: full-update [script ...]
 
     --help      show help and exit
-    --list      list scripts and exit
 EOF
 }
 
 while [ $# -gt 0 ]; do
     case "$1" in
-        --list)
-            find "$UPDATE_DIR" -type f -printf '%f\n' | sort -n
-            exit
-            ;;
         --help)
             show_help
             exit
@@ -39,15 +32,26 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-printf '%bfull-update - start %s%b\n' "$YELLOW" "$(date)" "$RESET_COLOR"
-for cmd in "$UPDATE_DIR"/*; do
-    case "$cmd" in
-        */00-dotfiles)
-            run_script "$cmd" --all
-            ;;
-        *)
-            run_script "$cmd"
-            ;;
-    esac
+process() {
+    if ! [ -d "$1"/full-update ]; then
+        return
+    fi
+    printf '%bfull-update - %s - start %s%b\n' "$YELLOW" "$1" "$(date)" "$RESET_COLOR"
+    for cmd in "$1"/full-update/*; do
+        case "$cmd" in
+            */00-dotfiles)
+                run_script "$cmd" --all
+                ;;
+            *)
+                run_script "$cmd"
+                ;;
+        esac
+    done
+    printf '%bfull-update - %s - done %s%b\n' "$YELLOW" "$1" "$(date)" "$RESET_COLOR"
+}
+
+process "$DOTFILES"
+
+for d in $(env | grep ^DOTFILES_ | sort); do
+    process "$(echo "$d" | cut -d = -f 2)"
 done
-printf '%bfull-update - done %s%b\n' "$YELLOW" "$(date)" "$RESET_COLOR"
