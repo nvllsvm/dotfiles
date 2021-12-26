@@ -3,7 +3,6 @@ set -e
 
 DEVICE="$1"
 DESTINATION="$2"
-LABEL="$3"
 
 if ! [ -e "$DEVICE" ]; then
     cat >&2 << EOF
@@ -12,9 +11,7 @@ EOF
     exit 1
 fi
 
-if [ -z "$LABEL" ]; then
-    LABEL="$(blkid -o value -s LABEL "$DEVICE")"
-fi
+LABEL="$(blkid -o value -s LABEL "$DEVICE")"
 
 OUTFILE="${DESTINATION}/${LABEL}.iso"
 LOGFILE="${DESTINATION}/${LABEL}.log"
@@ -23,6 +20,7 @@ if [ -e "$OUTFILE" ] || [ -e "$LOGFILE" ]; then
     echo 'error: OUTFILE and/or LOGFILE already exists' >&2
     exit 1
 fi
+mkdir -p "$DESTINATION"
 
 echo 'Reading without retry ...'
 ddrescue --sector-size=2048 --verbose --no-scrape "$DEVICE" "${OUTFILE}" "${LOGFILE}"
