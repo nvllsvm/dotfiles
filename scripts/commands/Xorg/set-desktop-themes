@@ -156,6 +156,7 @@ Xcursor.size: ${CURSOR_SIZE}
 *background: #${BASE16_BACKGROUND}
 EOF
 
+rm -rf ~/.config/rofi
 mkdir -p ~/.config/rofi
 cat > ~/.config/rofi/config.rasi << EOF
 configuration {
