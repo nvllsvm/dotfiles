@@ -17,12 +17,10 @@ if [ "$(realpath ~/bin)" != "$DOTFILES/termux/bin" ]; then
     ln -s "${DOTFILES}/termux/bin" ~/bin
 fi
 
-if ! [ -d ~/storage ]; then
-    ln -s /storage/emulated/0 ~/storage
-fi
-if ! [ -d ~/notes ]; then
-    ln -s ~/storage/syncthing/default/notes ~/notes
-fi
+yes | termux-setup-storage
+ln -sfT ~/storage/shared/syncthing/default/notes ~/notes
+ln -sfT ~/storage/shared/syncthing ~/syncthing
+ln -sfT ~/storage/shared/Download ~/download
 
 yes | pkg upgrade
 yes | apt autoremove
