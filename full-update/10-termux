@@ -11,6 +11,12 @@ if [ "$(realpath ~/.termux)" != "$DOTFILES/termux" ]; then
     ln -s "${DOTFILES}/termux" ~/.termux
 fi
 
+if [ "$(realpath ~/bin)" != "$DOTFILES/termux/bin" ]; then
+    echo "Linking configuration ..."
+    rm -rf ~/bin
+    ln -s "${DOTFILES}/termux/bin" ~/bin
+fi
+
 if ! [ -d ~/storage ]; then
     ln -s /storage/emulated/0 ~/storage
 fi
