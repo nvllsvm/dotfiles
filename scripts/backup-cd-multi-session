@@ -1,0 +1,25 @@
+#!/usr/bin/env sh
+set -e
+
+DEVICE="$1"
+DESTINATION="$2"
+
+if ! [ -e "$DEVICE" ]; then
+    cat >&2 << EOF
+usage: INFILE OUTDIR
+EOF
+    exit 1
+fi
+
+LABEL="$(blkid -o value -s LABEL "$DEVICE")"
+
+OUTFILE="${DESTINATION}/${LABEL}.bin"
+TOCFILE="${DESTINATION}/${LABEL}.toc"
+
+if [ -e "$OUTFILE" ] || [ -e "$TOCFILE" ]; then
+    echo 'error: OUTFILE and/or TOCFILE already exists' >&2
+    exit 1
+fi
+mkdir -p "$DESTINATION"
+
+cdrdao read-cd --read-raw --datafile "$OUTFILE" "$TOCFILE"
