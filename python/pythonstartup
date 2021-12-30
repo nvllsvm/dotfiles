@@ -196,3 +196,11 @@ def cbpaste():
         stdout=subprocess.PIPE,
         check=True)
     return proc.stdout
+
+
+def bytes_to_human(num):
+    for unit in ['B', 'KB', 'MB', 'GB', 'TB', 'PB']:
+        if abs(num) < 1024.0:
+            break
+        num /= 1024.0
+    return f'{num:.1f}{unit}'
