@@ -970,13 +970,15 @@ async def _get_class(path):
             except Exception:
                 pass
 
-        # iso9660 image
-        elif start.startswith(b'CD001'):
-            return xorriso
         elif start.startswith(b'#!/bin/sh\n'):
             f.seek(271)
             if f.read(58) == b'# with modifications for mojosetup and GOG.com installer.\n':  # noqa: E501
                 return gog_linux
+
+        # iso9660
+        f.seek(32769)
+        if f.read(5) == b'CD001':
+            return xorriso
 
     if suffixes := [suffix.lower() for suffix in path.suffixes]:
         # ffs - brotli doesn't have a file signature
