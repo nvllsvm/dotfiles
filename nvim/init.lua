@@ -1,3 +1,4 @@
+vim.cmd([[
 let g:python3_host_prog=glob('~/.config/nvim/python3_env/bin/python')
 
 set ruler
@@ -222,3 +223,4 @@ for _, lsp in ipairs(servers) do
   }
 end
 EOF
+]])
