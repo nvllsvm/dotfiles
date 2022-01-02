@@ -44,8 +44,8 @@ fi
 echo Updating python environment ...
 (update_venv)
 
-if [ -d ~/.config/nvim/plugged ]; then
-    for d in ~/.config/nvim/plugged/*; do
+if [ -e ~/.config/nvim/plugged ]; then
+    for d in ~/.config/nvim/plugged/*/; do
         git -C "$d" reset --quiet --hard HEAD
     done
 fi
