@@ -3,28 +3,31 @@ set -e
 
 export PIP_REQUIRE_VIRTUALENV=0
 
-if ! command -v pip > /dev/null 2>&1; then
+if ! command -v python > /dev/null 2>&1; then
     exit
-fi
-
-if [ "$(realpath ~/.config/pip)" != "${DOTFILES}/pip" ]; then
-    rm -rf ~/.config/pip
-    ln -s "${DOTFILES}/pip" ~/.config
 fi
 
 pip() {
     python -m pip "$@"
 }
 
-if [ "$(python -m pip --version)" != "$(pip --version)" ]; then
+if [ "$(realpath ~/.config/pip)" != "${DOTFILES}/pip" ]; then
+    rm -rf ~/.config/pip
+    ln -s "${DOTFILES}/pip" ~/.config
+fi
+
+if ! python -m pip --version || [ "$(python -m pip --version)" != "$(pip --version)" ]; then
+    echo 'Installing pip'
     python -m ensurepip --user --default-pip
 fi
 
 if [ "$(pip list | grep -c -e '^pip ' -e '^setuptools ' -e '^wheel ')" != '3' ]; then
+    echo 'Updating pip, setuptools, and wheel'
     pip install --quiet --user --upgrade --force-reinstall pip setuptools wheel
 fi
 
 ood_packages="$(pip list --outdated --format=freeze)"
 if [ -n "${ood_packages}" ]; then
+    echo 'Updating out-of-date packages'
     pip install --user --upgrade $(echo "${ood_packages}" | cut -d = -f 1)
 fi
