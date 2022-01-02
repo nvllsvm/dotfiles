@@ -16,7 +16,7 @@ if [ "$(realpath ~/.config/pip)" != "${DOTFILES}/pip" ]; then
     ln -s "${DOTFILES}/pip" ~/.config
 fi
 
-if ! python -m pip --version || [ "$(python -m pip --version)" != "$(pip --version)" ]; then
+if ! python -m pip --version 2>&1 > /dev/null || [ "$(python -m pip --version)" != "$(pip --version)" ]; then
     echo 'Installing pip'
     python -m ensurepip --user --default-pip
 fi
