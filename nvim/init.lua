@@ -46,7 +46,6 @@ Plug 'Vimjas/vim-python-pep8-indent'
 
 Plug 'plasticboy/vim-markdown'
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }}
-Plug 'mzlogin/vim-markdown-toc'
 Plug 'dhruvasagar/vim-table-mode'
 
 Plug 'junegunn/fzf'
