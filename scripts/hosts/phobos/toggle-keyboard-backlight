@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+DEV=/sys/class/leds/asus::kbd_backlight/brightness
+case "$(cat "$DEV")" in
+    0)
+        echo 1 > "$DEV"
+        ;;
+    *)
+        echo 0 > "$DEV"
+esac
