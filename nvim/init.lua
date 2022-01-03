@@ -1,10 +1,24 @@
+vim.o.ruler = true
+vim.o.tabstop = 4
+vim.o.shiftwidth = 4
+vim.o.expandtab = true
+vim.o.wrap = false
+vim.o.cursorline = true
+vim.o.hidden = true
+
+vim.o.foldmethod = "syntax"
+
+-- case insensitive search
+vim.o.ignorecase = true
+
+vim.g.tex_flavor = "latex"
+
+-- line numbers
+vim.o.number = true
+vim.o.relativenumber = true
+
 vim.cmd([[
 let g:python3_host_prog=glob('~/.config/nvim/python3_env/bin/python')
-
-set ruler
-set tabstop=4
-set shiftwidth=4
-set expandtab
 
 set mouse=a
 
@@ -13,24 +27,13 @@ set number
 set relativenumber
 nmap <silent> <C-n> :set number!<CR>:set relativenumber!<CR>
 
-" case insensitive search
-set ignorecase
-
 filetype plugin indent on
 
 set grepprg=grep\ -nH\ $*
-let g:tex_flavor = "latex"
 
 au BufReadCmd   *.epub      call zip#Browse(expand("<amatch>"))
 
-set foldmethod=syntax
-
-set nowrap
-
-set cursorline
 nmap <silent> <C-c> :set cursorcolumn!<CR>
-
-set hidden
 
 call plug#begin('~/.config/nvim/plugged')
 Plug 'hrsh7th/nvim-compe'
