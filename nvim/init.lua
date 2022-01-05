@@ -140,7 +140,8 @@ function _IdentifyHighlightingGroup()
 endfunction
 command IdentifyHighlightingGroup :call _IdentifyHighlightingGroup()
 
-lua << EOF
+]])
+
 vim.o.completeopt = "menuone,noselect"
 require'compe'.setup {
   enabled = true;
@@ -175,9 +176,7 @@ require'compe'.setup {
     luasnip = true;
   };
 }
-EOF
 
-lua << EOF
 local nvim_lsp = require('lspconfig')
 
 -- Use an on_attach function to only map the following keys
@@ -224,5 +223,3 @@ for _, lsp in ipairs(servers) do
     }
   }
 end
-EOF
-]])
