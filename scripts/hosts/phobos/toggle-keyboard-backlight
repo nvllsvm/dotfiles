@@ -1,9 +1,18 @@
 #!/usr/bin/env sh
+notify() {
+    dunstify \
+        --hints=string:x-dunst-stack-tag:set-volume \
+        --hints=int:transient:1 \
+        'Keyboard Backlight' "$@"
+}
+
 DEV=/sys/class/leds/asus::kbd_backlight/brightness
 case "$(cat "$DEV")" in
     0)
+        notify ✔
         echo 1 > "$DEV"
         ;;
     *)
+        notify 🚫
         echo 0 > "$DEV"
 esac
