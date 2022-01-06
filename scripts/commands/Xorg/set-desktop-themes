@@ -64,7 +64,7 @@ else
             FONT_SIZE=12
         else
             DUNST_WIDTH=300
-            DUNST_OFFSET=0x20
+            DUNST_OFFSET=0x21
             FONT_SIZE=9
         fi
     else
