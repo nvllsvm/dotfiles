@@ -36,12 +36,15 @@ class cli_7zip:
     async def extract(cls, path, dest, password='', overwrite=False):
         if overwrite:
             raise NotImplementedError
-        subprocess.run(
-            [cls._get_bin(), 'x', f'-p{password}', '-spe', f'-o{dest}',
-             '--', str(path)],
-            stdout=subprocess.DEVNULL,  # no quiet flag
-            check=True
-        )
+        args = [
+            cls._get_bin(), 'x', f'-p{password}', '-spe', f'-o{dest}',
+            '--', str(path)
+        ]
+        proc = await asyncio.create_subprocess_exec(
+            *args, stdout=asyncio.subprocess.DEVNULL)
+        await proc.wait()
+        if proc.returncode:
+            raise ProcessError(proc.returncode)
 
     @classmethod
     async def contents(cls, path):
@@ -1029,6 +1032,63 @@ def format_contents(paths):
     return sorted(contents, key=lambda x: (x.lower(), x))
 
 
+class AsyncExecutor:
+    def __init__(self, max_pending=None):
+        self._max_pending = \
+            os.cpu_count() if max_pending is None else max_pending
+        self._queued = []
+        self._pending = set()
+
+    def submit(self, func, *args, **kwargs):
+        self._queued.append((func, args, kwargs))
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            pass
+        else:
+            self._fill()
+
+    async def as_completed(self):
+        while self._queued or self._pending:
+            self._fill()
+
+            done, self._pending = await asyncio.wait(
+                self._pending, return_when=asyncio.FIRST_COMPLETED)
+
+            for result in done:
+                yield result
+
+    def _fill(self):
+        for _ in range(self._max_pending - len(self._pending)):
+            if not self._queued:
+                return
+            func, args, kwargs = self._queued.pop()
+            self._pending.add(asyncio.create_task(func(*args, **kwargs)))
+
+
+async def process_archive(cls, volumes, path, password, args):
+    print('Extracting', path)
+    await cls.extract(
+        volumes[0],
+        _build_dest(path, args.parent, args.child),
+        password=password,
+        overwrite=args.force)
+
+    if args.rm:
+        for path in volumes:
+            path.unlink()
+
+
+def _num_procs(value):
+    value = int(value)
+    if value == 0:
+        return os.cpu_count()
+    elif value > 0:
+        return value
+    else:
+        raise argparse.ArgumentError('invalid num_procs')
+
+
 async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -1049,16 +1109,25 @@ async def main():
     parser.add_argument(
         '--password', action='store_true',
         help='prompt for password')
+    parser.add_argument(
+        '-n', metavar='NUM', dest='num_procs', type=_num_procs, default=1,
+        help='number of parallel jobs (default: %(default)s)')
     parser.add_argument('archive', nargs='+', type=pathlib.Path)
     args = parser.parse_args()
 
+    if args.num_procs > 1 and not args.child:
+        parser.error('must specify --child when extracting in parallel')
+        parser.exit(1)
+
     password = getpass.getpass('Password: ') if args.password else None
 
-    extracted = set()
+    executor = AsyncExecutor(max_pending=args.num_procs)
+
+    all_volumes = set()
     for path in args.archive:
         path = path.absolute()
 
-        if path in extracted:
+        if path in all_volumes:
             continue
 
         cls = await _get_class(path)
@@ -1070,19 +1139,13 @@ async def main():
             sys.stdout.buffer.write(b'\n'.join(contents) + b'\n')
             sys.stdout.buffer.flush()
         else:
-            print('Extracting', path)
             volumes = await cls.volumes(path, password)
+            all_volumes.update(volumes)
+            executor.submit(
+                process_archive, cls, volumes, path, password, args)
 
-            await cls.extract(
-                volumes[0],
-                _build_dest(path, args.parent, args.child),
-                password=password,
-                overwrite=args.force)
-
-            if args.rm:
-                for path in volumes:
-                    path.unlink()
-            extracted.update(volumes)
+    async for future in executor.as_completed():
+        future.result()
 
 
 if __name__ == '__main__':
