@@ -48,13 +48,16 @@ class cli_7zip:
 
     @classmethod
     async def contents(cls, path):
-        proc = subprocess.run(
-            [cls._get_bin(), '-ba', 'l', '--', str(path)],
-            stdout=subprocess.PIPE,
-            check=True
-        )
+        args = [cls._get_bin(), '-ba', 'l', '--', str(path)]
+        proc = await asyncio.create_subprocess_exec(
+            *args, stdout=asyncio.subprocess.PIPE)
+        await proc.wait()
+        if proc.returncode:
+            raise ProcessError(proc.returncode)
+        stdout = await proc.stdout.read()
+
         contents = []
-        for line in proc.stdout.splitlines():
+        for line in stdout.splitlines():
             # - date+time may be blank
             # - size may be blank
             attrs = line[20:25]
@@ -66,13 +69,16 @@ class cli_7zip:
 
     @classmethod
     async def volumes(cls, path, password=''):
-        result = subprocess.run(
-            [cls._get_bin(), 'l', f'-p{password}', '--', str(path)],
-            stdout=subprocess.PIPE,
-            check=True)
+        args = [cls._get_bin(), 'l', f'-p{password}', '--', str(path)]
+        proc = await asyncio.create_subprocess_exec(
+            *args, stdout=asyncio.subprocess.PIPE)
+        await proc.wait()
+        if proc.returncode:
+            raise ProcessError(proc.returncode)
+        stdout = await proc.stdout.read()
 
         num_volumes = 1
-        for line in reversed(result.stdout.splitlines()):
+        for line in reversed(stdout.splitlines()):
             if line.startswith(b'Volumes = '):
                 num_volumes = int(line.split(b' = ')[1])
                 break
