@@ -26,7 +26,7 @@ while [ $# -gt 0 ]; do
         *)
             script="$1"
             shift
-            run_script "$UPDATE_DIR"/"$script" "$@"
+            run_script "$DOTFILES"/full-update/"$script" "$@"
             exit
             ;;
     esac
