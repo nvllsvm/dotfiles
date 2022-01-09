@@ -175,7 +175,8 @@ def _sigint_handler(*_):
 async def _process(func, path, strip):
     before = path.stat().st_size
 
-    with TempPath(dir=path.parent) as temp_path:
+    with TempPath(dir=path.parent, prefix='.imgoptim_',
+                  suffix=path.name + '.tmp') as temp_path:
         await func(path, temp_path, strip=strip)
 
         after = temp_path.stat().st_size
