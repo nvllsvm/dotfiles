@@ -58,5 +58,5 @@ yay -Sc --noconfirm > /dev/null
 GIMP_BIN="$(which 'gimp-2.99')"
 if [ -n "$GIMP_BIN" ]; then
     rm -rf ~/.local/bin/gimp
-    ln -sT "$GIMP_BIN" ~/.loca/bin/gimp
+    ln -sT "$GIMP_BIN" ~/.local/bin/gimp
 fi
