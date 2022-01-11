@@ -4,14 +4,14 @@ import sys
 
 import i3ipc
 
-FIREFOX_PATH = '/usr/bin/firefox-developer-edition'
+FIREFOX_PATH = '/usr/bin/firefox'
 
 
 def find_firefox_windows(is_private):
     if is_private:
-        pattern = r'.*Firefox Developer Edition \(Private Browsing\)$'
+        pattern = r'.*Mozilla Firefox \(Private Browsing\)$'
     else:
-        pattern = '.*Firefox Developer Edition$'
+        pattern = '.*Mozilla Firefox$'
 
     return [
         item
