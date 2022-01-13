@@ -19,6 +19,8 @@ setopt inc_append_history
 setopt share_history
 setopt auto_pushd
 
+unsetopt correct_all
+
 bindkey "^[[A" history-beginning-search-backward
 bindkey "^[[B" history-beginning-search-forward
 
