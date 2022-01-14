@@ -1,4 +1,0 @@
-#!/usr/bin/env sh
-set -e
-sha="$(git rev-list -n 1 HEAD -- "$1")"
-git checkout "${sha}"^ -- "$1" 
