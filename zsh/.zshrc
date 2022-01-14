@@ -4,6 +4,18 @@ zstyle ':completion:*' rehash true
 zstyle ':completion:*:matches'         group 'yes'
 zstyle ':completion:*'                 group-name ''
 zstyle ':completion:*' list-dirs-first true
+
+# Prevent autocompleting to a different parent directory when
+# the child does not exist.
+#
+# Ex.
+# /a1/other
+# /a2/file
+#
+# Without this option, `cd a1/f` would complete to `a2/file`.
+# That's annoying.
+zstyle ':completion:*' accept-exact-dirs true
+
 autoload -U colors && colors
 autoload -U compinit
 autoload -U add-zsh-hook
