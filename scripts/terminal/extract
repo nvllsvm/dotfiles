@@ -1073,7 +1073,8 @@ class AsyncExecutor:
 
 
 async def process_archive(cls, volumes, path, password, args):
-    print('Extracting', path)
+    if not args.quiet:
+        print('Extracting', path)
     await cls.extract(
         volumes[0],
         _build_dest(path, args.parent, args.child),
@@ -1118,6 +1119,9 @@ async def main():
     parser.add_argument(
         '-n', metavar='NUM', dest='num_procs', type=_num_procs, default=1,
         help='number of parallel jobs (default: %(default)s)')
+    parser.add_argument(
+        '-q', '--quiet', action='store_true',
+        help='suppress non-error output')
     parser.add_argument('archive', nargs='+', type=pathlib.Path)
     args = parser.parse_args()
 
