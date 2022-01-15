@@ -4,6 +4,7 @@ import collections
 import hashlib
 import json
 import pathlib
+import sys
 
 
 def all_files(root):
@@ -20,9 +21,13 @@ def all_files(root):
 
 def sha256sum(path):
     hasher = hashlib.sha256()
-    with open(path, 'rb') as handle:
-        while data := handle.read(65536):
-            hasher.update(data)
+    try:
+        with open(path, 'rb') as handle:
+            while data := handle.read(65536):
+                hasher.update(data)
+    except OSError:
+        print(f'error reading "{path}"', file=sys.stderr)
+        raise
     return hasher.hexdigest()
 
 
