@@ -87,6 +87,7 @@ def download_datfiles():
         data = pickle.loads(REDUMP_DAT_FILE.read_bytes())
     else:
         systems = [
+            'dc',   # dreamcast
             'gc',   # gamecube
             'mac',  # macintosh
             'pc',   # PC
