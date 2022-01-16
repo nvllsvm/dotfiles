@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+sudo pstate-frequency -S -g performance > /dev/null
+sudo pstate-frequency -S -t 0 > /dev/null
+sudo pstate-frequency -S -m 100 > /dev/null
+sudo pstate-frequency -G -c 
