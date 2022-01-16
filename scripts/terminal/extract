@@ -584,14 +584,20 @@ class gnu_tar:
         return stdout.splitlines()
 
     @staticmethod
-    async def extract(path, dest, password=None, overwrite=False):
-        args = [
-            'tar', 'xf', path, '--force-local', f'--one-top-level={dest}',
-        ]
+    async def extract(path, dest, paths=None, password=None, overwrite=False):
+        args = ['tar', 'xf', path, '--force-local']
+        if dest == sys.stdout.buffer:
+            args.append('--to-stdout')
+        else:
+            args.append(f'--one-top-level={dest}')
+
         if overwrite:
             args.append('--overwrite')
         else:
             args.append('--keep-old-files')
+
+        if paths:
+            args.extend(paths)
 
         proc = await asyncio.create_subprocess_exec(*args)
         await proc.wait()
@@ -1072,12 +1078,18 @@ class AsyncExecutor:
             self._pending.add(asyncio.create_task(func(*args, **kwargs)))
 
 
-async def process_archive(cls, volumes, path, password, args):
-    if not args.quiet:
+async def process_archive(cls, volumes, path, paths, password, args):
+    if not args.quiet and not args.stdout:
         print('Extracting', path)
+    if args.stdout:
+        dest = sys.stdout.buffer
+    else:
+        dest =_build_dest(path, args.parent, args.child)
+
     await cls.extract(
         volumes[0],
-        _build_dest(path, args.parent, args.child),
+        dest,
+        paths=paths,
         password=password,
         overwrite=args.force)
 
@@ -1104,6 +1116,9 @@ async def main():
     parser.add_argument(
         '-c', dest='child', action='store_true',
         help='extract each archive to a unique child directory')
+    parser.add_argument(
+        '--stdout', action='store_true',
+        help='extract a specifc file to stdout')
     parser.add_argument(
         '-l', dest='list', action='store_true',
         help='list contents')
@@ -1134,7 +1149,15 @@ async def main():
     executor = AsyncExecutor(max_pending=args.num_procs)
 
     all_volumes = set()
-    for path in args.archive:
+    if args.stdout:
+        assert len(args.archive) == 2
+        archives = [args.archive[0]]
+        paths = [str(args.archive[1])]
+    else:
+        archives = args.archive
+        paths = None
+
+    for path in archives:
         path = path.absolute()
 
         if path in all_volumes:
@@ -1152,7 +1175,7 @@ async def main():
             volumes = await cls.volumes(path, password)
             all_volumes.update(volumes)
             executor.submit(
-                process_archive, cls, volumes, path, password, args)
+                process_archive, cls, volumes, path, paths, password, args)
 
     async for future in executor.as_completed():
         future.result()
