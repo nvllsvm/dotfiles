@@ -50,6 +50,7 @@ class Redump:
                 'mac',  # macintosh
                 'pc',   # PC
                 'ps2',  # playstation 2
+                'ps3',  # playstation 3
                 'psx',  # playstation
                 'wii',  # wii
             ]
