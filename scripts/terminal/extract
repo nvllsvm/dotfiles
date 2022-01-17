@@ -1183,10 +1183,6 @@ async def main():
     parser.add_argument('archive', nargs='+', type=pathlib.Path)
     args = parser.parse_args()
 
-    if args.num_procs > 1 and not args.child:
-        parser.error('must specify --child when extracting in parallel')
-        parser.exit(1)
-
     password = getpass.getpass('Password: ') if args.password else None
 
     executor = AsyncExecutor(max_pending=args.num_procs)
