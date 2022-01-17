@@ -1196,9 +1196,12 @@ async def main():
 
     all_volumes = set()
     if args.stdout:
-        assert len(args.archive) == 2
         archives = [args.archive[0]]
-        paths = [str(args.archive[1])]
+        if len(args.archive) == 2:
+            paths = [str(args.archive[1])]
+        else:
+            paths = None
+            assert len(args.archive) == 1
     else:
         archives = args.archive
         paths = None
