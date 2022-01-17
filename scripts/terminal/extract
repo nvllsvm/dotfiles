@@ -33,7 +33,10 @@ class cli_7zip:
         raise KeyError
 
     @classmethod
-    async def extract(cls, path, dest, password='', overwrite=False):
+    async def extract(cls, path, dest, paths=None, password='',
+                      overwrite=False):
+        if paths:
+            raise NotImplementedError
         if overwrite:
             raise NotImplementedError
         args = [
@@ -122,7 +125,10 @@ class udisksctl:
                 )
 
     @classmethod
-    async def extract(cls, path, dest, password=None, overwrite=False):
+    async def extract(cls, path, dest, paths=None, password=None,
+                      overwrite=False):
+        if paths:
+            raise NotImplementedError
         if overwrite:
             raise NotImplementedError
 
@@ -245,7 +251,9 @@ class unzip:
         ]
 
     @staticmethod
-    async def extract(path, dest, password=None, overwrite=False):
+    async def extract(path, dest, paths=None, password=None, overwrite=False):
+        if paths:
+            raise NotImplementedError
         if overwrite:
             raise NotImplementedError
         subprocess.run(
@@ -276,7 +284,9 @@ class cabextract:
         ]
 
     @staticmethod
-    async def extract(path, dest, password=None, overwrite=False):
+    async def extract(path, dest, paths=None, password=None, overwrite=False):
+        if paths:
+            raise NotImplementedError
         if overwrite:
             raise NotImplementedError
         subprocess.run(
@@ -328,7 +338,9 @@ class xorriso:
         return paths
 
     @staticmethod
-    async def extract(path, dest, password=None, overwrite=False):
+    async def extract(path, dest, paths=None, password=None, overwrite=False):
+        if paths:
+            raise NotImplementedError
         if overwrite:
             raise NotImplementedError
         subprocess.run(
@@ -359,7 +371,9 @@ class unrar:
         return set(proc.stdout.splitlines())
 
     @staticmethod
-    async def extract(path, dest, password=None, overwrite=False):
+    async def extract(path, dest, paths=None, password=None, overwrite=False):
+        if paths:
+            raise NotImplementedError
         if overwrite:
             raise NotImplementedError
         subprocess.run(
@@ -417,7 +431,9 @@ class unace:
         ))
 
     @staticmethod
-    async def extract(path, dest, password=None, overwrite=False):
+    async def extract(path, dest, paths=None, password=None, overwrite=False):
+        if paths:
+            raise NotImplementedError
         args = ['unace', 'e']
         if overwrite:
             args.append('-o')
@@ -470,7 +486,9 @@ class innoextract:
         return contents
 
     @staticmethod
-    async def extract(path, dest, password=None, overwrite=False):
+    async def extract(path, dest, paths=None, password=None, overwrite=False):
+        if paths:
+            raise NotImplementedError
         if overwrite:
             raise NotImplementedError
         # safe to pass --gog flag to non-gog installers
@@ -499,7 +517,10 @@ class gog_linux:
             return sorted(c.encode() for c in contents)
 
     @classmethod
-    async def extract(cls, path, dest, password=None, overwrite=False):
+    async def extract(cls, path, dest, paths=None, password=None,
+                      overwrite=False):
+        if paths:
+            raise NotImplementedError
         if overwrite:
             raise NotImplementedError
         with cls._zipfile(path) as zf:
@@ -621,7 +642,9 @@ class gzip:
         return [path.with_suffix('').name.encode()]
 
     @staticmethod
-    async def extract(path, dest, password=None, overwrite=False):
+    async def extract(path, dest, paths=None, password=None, overwrite=False):
+        if paths:
+            raise NotImplementedError
         if overwrite:
             raise NotImplementedError
         target = dest / path.with_suffix('').name
@@ -650,7 +673,9 @@ class pbzip2:
         return [path.with_suffix('').name.encode()]
 
     @staticmethod
-    async def extract(path, dest, password=None, overwrite=False):
+    async def extract(path, dest, paths=None, password=None, overwrite=False):
+        if paths:
+            raise NotImplementedError
         if overwrite:
             raise NotImplementedError
         target = dest / path.with_suffix('').name
@@ -679,7 +704,9 @@ class pigz:
         return [path.with_suffix('').name.encode()]
 
     @staticmethod
-    async def extract(path, dest, password=None, overwrite=False):
+    async def extract(path, dest, paths=None, password=None, overwrite=False):
+        if paths:
+            raise NotImplementedError
         if overwrite:
             raise NotImplementedError
         target = dest / path.with_suffix('').name
@@ -712,7 +739,9 @@ class pixz:
         return [path.with_suffix('').name.encode()]
 
     @staticmethod
-    async def extract(path, dest, password=None, overwrite=False):
+    async def extract(path, dest, paths=None, password=None, overwrite=False):
+        if paths:
+            raise NotImplementedError
         if overwrite:
             raise NotImplementedError
         target = dest / path.with_suffix('').name
@@ -743,7 +772,9 @@ class bzip2:
         return [path.with_suffix('').name.encode()]
 
     @staticmethod
-    async def extract(path, dest, password=None, overwrite=False):
+    async def extract(path, dest, paths=None, password=None, overwrite=False):
+        if paths:
+            raise NotImplementedError
         if overwrite:
             raise NotImplementedError
         target = dest / path.with_suffix('').name
@@ -772,7 +803,9 @@ class xz:
         return [path.with_suffix('').name.encode()]
 
     @staticmethod
-    async def extract(path, dest, password=None, overwrite=False):
+    async def extract(path, dest, paths=None, password=None, overwrite=False):
+        if paths:
+            raise NotImplementedError
         if overwrite:
             raise NotImplementedError
         target = dest / path.with_suffix('').name
@@ -801,7 +834,9 @@ class lz4:
         return [path.with_suffix('').name]
 
     @staticmethod
-    async def extract(path, dest, password=None, overwrite=False):
+    async def extract(path, dest, paths=None, password=None, overwrite=False):
+        if paths:
+            raise NotImplementedError
         args = ['lz4', '-d']
         if overwrite:
             args.append('-f')
@@ -826,7 +861,9 @@ class zstd:
         return [path.with_suffix('').name.encode()]
 
     @staticmethod
-    async def extract(path, dest, password=None, overwrite=False):
+    async def extract(path, dest, paths=None, password=None, overwrite=False):
+        if paths:
+            raise NotImplementedError
         args = ['zstd', '-d', '--output-dir-flat', dest]
         if overwrite:
             args.append('-f')
@@ -855,7 +892,9 @@ class brotli:
         return [path.with_suffix('').name]
 
     @staticmethod
-    async def extract(path, dest, password=None, overwrite=False):
+    async def extract(path, dest, paths=None, password=None, overwrite=False):
+        if paths:
+            raise NotImplementedError
         args = ['brotli', '--decompress', '--stdout']
         if overwrite:
             args.append('--force')
@@ -1084,7 +1123,7 @@ async def process_archive(cls, volumes, path, paths, password, args):
     if args.stdout:
         dest = sys.stdout.buffer
     else:
-        dest =_build_dest(path, args.parent, args.child)
+        dest = _build_dest(path, args.parent, args.child)
 
     await cls.extract(
         volumes[0],
