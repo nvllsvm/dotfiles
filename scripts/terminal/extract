@@ -35,16 +35,23 @@ class cli_7zip:
     @classmethod
     async def extract(cls, path, dest, paths=None, password='',
                       overwrite=False):
-        if paths:
-            raise NotImplementedError
+        args = [cls._get_bin()]
+        kwargs = {}
         if overwrite:
             raise NotImplementedError
-        args = [
-            cls._get_bin(), 'x', f'-p{password}', '-spe', f'-o{dest}',
-            '--', str(path)
-        ]
-        proc = await asyncio.create_subprocess_exec(
-            *args, stdout=asyncio.subprocess.DEVNULL)
+
+        if dest == sys.stdout.buffer:
+            args.extend(['e', f'-p{password}', '-so', '--', str(path)])
+        else:
+            args.extend([
+                'x', f'-p{password}', '-spe', f'-o{dest}', '--', str(path)
+            ])
+            kwargs['stdout'] = asyncio.subprocess.DEVNULL
+
+        if paths:
+            args.extend(paths)
+
+        proc = await asyncio.create_subprocess_exec(*args, **kwargs)
         await proc.wait()
         if proc.returncode:
             raise ProcessError(proc.returncode)
