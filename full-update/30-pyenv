@@ -16,8 +16,9 @@ else
 fi
 
 "$INSTALL_DIR"/bin/pyenv rehash
+PYTHON_VERSION="$(ls "${INSTALL_DIR}/versions" | rg '^\d' | sort --version-sort | tail -n 1)"
 
-python << EOF
+"${INSTALL_DIR}/versions/${PYTHON_VERSION}/bin/python" << EOF
 import os
 import pathlib
 import shutil
