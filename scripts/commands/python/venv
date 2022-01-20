@@ -121,8 +121,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--prune', action=_PruneAction)
     parser.add_argument('-d', '--delete', action='store_true')
-    parser.add_argument('--env', type=pathlib.Path)
-    parser.add_argument('bin', nargs='?', type=_python_bin)
+    parser.add_argument('-e', '--env', type=pathlib.Path)
+    parser.add_argument('-p', '--python', type=_python_bin, default='python3')
     args = parser.parse_args()
 
     if not shutil.which('direnv'):
@@ -130,8 +130,6 @@ def main():
         parser.exit(1)
 
     os.environ.pop('VIRTUAL_ENV', None)
-
-    python_bin = args.bin or 'python'
 
     cwd = pathlib.Path().resolve()
     cwd_envrc = cwd.joinpath('.envrc')
@@ -141,7 +139,8 @@ def main():
         env_folder = args.env
     else:
         ENV_ROOT.mkdir(parents=True, exist_ok=True)
-        env_folder = ENV_ROOT / hashlib.sha256(str(cwd).encode()).hexdigest()
+        env_folder = ENV_ROOT / hashlib.sha256(
+            f'{cwd}{args.python}'.encode()).hexdigest()
 
     try:
         shutil.rmtree(env_folder)
@@ -151,7 +150,7 @@ def main():
     if args.delete:
         parser.exit()
 
-    create_virtualenv(python_bin, env_folder)
+    create_virtualenv(args.python, env_folder)
     upgrade_virtualenv(env_folder)
 
     env_folder.joinpath('.parent').symlink_to(cwd)
