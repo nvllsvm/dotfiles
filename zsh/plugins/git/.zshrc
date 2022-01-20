@@ -3,7 +3,7 @@ if command -v git > /dev/null; then
         touch ~/.cache/gs
         case $# in
             0)
-                target="$(fzf --no-sort < ~/.cache/gs)"
+                target="$(fzf --exact --no-sort < ~/.cache/gs)"
                 if [ -z "$target" ]; then
                     return 130
                 fi
