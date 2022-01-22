@@ -1,4 +1,9 @@
 #!/usr/bin/env sh
+# Backup a multi-session CD on a drive that doesn't properly support
+# multi-session. Ex WH16NS40.
+#
+# Prefer using a drive which properly supports multi-session ex.
+# PX-716A or PX-760A
 set -e
 
 DEVICE="$1"
