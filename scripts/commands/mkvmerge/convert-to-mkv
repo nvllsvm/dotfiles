@@ -3,6 +3,7 @@ import argparse
 import logging
 import pathlib
 import subprocess
+import tempfile
 
 EXTENSIONS = {
     '.avi',
@@ -12,6 +13,26 @@ EXTENSIONS = {
 }
 
 LOGGER = logging.getLogger('convert-to-mkv')
+
+
+@contextlib.contextmanager
+def TempPath(**kwargs):
+    """Wrapper around tempfile.NamedTemporaryFile which returns a path object
+
+    Unlike tempfile.NamedTemporaryFile, the FileNotFoundError exception is not
+    raised if the file is deleted before the context closes.
+
+    :rtype: pathlib.Path
+    """
+    with tempfile.NamedTemporaryFile(**kwargs, delete=False) as tmp:
+        temp_path = pathlib.Path(tmp.name)
+        try:
+            yield temp_path
+        finally:
+            try:
+                temp_path.unlink()
+            except FileNotFoundError:
+                pass
 
 
 def all_files(root):
@@ -57,10 +78,11 @@ def main():
 
         if suffix in EXTENSIONS:
             dest = path.with_suffix('.mkv')
-            if dest.exists():
-                raise RuntimeError(f'file exists: {path}')
             LOGGER.info('converting %s', path)
-            mkvmerge(dest, path)
+            with TempPath(dir=dest.parent, prefix='.convert-to-mkv_',
+                          suffix=dest.suffix + '.tmp') as tmp:
+                mkvmerge(tmp, path)
+                tmp.rename(dest)
             path.unlink()
         else:
             LOGGER.error('unrecognized extension: "%s"', path.suffix)
