@@ -71,6 +71,30 @@ if command -v termux-info > /dev/null; then
         zsh
 fi
 
+if command -v apk > /dev/null; then
+    apk add \
+        bat \
+        curl \
+        dash \
+        fd \
+        fzf \
+        g++ \
+        gcc \
+        git \
+        htop \
+        jq \
+        musl-dev \
+        neovim \
+        openssh \
+        python3 \
+        python3-dev \
+        ripgrep \
+        rsync \
+        tmux \
+        zsh \
+        zstd
+fi
+
 if command -v pip > /dev/null; then
     pip install \
         flake8 \
