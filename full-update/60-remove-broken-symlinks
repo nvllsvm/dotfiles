@@ -5,5 +5,5 @@ remove_broken_symlinks() {
     fi
 }
 
-remove_broken_symlinks ~/.local/bin
-remove_broken_symlinks ~/.local/share/applications
+remove_broken_symlinks ~/.local/bin || true
+remove_broken_symlinks ~/.local/share/applications || true
