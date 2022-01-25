@@ -48,9 +48,11 @@ class Redump:
                 'dc',   # dreamcast
                 'gc',   # gamecube
                 'mac',  # macintosh
+                'mcd',  # SEGA Mega CD
                 'pc',   # PC
                 'ps2',  # playstation 2
                 'ps3',  # playstation 3
+                'psp',  # playstation portable
                 'psx',  # playstation
                 'wii',  # wii
             ]
@@ -149,10 +151,15 @@ def find_dump_hashes(root):
         for path in root.iterdir()
         if path.is_file() and path.suffix in SUFFIXES
     ]
+
     if len(paths) > 1:
-        for path in paths:
-            if path.suffix != '.bin':
-                raise RuntimeError('unexpected files')
+        iso_paths = [path for path in paths if path.suffix == '.iso']
+        if len(iso_paths) == 1:
+            paths = iso_paths
+        else:
+            for path in paths:
+                if path.suffix != '.bin':
+                    raise RuntimeError('unexpected files')
 
     return {path: sha1sum(path) for path in sorted(paths)}
 
