@@ -37,7 +37,7 @@ download() {
         http://youtube.com*|\
         https://www.youtube.com*|\
         https://youtube.com*)
-            yt-dlp "$1"
+            yt-dlp --merge-output-format=mkv "$1"
             ;;
         *)
             if command -v aria2c > /dev/null; then
