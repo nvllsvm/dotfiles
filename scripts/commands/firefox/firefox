@@ -23,6 +23,16 @@ def find_firefox_windows(is_private):
     ]
 
 
+def firefox(args):
+    subprocess.run(
+        args,
+        # needed to fix firefox starting, but never displaying when opening
+        # a link from an electron app.
+        # what the fuck?!
+        stdout=subprocess.DEVNULL,
+    )
+
+
 conn = i3ipc.Connection()
 
 is_private = '--private-window' in sys.argv
@@ -37,6 +47,6 @@ if windows := find_firefox_windows(is_private):
     window = windows[0]
     window.command('focus')
     if has_url:
-        subprocess.run(args)
+        firefox(args)
 else:
-    subprocess.run(args)
+    firefox(args)
