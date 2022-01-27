@@ -69,6 +69,15 @@ else
         image/*)
             exiv2 "$1"
             ;;
+        application/octet-stream)
+            case "$(printf %s "$1" | tr '[:upper:]' '[:lower:]')" in
+                *.umx)
+                    ffprobe -hide_banner -- "$1" 2>&1
+                    ;;
+                *)
+                    default_preview "$1"
+            esac
+            ;;
         *)
             default_preview "$1"
     esac

@@ -216,18 +216,9 @@ def get_name(path, redump):
     raise RuntimeError('wtf')
 
 
-def rename_path(path, target):
-    if path == target:
-        print('VALIDATED', target)
-        return
-    if target.exists():
-        raise RuntimeError(f'target exists {target}')
-    print('RENAMING', path, target)
-    path.rename(target)
-
-
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--no-rename', action='store_true')
     parser.add_argument('path', type=pathlib.Path, nargs='+')
     args = parser.parse_args()
 
@@ -250,14 +241,26 @@ def main():
             redump_id, name = get_name(path, redump)
 
         if redump_id:
-            rename_path(path, path.with_name(
-                f'redump_{redump_id} {name}{suffix}'))
+            target = path.with_name(f'redump_{redump_id} {name}{suffix}')
+
+            if path == target:
+                print('✅ VALIDATED', target)
+                return
+            if target.exists():
+                raise RuntimeError(f'target exists {target}')
+            print('✅ RENAMING', path, target)
+
+            if not args.no_rename:
+                path.rename(target)
+
         else:
+            print('⚠  ERROR: unknown', path.name)
             if not path.name.startswith('unknown '):
                 target = path.with_name(f'unknown {path.name}')
                 while target.exists():
                     target = target.with_name(f'{target.name}_')
-                path.rename(target)
+                if not args.no_rename:
+                    path.rename(target)
 
 
 if __name__ == '__main__':
