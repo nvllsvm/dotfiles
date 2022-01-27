@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-import unittest
-import sys
-
+# need main idiom for multiprocess, etc
 if __name__ == '__main__':
-    print(sys.argv[])
-    unittest.main()
+    import unittest.__main__
