@@ -29,8 +29,6 @@ class cli_7zip:
     def _get_bin():
         if shutil.which('7zz'):
             return '7zz'
-        elif shutil.which('7z'):
-            return '7z'
         raise KeyError
 
     @classmethod
