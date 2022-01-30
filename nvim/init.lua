@@ -18,8 +18,6 @@ vim.o.number = true
 vim.o.relativenumber = true
 
 vim.cmd([[
-let g:python3_host_prog=glob('~/.config/nvim/python3_env/bin/python')
-
 set mouse=a
 
 " line numbers
