@@ -224,7 +224,7 @@ OFFSET="${DUNST_OFFSET}" \
 dunst -config /tmp/dunstrc 2>&1 &
 
 if [ -d ~/.config/sway ]; then
-    cat > ~/.config/sway/colors << EOF
+    cat > ~/.config/sway/config.d/10-colors << EOF
 set \$color_00 #${BASE16_COLOR0}
 set \$color_01 #${BASE16_COLOR1}
 set \$color_02 #${BASE16_COLOR2}
