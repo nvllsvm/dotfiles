@@ -1123,19 +1123,7 @@ class AsyncExecutor:
 async def process_archive(cls, volumes, path, paths, password, args):
     if not args.quiet and not args.stdout:
         print('Extracting', path)
-    if args.stdout:
-        dest = sys.stdout.buffer
-        await cls.extract(
-            volumes[0],
-            dest,
-            paths=paths,
-            password=password,
-            overwrite=args.force)
-
-        if args.rm:
-            for path in volumes:
-                path.unlink()
-    elif args.child:
+    if args.child:
         dest = _build_dest(path, args.parent, args.child)
         with tempfile.TemporaryDirectory(
                 dir=dest.parent, prefix='.extract_',
@@ -1154,7 +1142,9 @@ async def process_archive(cls, volumes, path, paths, password, args):
                 for path in volumes:
                     path.unlink()
     else:
-        dest = _build_dest(path, args.parent, args.child)
+        dest = sys.stdout.buffer if args.stdout else _build_dest(
+            path, args.parent, args.child)
+
         await cls.extract(
             volumes[0],
             dest,
