@@ -1135,7 +1135,7 @@ async def process_archive(cls, volumes, path, paths, password, args):
         if args.rm:
             for path in volumes:
                 path.unlink()
-    else:
+    elif args.child:
         dest = _build_dest(path, args.parent, args.child)
         with tempfile.TemporaryDirectory(
                 dir=dest.parent, prefix='.extract_',
@@ -1153,6 +1153,18 @@ async def process_archive(cls, volumes, path, paths, password, args):
             if args.rm:
                 for path in volumes:
                     path.unlink()
+    else:
+        dest = _build_dest(path, args.parent, args.child)
+        await cls.extract(
+            volumes[0],
+            dest,
+            paths=paths,
+            password=password,
+            overwrite=args.force)
+
+        if args.rm:
+            for path in volumes:
+                path.unlink()
 
 
 def _num_procs(value):
