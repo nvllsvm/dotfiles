@@ -319,28 +319,30 @@ _formats = {
 }
 
 
-def _build_dest(source, suffix):
+def _build_dest(source, suffix, parent=None):
+    parent = parent if parent is not None else source.parent
     increment = 0
     while True:
-        dest = pathlib.Path(
+        dest = parent / pathlib.Path(
             ''.join([
                 source.name,
                 f'_{increment}' if increment else '',
-                suffix])).absolute()
+                suffix]))
 
         if not dest.exists():
+            dest.parent.mkdir(exist_ok=True, parents=True)
             return dest.absolute()
 
         increment += 1
 
 
-async def process(source, archive_format, remove, fast=False):
+async def process(source, archive_format, remove, fast=False, parent=None):
     formats = _formats[archive_format]
 
     source = source.absolute()
     suffix = formats['suffix']
 
-    dest = _build_dest(source, suffix)
+    dest = _build_dest(source, suffix, parent=parent)
 
     before = sum(path.stat().st_size for path in _all_paths(source))
     with TempPath(dir=dest.parent, prefix='.archive_',
@@ -460,6 +462,9 @@ def main():
     group_format.add_argument(
         '--fast', default=False, action='store_true',
         help='increase archiving speed at the expense of compression')
+    parser.add_argument(
+        '-p', dest='parent', metavar='DIR', type=pathlib.Path,
+        help='parent directory to save the archive in')
     parser.add_argument('source', type=lambda p: pathlib.Path(p).absolute(),
                         nargs='+')
     args = parser.parse_args()
@@ -476,7 +481,8 @@ def main():
             else:
                 sources.append(source)
 
-            executor.submit(process, source, args.format, args.rm, args.fast)
+            executor.submit(process, source, args.format, args.rm, args.fast,
+                            parent=args.parent)
 
         size_diff_printer = SizeDiffPrinter()
         async for future in executor.as_completed():
