@@ -78,7 +78,7 @@ bar {
     status_command    i3-custom-status
     position          top
     workspace_buttons yes
-    tray_output       primary
+    tray_output       *
     separator_symbol  "   "
 
 
