@@ -11,6 +11,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import zipfile
 
 
@@ -1126,19 +1127,34 @@ async def process_archive(cls, volumes, path, paths, password, args):
         print('Extracting', path)
     if args.stdout:
         dest = sys.stdout.buffer
+        await cls.extract(
+            volumes[0],
+            dest,
+            paths=paths,
+            password=password,
+            overwrite=args.force)
+
+        if args.rm:
+            for path in volumes:
+                path.unlink()
     else:
         dest = _build_dest(path, args.parent, args.child)
+        with tempfile.TemporaryDirectory(
+                dir=dest.parent, prefix='.extract_',
+                suffix=dest.name + '.tmp') as tmp:
+            tmp = pathlib.Path(tmp)
 
-    await cls.extract(
-        volumes[0],
-        dest,
-        paths=paths,
-        password=password,
-        overwrite=args.force)
+            await cls.extract(
+                volumes[0],
+                tmp,
+                paths=paths,
+                password=password,
+                overwrite=args.force)
 
-    if args.rm:
-        for path in volumes:
-            path.unlink()
+            tmp.rename(dest)
+            if args.rm:
+                for path in volumes:
+                    path.unlink()
 
 
 def _num_procs(value):
