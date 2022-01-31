@@ -19,7 +19,7 @@ def find_firefox_windows(is_private):
         item
         for item in conn.get_tree().find_named(
             PRIVATE_WINDOW_PATTERN if is_private else WINDOW_PATTERN)
-        if item.window_instance == 'Navigator'
+        if item.window_instance in ('Navigator', None)  # None for Sway
     ]
 
 
