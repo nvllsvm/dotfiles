@@ -1,9 +1,9 @@
 #!/usr/bin/env sh
 remove_broken_symlinks() {
     if [ -d "$1" ]; then
-        find "$1" -xtype l -exec rm {} \;
+        cd "$1" || exit 1
+        find -L . -name . -o -type d -prune -o -type l -exec rm {} +
     fi
 }
 
-remove_broken_symlinks ~/.local/bin || true
-remove_broken_symlinks ~/.local/share/applications || true
+remove_broken_symlinks ~/.local/bin
