@@ -1,12 +1,8 @@
 include ~/.config/sway/config.d/*
-include ~/.config/sway/colors
-include ~/.config/sway/outputs
 
 output "*" bg $color_bg solid_color
 
 set $mod Mod4
-
-font pango:Monospace 11
 
 floating_modifier $mod
 

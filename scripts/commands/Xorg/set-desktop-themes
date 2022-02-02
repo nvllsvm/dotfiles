@@ -251,7 +251,13 @@ set \$color_21 #${BASE16_COLOR21}
 set \$color_fg #${BASE16_FOREGROUND}
 set \$color_bg #${BASE16_BACKGROUND}
 EOF
+
+    cat > ~/.config/sway/config.d/10-font << EOF
+font pango:${FONT_NAME} ${FONT_SIZE}
+EOF
 fi
+
+
 if pidof sway > /dev/null; then
     swaymsg reload
 fi
