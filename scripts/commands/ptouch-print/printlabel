@@ -13,12 +13,21 @@ def center_lines(lines):
 
 
 def print_label(lines):
-    if not (1 <= len(lines) <= 4):
-        raise ValueError('lines must be between 1 and 4 inclusive')
+    match len(lines):
+        case 4:
+            raise NotImplementedError
+        case 3:
+            raise NotImplementedError
+        case 2:
+            fontsize = 25
+        case 1:
+            fontsize = 50
+        case _:
+            raise ValueError('lines must be between 1 and 4 inclusive')
 
     subprocess.run(
         ['ptouch-print',
-         '--fontsize', '25',
+         '--fontsize', str(fontsize),
          '--font', 'DejaVuSansMono-Bold',
          '--text', *lines],
         check=True)
