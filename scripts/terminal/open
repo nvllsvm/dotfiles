@@ -5,10 +5,7 @@ if command -v termux-open > /dev/null; then
 elif command -v xdg-open > /dev/null; then
     if pidof Xorg > /dev/null && [ -z "$XAUTHORITY" ]; then
         export XAUTHORITY=~/.Xauthority
-        export DISPLAY=$(
-            ps e -u $USERNAME | \
-            sed -rn 's/.* DISPLAY=(:[0-9]*).*/\1/p' | \
-            head -n 1)
+        export DISPLAY="$(ps e -u "$(whoami)" | sed -rn 's/.* DISPLAY=(:[0-9]*).*/\1/p' | head -n 1)"
     fi
     nohup xdg-open "$@" > /dev/null 2>&1 &
 else
