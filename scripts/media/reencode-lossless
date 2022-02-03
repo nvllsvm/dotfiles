@@ -93,7 +93,8 @@ def TempPath(**kwargs):
 
 async def encode_flac(fd, dest):
     proc = await asyncio.create_subprocess_exec(
-        'flac', '-s', '--best', '-V', '-f', '-o', dest, '-',
+        'flac', '--silent', '--best', '--verify', '--force',
+        '--output-name', dest, '-',
         stdin=fd)
 
     async def result():
