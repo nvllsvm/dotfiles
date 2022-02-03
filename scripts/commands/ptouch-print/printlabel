@@ -15,9 +15,9 @@ def center_lines(lines):
 def print_label(lines):
     match len(lines):
         case 4:
-            raise NotImplementedError
+            fontsize = 12
         case 3:
-            raise NotImplementedError
+            fontsize = 15
         case 2:
             fontsize = 25
         case 1:
@@ -38,7 +38,7 @@ def _lines(value):
         line.strip()
         for line in value.split(r'\n')
     ]
-    if len(lines) not in (1, 2):
+    if len(lines) not in (1, 2, 3, 4):
         raise argparse.ArgumentError
     return lines
 
