@@ -87,13 +87,22 @@ def cue_track_count(path):
 
 
 def split_flac(flac_path, cue_path):
+    parent = cue_path.absolute().parent
     LOGGER.info(f'Splitting {flac_path}')
-    subprocess.run(
-        ['shntool', 'split', '-q', '-f', cue_path.name, '-o',
-         'flac flac --output-name=split%f -', '-t', '%n', flac_path.name],
-        cwd=cue_path.parent,
-        check=True
-    )
+    with tempfile.TemporaryDirectory(dir=parent,
+                                     prefix='.shntool_split') as tmpdir:
+        subprocess.run(
+            ['shntool', 'split', '-q',
+             '-d', tmpdir,
+             '-f', cue_path.name,
+             '-o', 'flac flac --output-name split%f -',
+             '-t', '%n',
+             flac_path.name],
+            cwd=parent,
+            check=True
+        )
+        for path in pathlib.Path(tmpdir).iterdir():
+            path.rename(parent / path.name)
     flac_path.unlink()
 
 
