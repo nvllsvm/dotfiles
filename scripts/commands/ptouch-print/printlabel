@@ -15,7 +15,7 @@ def center_lines(lines):
 def print_label(lines):
     match len(lines):
         case 4:
-            fontsize = 12
+            fontsize = 10
         case 3:
             fontsize = 15
         case 2:
