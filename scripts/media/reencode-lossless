@@ -159,10 +159,10 @@ def all_files(root):
     return files
 
 
-async def run(executor):
+async def run(executor, num_items):
     errors = []
 
-    size_diff_printer = SizeDiffPrinter()
+    size_diff_printer = SizeDiffPrinter(num_items)
 
     async for result in executor.as_completed():
         try:
@@ -213,10 +213,12 @@ class AsyncExecutor:
 
 
 class SizeDiffPrinter:
-
-    def __init__(self):
+    def __init__(self, num_items):
         self._before_total = 0
         self._after_total = 0
+        self._num_items = num_items
+        self._num_printed = 0
+        self._printed = False
 
     @staticmethod
     def format_diff(before, after):
@@ -236,19 +238,21 @@ class SizeDiffPrinter:
         return f'{num:.1f}{unit}'
 
     def print(self, before, after, name):
+        self._num_printed += 1
         self._before_total += before
         self._after_total += after
         diff = self.format_diff(before, after)
 
         s = f'{diff:>6}%' if diff else 7 * '-'
-        print(f'{s}  {name}')
+        print(f'({self._num_printed}/{self._num_items})\t{s}\t{name}')
 
     def print_total(self):
-        if diff := self.format_diff(self._before_total, self._after_total):
-            fmt = self.sizeof_fmt(self._before_total - self._after_total)
-            print(f'Total: {diff}% ({fmt})')
-        else:
-            print('Total: -')
+        if self._num_printed:
+            if diff := self.format_diff(self._before_total, self._after_total):
+                fmt = self.sizeof_fmt(self._before_total - self._after_total)
+                print(f'Total: {diff}% ({fmt})')
+            else:
+                print('Total: -')
 
 
 def main():
@@ -269,11 +273,13 @@ def main():
             paths.add(path)
 
     executor = AsyncExecutor(max_pending=args.numprocs)
+    num_items = 0
     for path in paths:
         if path.suffix.lower() in ('.flac', '.ape', '.wav', '.wv'):
+            num_items += 1
             executor.submit(reencode, path)
 
-    asyncio.run(run(executor))
+    asyncio.run(run(executor, num_items))
 
 
 if __name__ == '__main__':
