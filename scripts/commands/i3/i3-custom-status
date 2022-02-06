@@ -10,6 +10,7 @@ case "$(hostname)" in
         cat >> "$CONF" << EOF
 [[block]]
 block = "battery"
+device = "BAT0"
 EOF
         ;;
 esac
