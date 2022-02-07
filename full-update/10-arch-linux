@@ -31,12 +31,6 @@ if ! command -v yay > /dev/null 2>&1; then
     cd -
 fi
 
-if [ "$(pacman -Qi yay | head -n 2 | tail -n 1 | awk '{print $3}')" = '11.1.0-1' ]; then
-    log 'Patching yay 11.1.0-1'
-    sudo sed -i 's:rpc.php:rpc////:g' /usr/bin/yay
-    pacman -Qi yay | head -n 2 | tail -n 1 | awk '{print $3}'
-fi
-
 log 'Updating packages'
 yay -Syu --noconfirm --devel
 
