@@ -17,9 +17,6 @@ if [ ! -f ~/.config/nvim/autoload/plug.vim ]; then
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 fi
 
-echo Cleaning up legacy python stuff ...
-rm -rf ~/.config/nvim/python3_env
-
 if [ -e ~/.config/nvim/plugged ]; then
     for d in ~/.config/nvim/plugged/*/; do
         git -C "$d" reset --quiet --hard HEAD
