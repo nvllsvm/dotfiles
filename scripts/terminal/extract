@@ -376,14 +376,19 @@ class unrar:
 
     @staticmethod
     async def extract(path, dest, paths=None, password=None, overwrite=False):
+        kwargs = {}
         if paths:
             raise NotImplementedError
         if overwrite:
             raise NotImplementedError
+        if password:
+            kwargs['input'] = password
+        else:
+            kwargs['stdin'] = subprocess.DEVNULL
         subprocess.run(
             ['unrar', 'x', '-idc', '-idd', '-idn', '-idp', '-idq',
              '--', path, dest],
-            check=True)
+            check=True, **kwargs)
 
     @staticmethod
     async def volumes(path, password=''):
