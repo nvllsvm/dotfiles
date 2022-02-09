@@ -1,4 +1,3 @@
-#!/usr/bin/env python
-# need main idiom for multiprocess, etc
-if __name__ == '__main__':
-    import unittest.__main__
+#!/usr/bin/env sh
+# invoking unittest.__main__ caused package lookup issues
+exec python -m unittest "$@"
