@@ -39,7 +39,7 @@ def _all_paths(root):
                 paths.add(path)
                 if path.is_dir() and not path.is_symlink():
                     stack.append(path)
-    # needed for deterministic archives ex. tar
+    # sorted for deterministic archives ex. tar
     return sorted(paths)
 
 
