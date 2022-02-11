@@ -16,9 +16,10 @@ else
 fi
 
 "$INSTALL_DIR"/bin/pyenv rehash
-PYTHON_VERSION="$(ls "${INSTALL_DIR}/versions" | rg '^\d' | sort --version-sort | tail -n 1)"
 
-"${INSTALL_DIR}/versions/${PYTHON_VERSION}/bin/python" << EOF
+if [ -d "${INSTALL_DIR}"/versions ]; then
+    PYTHON_VERSION="$(ls "${INSTALL_DIR}/versions" | rg '^\d' | sort --version-sort | tail -n 1)"
+    "${INSTALL_DIR}/versions/${PYTHON_VERSION}/bin/python" << EOF
 import os
 import pathlib
 import shutil
@@ -59,3 +60,4 @@ if VERSION_FILE.exists():
 
         done.update(links)
 EOF
+fi
