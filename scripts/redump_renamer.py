@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 import argparse
+import contextvars
 import functools
 import hashlib
 import io
+import logging
 import pathlib
 import pickle
 import re
@@ -16,6 +18,45 @@ import httpx
 import yarl
 
 SUFFIXES = ('.bin', '.iso', '.mdf')
+
+NAME = 'redump-renamer'
+
+LOGGER = logging.getLogger(NAME)
+
+_LOG_CONTEXT = {}
+
+
+def log_context(key, value):
+    global _LOG_CONTEXT
+
+    if key not in _LOG_CONTEXT:
+        _LOG_CONTEXT[key] = contextvars.ContextVar(key, default=None)
+
+    _LOG_CONTEXT[key].set(value)
+
+
+class _LogFormatter(logging.Formatter):
+    def format(self, record):
+        parts = [super().format(record)]
+
+        for key, cvar in _LOG_CONTEXT.items():
+            value = cvar.get()
+            if value:
+                parts.append(f'[{key} {value}]')
+
+        return ' '.join(parts)
+
+
+def setup_logging(name, level=logging.INFO):
+    logger = logging.getLogger()
+    logger.setLevel(level)
+
+    fmt = _LogFormatter('%(levelname)-8s %(name)s %(message)s')
+
+    sh = logging.StreamHandler()
+    sh.setLevel(level)
+    sh.setFormatter(fmt)
+    logger.addHandler(sh)
 
 
 class Redump:
@@ -42,6 +83,7 @@ class Redump:
         Note: the response does not contain an etag
         """
         if self.REDUMP_DAT_FILE.exists():
+            LOGGER.debug('Using dat redump cache [%s]', self.REDUMP_DAT_FILE)
             data = pickle.loads(self.REDUMP_DAT_FILE.read_bytes())
         else:
             systems = [
@@ -146,9 +188,11 @@ def safe_write_bytes(path, data):
 
 
 def find_dump_hashes(root):
+    iterator = root.iterdir() if root.is_dir() else [root]
+
     paths = [
         path
-        for path in root.iterdir()
+        for path in iterator
         if path.is_file() and path.suffix in SUFFIXES
     ]
 
@@ -161,7 +205,9 @@ def find_dump_hashes(root):
                 if path.suffix != '.bin':
                     raise RuntimeError('unexpected files')
 
-    return {path: sha1sum(path) for path in sorted(paths)}
+    hashes = {path: sha1sum(path) for path in sorted(paths)}
+    LOGGER.debug('sha1 hashes %s', hashes)
+    return hashes
 
 
 def sha1sum(path):
@@ -203,6 +249,7 @@ def get_name(path, redump):
     try:
         system, name = hashes[tuple(arg_hashes.values())]
     except KeyError:
+        LOGGER.warning('No redump match found')
         return None, path.name
 
     # fix for games like 'Fury^3'
@@ -211,6 +258,7 @@ def get_name(path, redump):
     for redump_id in redump.scrape_redump(name, system):
         sha1 = redump.download_sha1(redump_id)
         if expected == tuple(sha1.values()):
+            LOGGER.info('Found redump match %s "%s"', redump_id, name)
             return redump_id, name.replace('/', '')
 
     raise RuntimeError('wtf')
@@ -219,23 +267,31 @@ def get_name(path, redump):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--no-rename', action='store_true')
+    parser.add_argument('--verbose', action='store_true')
     parser.add_argument('path', type=pathlib.Path, nargs='+')
     args = parser.parse_args()
+
+    setup_logging(NAME,
+                  level=logging.DEBUG if args.verbose else logging.INFO)
 
     redump = Redump()
 
     for path in args.path:
-        print('PROCESSING', path)
+        log_context('path', path)
+        LOGGER.info('PROCESSING')
         if path.is_file():
-            if path.suffixes[-2:] != ['.tar', '.zst']:
+            if path.suffix == '.iso':
+                suffix = '.iso'
+                redump_id, name = get_name(path, redump)
+            elif path.suffixes[-2:] == ['.tar', '.zst']:
+                suffix = '.tar.zst'
+                parent = pathlib.Path('~').expanduser()
+                with tempfile.TemporaryDirectory(dir=parent) as tmp:
+                    dest = pathlib.Path(tmp) / path.name
+                    extract(path, dest)
+                    redump_id, name = get_name(dest, redump)
+            else:
                 raise RuntimeError()
-
-            suffix = '.tar.zst'
-            parent = pathlib.Path('~').expanduser()
-            with tempfile.TemporaryDirectory(dir=parent) as tmp:
-                dest = pathlib.Path(tmp) / path.name
-                extract(path, dest)
-                redump_id, name = get_name(dest, redump)
         else:
             suffix = ''
             redump_id, name = get_name(path, redump)
@@ -244,17 +300,17 @@ def main():
             target = path.with_name(f'redump_{redump_id} {name}{suffix}')
 
             if path == target:
-                print('✅ VALIDATED', target)
+                LOGGER.info('✅ VALIDATED')
                 return
             if target.exists():
                 raise RuntimeError(f'target exists {target}')
-            print('✅ RENAMING', path, target)
+            LOGGER.info('✅ RENAMING %s', target)
 
             if not args.no_rename:
                 path.rename(target)
 
         else:
-            print('⚠  ERROR: unknown', path.name)
+            LOGGER.error('⚠  ERROR: unknown')
             if not path.name.startswith('unknown '):
                 target = path.with_name(f'unknown {path.name}')
                 while target.exists():
