@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
 # manually close a notification if it has a timeout.
 # dunst occasionally fails to close notifications https://github.com/dunst-project/dunst/issues/757
+exec /usr/bin/dunstify "$@"
 
 dunstify() {
     # seems safe to always pass --printid
