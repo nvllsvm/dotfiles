@@ -100,8 +100,8 @@ nnoremap <leader>r :Rg<Cr>
 
 nnoremap <leader>f :Ex<Cr>
 
-nnoremap <leader>n :bn<Cr>
-nnoremap <leader>p :bp<Cr>
+nnoremap <leader>n :bn!<Cr>
+nnoremap <leader>p :bp!<Cr>
 nnoremap <leader>D :bd<Cr>
 nnoremap <leadr>3 :b#<Cr>
 nnoremap <leader>l :buffers<CR>:buffer<Space>
