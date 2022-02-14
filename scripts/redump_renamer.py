@@ -96,6 +96,7 @@ class Redump:
                 'ps3',  # playstation 3
                 'psp',  # playstation portable
                 'psx',  # playstation
+                'ss',   # SEGA Saturn
                 'wii',  # wii
             ]
             data = {}
