@@ -22,19 +22,13 @@ class cli_7zip:
     @classmethod
     @functools.lru_cache()
     def check(cls):
-        cls._get_bin()
-
-    @staticmethod
-    @functools.lru_cache()
-    def _get_bin():
-        if shutil.which('7zz'):
-            return '7zz'
-        raise KeyError
+        if not shutil.which('7zz'):
+            raise KeyError
 
     @classmethod
     async def extract(cls, path, dest, paths=None, password='',
                       overwrite=False):
-        args = [cls._get_bin()]
+        args = ['7zz']
         kwargs = {}
         if overwrite:
             raise NotImplementedError
@@ -57,7 +51,7 @@ class cli_7zip:
 
     @classmethod
     async def contents(cls, path):
-        args = [cls._get_bin(), '-ba', 'l', '--', str(path)]
+        args = ['7zz', '-ba', 'l', '--', str(path)]
         proc = await asyncio.create_subprocess_exec(
             *args, stdout=asyncio.subprocess.PIPE)
         stdout, _ = await proc.communicate()
@@ -77,7 +71,7 @@ class cli_7zip:
 
     @classmethod
     async def volumes(cls, path, password=''):
-        args = [cls._get_bin(), 'l', f'-p{password}', '--', str(path)]
+        args = ['7zz', 'l', f'-p{password}', '--', str(path)]
         proc = await asyncio.create_subprocess_exec(
             *args, stdout=asyncio.subprocess.PIPE)
         stdout, _ = await proc.communicate()
