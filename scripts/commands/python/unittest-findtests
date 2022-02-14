@@ -36,11 +36,13 @@ def main():
     parser.add_argument('name', default='.', nargs='?')
     args = parser.parse_args()
 
-    logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO)
+    if args.verbose:
+        logging.basicConfig(level=logging.DEBUG)
 
-    # redirect stdout to make loud imports stfu
+    # redirect output to make loud imports stfu
     with contextlib.redirect_stdout(subprocess.DEVNULL):
-        tests = find_tests(args.name)
+        with contextlib.redirect_stderr(subprocess.DEVNULL):
+            tests = find_tests(args.name)
 
     print('\n'.join(sorted(tests)))
 
