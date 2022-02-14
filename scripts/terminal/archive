@@ -283,7 +283,7 @@ async def optimize_zip(path):
     assert proc.returncode == 0
 
 
-_formats = {
+_FORMATS = {
     '7z': {
         'func': create_7z,
         'suffix': '.7z',
@@ -337,7 +337,7 @@ def _build_dest(source, suffix, parent=None):
 
 
 async def process(source, archive_format, remove, fast=False, parent=None):
-    formats = _formats[archive_format]
+    formats = _FORMATS[archive_format]
 
     source = source.absolute()
     suffix = formats['suffix']
@@ -453,7 +453,7 @@ def main():
     parser.add_argument('--rm', default=False, action='store_true',
                         help='remove source after success')
     group_format.add_argument(
-        '-f', metavar='FORMAT', choices=_formats,
+        '-f', metavar='FORMAT', choices=_FORMATS,
         dest='format', default='tar-zstd',
         help='archive format: %(choices)s (default: %(default)s)')
     parser.add_argument('-n', metavar='NUM', dest='num_procs',
