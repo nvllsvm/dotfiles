@@ -48,6 +48,8 @@ Plug 'dhruvasagar/vim-table-mode'
 
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
+
+Plug 'chrisbra/csv.vim'
 call plug#end()
 
 let $FZF_DEFAULT_COMMAND = "fd --type file --ignore-file ~/.config/nvim/fzf_fd_ignore"
