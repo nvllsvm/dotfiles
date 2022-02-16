@@ -1,15 +1,16 @@
 output DisplayPort-2
 off
+output DisplayPort-0
+off
 output DisplayPort-1
 off
 output HDMI-A-0
-off
-output DisplayPort-0
 crtc 0
-mode 1920x1200
+gamma 0.909:0.909:0.909
+mode 1920x1080
 pos 0x0
 primary
-rate 59.95
+rate 120.00
 x-prop-max_bpc 8
 x-prop-non_desktop 0
 x-prop-scaling_mode None

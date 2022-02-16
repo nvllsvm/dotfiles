@@ -1,13 +1,20 @@
-output DisplayPort-1
-off
 output DisplayPort-2
+off
+output DisplayPort-0
 off
 output HDMI-A-0
 off
-output DisplayPort-0
+output DisplayPort-1
 crtc 0
 gamma 1.0:1.0:0.909
 mode 3440x1440
 pos 0x0
 primary
 rate 143.92
+x-prop-max_bpc 8
+x-prop-non_desktop 0
+x-prop-scaling_mode None
+x-prop-tearfree auto
+x-prop-underscan off
+x-prop-underscan_hborder 0
+x-prop-underscan_vborder 0

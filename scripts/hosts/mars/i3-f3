@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-exec autorandr --force --load mars-office-tv
+exec autorandr --force --load mars-office-tv-1080
