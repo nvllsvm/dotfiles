@@ -1043,17 +1043,19 @@ async def _get_class(path):
         # unable to find magic number
         elif suffixes[-1] == '.ace':
             return unace
-        # bchunk generates zero-prefixed iso
-        elif suffixes[-1] in '.iso':
-            return xorriso
         elif suffixes[-1] == '.img':
-            return udisksctl
-        # some mdf are also iso
-        elif suffixes[-1] == '.mdf':
             return udisksctl
         # some tars lack file signature
         elif suffixes[-1] == '.tar':
             return gnu_tar
+
+    # 7zz supports a bunch of things
+    try:
+        cli_7zip.check()
+        if await cli_7zip.contents(path):
+            return cli_7zip
+    except Exception:
+        pass
 
     raise NotImplementedError(path)
 
