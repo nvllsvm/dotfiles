@@ -61,13 +61,14 @@ import zoneinfo
 for name in [
         'arrow',
         'httpx',
+        'magic',
         'mutagen',
-        'pkg_resources',
         'psycopg2',
         'redis',
         'requests',
         'tabulate',
         'toml',
+        'tqdm',
         'yaml',
         'yarl',
 ]:
