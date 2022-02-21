@@ -96,7 +96,9 @@ async def encode_flac(fd, dest):
     proc = await asyncio.create_subprocess_exec(
         'flac', '--silent', '--best', '--verify', '--force',
         '--output-name', dest, '-',
-        stdin=fd)
+        stdin=fd,
+        stderr=asyncio.subprocess.DEVNULL,
+    )
 
     async def result():
         await proc.wait()
