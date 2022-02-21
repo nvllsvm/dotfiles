@@ -3,8 +3,10 @@ set -eu
 pattern="$1"
 shift
 for f in "$@"; do
-    new="$(printf %s "$f" | sed "$pattern")"
-    if [ "$new" != "$f" ]; then
-        mv --no-clobber "$f" "$new"
+    dir="$(dirname "$f")"
+    base="$(basename "$f")"
+    new="$(printf %s "$base" | sed "$pattern")"
+    if [ "$dir/$new" != "$f" ]; then
+        mv --no-clobber "$f" "$dir/$new"
     fi
 done
