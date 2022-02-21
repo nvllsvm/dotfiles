@@ -120,7 +120,7 @@ def main():
     if (args.check or args.fix) and exts:
         if args.fix:
             for mime, paths in exts.items():
-                if mime not in ALL_SUFFIXES:
+                if mime not in MIME_SUFFIXES:
                     continue
                 suffix = MIME_SUFFIXES[mime][0]
                 for path in paths:

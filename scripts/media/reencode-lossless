@@ -50,6 +50,7 @@ async def decode_wv(source, fd):
 async def decode_flac(source, fd):
     proc = await asyncio.create_subprocess_exec(
         'flac', '-csd', source,
+        stderr=asyncio.subprocess.DEVNULL,
         stdout=fd)
 
     async def result():
