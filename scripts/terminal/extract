@@ -995,7 +995,9 @@ async def _get_class(path):
                     return gzip
         # xz
         elif start.startswith(b'\xfd7zXZ\x00'):
-            if len(suffixes) >= 2 and suffixes[-2] == '.tar':
+            if len(suffixes) >= 1 and suffixes[-1] == '.txz':
+                return gnu_tar
+            elif len(suffixes) >= 2 and suffixes[-2] == '.tar':
                 return gnu_tar
             else:
                 try:
