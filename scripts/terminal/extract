@@ -20,7 +20,7 @@ class cli_7zip:
     _ALT_PART_RE = re.compile(r'(.*\.)(\d+)$')
 
     @classmethod
-    @functools.lru_cache()
+    @functools.cache
     def check(cls):
         if not shutil.which('7zz'):
             raise KeyError
@@ -108,7 +108,7 @@ class cli_7zip:
 
 class udisksctl:
     @staticmethod
-    @functools.lru_cache()
+    @functools.cache
     def check():
         if not shutil.which('udisksctl'):
             raise KeyError
@@ -232,7 +232,7 @@ class udisksctl:
 
 class unzip:
     @staticmethod
-    @functools.lru_cache()
+    @functools.cache
     def check():
         if not shutil.which('unzip'):
             raise KeyError
@@ -265,7 +265,7 @@ class unzip:
 
 class cabextract:
     @staticmethod
-    @functools.lru_cache()
+    @functools.cache
     def check():
         if not shutil.which('cabextract'):
             raise KeyError
@@ -298,7 +298,7 @@ class cabextract:
 
 class xorriso:
     @staticmethod
-    @functools.lru_cache()
+    @functools.cache
     def check():
         if not shutil.which('xorriso'):
             raise KeyError
@@ -355,7 +355,7 @@ class xorriso:
 
 class unrar:
     @staticmethod
-    @functools.lru_cache()
+    @functools.cache
     def check():
         if not shutil.which('unrar'):
             raise KeyError
@@ -401,7 +401,7 @@ class unace:
     # note: unace command seems to expect file to end with `.ace`
 
     @staticmethod
-    @functools.lru_cache()
+    @functools.cache
     def check():
         if not shutil.which('unace'):
             raise KeyError
@@ -455,7 +455,7 @@ class unace:
 
 class innoextract:
     @staticmethod
-    @functools.lru_cache()
+    @functools.cache
     def check():
         if not shutil.which('innoextract'):
             raise KeyError
@@ -582,7 +582,7 @@ class gog_linux:
 
 class gnu_tar:
     @staticmethod
-    @functools.lru_cache()
+    @functools.cache
     def check():
         try:
             proc = subprocess.run(
@@ -634,7 +634,7 @@ class gnu_tar:
 
 class gzip:
     @staticmethod
-    @functools.lru_cache()
+    @functools.cache
     def check():
         if not shutil.which('gzip'):
             raise KeyError
@@ -665,7 +665,7 @@ class gzip:
 
 class pbzip2:
     @staticmethod
-    @functools.lru_cache()
+    @functools.cache
     def check():
         if not shutil.which('pbzip2'):
             raise KeyError
@@ -696,7 +696,7 @@ class pbzip2:
 
 class pigz:
     @staticmethod
-    @functools.lru_cache()
+    @functools.cache
     def check():
         if not shutil.which('pigz'):
             raise KeyError
@@ -731,7 +731,7 @@ class pigz:
 
 class pixz:
     @staticmethod
-    @functools.lru_cache()
+    @functools.cache
     def check():
         if not shutil.which('pixz'):
             raise KeyError
@@ -764,7 +764,7 @@ class pixz:
 
 class bzip2:
     @staticmethod
-    @functools.lru_cache()
+    @functools.cache
     def check():
         if not shutil.which('bzip2'):
             raise KeyError
@@ -795,7 +795,7 @@ class bzip2:
 
 class xz:
     @staticmethod
-    @functools.lru_cache()
+    @functools.cache
     def check():
         if not shutil.which('xz'):
             raise KeyError
@@ -826,7 +826,7 @@ class xz:
 
 class lz4:
     @staticmethod
-    @functools.lru_cache()
+    @functools.cache
     def check():
         if not shutil.which('lz4'):
             raise KeyError
@@ -853,7 +853,7 @@ class lz4:
 
 class zstd:
     @staticmethod
-    @functools.lru_cache()
+    @functools.cache
     def check():
         if not shutil.which('zstd'):
             raise KeyError
@@ -884,7 +884,7 @@ class zstd:
 
 class brotli:
     @staticmethod
-    @functools.lru_cache()
+    @functools.cache
     def check():
         if not shutil.which('brotli'):
             raise KeyError
