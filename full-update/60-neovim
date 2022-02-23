@@ -27,5 +27,7 @@ echo Updating plugins ...
 nvim -c 'PlugUpgrade | PlugUpdate! | PlugClean!' -c 'qa'
 
 if command -v pip; then
-    pip install jedi-language-server
+    if ! pip show jedi-language-server > /dev/null; then
+        pip install jedi-language-server
+    fi
 fi
