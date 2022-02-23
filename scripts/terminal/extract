@@ -919,6 +919,47 @@ class brotli:
         return [path]
 
 
+class unsquashfs:
+    @staticmethod
+    @functools.cache
+    def check():
+        if not shutil.which('unsquashfs'):
+            raise KeyError
+
+    @staticmethod
+    async def contents(path):
+        proc = await asyncio.create_subprocess_exec(
+            'unsquashfs', '-lc', str(path),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL)
+        stdout, _ = await proc.communicate()
+        if proc.returncode:
+            raise ProcessError(proc.returncode)
+        return stdout.splitlines()
+
+    @staticmethod
+    async def extract(path, dest, paths=None, password=None, overwrite=False):
+        if paths or password:
+            raise NotImplementedError
+
+        args = [
+            'unsquashfs',
+            '-quiet',
+            '-force',  # fails to extract even when extracting to empty dir
+            '-dest', str(dest),
+            str(path),
+        ]
+
+        proc = await asyncio.create_subprocess_exec(*args)
+        await proc.wait()
+        if proc.returncode:
+            raise ProcessError(proc.returncode)
+
+    @staticmethod
+    async def volumes(path, password=''):
+        return [path]
+
+
 def _build_dest(path, parent, child):
     if parent is None:
         parent = path.parent
@@ -1034,6 +1075,10 @@ async def _get_class(path):
                 return unzip
             except Exception:
                 pass
+
+        # squashfs
+        elif start.startswith(b'hsqs'):
+            return unsquashfs
 
         elif start.startswith(b'#!/bin/sh\n'):
             f.seek(271)
