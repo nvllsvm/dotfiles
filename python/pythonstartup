@@ -63,7 +63,7 @@ for name in [
         'httpx',
         'magic',
         'mutagen',
-        'psycopg2',
+        'psycopg',
         'redis',
         'requests',
         'tabulate',
