@@ -967,7 +967,7 @@ async def _get_class(path):
                 start.startswith(b'PK\x05\x06') or \
                 start.startswith(b'PK\x07\x08'):
             try:
-                # better handling of weird filenames, multipart
+                # better handling of multipart
                 cli_7zip.check()
                 return cli_7zip
             except KeyError:
