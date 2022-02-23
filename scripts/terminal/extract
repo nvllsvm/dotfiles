@@ -240,7 +240,10 @@ class unzip:
     @staticmethod
     async def contents(path):
         proc = subprocess.run(
-            ['unzip', '-qq', '-l', path],
+            ['unzip',
+             '-O', 'UTF-8',  # encoding for DOS, Windows, OS/2
+             '-I', 'UTF-8',  # encoding for UNIX, other
+             '-qq', '-l', path],
             stdout=subprocess.PIPE,
             check=True)
         return [
@@ -255,7 +258,11 @@ class unzip:
         if overwrite:
             raise NotImplementedError
         subprocess.run(
-            ['unzip', '-d', dest, path],
+            ['unzip',
+             '-O', 'UTF-8',  # encoding for DOS, Windows, OS/2
+             '-I', 'UTF-8',  # encoding for UNIX, other
+             '-qq',
+             '-d', dest, path],
             check=True)
 
     @staticmethod
