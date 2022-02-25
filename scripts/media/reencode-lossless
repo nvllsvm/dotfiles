@@ -247,7 +247,8 @@ class SizeDiffPrinter:
         diff = self.format_diff(before, after)
 
         s = f'{diff:>6}%' if diff else 7 * '-'
-        print(f'({self._num_printed}/{self._num_items})\t{s}\t{name}')
+        num_printed = str(self._num_printed).rjust(len(str(self._num_items)))
+        print(f'({num_printed}/{self._num_items})\t{s}\t{name}')
 
     def print_total(self):
         if self._num_printed:
