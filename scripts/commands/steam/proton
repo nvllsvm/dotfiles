@@ -20,7 +20,7 @@ list_versions() {
 
 export STEAM_COMPAT_CLIENT_INSTALL_PATH=~/.local/share/Steam
 
-USE_PROTON_VERSION=
+USE_PROTON_VERSION=system
 SHOW_VERSION=
 while [ $# -gt 0 ]; do
     case "$1" in
