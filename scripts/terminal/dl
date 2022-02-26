@@ -39,6 +39,8 @@ download() {
         https://youtube.com*)
             yt-dlp \
                 --output '%(upload_date)s %(title)s [%(id)s]' \
+                --write-subs \
+                --embed-subs \
                 --add-metadata \
                 --merge-output-format=mkv "$1"
             ;;
