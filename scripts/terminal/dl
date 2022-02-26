@@ -37,7 +37,10 @@ download() {
         http://youtube.com*|\
         https://www.youtube.com*|\
         https://youtube.com*)
-            yt-dlp --merge-output-format=mkv "$1"
+            yt-dlp \
+                --output '%(upload_date)s %(title)s [%(id)s]' \
+                --add-metadata \
+                --merge-output-format=mkv "$1"
             ;;
         *)
             if command -v aria2c > /dev/null; then
