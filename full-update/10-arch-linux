@@ -62,3 +62,6 @@ if [ -n "$GIMP_BIN" ]; then
     rm -rf ~/.local/bin/gimp
     ln -sT "$GIMP_BIN" ~/.local/bin/gimp
 fi
+
+log 'Locating .pac* files'
+sudo find /etc -regextype posix-extended -regex ".+\.pac(new|save)" 2> /dev/null || true
