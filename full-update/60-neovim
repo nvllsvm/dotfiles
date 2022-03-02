@@ -2,7 +2,7 @@
 set -e
 
 if ! command -v nvim > /dev/null; then
-    rm -rf ~/.config/nvim
+    rm -rf ~/.config/nvim ~/.cache/nvim ~/.local/share/nvim
     exit
 fi
 
@@ -11,19 +11,7 @@ if [ "$(realpath ~/.config/nvim)" != "$DOTFILES/nvim" ]; then
     ln -sT "${DOTFILES}/nvim" ~/.config/nvim
 fi
 
-if [ ! -f ~/.config/nvim/autoload/plug.vim ]; then
-    echo Installing plugin manager environment ...
-    curl --compressed -fLo ~/.config/nvim/autoload/plug.vim --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-fi
-
-if [ -e ~/.config/nvim/plugged ]; then
-    for d in ~/.config/nvim/plugged/*/; do
-        git -C "$d" reset --quiet --hard HEAD
-    done
-fi
-
-nvim -c 'PlugUpgrade | PlugUpdate! | PlugClean!' -c 'qa'
+nvim -c 'autocmd User PackerComplete quitall' -c 'PackerSync'
 
 if command -v pip > /dev/null; then
     if ! pip show jedi-language-server > /dev/null; then

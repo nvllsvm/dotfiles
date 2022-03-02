@@ -1,3 +1,47 @@
+local fn = vim.fn
+local install_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
+if fn.empty(fn.glob(install_path)) > 0 then
+  packer_bootstrap = fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path})
+end
+
+require('packer').startup(function(use)
+    use 'wbthomason/packer.nvim'
+
+    use 'hrsh7th/nvim-compe'
+    use 'neomake/neomake'
+    use 'fnune/base16-vim'
+    use 'neovim/nvim-lspconfig'
+    use 'Vimjas/vim-python-pep8-indent'
+
+    use 'plasticboy/vim-markdown'
+    use 'dhruvasagar/vim-table-mode'
+
+    use 'junegunn/fzf'
+    use 'junegunn/fzf.vim'
+
+    use 'chrisbra/csv.vim'
+
+    use {
+        'nvim-treesitter/nvim-treesitter',
+        run = ':TSUpdate'
+    }
+
+    use {
+        "nvim-neorg/neorg",
+        ft = "norg",
+        after = "nvim-treesitter",
+        config = function()
+            require('neorg').setup {
+		        ["core.defaults"] = {}
+            }
+        end,
+        requires = "nvim-lua/plenary.nvim"
+    }
+    if packer_bootstrap then
+        require('packer').sync()
+    end
+end)
+
 vim.o.ruler = true
 vim.o.tabstop = 4
 vim.o.shiftwidth = 4
@@ -17,43 +61,27 @@ vim.g.tex_flavor = "latex"
 vim.o.number = true
 vim.o.relativenumber = true
 
-vim.cmd([[
-set mouse=a
+vim.o.mouse = 'a'
 
-" line numbers
-set number
-set relativenumber
-nmap <silent> <C-n> :set number!<CR>:set relativenumber!<CR>
+vim.api.nvim_set_keymap('n', '<C-n>', ':set number!<CR>:set relativenumber!<CR>', { noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<C-c>', ':set cursorcolumn!<CR>', { noremap = true, silent = true})
+
+vim.api.nvim_set_keymap('n', '<leader>z', ':Files<CR>', { noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<leader>r', ':Rg<CR>', { noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<leader>f', ':Ex<CR>', { noremap = true, silent = true})
+
+vim.api.nvim_set_keymap('n', '<leader>n', ':bn!<CR>', { noremap = true})
+vim.api.nvim_set_keymap('n', '<leader>p', ':bp!<CR>', { noremap = true})
+vim.api.nvim_set_keymap('n', '<leader>D', ':bd<CR>', { noremap = true})
+vim.api.nvim_set_keymap('n', '<leader>3', ':b#<CR>', { noremap = true})
+vim.api.nvim_set_keymap('n', '<leader>l', ':buffers<CR>:buffer<Space>', { noremap = true})
+
+-- <Ctrl-l> redraws the screen and removes any search highlighting.
+vim.api.nvim_set_keymap('n', '<C-l>', ':nohl<CR>:NeomakeClean<CR><C-l>', { noremap = true, silent = true})
+
+vim.cmd([[
 
 filetype plugin indent on
-
-set grepprg=grep\ -nH\ $*
-
-au BufReadCmd   *.epub      call zip#Browse(expand("<amatch>"))
-
-nmap <silent> <C-c> :set cursorcolumn!<CR>
-
-call plug#begin('~/.config/nvim/plugged')
-Plug 'hrsh7th/nvim-compe'
-Plug 'neomake/neomake'
-Plug 'chriskempson/base16-vim'
-
-Plug 'neovim/nvim-lspconfig'
-
-Plug 'Vimjas/vim-python-pep8-indent'
-
-Plug 'plasticboy/vim-markdown'
-Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }}
-Plug 'dhruvasagar/vim-table-mode'
-
-Plug 'junegunn/fzf'
-Plug 'junegunn/fzf.vim'
-
-Plug 'chrisbra/csv.vim'
-
-Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-Plug 'nvim-neorg/neorg' | Plug 'nvim-lua/plenary.nvim'
-call plug#end()
 
 let $FZF_DEFAULT_COMMAND = "fd --type file --ignore-file ~/.config/nvim/fzf_fd_ignore"
 
@@ -61,9 +89,6 @@ let $FZF_DEFAULT_COMMAND = "fd --type file --ignore-file ~/.config/nvim/fzf_fd_i
 set completeopt-=preview
 
 autocmd StdinReadPre * let s:std_in=1
-
-" <Ctrl-l> redraws the screen and removes any search highlighting.
-nnoremap <silent> <C-l> :nohl<CR>:NeomakeClean<CR><C-l>
 
 " open all folds automatically
 autocmd BufWinEnter * normal! zR
@@ -99,17 +124,6 @@ else
 endif
 
 let g:markdown_enable_spell_checking = 0
-
-nnoremap <leader>z :Files<Cr>
-nnoremap <leader>r :Rg<Cr>
-
-nnoremap <leader>f :Ex<Cr>
-
-nnoremap <leader>n :bn!<Cr>
-nnoremap <leader>p :bp!<Cr>
-nnoremap <leader>D :bd<Cr>
-nnoremap <leadr>3 :b#<Cr>
-nnoremap <leader>l :buffers<CR>:buffer<Space>
 
 let g:netrw_banner = 0
 let g:netrw_dirhistmax = 0

@@ -1,4 +1,1 @@
-/autoload/plug.vim
-/autoload/plug.vim.old
-/plugged
-/python3_env
+/plugin/packer_compiled.lua
