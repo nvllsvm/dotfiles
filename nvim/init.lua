@@ -50,6 +50,9 @@ Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 
 Plug 'chrisbra/csv.vim'
+
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'nvim-neorg/neorg' | Plug 'nvim-lua/plenary.nvim'
 call plug#end()
 
 let $FZF_DEFAULT_COMMAND = "fd --type file --ignore-file ~/.config/nvim/fzf_fd_ignore"
