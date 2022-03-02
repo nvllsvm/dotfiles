@@ -158,14 +158,14 @@ async def create_gzip(path, dest, fast=False):
     if path.is_dir():
         raise RuntimeError
 
-    with open(path, 'wb') as path_handle:
+    with open(dest, 'wb') as dest_handle:
         proc = await asyncio.create_subprocess_exec(
             'gzip',
             '-c',  # stdout
             '-1' if fast else '-9',
             path,
-            stdout=path_handle)
-    await proc.wait()
+            stdout=dest_handle)
+        await proc.wait()
     assert proc.returncode == 0
 
 
