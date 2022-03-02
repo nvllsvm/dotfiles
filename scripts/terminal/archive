@@ -296,15 +296,15 @@ _FORMATS = {
         'func': create_tar,
         'suffix': '.tar'
     },
-    'tar-gz': {
+    'tar.gz': {
         'func': create_tar_gz,
         'suffix': '.tar.gz'
     },
-    'tar-xz': {
+    'tar.xz': {
         'func': create_tar_xz,
         'suffix': '.tar.xz'
     },
-    'tar-zstd': {
+    'tar.zst': {
         'func': create_tar_zstd,
         'suffix': '.tar.zst'
     },
@@ -312,7 +312,7 @@ _FORMATS = {
         'func': create_zip,
         'suffix': '.zip',
     },
-    'zstd': {
+    'zst': {
         'func': create_zstd,
         'suffix': '.zst'
     },
@@ -454,7 +454,7 @@ def main():
                         help='remove source after success')
     group_format.add_argument(
         '-f', metavar='FORMAT', choices=_FORMATS,
-        dest='format', default='tar-zstd',
+        dest='format', default='tar.zst',
         help='archive format: %(choices)s (default: %(default)s)')
     parser.add_argument('-n', metavar='NUM', dest='num_procs',
                         type=_num_procs, default=1,
