@@ -3,12 +3,15 @@ import argparse
 import json
 import os
 import pathlib
+import shlex
 import sys
 
 PREFIX_ROOT = pathlib.Path('~/.local/share/proton-prefixes').expanduser()
 STEAM_ROOT = pathlib.Path('~/.local/share/Steam').expanduser()
 SYSTEM_PROTON = pathlib.Path('/usr/bin/proton')
 LINK_ROOT = pathlib.Path('~/.local/bin').expanduser()
+
+DEFAULT_PREFIX = 'default'
 
 
 def installed_versions():
@@ -44,11 +47,17 @@ def main():
 
     script_path = pathlib.Path(__file__)
     if script_path.name != script_path.resolve().name:
+        create_link = False
         args = parser.parse_args(json.loads(
             (PREFIX_ROOT / script_path.name / 'link_args').read_text()
         ))
     else:
+        if not sys.argv[1:]:
+            parser.print_help()
+            parser.exit(1)
+
         args = parser.parse_args()
+        create_link = args.link
 
     if args.prefix is None:
         print('\n'.join(sorted(
@@ -78,7 +87,7 @@ def main():
             parser.exit(1)
 
     prefix.mkdir(exist_ok=True, parents=True)
-    if args.link:
+    if create_link:
         """
         create two symlinks like so:
             ~/.local/bin/PREFIX -> PREFIX_ROOT/PREFIX/link -> THIS_SCRIPT
@@ -116,7 +125,6 @@ def main():
         'STEAM_COMPAT_DATA_PATH': str(PREFIX_ROOT / args.prefix),
         'WINEARCH': args.winearch,
     })
-
     os.execl(*proton_bin, *cmd)
 
 
