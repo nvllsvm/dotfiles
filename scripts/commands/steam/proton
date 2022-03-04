@@ -79,6 +79,14 @@ def main():
 
     prefix.mkdir(exist_ok=True, parents=True)
     if args.link:
+        """
+        create two symlinks like so:
+            ~/.local/bin/PREFIX -> PREFIX_ROOT/PREFIX/link -> THIS_SCRIPT
+
+        why?
+        - does not require a new PATH in PATH
+        - if PREFIX_ROOT/PREFIX is deleted, the symlink becomes broken
+        """
         (prefix / 'link_args').write_text(json.dumps(sys.argv[1:]))
 
         link_1 = prefix / 'link'
