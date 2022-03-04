@@ -1,89 +1,116 @@
-#!/usr/bin/env sh
-set -e
+#!/usr/bin/env python
+import argparse
+import json
+import os
+import pathlib
+import sys
 
-STEAMAPPS_COMMON=~/.steam/steam/steamapps/common
+PREFIX_ROOT = pathlib.Path('~/.local/share/proton-prefixes').expanduser()
+STEAM_ROOT = pathlib.Path('~/.local/share/Steam').expanduser()
+SYSTEM_PROTON = pathlib.Path('/usr/bin/proton')
+LINK_ROOT = pathlib.Path('~/.local/bin').expanduser()
 
-show_help() {
-    cat << EOF
-usage: proton --prefix PATH PROGRAM [ARG ...]
-    --help          show help and exit
-    --list          list installed versions an exit
-    --prefix PATH   use a custom prefix path
-    --use VERSION   use specific version of proton
-    --version       show program's version and exit
-EOF
-}
 
-list_versions() {
-    find "$STEAMAPPS_COMMON" -mindepth 1 -maxdepth 1 -name 'Proton *' -exec basename {} \; | awk '{print $2}' | sort --version-sort
-}
+def installed_versions():
+    versions = {}
 
-export STEAM_COMPAT_CLIENT_INSTALL_PATH=~/.local/share/Steam
+    if SYSTEM_PROTON.is_file():
+        versions['system'] = [SYSTEM_PROTON, 'run']
 
-USE_PROTON_VERSION=system
-SHOW_VERSION=
-while [ $# -gt 0 ]; do
-    case "$1" in
-        --)
-            break
-            ;;
-        --help)
-            show_help
-            exit
-            ;;
-        --list)
-            list_versions
-            exit
-            ;;
-        --prefix)
-            mkdir -p -- "$2"
-            STEAM_COMPAT_DATA_PATH="$(realpath -- "$2")"
-            export STEAM_COMPAT_DATA_PATH
-            shift
-            shift
-            ;;
-        --use)
-            USE_PROTON_VERSION="$2"
-            shift
-            shift
-            ;;
-        --version)
-            SHOW_VERSION=1
-            shift
-            ;;
-        -*)
-            echo 'error: unrecognized argument (s)'>&2
-            exit 1
-            ;;
-        *)
-            break
-            ;;
-    esac
-done
+    for path in (STEAM_ROOT / 'steamapps' / 'common').iterdir():
+        if not path.name.startswith('Proton '):
+            continue
+        if not path.is_dir():
+            continue
+        proton_bin = path / 'proton'
+        if proton_bin.is_file():
+            version = path.name.removeprefix('Proton ').strip()
 
-if [ $# -eq 0 ]; then
-    show_help >&2
-    exit 1
-fi
+            # double run???
+            versions[version] = [proton_bin, 'run', 'run']
 
-if [ -z "$STEAM_COMPAT_DATA_PATH" ]; then
-    export STEAM_COMPAT_DATA_PATH=~/.local/share/proton-pfx-"${USE_PROTON_VERSION:-default}"
-    mkdir -p "$STEAM_COMPAT_DATA_PATH"
-fi
+    return versions
 
-if [ -n "$SHOW_VERSION" ]; then
-    # initialize/upgrade prefix
-    proton_run echo
 
-    cat "$STEAM_COMPAT_DATA_PATH"/version
-    exit
-fi
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--link', action='store_true')
+    parser.add_argument('--versions', action='store_true')
+    parser.add_argument('--winearch', choices=['win32', 'win64'],
+                        default='win64')
+    parser.add_argument('-p', '--prefix', default='default', nargs='?')
+    parser.add_argument('--use', metavar='VERSION', default='system')
+    parser.add_argument('args', nargs='*')
 
-if [ "$USE_PROTON_VERSION" = 'system' ]; then
-    exec /usr/bin/proton run "$@"
-elif [ -n "$USE_PROTON_VERSION" ]; then
-    PROTON_BASE="$STEAMAPPS_COMMON/Proton $USE_PROTON_VERSION"
-else
-    PROTON_BASE="$STEAMAPPS_COMMON/$(find "$STEAMAPPS_COMMON" -maxdepth 1 -mindepth 1 -printf '%P\n' | grep '^Proton' | sort --version-sort | tail -n 1)"
-fi
-exec "$PROTON_BASE"/proton run "$@"
+    script_path = pathlib.Path(__file__)
+    if script_path.name != script_path.resolve().name:
+        args = parser.parse_args(json.loads(
+            (PREFIX_ROOT / script_path.name / 'link_args').read_text()
+        ))
+    else:
+        args = parser.parse_args()
+
+    if args.prefix is None:
+        print('\n'.join(sorted(
+            path.name
+            for path in PREFIX_ROOT.iterdir()
+        )))
+        parser.exit()
+
+    prefix = PREFIX_ROOT / args.prefix
+
+    versions = installed_versions()
+    if args.versions:
+        for version in sorted(versions):
+            print(version)
+        parser.exit()
+
+    prefix = PREFIX_ROOT / args.prefix
+
+    proton_bin = versions[args.use]
+
+    if not args.args:
+        if prefix.is_dir():
+            print(prefix)
+            parser.exit()
+        else:
+            parser.error('no such prefix')
+            parser.exit(1)
+
+    prefix.mkdir(exist_ok=True, parents=True)
+    if args.link:
+        (prefix / 'link_args').write_text(json.dumps(sys.argv[1:]))
+
+        link_1 = prefix / 'link'
+        link_2 = LINK_ROOT / args.prefix
+
+        link_1.unlink(missing_ok=True)
+        link_2.unlink(missing_ok=True)
+
+        link_1.symlink_to(script_path.resolve())
+        link_2.symlink_to(link_1)
+
+    cmd = args.args
+    if args.args[0].startswith('c:\\'):
+        path = prefix / 'pfx' / 'drive_c'
+        parts = args.args[0].removeprefix('c:\\').split('\\')
+        for part in parts[:-1]:
+            path = path / part
+        os.chdir(path)
+        cmd = [
+            path / parts[-1],
+            *args.args[1:]
+        ]
+
+    os.environ.update({
+        'STEAMAPPS_COMMON': str(STEAM_ROOT / 'steamapps' / 'common'),
+        'STEAM_COMPAT_CLIENT_INSTALL_PATH': str(STEAM_ROOT),
+        'STEAM_COMPAT_DATA_PATH': str(PREFIX_ROOT / args.prefix),
+        'WINEARCH': args.winearch,
+    })
+
+    os.execl(*proton_bin, *cmd)
+
+
+if __name__ == '__main__':
+    main()
