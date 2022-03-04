@@ -16,7 +16,7 @@ def installed_versions():
     versions = {}
 
     if SYSTEM_PROTON.is_file():
-        versions['system'] = [SYSTEM_PROTON, 'run']
+        versions['system'] = [SYSTEM_PROTON, 'run', 'run']
 
     for path in (STEAM_ROOT / 'steamapps' / 'common').iterdir():
         if not path.name.startswith('Proton '):
@@ -127,6 +127,7 @@ def main():
         'STEAM_COMPAT_DATA_PATH': str(PREFIX_ROOT / args.prefix),
         'WINEARCH': args.winearch,
     })
+    print(cmd)
     os.execl(*proton_bin, *cmd)
 
 
