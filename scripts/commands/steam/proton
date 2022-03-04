@@ -11,8 +11,6 @@ STEAM_ROOT = pathlib.Path('~/.local/share/Steam').expanduser()
 SYSTEM_PROTON = pathlib.Path('/usr/bin/proton')
 LINK_ROOT = pathlib.Path('~/.local/bin').expanduser()
 
-DEFAULT_PREFIX = 'default'
-
 
 def installed_versions():
     versions = {}
