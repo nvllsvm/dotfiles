@@ -3,7 +3,7 @@ import argparse
 import json
 import os
 import pathlib
-import shlex
+import subprocess
 import sys
 
 PREFIX_ROOT = pathlib.Path('~/.local/share/proton-prefixes').expanduser()
@@ -84,7 +84,11 @@ def main():
             parser.error('no such prefix')
             parser.exit(1)
 
-    prefix.mkdir(exist_ok=True, parents=True)
+    if not prefix.is_dir():
+        prefix.mkdir(exist_ok=True, parents=True)
+        # enable case-insensitivity (ext4)
+        subprocess.run(['chattr', '+F', str(prefix)], check=True)
+
     if create_link:
         """
         create two symlinks like so:
