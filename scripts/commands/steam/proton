@@ -46,9 +46,9 @@ def main():
     script_path = pathlib.Path(__file__)
     if script_path.name != script_path.resolve().name:
         create_link = False
-        args = parser.parse_args(json.loads(
-            (PREFIX_ROOT / script_path.name / 'link_args').read_text()
-        ))
+        link_args = json.loads(
+            (PREFIX_ROOT / script_path.name / 'link_args').read_text())
+        args = parser.parse_args([*link_args, *sys.argv[1:]])
     else:
         if not sys.argv[1:]:
             parser.print_help()
