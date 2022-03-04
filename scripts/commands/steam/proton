@@ -127,7 +127,6 @@ def main():
         'STEAM_COMPAT_DATA_PATH': str(PREFIX_ROOT / args.prefix),
         'WINEARCH': args.winearch,
     })
-    print(cmd)
     os.execl(*proton_bin, *cmd)
 
 
