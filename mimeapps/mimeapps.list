@@ -40,5 +40,6 @@ x-scheme-handler/chrome=firefox-dotfiles.desktop
 x-scheme-handler/ftp=firefox-dotfiles.desktop
 x-scheme-handler/http=firefox-dotfiles.desktop
 x-scheme-handler/https=firefox-dotfiles.desktop
+x-scheme-handler/magnet=torrent.desktop
 x-scheme-handler/sgnl=signal-desktop.desktop
 x-scheme-handler/unknown=firefox-dotfiles.desktop
