@@ -8,9 +8,12 @@ import tempfile
 
 EXTENSIONS = {
     '.avi',
+    '.flv',
     '.m4v',
     '.mov',
     '.mp4',
+    '.mpeg',
+    '.mpg',
     '.webm',
 }
 
