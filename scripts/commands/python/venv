@@ -67,12 +67,10 @@ def create_virtualenv(python_bin, path):
     if shutil.which('virtualenv'):
         subprocess.run(
             ['virtualenv', '-p', str(python_bin), str(path)],
-            stdout=subprocess.DEVNULL,
             check=True)
     else:
         subprocess.run(
             [str(python_bin), '-m', 'venv', str(path)],
-            stdout=subprocess.DEVNULL,
             check=True)
 
 
