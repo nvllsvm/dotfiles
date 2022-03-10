@@ -61,6 +61,7 @@ import zoneinfo
 for name in [
         'arrow',
         'httpx',
+        'iso8601',
         'magic',
         'mutagen',
         'psycopg',
