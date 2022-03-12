@@ -19,7 +19,7 @@ fi
 
 if [ -f '/data/data/com.termux/files/usr/etc/ssh/sshd_config' ]; then
     echo "Linking sshd configuration ..."
-    cat << EOF
+    cat > /data/data/com.termux/files/usr/etc/ssh/sshd_config << EOF
 PrintMotd no
 PasswordAuthentication no
 Subsystem sftp /data/data/com.termux/files/usr/libexec/sftp-server
