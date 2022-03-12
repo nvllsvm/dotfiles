@@ -17,6 +17,14 @@ if [ "$(realpath ~/bin)" != "$DOTFILES/termux/bin" ]; then
     ln -s "${DOTFILES}/termux/bin" ~/bin
 fi
 
+if [ -f '/data/data/com.termux/files/usr/etc/ssh/sshd_config' ]; then
+    echo "Linking sshd configuration ..."
+    cat << EOF
+PrintMotd no
+PasswordAuthentication no
+Subsystem sftp /data/data/com.termux/files/usr/libexec/sftp-server
+EOF
+
 yes | termux-setup-storage
 ln -sfT ~/storage/shared/syncthing/default/notes ~/notes
 ln -sfT ~/storage/shared/syncthing ~/syncthing

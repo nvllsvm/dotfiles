@@ -1,3 +1,0 @@
-PrintMotd yes
-PasswordAuthentication no
-Subsystem sftp /data/data/com.termux/files/usr/libexec/sftp-server
