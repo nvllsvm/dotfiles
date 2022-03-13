@@ -1,27 +1,35 @@
 #!/usr/bin/env sh
 DEV='/sys/class/leds/asus::kbd_backlight'
-CURRENT="$(cat "${DEV}/brightness")"
+IDLE_TIMEOUT=10
+STATE="${TMPDIR:-/tmp}/set-keyboard-backlight.state"
+
+current() {
+    cat "${DEV}/brightness"
+}
 
 usage() {
-    echo 'usage: set-keyboard-backlight (inc|dec)'
+    echo 'usage: set-keyboard-backlight (inc|dec|idle-toggle)'
 }
 
 case $# in
     0)
-        echo "$CURRENT"
+        echo "${CURRENT}"
         exit
         ;;
     1)
         case "$1" in
             inc)
-                new_brightness="$((CURRENT + 1))"
-                echo "$new_brightness" > "${DEV}/brightness"
+                new_brightness="$(($(current) + 1))"
+                echo "$new_brightness" | tee "${DEV}/brightness" "${STATE}"
                 ;;
             dec)
-                new_brightness="$((CURRENT - 1))"
+                new_brightness="$(($(current) - 1))"
                 if [ "$new_brightness" -ge 0 ]; then
-                    echo "$new_brightness" > "${DEV}/brightness"
+                    echo "$new_brightness" | tee "${DEV}/brightness" "${STATE}"
                 fi
+                ;;
+            idle-toggle)
+                exec xidlehook --timer "${IDLE_TIMEOUT}" "echo 0 > ${DEV}/brightness" "cat ${STATE} > ${DEV}/brightness"
                 ;;
             *)
                 usage >&2

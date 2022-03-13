@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+exec xidlehook --timer 10 'set-keyboard-backlight off' 'set-keyboard-backlight on'
