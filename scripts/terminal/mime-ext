@@ -6,8 +6,7 @@ import json
 import pathlib
 import sys
 
-# package: python-magic
-import magic
+import magic  # package: python-magic
 
 MIME_SUFFIXES = {
     'application/x-bittorrent': [
