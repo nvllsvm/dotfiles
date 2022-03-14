@@ -29,6 +29,7 @@ case $# in
                 fi
                 ;;
             idle-toggle)
+                current > "${STATE}"
                 exec xidlehook --timer "${IDLE_TIMEOUT}" "echo 0 > ${DEV}/brightness" "cat ${STATE} > ${DEV}/brightness"
                 ;;
             *)
