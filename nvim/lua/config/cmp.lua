@@ -1,7 +1,6 @@
 -- https://github.com/hrsh7th/nvim-cmp
 local cmp = require('cmp')
 local luasnip = require('luasnip')
-local cmp_autopairs = require('nvim-autopairs.completion.cmp')
 
 require('luasnip.loaders.from_vscode').lazy_load()
 vim.api.nvim_command('hi LuasnipChoiceNodePassive cterm=italic')
@@ -42,7 +41,7 @@ cmp.setup({
             i = cmp.mapping.abort(),
             c = cmp.mapping.close(),
         }),
-        ['<CR>'] = cmp.mapping.confirm({ select = true }),
+        ['<C-n>'] = cmp.mapping.confirm({ select = true }),
         ['<Tab>'] = function(fallback)
             if cmp.visible() then
                 cmp.select_next_item()
@@ -73,7 +72,3 @@ cmp.setup({
         { name = 'rg' },
     }),
 })
-
--- https://github.com/windwp/nvim-autopairs
-require('nvim-autopairs').setup()
-cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done({ map_char = { tex = '' } }))
