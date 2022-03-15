@@ -6,7 +6,7 @@ for f in "$@"; do
     dir="$(dirname "$f")"
     base="$(basename "$f")"
     new="$(printf %s "$base" | sed "$pattern")"
-    if [ "$dir/$new" != "$f" ]; then
+    if [ "$new" != "$base" ]; then
         mv --no-clobber "$f" "$dir/$new"
     fi
 done
