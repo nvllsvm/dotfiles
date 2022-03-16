@@ -20,6 +20,7 @@ let g:vim_markdown_conceal_code_blocks = 0
 
 let g:vim_markdown_folding_style_pythonic = 1
 let g:vim_markdown_folding_level = 6
+let g:vim_markdown_folding_disabled = 1
 
 
 " r Automatically insert the current comment leader after hitting
