@@ -49,6 +49,7 @@ import tarfile
 import tempfile
 import textwrap
 import time
+import unicodedata
 import unittest
 import unittest.mock
 import urllib.parse
