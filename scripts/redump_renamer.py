@@ -98,6 +98,7 @@ class Redump:
                 'psx',  # playstation
                 'ss',   # SEGA Saturn
                 'wii',  # wii
+                'xbox', # xbox
             ]
             data = {}
             for system in systems:
@@ -302,7 +303,7 @@ def main():
 
             if path == target:
                 LOGGER.info('✅ VALIDATED')
-                return
+                continue
             if target.exists():
                 raise RuntimeError(f'target exists {target}')
             LOGGER.info('✅ RENAMING %s', target)
