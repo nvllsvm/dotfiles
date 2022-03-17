@@ -28,3 +28,7 @@ let g:vim_markdown_folding_disabled = 1
 " o Automatically insert the current comment leader after hitting 'o' or
 "   'O' in Normal mode.
 set formatoptions+=ro
+
+" markdown folds are horrendouly fucked in neovim.
+" bullshit automatic closing of other folds when doing `c$` on heading level 3, probably others
+set nofoldenable
