@@ -1040,7 +1040,7 @@ async def _get_class(path):
                     pbzip2.check()
                     return pbzip2
                 except KeyError:
-                    return gzip
+                    return bzip2
         # xz
         elif start.startswith(b'\xfd7zXZ\x00'):
             if len(suffixes) >= 1 and suffixes[-1] == '.txz':
