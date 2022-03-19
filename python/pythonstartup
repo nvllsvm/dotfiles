@@ -223,3 +223,15 @@ def safe_write_bytes(path, data):
                 temp_path.unlink()
             except FileNotFoundError:
                 pass
+
+
+def path_size(root=None):
+    stack = [pathlib.Path(root) if root else pathlib.Path()]
+    total = 0
+    while stack:
+        root = stack.pop()
+        if root.is_file():
+            total += root.stat().st_size
+        else:
+            stack.extend(root.iterdir())
+    return total
