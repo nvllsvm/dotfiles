@@ -69,10 +69,10 @@ EXPECTED_TAGS = (
 LOGGER = logging.getLogger('music-organizer')
 
 
-def album_folder_name(album_name):
+def folder_name(tag_value):
     return ''.join(
         c
-        for c in album_name
+        for c in tag_value
         if c not in ('/', '\\', ':', '*', '?', '"', '<', '>', '|')
     )
 
@@ -347,12 +347,18 @@ def main():
                 LOGGER.error(f'Multiple album tags in "{root_path}"')
             elif albums:
                 album = list(albums)[0]
-                expected_album = album_folder_name(album)
+                expected_album = folder_name(album)
+                if not expected_album:
+                    LOGGER.error('invalid album name "%s"', root_path)
+                    raise RuntimeError('figure out what to do')
                 if root_path.name != expected_album:
                     LOGGER.info('renmaing album folder from "%s" to "%s"',
                                 root_path, album)
                     new_root = root_path.with_name(expected_album)
-                    if not new_root.exists():
+                    if new_root.exists():
+                        LOGGER.error('new root already exists "%s"', new_root)
+                        continue
+                    else:
                         root_path.rename(new_root)
                         root_path = new_root
 
