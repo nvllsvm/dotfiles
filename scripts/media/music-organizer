@@ -295,9 +295,17 @@ def main():
         check_cue_files(root_path)
 
         if args.check_tags:
+            artists = set()
+            albumartists = set()
             albums = set()
 
-            for path in {p for p in root_path.iterdir() if p.is_file()}:
+            missing_album = False
+            missing_artist = False
+
+            tracks = []
+            for path in sorted(root_path.iterdir()):
+                if not path.is_file():
+                    continue
                 set_permissions(path)
                 if path.suffix in AUDIO_EXT:
                     metadata = mutagen.File(path, easy=True)
@@ -308,18 +316,34 @@ def main():
                     try:
                         albums.add(metadata['album'][0])
                     except KeyError:
-                        pass
+                        missing_album = True
                     try:
                         artists.update(metadata['artist'])
                     except KeyError:
-                        pass
+                        missing_artist = True
                     try:
                         artists.update(metadata['albumartist'])
+                        albumartists.update(metadata['albumartist'])
                     except KeyError:
                         pass
+                    tracks.append(path)
 
             if len(albums) > 1:
                 LOGGER.error(f'Multiple album tags in "{root_path}"')
+
+            if len(albumartists) > 1:
+                LOGGER.error(f'Multiple albumartists in "{root_path}"')
+            elif not missing_artist \
+                    and not missing_album \
+                    and not albumartists \
+                    and len(artists) == len(albums) == 1:
+                artist = list(artists)[0]
+                for path in tracks:
+                    metadata = mutagen.File(path, easy=True)
+                    LOGGER.info('Setting albumartist to "%s" (%s)',
+                                artist, path)
+                    metadata['albumartist'] = artist
+                    metadata.save()
 
     # audit artist title variations
     artist_variants = collections.defaultdict(set)
