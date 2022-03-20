@@ -69,6 +69,14 @@ EXPECTED_TAGS = (
 LOGGER = logging.getLogger('music-organizer')
 
 
+def album_folder_name(album_name):
+    return ''.join(
+        c
+        for c in album_name
+        if c not in ('/', '\\', ':', '*', '?', '"', '<', '>', '|')
+    )
+
+
 def cue_track_count(path):
     """Return the number of tracks in a .cue file
 
@@ -288,7 +296,7 @@ def main():
 
     artists = set()
 
-    for root_path in all_dirs(args.directory):
+    for root_path in all_dirs(args.directory.absolute()):
         set_permissions(root_path)
         rename_extensions(root_path)
         organize_images(root_path)
@@ -303,8 +311,15 @@ def main():
             missing_artist = False
 
             tracks = []
+            has_symlinks = False
+            has_subdirs = False
             for path in sorted(root_path.iterdir()):
-                if not path.is_file():
+                if path.is_symlink():
+                    has_symlinks = True
+                    LOGGER.error('Symlink detected "%s"', path)
+                    continue
+                elif path.is_dir():
+                    has_subdirs = True
                     continue
                 set_permissions(path)
                 if path.suffix in AUDIO_EXT:
@@ -330,6 +345,16 @@ def main():
 
             if len(albums) > 1:
                 LOGGER.error(f'Multiple album tags in "{root_path}"')
+            elif albums:
+                album = list(albums)[0]
+                expected_album = album_folder_name(album)
+                if root_path.name != expected_album:
+                    LOGGER.info('renmaing album folder from "%s" to "%s"',
+                                root_path, album)
+                    new_root = root_path.with_name(expected_album)
+                    if not new_root.exists():
+                        root_path.rename(new_root)
+                        root_path = new_root
 
             if len(albumartists) > 1:
                 LOGGER.error(f'Multiple albumartists in "{root_path}"')
