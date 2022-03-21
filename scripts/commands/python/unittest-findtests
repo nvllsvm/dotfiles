@@ -2,6 +2,7 @@
 import argparse
 import contextlib
 import logging
+import pathlib
 import subprocess
 import unittest
 
@@ -33,16 +34,18 @@ def find_tests(name):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--verbose', action='store_true')
-    parser.add_argument('name', default='.', nargs='?')
+    parser.add_argument('name', default=pathlib.Path().absolute(), nargs='?')
     args = parser.parse_args()
 
     if args.verbose:
         logging.basicConfig(level=logging.DEBUG)
 
-    # redirect output to make loud imports stfu
-    with contextlib.redirect_stdout(subprocess.DEVNULL):
-        with contextlib.redirect_stderr(subprocess.DEVNULL):
-            tests = find_tests(args.name)
+    tests = find_tests(args.name)
+    if False:
+        # redirect output to make loud imports stfu
+        with contextlib.redirect_stdout(subprocess.DEVNULL):
+            with contextlib.redirect_stderr(subprocess.DEVNULL):
+                tests = find_tests(args.name)
 
     print('\n'.join(sorted(tests)))
 
