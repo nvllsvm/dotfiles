@@ -6,7 +6,6 @@ end
 require('packer').startup(function(use)
     use 'wbthomason/packer.nvim'
 
-    use {'neoclide/coc.nvim', branch="release"}
     use 'Vimjas/vim-python-pep8-indent'
     use 'fnune/base16-vim'
     use 'hrsh7th/cmp-buffer'

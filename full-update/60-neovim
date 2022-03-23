@@ -12,4 +12,3 @@ if [ "$(realpath ~/.config/nvim)" != "$DOTFILES/nvim" ]; then
 fi
 
 nvim -c 'autocmd User PackerComplete quitall' -c 'PackerSync'
-nvim -c 'CocUpdateSync|q'
