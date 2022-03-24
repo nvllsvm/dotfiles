@@ -1,3 +1,4 @@
+notes_dir = os.getenv("NOTES_DIR") or '~/notes'
 function Journal()
-    vim.cmd('e ' .. os.getenv("NOTES_DIR") .. "/journal/" .. os.date("%Y-%m-%d") .. ".md")
+    vim.cmd('e ' .. notes_dir .. "/journal/" .. os.date("%Y-%m-%d") .. ".md")
 end
