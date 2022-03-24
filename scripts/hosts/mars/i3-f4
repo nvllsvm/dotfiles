@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-exec autorandr --force --load mars-basement
+exec autorandr --force --load mars-lounge
