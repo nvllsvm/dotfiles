@@ -173,6 +173,7 @@ async def run(executor, num_items):
         except Exception as e:
             LOGGER.exception(e)
             errors.append(str(e))
+            continue
 
         size_diff_printer.print(before, after, source)
     size_diff_printer.print_total()
