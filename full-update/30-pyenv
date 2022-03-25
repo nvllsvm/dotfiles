@@ -18,7 +18,7 @@ fi
 "$INSTALL_DIR"/bin/pyenv rehash
 
 if [ -d "${INSTALL_DIR}"/versions ]; then
-    PYTHON_VERSION="$(ls "${INSTALL_DIR}/versions" | rg '^\d' | sort --version-sort | tail -n 1)"
+    PYTHON_VERSION="$(ls "${INSTALL_DIR}/versions" | rg '^\d' | sort --version-sort | tail -n 1 | sed 's/[ \t]*$//')"
     "${INSTALL_DIR}/versions/${PYTHON_VERSION}/bin/python" << EOF
 import os
 import pathlib
