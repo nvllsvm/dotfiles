@@ -31,7 +31,7 @@ async def decode_ape(source, fd):
     async def result():
         await proc.wait()
         if proc.returncode != 0:
-            raise DecodeError()
+            raise DecodeError(source)
     return result()
 
 
@@ -43,7 +43,7 @@ async def decode_wv(source, fd):
     async def result():
         await proc.wait()
         if proc.returncode != 0:
-            raise DecodeError()
+            raise DecodeError(source)
     return result()
 
 
@@ -56,7 +56,7 @@ async def decode_flac(source, fd):
     async def result():
         await proc.wait()
         if proc.returncode != 0:
-            raise DecodeError()
+            raise DecodeError(source)
     return result()
 
 
@@ -68,7 +68,7 @@ async def decode_wav(source, fd):
     async def result():
         await proc.wait()
         if proc.returncode != 0:
-            raise DecodeError()
+            raise DecodeError(source)
     return result()
 
 
