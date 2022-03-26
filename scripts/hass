@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 import argparse
 import json
+import time
 import os
 
 import httpx
 
 TOKEN = os.environ['HASS_TOKEN']
 URL = os.environ['HASS_URL']
+
+TIMEOUT = 30
 
 
 class HASS:
@@ -38,12 +41,29 @@ def office_tv_on(_):
     hass = HASS(URL, TOKEN)
     hass.post_services('media_player', 'turn_on',
                        entity_id='media_player.office_tv')
-    hass.post_services('media_player', 'select_source',
-                       entity_id='media_player.office_tv',
-                       source='PC')
-    hass.post_services('media_player', 'volume_set',
-                       entity_id='media_player.office_tv',
-                       volume_level=0.1)
+
+    # buggy bullshit
+    start = time.time()
+    while True:
+        attributes = [
+            state['attributes']
+            for state in hass.get_states()
+            if state['entity_id'] == 'media_player.office_tv'
+        ][0]
+
+        if attributes.get('volume_level') != 0.1:
+            hass.post_services('media_player', 'volume_set',
+                               entity_id='media_player.office_tv',
+                               volume_level=0.1)
+        elif attributes.get('source') != 'PC':
+            hass.post_services('media_player', 'select_source',
+                               entity_id='media_player.office_tv',
+                               source='PC')
+        else:
+            break
+        time.sleep(0.1)
+        if (time.time() - start) > TIMEOUT:
+            raise TimeoutError
 
 
 def office_tv_off(_):

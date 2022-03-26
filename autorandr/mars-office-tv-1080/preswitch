@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-hass post-services media_player turn_on media_player.office_tv
+hass office-tv-on
