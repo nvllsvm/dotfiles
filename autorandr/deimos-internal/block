@@ -1,8 +1,0 @@
-#!/usr/bin/env sh
-case "$(hostname)" in
-    deimos)
-        exit 1
-        ;;
-    *)
-        exit
-esac

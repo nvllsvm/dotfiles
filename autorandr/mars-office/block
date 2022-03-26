@@ -1,8 +1,0 @@
-#!/usr/bin/env sh
-case "$(hostname)" in
-    mars)
-        exit 1
-        ;;
-    *)
-        exit
-esac

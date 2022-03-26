@@ -1,3 +1,2 @@
 #!/usr/bin/env sh
-systemctl stop --user xow.service || true
 pkill -9 picom
