@@ -1,0 +1,151 @@
+#!/usr/bin/env python3
+import argparse
+import json
+import os
+
+import httpx
+
+TOKEN = os.environ['HASS_TOKEN']
+URL = os.environ['HASS_URL']
+
+
+class HASS:
+    def __init__(self, url, token):
+        self.url = url
+        self.session = httpx.Client()
+        self.session.headers['Authorization'] = f'Bearer {token}'
+
+    def get_states(self):
+        response = self.session.get(f'{self.url}/api/states')
+        response.raise_for_status()
+        return response.json()
+
+    def get_services(self):
+        response = self.session.get(f'{self.url}/api/services')
+        response.raise_for_status()
+        return response.json()
+
+    def post_services(self, domain, service, entity_id, **kwargs):
+        response = self.session.post(
+            f'{self.url}/api/services/{domain}/{service}',
+            json=dict(entity_id=entity_id, **kwargs),
+        )
+        response.raise_for_status()
+        return response.json()
+
+
+def office_tv_on(_):
+    hass = HASS(URL, TOKEN)
+    hass.post_services('media_player', 'turn_on',
+                       entity_id='media_player.office_tv')
+    hass.post_services('media_player', 'select_source',
+                       entity_id='media_player.office_tv',
+                       source='PC')
+    hass.post_services('media_player', 'volume_set',
+                       entity_id='media_player.office_tv',
+                       volume_level=0.1)
+
+
+def office_tv_off(_):
+    hass = HASS(URL, TOKEN)
+    hass.post_services('media_player', 'turn_off',
+                       entity_id='media_player.office_tv')
+
+
+def office_tv_mute_toggle(_):
+    hass = HASS(URL, TOKEN)
+    hass.get_states()
+    is_muted = [
+        state['attributes']['is_volume_muted']
+        for state in hass.get_states()
+        if state['entity_id'] == 'media_player.office_tv'
+    ][0]
+    hass.post_services('media_player', 'volume_mute',
+                       entity_id='media_player.office_tv',
+                       is_volume_muted=not is_muted)
+
+
+def office_tv_volume_up(_):
+    hass = HASS(URL, TOKEN)
+    hass.get_states()
+    volume_level = [
+        state['attributes']['volume_level']
+        for state in hass.get_states()
+        if state['entity_id'] == 'media_player.office_tv'
+    ][0]
+    hass.post_services('media_player', 'volume_set',
+                       entity_id='media_player.office_tv',
+                       volume_level=min(volume_level + 0.05, 1))
+
+
+def office_tv_volume_down(_):
+    hass = HASS(URL, TOKEN)
+    hass.get_states()
+    volume_level = [
+        state['attributes']['volume_level']
+        for state in hass.get_states()
+        if state['entity_id'] == 'media_player.office_tv'
+    ][0]
+    hass.post_services('media_player', 'volume_set',
+                       entity_id='media_player.office_tv',
+                       volume_level=max(volume_level - 0.05, 0))
+
+
+def get_states(args):
+    hass = HASS(URL, TOKEN)
+    print(json.dumps(hass.get_states(), indent=2, sort_keys=True))
+
+
+def get_services(args):
+    hass = HASS(URL, TOKEN)
+    print(json.dumps(hass.get_services(), indent=2, sort_keys=True))
+
+
+def post_services(args):
+    hass = HASS(URL, TOKEN)
+    hass.post_services(args.domain, args.service, args.entity_id)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(
+        dest='command', metavar='COMMAND', required=True)
+
+    # generic
+    get_states_parser = subparsers.add_parser('get-states')
+    get_states_parser.set_defaults(func=get_states)
+
+    get_services_parser = subparsers.add_parser('get-services')
+    get_services_parser.set_defaults(func=get_services)
+
+    post_services_parser = subparsers.add_parser('post-services')
+    post_services_parser.set_defaults(func=post_services)
+    post_services_parser.add_argument('domain')
+    post_services_parser.add_argument('service')
+    post_services_parser.add_argument('entity_id')
+
+    # specific
+    office_tv_on_parser = subparsers.add_parser('office-tv-on')
+    office_tv_on_parser.set_defaults(func=office_tv_on)
+
+    office_tv_off_parser = subparsers.add_parser('office-tv-off')
+    office_tv_off_parser.set_defaults(func=office_tv_off)
+
+    office_tv_mute_toggle_parser = subparsers.add_parser(
+        'office-tv-mute-toggle')
+    office_tv_mute_toggle_parser.set_defaults(func=office_tv_mute_toggle)
+
+    office_tv_volume_up_parser = subparsers.add_parser('office-tv-volume-up')
+    office_tv_volume_up_parser.set_defaults(func=office_tv_volume_up)
+
+    office_tv_volume_down_parser = subparsers.add_parser(
+        'office-tv-volume-down')
+    office_tv_volume_down_parser.set_defaults(func=office_tv_volume_down)
+
+    args = parser.parse_args()
+
+    args.func(args)
+
+
+if __name__ == '__main__':
+    main()
