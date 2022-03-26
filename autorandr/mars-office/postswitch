@@ -6,5 +6,3 @@ pactl set-card-profile alsa_card.usb-Schiit_Audio_USB_Modi_Device-00 output:iec9
 pactl set-card-profile alsa_card.usb-audio-technica_AT2020USB_-00 input:analog-stereo
 pactl set-default-sink alsa_output.usb-Schiit_Audio_USB_Modi_Device-00.pro-output-0
 pactl set-default-source alsa_input.usb-audio-technica_AT2020USB_-00.pro-input-0
-
-hass post-services media_player turn_off media_player.office_tv
