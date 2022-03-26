@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set-desktop-themes --dpi 96
 
-pactl-all-off
-pactl set-card-profile alsa_card.usb-Schiit_Audio_I_m_Fulla_Schiit-00 output:iec958-stereo
+pactl-set-only \
+    --profile alsa_card.usb-Schiit_Audio_I_m_Fulla_Schiit-00 output:iec958-stereo
 
 i3-move-ws
