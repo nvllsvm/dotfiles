@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+case "$(hostname)" in
+    phobos)
+        exit 1
+        ;;
+    *)
+        exit
+esac
