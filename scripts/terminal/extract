@@ -28,10 +28,19 @@ class cli_7zip:
     @classmethod
     async def extract(cls, path, dest, paths=None, password='',
                       overwrite=False):
-        args = ['7zz']
-        kwargs = {}
+        args = [
+            '7zz',
+            '-bd',  # disable progress indicator
+            '-bb0',  # quietest log level
+        ]
+
+        kwargs = {
+            # prevent prompt when files already exist
+            'stdin': asyncio.subprocess.DEVNULL,
+        }
+
         if overwrite:
-            raise NotImplementedError
+            args.append('-aoa')  # overwrite all without prompting
 
         if dest == sys.stdout.buffer:
             args.extend(['e', f'-p{password}', '-so', '--', str(path)])
@@ -39,6 +48,7 @@ class cli_7zip:
             args.extend([
                 'x', f'-p{password}', '-spe', f'-o{dest}', '--', str(path)
             ])
+            # supress output that shows even at the quiest log level
             kwargs['stdout'] = asyncio.subprocess.DEVNULL
 
         if paths:
@@ -239,31 +249,41 @@ class unzip:
 
     @staticmethod
     async def contents(path):
-        proc = subprocess.run(
-            ['unzip',
-             '-O', 'UTF-8',  # encoding for DOS, Windows, OS/2
-             '-I', 'UTF-8',  # encoding for UNIX, other
-             '-qq', '-l', path],
-            stdout=subprocess.PIPE,
-            check=True)
+        proc = await asyncio.create_subprocess_exec(
+            'unzip',
+            '-O', 'UTF-8',  # encoding for DOS, Windows, OS/2
+            '-I', 'UTF-8',  # encoding for UNIX, other
+            '-qq', '-l', path,
+            stdout=asyncio.subprocess.PIPE)
+        stdout, _ = await proc.communicate()
+        if proc.returncode:
+            raise ProcessError(proc.returncode)
         return [
             line.split(maxsplit=3)[-1]
-            for line in proc.stdout.splitlines()
+            for line in stdout.splitlines()
         ]
 
     @staticmethod
     async def extract(path, dest, paths=None, password=None, overwrite=False):
         if paths:
             raise NotImplementedError
+        args = [
+            'unzip',
+            '-O', 'UTF-8',  # encoding for DOS, Windows, OS/2
+            '-I', 'UTF-8',  # encoding for UNIX, other
+            '-qq',
+            '-d', dest,
+        ]
         if overwrite:
-            raise NotImplementedError
-        subprocess.run(
-            ['unzip',
-             '-O', 'UTF-8',  # encoding for DOS, Windows, OS/2
-             '-I', 'UTF-8',  # encoding for UNIX, other
-             '-qq',
-             '-d', dest, path],
-            check=True)
+            args.append('-o')  # overwrite without prompting
+        args.append(path)
+        proc = await asyncio.create_subprocess_exec(
+            *args,
+            stdin=asyncio.subprocess.DEVNULL,
+            stdout=asyncio.subprocess.PIPE)
+        await proc.communicate()
+        if proc.returncode:
+            raise ProcessError(proc.returncode)
 
     @staticmethod
     async def volumes(path, password=''):
