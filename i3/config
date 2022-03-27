@@ -151,9 +151,9 @@ bindsym $mod+F6 exec --no-startup-id i3-f6
 bindsym $mod+equal workspace next_on_output
 bindsym $mod+minus workspace prev_on_output
 
-bindsym XF86AudioMute exec --no-startup-id set-volume --toggle-mute
-bindsym XF86AudioLowerVolume exec --no-startup-id set-volume --unmute --decrease 5
-bindsym XF86AudioRaiseVolume exec --no-startup-id set-volume --unmute --increase 5
+bindsym XF86AudioMute exec --no-startup-id set-volume toggle-mute
+bindsym XF86AudioLowerVolume exec --no-startup-id set-volume output-down
+bindsym XF86AudioRaiseVolume exec --no-startup-id set-volume output-up
 
 bindsym Shift+XF86AudioMute exec --no-startup-id toggle-source-mute
 bindsym XF86AudioMicMute exec --no-startup-id toggle-source-mute

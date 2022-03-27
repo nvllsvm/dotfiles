@@ -6,16 +6,57 @@ notify() {
         'Volume' "$@"
 }
 
-res="$(pamixer --get-mute --get-volume "$@")"
-set -- $res
-MUTED="$1"
-VOLUME="$2"
+change_pamixer() {
+    case "$1" in
+        toggle-mute)
+            res="$(pamixer --get-mute --get-volume --toggle-mute)"
+            ;;
+        output-up)
+            res="$(pamixer --get-mute --get-volume --unmute --increase 5)"
+            ;;
+        output-down)
+            res="$(pamixer --get-mute --get-volume --unmute --decrease 5)"
+            ;;
+        *)
+            echo 'error: unexpected arguments' >&2
+            exit 1
+    esac
 
-case "$MUTED" in
-    true)
-        notify 🔇
+    set -- $res
+    MUTED="$1"
+    VOLUME="$2"
+
+    case "$MUTED" in
+        true)
+            notify 🔇
+            ;;
+        *)
+            notify -h "int:value:${VOLUME}"
+            ;;
+    esac
+}
+
+change_hass() {
+    case "$1" in
+        toggle-mute)
+            hass office-tv-mute-toggle
+            ;;
+        output-up)
+            hass office-tv-volume-up
+            ;;
+        output-down)
+            hass office-tv-volume-down
+            ;;
+        *)
+            echo 'error: unexpected arguments' >&2
+            exit 1
+    esac
+}
+
+case "$(pamixer --get-default-sink)" in
+    *alsa_output.pci-0000_0b_00.1.hdmi-stereo-extra3*)
+        change_hass "$@"
         ;;
     *)
-        notify -h "int:value:${VOLUME}"
-        ;;
+        change_pamixer "$@"
 esac
