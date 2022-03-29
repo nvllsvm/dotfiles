@@ -29,19 +29,59 @@ require('packer').startup(function(use)
 
     use {
         'nvim-treesitter/nvim-treesitter',
-        run = ':TSUpdate'
+        run = ':TSUpdate',
+        config = function()
+            require('nvim-treesitter.configs').setup {
+                ensure_installed = "maintained",
+                highlight = { -- Be sure to enable highlights if you haven't!
+                    enable = true,
+                }
+            }
+        end,
     }
 
     use {
         "nvim-neorg/neorg",
         config = function()
             require('neorg').setup {
-		        ["core.defaults"] = {}
+                load = {
+                    ["core.defaults"] = {},
+                    ["core.gtd.base"] = {
+                        config = {
+                            workspace = "notes",
+                        }
+                    },
+                    ["core.norg.concealer"] = {},
+                    ["core.norg.journal"] = {},
+                    ["core.norg.qol.toc"] = {},
+                    ["core.norg.completion"] = {
+                        config = {
+                            engine = "nvim-cmp",
+                        }
+                    },
+                    ["core.norg.dirman"] = {
+                        config = {
+                            workspaces = {
+                                notes = "~/syncthing/default/notes",
+                            },
+                            autochdir = true,
+                            index = "index.norg",
+                        }
+                    }
+                }
             }
         end,
+        after = "nvim-treesitter",
         requires = "nvim-lua/plenary.nvim"
     }
     if packer_bootstrap then
         require('packer').sync()
     end
 end)
+
+vim.cmd([[
+  augroup packer_user_config
+    autocmd!
+    autocmd BufWritePost plugins.lua source <afile> | PackerCompile
+  augroup end
+]])
