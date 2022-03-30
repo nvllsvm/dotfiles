@@ -18,6 +18,11 @@ EXTENSIONS = {
     '.webm',
 }
 
+SUBTITLE_EXTENSIONS = {
+    '.ass',
+    '.srt',
+}
+
 LOGGER = logging.getLogger('convert-to-mkv')
 
 
@@ -53,10 +58,18 @@ def all_files(root):
     return files
 
 
-def mkvmerge(dest, *sources):
-    subprocess.run(
-        ['mkvmerge', '--quiet', '--output', dest, *sources],
-        check=True)
+def mkvmerge(dest, *sources, delete_parts=True):
+    LOGGER.info('converting %s (parts %s)', dest, sources)
+    with TempPath(dir=dest.parent, prefix='.convert-to-mkv_',
+                  suffix=dest.suffix + '.tmp') as tmp:
+        subprocess.run(
+            ['mkvmerge', '--quiet', '--output', tmp, *sources],
+            check=True)
+        tmp.rename(dest)
+    if delete_parts:
+        for part in sources:
+            if part.absolute() != dest.absolute():
+                part.unlink()
 
 
 def main():
@@ -77,19 +90,17 @@ def main():
             paths.update(all_files(path))
 
     for path in sorted(paths):
-        suffix = path.suffix.lower()
-
-        if suffix == '.mkv':
-            continue
-
-        if suffix in EXTENSIONS:
+        if path.suffix.lower() in ('.mkv', *EXTENSIONS):
             dest = path.with_suffix('.mkv')
-            LOGGER.info('converting %s', path)
-            with TempPath(dir=dest.parent, prefix='.convert-to-mkv_',
-                          suffix=dest.suffix + '.tmp') as tmp:
-                mkvmerge(tmp, path)
-                tmp.rename(dest)
-            path.unlink()
+
+            subtitle_paths = [
+                p
+                for p in path.parent.glob(f'{path.stem}*')
+                if p.is_file() and p.suffix.lower() in SUBTITLE_EXTENSIONS
+            ]
+
+            if (dest != path) or subtitle_paths:
+                mkvmerge(dest, path, *subtitle_paths)
         else:
             LOGGER.error('unrecognized extension: "%s"', path.suffix)
 
