@@ -32,7 +32,7 @@ require('packer').startup(function(use)
         run = ':TSUpdate',
         config = function()
             require('nvim-treesitter.configs').setup {
-                ensure_installed = "maintained",
+                ensure_installed = {"lua", "norg", "python", "rust"},
                 highlight = { -- Be sure to enable highlights if you haven't!
                     enable = true,
                 }
