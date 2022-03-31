@@ -4,18 +4,31 @@ import collections
 import pathlib
 
 
+def all_files(*roots):
+    stack = []
+    files = []
+    for root in roots:
+        if root.is_file():
+            files.append(root)
+        elif root.is_dir():
+            stack.append(root)
+    while stack:
+        for path in stack.pop().iterdir():
+            if path.is_file():
+                files.append(path)
+            elif path.is_dir():
+                stack.append(path)
+    return files
+
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-r', '--recursive', action='store_true')
-    parser.add_argument('path', default='.', nargs='?')
+    parser.add_argument('path', type=pathlib.Path, nargs='+')
     args = parser.parse_args()
 
-    root = pathlib.Path(args.path)
-
     suffixes = collections.Counter()
-    for path in root.iterdir():
-        if not path.is_file():
-            continue
+
+    for path in all_files(*args.path):
         if suffix := path.suffix:
             suffixes[path.suffix] += 1
 
