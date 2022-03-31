@@ -5,7 +5,8 @@ STEP=10
 MINIMUM=1
 
 current_light() {
-    printf %.0f "$(light)"
+    # fix "ugly" values on asus flowx13 (ex. 31, 41)
+    printf %.0f "$(light)" | python -c 'import sys; sys.stdout.write(str(round(int(sys.stdin.read()) / 10) * 10))'
 }
 
 case "$1" in
