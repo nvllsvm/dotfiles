@@ -10,6 +10,7 @@ vim.o.cursorline = true
 vim.o.hidden = true
 
 vim.o.foldmethod = "syntax"
+vim.o.foldenable = false
 
 -- case insensitive search
 vim.o.ignorecase = true
@@ -46,9 +47,6 @@ let $FZF_DEFAULT_COMMAND = "fd --type file --ignore-file ~/.config/nvim/fzf_fd_i
 
 autocmd StdinReadPre * let s:std_in=1
 
-" open all folds automatically
-autocmd BufWinEnter * normal! zR
-
 let g:neomake_python_enabled_makers = ['flake8']
 
 let g:neomake_warning_sign = {'text': 'W'}
@@ -78,29 +76,9 @@ let g:markdown_enable_spell_checking = 0
 
 autocmd VimResized * wincmd =
 
-augroup JSON
-    function _JSONify()
-        set filetype=json
-        %!jq -S '.'
-        normal zR
-    endfunction
-
-    command JSON call _JSONify()
-
-    au BufNewFile,BufRead *.avsc set filetype=json
-augroup END
-
 " need to set both + and * else netrw barfs
 let g:clipboard = {'copy': {'*': 'cbcopy', '+': 'cbcopy'}, 'paste': {'*': 'cbpaste', '+': 'cbpaste'}}
 
 let g:mkdp_echo_preview_url = 1
-
-function _IdentifyHighlightingGroup()
-    echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<'
-    \ . synIDattr(synID(line("."),col("."),0),"name") . "> lo<"
-    \ . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"
-endfunction
-command IdentifyHighlightingGroup :call _IdentifyHighlightingGroup()
-
 ]])
 
