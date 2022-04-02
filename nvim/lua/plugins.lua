@@ -18,6 +18,9 @@ require('packer').startup(function(use)
     use 'windwp/nvim-autopairs'
     use 'onsails/lspkind-nvim'
 
+    use 'voldikss/vim-floaterm'
+    use 'ptzz/lf.vim'
+
     use 'plasticboy/vim-markdown'
     use 'dhruvasagar/vim-table-mode'
 
