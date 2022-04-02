@@ -172,6 +172,7 @@ bindsym XF86TouchpadToggle exec --no-startup-id toggle-touchpad-while-typing
 bindsym XF86Launch1 exec --no-startup-id mpd-control toggle
 
 bindsym $mod+backslash exec --no-startup-id i3-scratchpad-alacritty todo.md notes todo.md
+bindsym $mod+p exec --no-startup-id i3-scratchpad-alacritty nvim-repl-python nvim-repl -f ~/syncthing/notebook.py python
 bindsym $mod+n exec --no-startup-id i3-scratchpad-alacritty notes notes
 
 exec_always --no-startup-id i3-autoscratchpad
