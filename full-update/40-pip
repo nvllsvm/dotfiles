@@ -12,6 +12,7 @@ pip() {
 }
 
 if [ "$(realpath ~/.config/pip)" != "${DOTFILES}/pip" ]; then
+    mkdir -p ~/.config
     rm -rf ~/.config/pip
     ln -s "${DOTFILES}/pip" ~/.config
 fi
