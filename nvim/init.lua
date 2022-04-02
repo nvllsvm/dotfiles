@@ -49,9 +49,6 @@ autocmd StdinReadPre * let s:std_in=1
 " open all folds automatically
 autocmd BufWinEnter * normal! zR
 
-" show trailing spaces and tabs
-"autocmd FileType * set list listchars=tab:»·,trail:·
-
 let g:neomake_python_enabled_makers = ['flake8']
 
 let g:neomake_warning_sign = {'text': 'W'}
@@ -68,8 +65,6 @@ augroup END
 
 autocmd! BufWritePost * Neomake
 
-" readd support for --path to lmk
-"autocmd BufWritePost * call system("lmk --path '" . expand('%:p') . "\' &")
 autocmd BufWritePost * call system("lmk")
 
 let base16colorspace=256
