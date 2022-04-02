@@ -15,8 +15,6 @@ cmp.setup({
     },
     formatting = {
         format = function(entry, vim_item)
-            vim_item = require('lspkind').cmp_format()(entry, vim_item)
-
             local alias = {
                 buffer = 'buffer',
                 path = 'path',

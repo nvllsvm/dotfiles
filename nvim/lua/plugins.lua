@@ -15,8 +15,6 @@ require('packer').startup(function(use)
     use 'hrsh7th/nvim-cmp'
     use 'neomake/neomake'
     use 'neovim/nvim-lspconfig'
-    use 'windwp/nvim-autopairs'
-    use 'onsails/lspkind-nvim'
 
     use 'voldikss/vim-floaterm'
     use 'ptzz/lf.vim'
