@@ -81,11 +81,6 @@ endif
 
 let g:markdown_enable_spell_checking = 0
 
-let g:netrw_banner = 0
-let g:netrw_dirhistmax = 0
-let g:netrw_list_hide = '^.git/$,.pyc$,^../,^./'
-let g:netrw_bufsettings="noma nomod nu nobl nowrap ro rnu"
-
 autocmd VimResized * wincmd =
 
 augroup JSON
@@ -104,7 +99,6 @@ augroup END
 let g:clipboard = {'copy': {'*': 'cbcopy', '+': 'cbcopy'}, 'paste': {'*': 'cbpaste', '+': 'cbpaste'}}
 
 let g:mkdp_echo_preview_url = 1
-let g:netrw_browsex_viewer= "open"
 
 function _IdentifyHighlightingGroup()
     echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<'
