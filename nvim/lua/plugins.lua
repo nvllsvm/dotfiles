@@ -54,7 +54,7 @@ require('packer').startup(function(use)
                             workspace = "notes",
                         }
                     },
-                    ["core.norg.concealer"] = {},
+                    --["core.norg.concealer"] = {},
                     ["core.norg.journal"] = {},
                     ["core.norg.qol.toc"] = {},
                     ["core.norg.completion"] = {
