@@ -1,5 +1,5 @@
-require('plugins')
-require('config')
+require("plugins")
+require("config")
 
 vim.o.ruler = true
 vim.o.tabstop = 4
@@ -21,17 +21,16 @@ vim.g.tex_flavor = "latex"
 vim.o.number = true
 vim.o.relativenumber = true
 
-vim.o.mouse = 'a'
+vim.o.mouse = "a"
 
-vim.api.nvim_set_keymap('n', '<C-n>', ':set number!<CR>:set relativenumber!<CR>', { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<C-c>', ':set cursorcolumn!<CR>', { noremap = true, silent = true})
+vim.api.nvim_set_keymap("n", "<C-n>", ":set number!<CR>:set relativenumber!<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<C-c>", ":set cursorcolumn!<CR>", { noremap = true, silent = true })
 
-vim.api.nvim_set_keymap('n', '<leader>z', ':Files<CR>', { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<leader>r', ':Rg<CR>', { noremap = true, silent = true})
-
+vim.api.nvim_set_keymap("n", "<leader>z", ":Files<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>r", ":Rg<CR>", { noremap = true, silent = true })
 
 -- <Ctrl-l> redraws the screen and removes any search highlighting.
-vim.api.nvim_set_keymap('n', '<C-l>', ':nohl<CR>:NeomakeClean<CR><C-l>', { noremap = true, silent = true})
+vim.api.nvim_set_keymap("n", "<C-l>", ":nohl<CR>:NeomakeClean<CR><C-l>", { noremap = true, silent = true })
 
 vim.cmd([[
 
@@ -57,4 +56,3 @@ autocmd VimResized * wincmd =
 " need to set both + and * else netrw barfs
 let g:clipboard = {'copy': {'*': 'cbcopy', '+': 'cbcopy'}, 'paste': {'*': 'cbpaste', '+': 'cbpaste'}}
 ]])
-
