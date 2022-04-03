@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import asyncio
 import json
 import time
 import os
@@ -15,21 +16,21 @@ TIMEOUT = 30
 class HASS:
     def __init__(self, url, token):
         self.url = url
-        self.client = httpx.Client()
+        self.client = httpx.AsyncClient()
         self.client.headers['Authorization'] = f'Bearer {token}'
 
-    def get_states(self):
-        response = self.client.get(f'{self.url}/api/states')
+    async def get_states(self):
+        response = await self.client.get(f'{self.url}/api/states')
         response.raise_for_status()
         return response.json()
 
-    def get_services(self):
-        response = self.client.get(f'{self.url}/api/services')
+    async def get_services(self):
+        response = await self.client.get(f'{self.url}/api/services')
         response.raise_for_status()
         return response.json()
 
-    def post_services(self, domain, service, entity_id, **kwargs):
-        response = self.client.post(
+    async def post_services(self, domain, service, entity_id, **kwargs):
+        response = await self.client.post(
             f'{self.url}/api/services/{domain}/{service}',
             json=dict(entity_id=entity_id, **kwargs),
         )
@@ -37,28 +38,30 @@ class HASS:
         return response.json()
 
 
-def office_tv_on(_):
+async def office_tv_on(_):
     hass = HASS(URL, TOKEN)
-    hass.post_services('media_player', 'turn_on',
-                       entity_id='media_player.office_tv')
+    await hass.post_services(
+        'media_player', 'turn_on', entity_id='media_player.office_tv')
 
     # buggy bullshit
     start = time.time()
     while True:
         attributes = [
             state['attributes']
-            for state in hass.get_states()
+            for state in await hass.get_states()
             if state['entity_id'] == 'media_player.office_tv'
         ][0]
 
         if attributes.get('volume_level') != 0.1:
-            hass.post_services('media_player', 'volume_set',
-                               entity_id='media_player.office_tv',
-                               volume_level=0.1)
+            await hass.post_services(
+                'media_player', 'volume_set',
+                entity_id='media_player.office_tv',
+                volume_level=0.1)
         elif attributes.get('source') != 'PC':
-            hass.post_services('media_player', 'select_source',
-                               entity_id='media_player.office_tv',
-                               source='PC')
+            await hass.post_services(
+                'media_player', 'select_source',
+                entity_id='media_player.office_tv',
+                source='PC')
         else:
             break
         time.sleep(0.1)
@@ -66,53 +69,56 @@ def office_tv_on(_):
             raise TimeoutError
 
 
-def office_tv_off(_):
+async def office_tv_off(_):
     hass = HASS(URL, TOKEN)
-    hass.post_services('media_player', 'turn_off',
-                       entity_id='media_player.office_tv')
+    await hass.post_services(
+        'media_player', 'turn_off',
+        entity_id='media_player.office_tv')
 
 
-def office_tv_mute_toggle(_):
+async def office_tv_mute_toggle(_):
     hass = HASS(URL, TOKEN)
-    hass.get_states()
     is_muted = [
         state['attributes']['is_volume_muted']
-        for state in hass.get_states()
+        for state in await hass.get_states()
         if state['entity_id'] == 'media_player.office_tv'
     ][0]
-    hass.post_services('media_player', 'volume_mute',
-                       entity_id='media_player.office_tv',
-                       is_volume_muted=not is_muted)
+    await hass.post_services(
+        'media_player', 'volume_mute',
+        entity_id='media_player.office_tv',
+        is_volume_muted=not is_muted)
 
 
-def office_tv_volume_up(_):
+async def office_tv_volume_up(_):
     hass = HASS(URL, TOKEN)
-    hass.post_services('media_player', 'volume_up',
-                       entity_id='media_player.office_tv')
+    await hass.post_services(
+        'media_player', 'volume_up',
+        entity_id='media_player.office_tv')
 
 
-def office_tv_volume_down(_):
+async def office_tv_volume_down(_):
     hass = HASS(URL, TOKEN)
-    hass.post_services('media_player', 'volume_down',
-                       entity_id='media_player.office_tv')
+    await hass.post_services(
+        'media_player', 'volume_down',
+        entity_id='media_player.office_tv')
 
 
-def get_states(args):
+async def get_states(args):
     hass = HASS(URL, TOKEN)
-    print(json.dumps(hass.get_states(), indent=2, sort_keys=True))
+    print(json.dumps(await hass.get_states(), indent=2, sort_keys=True))
 
 
-def get_services(args):
+async def get_services(args):
     hass = HASS(URL, TOKEN)
-    print(json.dumps(hass.get_services(), indent=2, sort_keys=True))
+    print(json.dumps(await hass.get_services(), indent=2, sort_keys=True))
 
 
-def post_services(args):
+async def post_services(args):
     hass = HASS(URL, TOKEN)
-    hass.post_services(args.domain, args.service, args.entity_id)
+    await hass.post_services(args.domain, args.service, args.entity_id)
 
 
-def main():
+async def main():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(
         dest='command', metavar='COMMAND', required=True)
@@ -150,8 +156,8 @@ def main():
 
     args = parser.parse_args()
 
-    args.func(args)
+    await args.func(args)
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())
