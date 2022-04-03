@@ -1,6 +1,8 @@
 -- https://github.com/hrsh7th/nvim-cmp
 local cmp = require('cmp')
+local mapping = require('cmp.config.mapping')
 local luasnip = require('luasnip')
+local types = require('cmp.types')
 
 require('luasnip.loaders.from_vscode').lazy_load()
 vim.api.nvim_command('hi LuasnipChoiceNodePassive cterm=italic')
@@ -34,30 +36,25 @@ cmp.setup({
     mapping = {
         ['<C-b>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
         ['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
-        ['<C-Space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
-        ['<C-e>'] = cmp.mapping({
-            i = cmp.mapping.abort(),
-            c = cmp.mapping.close(),
-        }),
-        ['<C-n>'] = cmp.mapping.confirm({ select = true }),
-        ['<Tab>'] = function(fallback)
-            if cmp.visible() then
-                cmp.select_next_item()
-            elseif luasnip.expand_or_jumpable() then
-                luasnip.expand_or_jump()
-            else
-                fallback()
-            end
+        ['<Tab>'] = cmp.mapping.confirm({ select = true }),
+      ['<C-n>'] = mapping({
+        i = mapping.select_next_item({ behavior = types.cmp.SelectBehavior.Select }),
+        c = function(fallback)
+          local cmp = require('cmp')
+          cmp.close()
+          vim.schedule(cmp.suspend())
+          fallback()
         end,
-        ['<S-Tab>'] = function(fallback)
-            if cmp.visible() then
-                cmp.select_prev_item()
-            elseif luasnip.jumpable(-1) then
-                luasnip.jump(-1)
-            else
-                fallback()
-            end
+      }),
+      ['<C-p>'] = mapping({
+        i = mapping.select_prev_item({ behavior = types.cmp.SelectBehavior.Select }),
+        c = function(fallback)
+          local cmp = require('cmp')
+          cmp.close()
+          vim.schedule(cmp.suspend())
+          fallback()
         end,
+      }),
     },
     sources = cmp.config.sources({
         { name = 'nvim_lsp', priority = 10 },
