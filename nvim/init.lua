@@ -34,6 +34,10 @@ vim.api.nvim_set_keymap("n", "<C-l>", ":nohl<CR>:NeomakeClean<CR><C-l>", { norem
 
 vim.cmd([[
 
+" relative percentage to screen
+let g:lf_width = 1.0
+let g:lf_height = 1.0
+
 filetype plugin indent on
 
 let $FZF_DEFAULT_COMMAND = "fd --type file --ignore-file ~/.config/nvim/fzf_fd_ignore"
