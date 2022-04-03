@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 import argparse
+import asyncio
 import contextvars
-import functools
 import hashlib
 import io
 import logging
 import pathlib
 import pickle
 import re
-import subprocess
 import tempfile
 import xml.etree.ElementTree
 import zipfile
@@ -71,12 +70,12 @@ class Redump:
     _PAGE_PATH_PATTERN = re.compile(r'.*\?page=(\d+)')
 
     def __init__(self):
-        self.client = httpx.Client()
+        self.client = httpx.AsyncClient()
         self.url = yarl.URL('http://redump.org')
-        self.datfiles = self.download_datfiles()
         self.sha1_cache = None
+        self.datfiles = None
 
-    def download_datfiles(self):
+    async def download_datfiles(self):
         """
         Download the redump PC datfile.
 
@@ -102,7 +101,7 @@ class Redump:
             ]
             data = {}
             for system in systems:
-                response = self.client.get(
+                response = await self.client.get(
                     str(self.url / 'datfile' / system))
                 response.raise_for_status()
                 archive = zipfile.ZipFile(io.BytesIO(response.content))
@@ -115,14 +114,14 @@ class Redump:
             safe_write_bytes(self.REDUMP_DAT_FILE, pickle.dumps(data))
         return data
 
-    def scrape_redump(self, name, system):
+    async def scrape_redump(self, name, system):
         part = name.split()[0]
         url = self.url / 'discs' / 'system' / system / 'quicksearch' / part
 
         current_page = 1
         max_pages = 1
         while current_page <= max_pages:
-            response = self.client.get(
+            response = await self.client.get(
                 str(url.with_query({'page': str(current_page)})),
                 follow_redirects=True)
             response.raise_for_status()
@@ -145,8 +144,7 @@ class Redump:
                         yield redump_id
             current_page += 1
 
-    @functools.lru_cache()
-    def download_sha1(self, redump_id):
+    async def download_sha1(self, redump_id):
         if self.sha1_cache is None:
             if self.SHA1_CACHE_FILE.exists():
                 self.sha1_cache = pickle.loads(
@@ -156,7 +154,7 @@ class Redump:
 
         redump_id = str(redump_id)
         if redump_id not in self.sha1_cache:
-            response = self.client.get(
+            response = await self.client.get(
                 str(self.url / 'disc' / redump_id / 'sha1'))
             response.raise_for_status()
             self.sha1_cache[redump_id] = response.text
@@ -220,13 +218,15 @@ def sha1sum(path):
     return hasher.hexdigest()
 
 
-def extract(path, dest_dir):
-    subprocess.run(
-        ['extract', '--quiet', '-p', str(dest_dir), '--', str(path)],
-        check=True)
+async def extract(path, dest_dir):
+    proc = await asyncio.create_subprocess_exec(
+        'extract', '--quiet', '-p', str(dest_dir), '--', str(path))
+    await proc.wait()
+    if proc.returncode:
+        raise RuntimeError(proc.returncode)
 
 
-def get_name(path, redump):
+async def get_name(path, redump):
     arg_hashes = find_dump_hashes(path)
     expected = tuple(arg_hashes.values())
 
@@ -257,8 +257,8 @@ def get_name(path, redump):
     # fix for games like 'Fury^3'
     name = name.replace('^', '')
 
-    for redump_id in redump.scrape_redump(name, system):
-        sha1 = redump.download_sha1(redump_id)
+    async for redump_id in redump.scrape_redump(name, system):
+        sha1 = await redump.download_sha1(redump_id)
         if expected == tuple(sha1.values()):
             LOGGER.info('Found redump match %s "%s"', redump_id, name)
             return redump_id, name.replace('/', '')
@@ -266,7 +266,7 @@ def get_name(path, redump):
     raise RuntimeError('wtf')
 
 
-def main():
+async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--no-rename', action='store_true')
     parser.add_argument('--verbose', action='store_true')
@@ -277,6 +277,7 @@ def main():
                   level=logging.DEBUG if args.verbose else logging.INFO)
 
     redump = Redump()
+    redump.datfiles = await redump.download_datfiles()
 
     for path in args.path:
         log_context('path', path)
@@ -284,19 +285,19 @@ def main():
         if path.is_file():
             if path.suffix == '.iso':
                 suffix = '.iso'
-                redump_id, name = get_name(path, redump)
+                redump_id, name = await get_name(path, redump)
             elif path.suffixes[-2:] == ['.tar', '.zst']:
                 suffix = '.tar.zst'
                 parent = pathlib.Path('~').expanduser()
                 with tempfile.TemporaryDirectory(dir=parent) as tmp:
                     dest = pathlib.Path(tmp) / path.name
-                    extract(path, dest)
-                    redump_id, name = get_name(dest, redump)
+                    await extract(path, dest)
+                    redump_id, name = await get_name(dest, redump)
             else:
                 raise RuntimeError()
         else:
             suffix = ''
-            redump_id, name = get_name(path, redump)
+            redump_id, name = await get_name(path, redump)
 
         if redump_id:
             target = path.with_name(f'redump_{redump_id} {name}{suffix}')
@@ -322,4 +323,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())
