@@ -15,21 +15,21 @@ TIMEOUT = 30
 class HASS:
     def __init__(self, url, token):
         self.url = url
-        self.session = httpx.Client()
-        self.session.headers['Authorization'] = f'Bearer {token}'
+        self.client = httpx.Client()
+        self.client.headers['Authorization'] = f'Bearer {token}'
 
     def get_states(self):
-        response = self.session.get(f'{self.url}/api/states')
+        response = self.client.get(f'{self.url}/api/states')
         response.raise_for_status()
         return response.json()
 
     def get_services(self):
-        response = self.session.get(f'{self.url}/api/services')
+        response = self.client.get(f'{self.url}/api/services')
         response.raise_for_status()
         return response.json()
 
     def post_services(self, domain, service, entity_id, **kwargs):
-        response = self.session.post(
+        response = self.client.post(
             f'{self.url}/api/services/{domain}/{service}',
             json=dict(entity_id=entity_id, **kwargs),
         )
