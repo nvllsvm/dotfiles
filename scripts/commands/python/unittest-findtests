@@ -11,39 +11,59 @@ LOGGER = logging.getLogger('unittest-findtests')
 
 def find_tests(name):
     tests = set()
-    for suite in unittest.defaultTestLoader.discover(name):
-        LOGGER.debug('suite %r', suite)
-        for case in suite:
-            LOGGER.debug('case %r', case)
-            try:
-                iter_case = iter(case)
-            except TypeError as e:
-                LOGGER.debug('case error %r', e)
-                continue
-            for test in iter_case:
-                fullname = '.'.join([
-                    test.__module__,
-                    test.__class__.__qualname__,
-                    test._testMethodName
-                ])
-                LOGGER.debug('found %s', fullname)
-                tests.add(fullname)
-    return tests
+    try:
+        for suite in unittest.defaultTestLoader.discover(name,
+                                                         top_level_dir=name):
+            LOGGER.debug('suite %r', suite)
+            for case in suite:
+                LOGGER.debug('case %r', case)
+                try:
+                    iter_case = iter(case)
+                except TypeError as e:
+                    LOGGER.debug('case error %r', e)
+                    continue
+                for test in iter_case:
+                    fullname = '.'.join([
+                        test.__module__,
+                        test.__class__.__qualname__,
+                        test._testMethodName
+                    ])
+                    LOGGER.debug('found %s', fullname)
+                    tests.add(fullname)
+    except (AssertionError, ImportError) as e:
+        LOGGER.debug('loader error %r', e)
+    relative = name.relative_to(pathlib.Path())
+    return {
+        '.'.join((*relative.parts, test))
+        for test in tests
+    }
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--verbose', action='store_true')
-    parser.add_argument('name', default=pathlib.Path().absolute(), nargs='?')
+    parser.add_argument('path', type=pathlib.Path, nargs='?')
     args = parser.parse_args()
 
     if args.verbose:
         logging.basicConfig(level=logging.DEBUG)
 
+    # fixes discovery when both local tests and unrelated acceptance tests
+    # reside in current directory.
+    if args.path is None:
+        paths = []
+        for path in pathlib.Path().iterdir():
+            if path.is_dir():
+                paths.append(path)
+    else:
+        paths = [args.path.absolute()]
+
+    tests = set()
     # redirect output to make loud imports stfu
     with contextlib.redirect_stdout(subprocess.DEVNULL):
         with contextlib.redirect_stderr(subprocess.DEVNULL):
-            tests = find_tests(args.name)
+            for path in paths:
+                tests.update(find_tests(path))
 
     print('\n'.join(sorted(tests)))
 
