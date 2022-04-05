@@ -40,12 +40,10 @@ def main():
     if args.verbose:
         logging.basicConfig(level=logging.DEBUG)
 
-    tests = find_tests(args.name)
-    if False:
-        # redirect output to make loud imports stfu
-        with contextlib.redirect_stdout(subprocess.DEVNULL):
-            with contextlib.redirect_stderr(subprocess.DEVNULL):
-                tests = find_tests(args.name)
+    # redirect output to make loud imports stfu
+    with contextlib.redirect_stdout(subprocess.DEVNULL):
+        with contextlib.redirect_stderr(subprocess.DEVNULL):
+            tests = find_tests(args.name)
 
     print('\n'.join(sorted(tests)))
 
