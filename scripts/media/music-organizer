@@ -358,7 +358,7 @@ def main():
                     LOGGER.error('invalid album name "%s"', root_path)
                     raise RuntimeError('figure out what to do')
                 if root_path.name != expected_album:
-                    LOGGER.info('renmaing album folder from "%s" to "%s"',
+                    LOGGER.info('renaming album folder from "%s" to "%s"',
                                 root_path, album)
                     new_root = root_path.with_name(expected_album)
                     if new_root.exists():
