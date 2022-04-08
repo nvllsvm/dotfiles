@@ -107,10 +107,10 @@ class Redump:
                 archive = zipfile.ZipFile(io.BytesIO(response.content))
                 if len(archive.namelist()) != 1:
                     raise RuntimeError('expected archive to contain one file')
-                dat_file = archive.read(archive.namelist()[0])
-                self.REDUMP_DAT_FILE.write_bytes(dat_file)
-                data[system] = xml.etree.ElementTree.parse(
-                    self.REDUMP_DAT_FILE)
+                dat_file = io.BytesIO()
+                dat_file.write(archive.read(archive.namelist()[0]))
+                dat_file.seek(0)
+                data[system] = xml.etree.ElementTree.parse(dat_file)
             safe_write_bytes(self.REDUMP_DAT_FILE, pickle.dumps(data))
         return data
 
