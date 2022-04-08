@@ -469,23 +469,27 @@ def main():
         usage='%(prog)s [OPTIONS] source [source ...]')
 
     group_format = parser.add_argument_group('format')
-    parser.add_argument('--rm', default=False, action='store_true',
-                        help='remove source after success')
     group_format.add_argument(
         '-f', metavar='FORMAT', choices=_FORMATS,
         dest='format', default='tar.zst',
         help='archive format: %(choices)s (default: %(default)s)')
-    parser.add_argument('-n', metavar='NUM', dest='num_procs',
-                        type=_num_procs, default=1,
-                        help='number of parallel jobs (default: %(default)s)')
     group_format.add_argument(
         '--fast', default=False, action='store_true',
         help='increase archiving speed at the expense of compression')
+
+    parser.add_argument(
+        '--rm', default=False, action='store_true',
+        help='remove source after success')
+    parser.add_argument(
+        '-n', metavar='NUM', dest='num_procs',
+        type=_num_procs, default=1,
+        help='number of parallel jobs (default: %(default)s)')
     parser.add_argument(
         '-p', dest='parent', metavar='DIR', type=pathlib.Path,
         help='parent directory to save the archive in')
-    parser.add_argument('source', type=lambda p: pathlib.Path(p).absolute(),
-                        nargs='+')
+    parser.add_argument(
+        'source', type=lambda p: pathlib.Path(p).absolute(), nargs='+')
+
     args = parser.parse_args()
 
     async def run(args):
