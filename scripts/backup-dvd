@@ -12,6 +12,9 @@ EOF
 fi
 
 LABEL="$(blkid -o value -s LABEL "$DEVICE")"
+if [ -z "$DESTINATION" ]; then
+    DESTINATION="$LABEL"
+fi
 
 OUTFILE="${DESTINATION}/${LABEL}.iso"
 LOGFILE="${DESTINATION}/${LABEL}.log"
