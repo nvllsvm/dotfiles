@@ -21,13 +21,13 @@ def set_profile(card_name, profile_name):
         check=True)
 
 
-def set_sink_mute(name):
+def set_sink_mute():
     subprocess.run(
         ['pactl', 'set-sink-mute', '@DEFAULT_SINK@', '0'],
         check=True)
 
 
-def set_source_mute(name):
+def set_source_mute():
     subprocess.run(
         ['pactl', 'set-source-mute', '@DEFAULT_SOURCE@', '0'],
         check=True)
@@ -49,7 +49,6 @@ def main():
 
     set_sink_mute()
     set_source_mute()
-
 
 
 if __name__ == '__main__':
