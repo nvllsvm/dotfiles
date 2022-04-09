@@ -11,6 +11,12 @@ EOF
     exit 1
 fi
 
+# !! MUST BE RUN FIRST !!
+# "authenticates" the drive. something to do with encryption, not sure.
+# doesn't work without doing this.
+echo 'Running lsdvd ...'
+lsdvd -x "$DEVICE"
+
 LABEL="$(blkid -o value -s LABEL "$DEVICE")"
 if [ -z "$DESTINATION" ]; then
     DESTINATION="$LABEL"
@@ -24,11 +30,6 @@ if [ -e "$OUTFILE" ] || [ -e "$LOGFILE" ]; then
     exit 1
 fi
 mkdir -p "$DESTINATION"
-
-# "authenticates" the drive. something to do with encryption, not sure.
-# doesn't work without doing this
-echo 'Running lsdvd ...'
-lsdvd -x "$DEVICE"
 
 echo 'Reading without retry ...'
 ddrescue --sector-size=2048 --verbose --no-scrape "$DEVICE" "${OUTFILE}" "${LOGFILE}"
