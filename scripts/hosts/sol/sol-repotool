@@ -14,6 +14,8 @@ fi
 repotool_update() {
     sudo pacsync "$DATABASE" > /dev/null
 
+    cd ~/.cache/aurutils/sync || exit 1
+
     aur sync --no-view --no-confirm --database="$DATABASE" --no-ver --upgrades
 
     vcs_pkgs=$(aur repo --database="$DATABASE" --list | cut -f1 | grep -E "$AURVCS" || true)
@@ -21,7 +23,7 @@ repotool_update() {
         aur sync "$vcs_pkgs" --no-ver-argv --no-build --no-view
         for vcs_pkg in $vcs_pkgs; do
             repo_ver="$(aur repo --database "$DATABASE" --list | grep -P "^$vcs_pkg\t")"
-            current_ver="$(aur srcver ~/.cache/aurutils/sync/"$vcs_pkg")"
+            current_ver="$(aur srcver "$vcs_pkg")"
             ood="$(printf '%s' "$repo_ver" | aur vercmp -p <(printf '%s' "$current_ver"))"
             if [ -n "$ood" ]; then
                 repotool_add "$vcs_pkg"
