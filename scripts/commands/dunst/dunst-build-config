@@ -18,6 +18,9 @@ fi
 if [ -z "$OFFSET" ]; then
     OFFSET="0x50"
 fi
+if [ -n "$WAYLAND_DISPLAY" ]; then
+    OFFSET="0x0"
+fi
 
 eval "$(base16-export)"
 
