@@ -129,4 +129,6 @@ bindsym XF86AudioNext exec --no-startup-id mpd-control next
 bindsym XF86MonBrightnessDown exec --no-startup-id set-backlight dec
 bindsym XF86MonBrightnessUp exec --no-startup-id set-backlight inc
 
+output * adaptive_sync on
+
 exec swayidle -w before-sleep 'swaylock -f'
