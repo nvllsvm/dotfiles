@@ -27,6 +27,7 @@ image/tiff=org.nomacs.ImageLounge.desktop
 image/webp=org.nomacs.ImageLounge.desktop
 image/x-canon-cr2=org.nomacs.ImageLounge.desktop
 image/x-canon-cr3=org.nomacs.ImageLounge.desktop
+text/csv=neovim-dotfiles.desktop
 text/html=firefox-dotfiles.desktop
 text/plain=neovim-dotfiles.desktop
 video/mp4=mpv.desktop
