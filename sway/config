@@ -56,7 +56,7 @@ bindsym $mod+Shift+8 move container to workspace 8
 bindsym $mod+Shift+9 move container to workspace 9
 bindsym $mod+Shift+0 move container to workspace 10
 
-bindsym $mod+Shift+c reload
+bindsym $mod+Shift+r reload
 
 mode "resize" {
     bindsym h resize shrink width 10 px or 10 ppt
@@ -71,24 +71,7 @@ mode "resize" {
 bindsym $mod+r mode "resize"
 
 bar {
-    status_command    i3-custom-status
-    position          top
-    workspace_buttons yes
-    tray_output       *
-    separator_symbol  "   "
-
-
-    colors {
-        background $color_bg
-        statusline $color_fg
-        separator  $color_fg
-
-        # border background text
-        focused_workspace  $color_19 $color_19 $color_fg
-        active_workspace   $color_18 $color_19 $color_fg
-        inactive_workspace $color_bg $color_bg $color_08
-        urgent_workspace   $color_01 $color_01 $color_fg
-    }
+    swaybar_command waybar
 }
 
 # class                 border    bg        text      indicator child_border
@@ -131,4 +114,7 @@ bindsym XF86MonBrightnessUp exec --no-startup-id set-backlight inc
 
 output * adaptive_sync on
 
+exec set-desktop-themes
+exec syncthingtray --wait
 exec swayidle -w before-sleep 'swaylock -f'
+exec nm-applet --indicator
