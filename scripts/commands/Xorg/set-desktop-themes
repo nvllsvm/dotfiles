@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-set -e
+set -ex
 
 CURRENT_THEME=~/.setdesktoptheme
 
@@ -188,7 +188,8 @@ entry {
 }
 EOF
 
-xrandr --dpi "$DPI"
+# fails in sway
+xrandr --dpi "$DPI" || true
 
 alacritty-config-reload
 
