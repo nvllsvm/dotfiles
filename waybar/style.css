@@ -37,11 +37,15 @@ window#waybar {
 #network,
 #pulseaudio,
 #custom-media,
-#tray,
 #mode,
 #idle_inhibitor,
 #mpd {
-    padding: 0 1em;
+    padding: 0 1.25em;
+}
+
+#tray {
+    padding-left: 1.25em;
+    padding-right: 0.5em;
 }
 
 #window,

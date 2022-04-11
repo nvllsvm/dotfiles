@@ -8,7 +8,7 @@
     "modules-left": ["sway/workspaces", "sway/mode"],
     //"modules-center": ["sway/window"],
     "modules-center": [],
-    "modules-right": ["battery", "pulseaudio", "clock", "tray"],
+    "modules-right": ["battery", "pulseaudio#input", "pulseaudio#output", "clock", "tray"],
     // Modules configuration
     // "sway/workspaces": {
     //     "disable-scroll": true,
@@ -91,9 +91,28 @@
         // "format-full": "",
         "format-icons": ["", "", "", "", ""]
     },
-    "pulseaudio": {
+    "pulseaudio#output": {
         // "scroll-step": 1, // %, can be a float
-        "format": "{format_source} {icon} {volume}%",
+        "format": "{icon} {volume}%",
+        "format-bluetooth": "{volume}% {icon} {format_source}",
+        "format-bluetooth-muted": " {icon} {format_source}",
+        "format-muted": " {format_source}",
+        "format-source": " {volume}%",
+        "format-source-muted": "",
+        "format-icons": {
+            "headphone": "",
+            "hands-free": "",
+            "headset": "",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": ["", "", ""]
+        },
+        "on-click": "pavucontrol"
+    },
+    "pulseaudio#input": {
+        // "scroll-step": 1, // %, can be a float
+        "format": "{format_source}",
         "format-bluetooth": "{volume}% {icon} {format_source}",
         "format-bluetooth-muted": " {icon} {format_source}",
         "format-muted": " {format_source}",
