@@ -70,7 +70,7 @@
     "clock": {
         // "timezone": "America/New_York",
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
-        "format": "{:%Y-%m-%d %H:%M}"
+        "format": " {:%Y-%m-%d %H:%M}"
     },
     "backlight": {
         // "device": "acpi_video1",
@@ -84,9 +84,9 @@
             "critical": 15
         },
         "format": "{icon} {capacity}%",
+        "format-alt": "{icon} {capacity}%",
         "format-charging": " {capacity}",
         "format-plugged": " {capacity}",
-        "format-alt": "{icon} {time}",
         // "format-good": "", // An empty format will hide the module
         // "format-full": "",
         "format-icons": ["", "", "", "", ""]
@@ -96,7 +96,7 @@
         "format": "{icon} {volume}%",
         "format-bluetooth": "{volume}% {icon} {format_source}",
         "format-bluetooth-muted": " {icon} {format_source}",
-        "format-muted": " {format_source}",
+        "format-muted": " ",
         "format-source": " {volume}%",
         "format-source-muted": "",
         "format-icons": {
@@ -108,14 +108,14 @@
             "car": "",
             "default": ["", "", ""]
         },
-        "on-click": "pavucontrol"
+        "on-click": "set-volume toggle-mute"
     },
     "pulseaudio#input": {
         // "scroll-step": 1, // %, can be a float
         "format": "{format_source}",
         "format-bluetooth": "{volume}% {icon} {format_source}",
         "format-bluetooth-muted": " {icon} {format_source}",
-        "format-muted": " {format_source}",
+        "format-muted": "{format_source}",
         "format-source": " {volume}%",
         "format-source-muted": "",
         "format-icons": {
@@ -127,7 +127,7 @@
             "car": "",
             "default": ["", "", ""]
         },
-        "on-click": "pavucontrol"
+        "on-click": "toggle-source-mute"
     }
 }
 

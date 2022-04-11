@@ -4,6 +4,11 @@
     color: #d8d8d8;
 }
 
+menu {
+    background-color: #181818;
+    border: 2px solid #383838;
+}
+
 window#waybar {
     color: #d8d8d8;
     background-color: #181818;
