@@ -11,4 +11,4 @@ augroup my_neomake_highlights
       \ hi NeomakeWarning ctermbg=yellow
 augroup END
 
-autocmd! BufWritePost * Neomake
+autocmd BufWritePost * Neomake
