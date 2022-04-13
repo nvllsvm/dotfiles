@@ -3,17 +3,30 @@ set -e
 IMAGE=docker.io/nvllsvm/harmonize
 
 SOURCE=/storage/Audio/Library
-TARGET=/storage/Audio/Lossy_opus_128
+TARGET_128=/storage/Audio/Lossy_opus_128
+TARGET_192=/storage/Audio/Lossy_opus_192
 
-harmonize() {
+harmonize_128() {
     podman run \
         --rm \
         --pull always \
         --quiet \
         --userns= \
         -v "$SOURCE:$SOURCE" \
-        -v "$TARGET:$TARGET" \
+        -v "$TARGET_128:$TARGET_128" \
         "$IMAGE" "$@"
 }
 
-harmonize -n "$(nproc)" "$SOURCE" "$TARGET" --codec opus --bitrate 128 --music
+harmonize_192() {
+    podman run \
+        --rm \
+        --pull always \
+        --quiet \
+        --userns= \
+        -v "$SOURCE:$SOURCE" \
+        -v "$TARGET_192:$TARGET_192" \
+        "$IMAGE" "$@"
+}
+
+harmonize_128 -n "$(nproc)" "$SOURCE" "$TARGET_128" --codec opus --bitrate 128 --music
+harmonize_192 -n "$(nproc)" "$SOURCE" "$TARGET_192" --codec opus --bitrate 192 --music
