@@ -1,61 +1,64 @@
 #!/usr/bin/env python3
-import argparse
+import asyncio
 import json
-import signal
-import sys
-import urllib.parse
-import urllib.request
+
+import configargparse
+import httpx
+import yarl
 
 
-def _get_events(subdomain, token, query, start, end, order):
-    url = 'https://{}.loggly.com/apiv2/events/iterate?{}'.format(
-        subdomain,
-        urllib.parse.urlencode({
-            'q': query,
-            'from': start,
-            'until': end,
-            'order': order,
-            'size': 1000,  # API max
-        }))
+class Loggly:
 
-    while url:
-        req = urllib.request.Request(
-            url,
-            headers={'Authorization': f'bearer {token}'})
-        body = json.load(urllib.request.urlopen(req))
-        url = body.get('next')
-        yield from body.get('events', [])
+    def __init__(self, subdomain, token):
+        self.client = httpx.AsyncClient()
+        self.client.headers['Authorization'] = f'bearer {token}'
+        self.url = yarl.URL(f'https://{subdomain}.loggly.com')
+
+    async def search(self, query, start, end, order):
+        url = str((self.url / 'apiv2' / 'events' / 'iterate').with_query({
+                'q': query,
+                'from': start,
+                'until': end,
+                'order': order,
+                'size': 1000,  # API max
+            }))
+
+        while url:
+            response = await self.client.get(url)
+            body = response.json()
+            url = body.get('next')
+            for event in body.get('events', []):
+                yield event
 
 
-def _signal_handler(*_):
-    sys.exit(1)
-
-
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--token', required=True)
-    parser.add_argument('--subdomain', required=True)
+async def main():
+    parser = configargparse.ArgumentParser()
+    parser.add_argument('--token', env_var='LOGGLY_TOKEN')
+    parser.add_argument('--subdomain', env_var='LOGGLY_SUBDOMAIN')
 
     parser.add_argument('--from', default='-24h', dest='start')
     parser.add_argument('--to', default='now', dest='end')
     parser.add_argument('--order', choices=('asc', 'desc'), default='asc')
-    parser.add_argument('-n', type=int, dest='limit')
+    parser.add_argument('--limit', type=int, dest='limit')
     parser.add_argument('query')
-
-    signal.signal(signal.SIGINT, _signal_handler)
-    signal.signal(signal.SIGTERM, _signal_handler)
 
     args = parser.parse_args()
 
-    event_iter = _get_events(
-        args.subdomain, args.token, args.query, args.start, args.end,
-        args.order)
+    client = Loggly(subdomain=args.subdomain, token=args.token)
 
-    for i, event in enumerate(event_iter):
+    future = client.search(
+        query=args.query,
+        start=args.start,
+        end=args.end,
+        order=args.order)
+
+    num_events = 0
+    async for event in future:
         print(json.dumps(event))
-        if args.limit and i == args.limit:
+        num_events += 1
+        if args.limit and num_events == args.limit:
             break
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())
