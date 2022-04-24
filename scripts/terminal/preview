@@ -27,6 +27,7 @@ else
         application/gzip|\
         application/java-archive|\
         application/vnd.comicbook+zip|\
+        application/vnd.google-earth.kmz|\
         application/vnd.ms-cab-compressed|\
         application/vnd.rar|\
         application/x-7z-compressed|\
