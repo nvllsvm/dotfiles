@@ -5,6 +5,7 @@ import contextlib
 import functools
 import getpass
 import io
+import logging
 import os
 import pathlib
 import re
@@ -13,6 +14,9 @@ import subprocess
 import sys
 import tempfile
 import zipfile
+
+
+LOGGER = logging.getLogger('extract')
 
 
 class cli_7zip:
@@ -1271,8 +1275,12 @@ async def main():
     parser.add_argument(
         '-q', '--quiet', action='store_true',
         help='suppress non-error output')
+    parser.add_argument('--verbose', action='store_true')
     parser.add_argument('archive', nargs='+', type=pathlib.Path)
     args = parser.parse_args()
+
+    if args.verbose:
+        logging.basicConfig(level=logging.DEBUG)
 
     password = getpass.getpass('Password: ') if args.password else None
 
@@ -1297,6 +1305,7 @@ async def main():
             continue
 
         cls = await _get_class(path)
+        LOGGER.debug('Using %s for %s', cls, path)
         cls.check()
         if args.list:
             contents = format_contents(await cls.contents(path))
