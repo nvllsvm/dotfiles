@@ -1,39 +1,44 @@
-#!/usr/bin/env sh
-set -e
+#!/usr/bin/env python3
+import argparse
+import subprocess
 
-STEP=10
-MINIMUM=1
+STEP = 10
+MINIMUM = 1
+MAXIMUM = 100
 
-current_light() {
+
+def set_backlight(value):
+    subprocess.run(['light', '-S', str(value)], check=True)
+
+
+def get_backlight():
+    proc = subprocess.run(['light'], stdout=subprocess.PIPE, check=True)
     # fix "ugly" values on asus flowx13 (ex. 31, 41)
-    printf %.0f "$(light)" | python -c 'import sys; sys.stdout.write(str(round(int(sys.stdin.read()) / 10) * 10))'
-}
+    return max(round(float(proc.stdout.strip()) / 10) * 10, 1)
 
-case "$1" in
-    dec)
-        if [ "$(current_light)" -gt "$STEP" ]; then
-            light -U "$STEP"
-        else
-            light -S "$MINIMUM"
-        fi
-        ;;
-    inc)
-        if [ "$(current_light)" -lt "$STEP" ]; then
-            light -S "$STEP"
-        else
-            light -A "$STEP"
-        fi
-        ;;
-    *)
-        cat << EOF
-inc:  Increase backlight by 10
-dec:  Decrease backlight by 10
-EOF
-    exit 1
-esac
 
-dunstify \
-    --hints=string:x-dunst-stack-tag:set-backlight \
-    --hints=int:transient:1 \
-    --hints=int:value:"$(current_light)" \
-    "Backlight"
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('value', choices=['inc', 'dec'])
+    args = parser.parse_args()
+
+    value = get_backlight()
+    if args.value == 'inc':
+        value = min(value + STEP, MAXIMUM)
+        set_backlight(value)
+    elif args.value == 'dec':
+        value = max(value - STEP, MINIMUM)
+        set_backlight(value)
+
+    subprocess.run(
+        ['dunstify',
+         '--hints=string:x-dunst-stack-tag:set-backlight',
+         '--hints=int:transient:1',
+         f'--hints=int:value:{value}',
+         'Backlight'],
+        stdout=subprocess.DEVNULL,
+        check=True)
+
+
+if __name__ == '__main__':
+    main()
