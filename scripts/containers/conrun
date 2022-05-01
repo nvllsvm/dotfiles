@@ -39,7 +39,7 @@ CONTAINER_CMD=
 
 if command -v docker > /dev/null; then
     CONTAINER_CMD='docker'
-    run_help="$(docker run --help)"
+    run_help="$(docker run --help 2> /dev/null)"
     value_args="$(echo "$run_help" | cut '-c7-39' | grep '^--' | awk '{if ($2 != "") print $1}')"
     value_args="$value_args $(echo "$run_help" | cut '-c3-39' | grep '^-' | awk '{if ($3 != "") print $1}' | tr ',' ' ')"
     value_args="$value_args --net"
