@@ -30,14 +30,12 @@ def main():
         value = max(value - STEP, MINIMUM)
         set_backlight(value)
 
-    subprocess.run(
+    subprocess.Popen(
         ['dunstify',
          '--hints=string:x-dunst-stack-tag:set-backlight',
          '--hints=int:transient:1',
          f'--hints=int:value:{value}',
-         'Backlight'],
-        stdout=subprocess.DEVNULL,
-        check=True)
+         'Backlight'])
 
 
 if __name__ == '__main__':
