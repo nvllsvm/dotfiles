@@ -24,7 +24,7 @@ class Loggly:
             }))
 
         while url:
-            # disable timeout as some queries will take longer than the default
+            # disable timeout as some searches take longer than the default
             response = await self.client.get(url, timeout=None)
             body = response.json()
             url = body.get('next')
