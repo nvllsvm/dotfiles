@@ -24,7 +24,7 @@ class Loggly:
             }))
 
         while url:
-            response = await self.client.get(url)
+            response = await self.client.get(url, timeout=None)
             body = response.json()
             url = body.get('next')
             for event in body.get('events', []):
