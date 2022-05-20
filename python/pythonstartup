@@ -10,6 +10,7 @@ import contextlib
 import contextvars
 import copy
 import datetime
+import decimal
 import difflib
 import email
 import email.message
