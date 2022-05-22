@@ -393,11 +393,13 @@ class unrar:
 
     @staticmethod
     async def contents(path):
-        proc = subprocess.run(
-            ['unrar', 'vb', '-v', '--', path],
-            stdout=subprocess.PIPE,
-            check=True)
-        return set(proc.stdout.splitlines())
+        proc = await asyncio.create_subprocess_exec(
+            'unrar', 'vb', '-v', '--', path,
+            stdout=asyncio.subprocess.PIPE)
+        stdout, _ = await proc.communicate()
+        if proc.returncode:
+            raise ProcessError(proc.returncode)
+        return set(stdout.splitlines())
 
     @staticmethod
     async def extract(path, dest, paths=None, password=None, overwrite=False):
@@ -407,23 +409,28 @@ class unrar:
         if overwrite:
             raise NotImplementedError
         if password:
+            raise NotImplementedError
             kwargs['input'] = password
         else:
-            kwargs['stdin'] = subprocess.DEVNULL
-        subprocess.run(
-            ['unrar', 'x', '-idc', '-idd', '-idn', '-idp', '-idq',
-             '--', path, dest],
-            check=True, **kwargs)
+            kwargs['stdin'] = asyncio.subprocess.DEVNULL
+        proc = await asyncio.create_subprocess_exec(
+            'unrar', 'x', '-idc', '-idd', '-idn', '-idp', '-idq',
+            '--', path, dest, **kwargs)
+        await proc.communicate()
+        if proc.returncode:
+            raise ProcessError(proc.returncode)
 
     @staticmethod
     async def volumes(path, password=''):
-        proc = subprocess.run(
-            ['unrar', 'vt', '-v', '--', path],
-            stdout=subprocess.PIPE,
-            check=True)
+        proc = await asyncio.create_subprocess_exec(
+            'unrar', 'vt', '-v', '--', path,
+            stdout=asyncio.subprocess.PIPE)
+        stdout, _ = await proc.communicate()
+        if proc.returncode:
+            raise ProcessError(proc.returncode)
         return [
             path.parent / line.split(maxsplit=1)[-1]
-            for line in proc.stdout.decode().splitlines()
+            for line in stdout.decode().splitlines()
             if line.startswith('Archive: ')
         ]
 
