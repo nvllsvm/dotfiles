@@ -28,9 +28,10 @@ elif len(sys.argv) == 1:
     if proc.returncode:
         sys.exit(proc.returncode)
     data = proc.stdout.decode()
-elif len(sys.argv) == 2:
-    data = sys.argv[1]
+elif len(sys.argv) >= 2:
+    data = ' '.join(sys.argv[1:])
 else:
+    print(len(sys.argv))
     raise NotImplementedError
 
 data = data.strip().encode()
