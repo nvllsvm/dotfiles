@@ -30,6 +30,7 @@ image/x-canon-cr3=org.nomacs.ImageLounge.desktop
 text/csv=neovim-dotfiles.desktop
 text/html=firefox-dotfiles.desktop
 text/plain=neovim-dotfiles.desktop
+video/mp2t=mpv.desktop
 video/mp4=mpv.desktop
 video/mpeg=mpv.desktop
 video/quicktime=mpv.desktop
