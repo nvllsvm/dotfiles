@@ -403,19 +403,19 @@ class unrar:
 
     @staticmethod
     async def extract(path, dest, paths=None, password=None, overwrite=False):
-        kwargs = {}
+        args = []
         if paths:
             raise NotImplementedError
         if overwrite:
             raise NotImplementedError
-        if password:
-            raise NotImplementedError
-            kwargs['input'] = password
-        else:
-            kwargs['stdin'] = asyncio.subprocess.DEVNULL
+
+        if password is not None:
+            args.append(f'-p{password}')
+
         proc = await asyncio.create_subprocess_exec(
-            'unrar', 'x', '-idc', '-idd', '-idn', '-idp', '-idq',
-            '--', path, dest, **kwargs)
+            'unrar', 'x', '-idc', '-idd', '-idn', '-idp', '-idq', *args,
+            '--', path, dest,
+            stdin=asyncio.subprocess.DEVNULL)
         await proc.communicate()
         if proc.returncode:
             raise ProcessError(proc.returncode)
