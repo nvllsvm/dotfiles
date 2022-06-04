@@ -2,4 +2,4 @@
 export COMPOSE_PROJECT_NAME=sol-docker
 export COMPOSE_FILE="$HOME/code/sol-docker/docker-compose.yaml"
 
-exec docker compose "$@"
+exec docker-compose "$@"
