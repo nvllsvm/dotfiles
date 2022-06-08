@@ -17,7 +17,6 @@ fi
 
 "$INSTALL_DIR"/bin/pyenv rehash
 
-exit
 if [ -d "${INSTALL_DIR}"/versions ]; then
     PYTHON_VERSION="$(ls "${INSTALL_DIR}/versions" | rg '^\d' | sort --version-sort | tail -n 1 | sed 's/[ \t]*$//')"
     "${INSTALL_DIR}/versions/${PYTHON_VERSION}/bin/python" << EOF
