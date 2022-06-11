@@ -15,7 +15,7 @@ require("packer").startup({
         use("wbthomason/packer.nvim")
 
         use("Vimjas/vim-python-pep8-indent")
-        use("fnune/base16-vim")
+        use("base16-project/base16-vim")
         use("hrsh7th/cmp-buffer")
         use("hrsh7th/cmp-cmdline")
         use("hrsh7th/cmp-nvim-lsp")
