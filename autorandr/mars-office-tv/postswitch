@@ -2,6 +2,6 @@
 set-desktop-themes --dpi 96
 
 pactl-set-only \
-    --profile alsa_card.pci-0000_0b_00.1 output:hdmi-stereo-extra3
+    --profile alsa_card.pci-0000_0b_00.1 output:hdmi-stereo
 
 i3-move-ws
