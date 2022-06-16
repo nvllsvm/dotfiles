@@ -148,6 +148,7 @@ bindsym $mod+F3 exec --no-startup-id i3-f3
 bindsym $mod+F4 exec --no-startup-id i3-f4
 bindsym $mod+F5 exec --no-startup-id i3-f5
 bindsym $mod+F6 exec --no-startup-id i3-f6
+bindsym $mod+o exec --no-startup-id i3-o
 bindsym $mod+equal workspace next_on_output
 bindsym $mod+minus workspace prev_on_output
 

@@ -37,6 +37,48 @@ class HASS:
         return response.json()
 
 
+async def office_fan_silent(_):
+    hass = HASS(URL, TOKEN)
+    await hass.post_services(
+        'scene', 'turn_on', entity_id='scene.office_fan_silent')
+
+
+async def office_fan_max(_):
+    hass = HASS(URL, TOKEN)
+    await hass.post_services(
+        'scene', 'turn_on', entity_id='scene.office_fan_max')
+
+
+async def office_at_desk(_):
+    hass = HASS(URL, TOKEN)
+    await hass.post_services(
+        'scene', 'turn_on', entity_id='scene.office_at_desk')
+
+
+async def office_on(_):
+    hass = HASS(URL, TOKEN)
+    await hass.post_services(
+        'scene', 'turn_on', entity_id='scene.office_on')
+
+
+async def office_dark(_):
+    hass = HASS(URL, TOKEN)
+    await hass.post_services(
+        'scene', 'turn_on', entity_id='scene.office_dark')
+
+
+async def office_on_cool(_):
+    hass = HASS(URL, TOKEN)
+    await hass.post_services(
+        'scene', 'turn_on', entity_id='scene.office_on_cyan')
+
+
+async def office_studio_monitors_toggle(_):
+    hass = HASS(URL, TOKEN)
+    await hass.post_services(
+        'switch', 'toggle', entity_id='switch.office_studio_monitors')
+
+
 async def office_tv_on(_):
     hass = HASS(URL, TOKEN)
     await hass.post_services(
@@ -156,6 +198,29 @@ async def main():
     office_tv_volume_down_parser = subparsers.add_parser(
         'office-tv-volume-down')
     office_tv_volume_down_parser.set_defaults(func=office_tv_volume_down)
+
+    office_studio_monitors_toggle_parser = subparsers.add_parser(
+        'office-studio-monitors-toggle')
+    office_studio_monitors_toggle_parser.set_defaults(
+        func=office_studio_monitors_toggle)
+
+    office_at_desk_parser = subparsers.add_parser('office-at-desk')
+    office_at_desk_parser.set_defaults(func=office_at_desk)
+
+    office_on_parser = subparsers.add_parser('office-on')
+    office_on_parser.set_defaults(func=office_on)
+
+    office_on_cool_parser = subparsers.add_parser('office-on-cool')
+    office_on_cool_parser.set_defaults(func=office_on_cool)
+
+    office_fan_silent_parser = subparsers.add_parser('office-fan-silent')
+    office_fan_silent_parser.set_defaults(func=office_fan_silent)
+
+    office_fan_max_parser = subparsers.add_parser('office-fan-max')
+    office_fan_max_parser.set_defaults(func=office_fan_max)
+
+    office_dark_parser = subparsers.add_parser('office-dark')
+    office_dark_parser.set_defaults(func=office_dark)
 
     args = parser.parse_args()
 

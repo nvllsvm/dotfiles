@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+options() {
+    cat << EOF
+at-desk
+fan-max
+fan-silent
+dark
+on
+on-cool
+studio-monitors-toggle
+EOF
+}
+
+OPTION="$(options | rofi -dmenu -p '' -i)"
+if [ -n "$OPTION" ]; then
+    hass office-"$OPTION"
+fi
