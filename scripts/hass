@@ -37,6 +37,12 @@ class HASS:
         return response.json()
 
 
+async def office_fan_off(_):
+    hass = HASS(URL, TOKEN)
+    await hass.post_services(
+        'scene', 'turn_on', entity_id='scene.office_fan_off')
+
+
 async def office_fan_silent(_):
     hass = HASS(URL, TOKEN)
     await hass.post_services(
@@ -215,6 +221,9 @@ async def main():
 
     office_fan_silent_parser = subparsers.add_parser('office-fan-silent')
     office_fan_silent_parser.set_defaults(func=office_fan_silent)
+
+    office_fan_off_parser = subparsers.add_parser('office-fan-off')
+    office_fan_off_parser.set_defaults(func=office_fan_off)
 
     office_fan_max_parser = subparsers.add_parser('office-fan-max')
     office_fan_max_parser.set_defaults(func=office_fan_max)

@@ -2,6 +2,7 @@
 options() {
     cat << EOF
 at-desk
+fan-off
 fan-max
 fan-silent
 dark
