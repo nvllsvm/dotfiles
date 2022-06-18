@@ -82,13 +82,13 @@ async def office_on_cool(_):
 async def office_studio_monitors_on(_):
     hass = HASS(URL, TOKEN)
     await hass.post_services(
-        'switch', 'turn_on', entity_id='switch.office_studio_monitors')
+        'switch', 'turn_on', entity_id='switch.studio_monitors_on_off')
 
 
 async def office_studio_monitors_off(_):
     hass = HASS(URL, TOKEN)
     await hass.post_services(
-        'switch', 'turn_off', entity_id='switch.office_studio_monitors')
+        'switch', 'turn_off', entity_id='switch.studio_monitors_on_off')
 
 
 async def office_tv_on(_):
