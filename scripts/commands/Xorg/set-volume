@@ -54,7 +54,7 @@ change_hass() {
 }
 
 case "$(pamixer --get-default-sink)" in
-    *alsa_output.pci-0000_0b_00.1.hdmi-stereo-extra3*)
+    *alsa_output.pci-0000_0b_00.1.hdmi-stereo*)
         change_hass "$@"
         ;;
     *)
