@@ -1,7 +1,8 @@
 #!/usr/bin/env sh
 options() {
     cat << EOF
-at-desk
+at-monitor-desk
+at-tv-desk
 fan-off
 fan-max
 fan-silent
