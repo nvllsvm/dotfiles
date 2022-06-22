@@ -5,7 +5,7 @@ notify() {
         '🎙 Microphone' "$@"
 }
 
-MUTED="$(pamixer --get-mute --toggle --set-volume 100 --default-source)"
+MUTED="$(pamixer --get-mute --toggle-mute --set-volume 100 --default-source)"
 case "$MUTED" in
     true)
         notify 🚫
