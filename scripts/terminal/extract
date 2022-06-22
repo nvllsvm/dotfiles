@@ -1130,6 +1130,9 @@ async def _get_class(path):
             return unace
         elif suffixes[-1] == '.img':
             return udisksctl
+        # non-iso9660 ex. bluray
+        elif suffixes[-1] == '.iso':
+            return udisksctl
         # some tars lack file signature
         elif suffixes[-1] == '.tar':
             return gnu_tar
