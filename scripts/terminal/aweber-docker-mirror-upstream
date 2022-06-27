@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+set -e
+IMAGE="$1"
+TARGET="docker.aweber.io/upstream/${IMAGE}"
+docker pull "$IMAGE"
+docker tag "$IMAGE" "${TARGET}"
+docker push "${TARGET}"

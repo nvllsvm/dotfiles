@@ -42,6 +42,7 @@ log() {
 log "Removing all containers ..."
 all_containers=$(docker ps -aq)
 if [ -n "$all_containers" ]; then
+    docker kill $all_containers
     docker rm -f $all_containers
 fi
 

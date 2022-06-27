@@ -40,6 +40,7 @@ log() {
 }
 
 log "Removing all pods ..."
+podman kill --all
 podman pod rm --all --force
 
 log "Removing all containers ..."
