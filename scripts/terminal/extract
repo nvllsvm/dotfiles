@@ -24,16 +24,22 @@ class cli_7zip:
     _ALT_PART_RE = re.compile(r'(.*\.)(\d+)$')
 
     @classmethod
-    @functools.cache
     def check(cls):
-        if not shutil.which('7zz'):
-            raise KeyError
+        return cls._path()
+
+    @staticmethod
+    @functools.cache
+    def _path():
+        for name in ('7zz', '7z'):
+            if shutil.which(name):
+                return name
+        raise KeyError
 
     @classmethod
     async def extract(cls, path, dest, paths=None, password='',
                       overwrite=False):
         args = [
-            '7zz',
+            cls._path(),
             '-bd',  # disable progress indicator
             '-bb0',  # quietest log level
         ]
@@ -65,7 +71,7 @@ class cli_7zip:
 
     @classmethod
     async def contents(cls, path):
-        args = ['7zz', '-ba', 'l', '--', str(path)]
+        args = [cls._path(), '-ba', 'l', '--', str(path)]
         proc = await asyncio.create_subprocess_exec(
             *args, stdout=asyncio.subprocess.PIPE)
         stdout, _ = await proc.communicate()
@@ -85,7 +91,7 @@ class cli_7zip:
 
     @classmethod
     async def volumes(cls, path, password=''):
-        args = ['7zz', 'l', f'-p{password}', '--', str(path)]
+        args = [cls._path(), 'l', f'-p{password}', '--', str(path)]
         proc = await asyncio.create_subprocess_exec(
             *args, stdout=asyncio.subprocess.PIPE)
         stdout, _ = await proc.communicate()
