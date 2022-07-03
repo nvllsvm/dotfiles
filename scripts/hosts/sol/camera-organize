@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import asyncio
 import argparse
 import datetime
 import pathlib
@@ -21,7 +22,86 @@ VIDEO_EXT = set([
 ])
 
 
-def parse_date(path):
+class exiv2:
+
+    @classmethod
+    async def get_image_datetime(cls, path):
+        proc = await asyncio.create_subprocess_exec(
+            'exiv2', '--key', 'Exif.Image.DateTime', '--', path,
+            stderr=asyncio.subprocess.PIPE,
+            stdout=asyncio.subprocess.PIPE)
+        stdout, stderr = await proc.communicate()
+
+        # Exif.Image.Orientation not present in file
+        if proc.returncode == 1 and not stderr:
+            return None
+        elif proc.returncode != 0:
+            raise SubprocessError
+        _, _, _, value = stdout.decode().split(maxsplit=3)
+        value = value.strip()
+        if value != '(0)':
+            dt = datetime.datetime.strptime(value, '%Y:%m:%d %H:%M:%S')
+
+        proc = await asyncio.create_subprocess_exec(
+            'exiv2', '--key', 'Exif.Photo.OffsetTime', '--', path,
+            stderr=asyncio.subprocess.PIPE,
+            stdout=asyncio.subprocess.PIPE)
+        stdout, stderr = await proc.communicate()
+
+        if proc.returncode == 1 and not stderr:
+            return dt
+        elif proc.returncode != 0:
+            raise SubprocessError
+        else:
+            _, _, _, value = stdout.decode().split(maxsplit=3)
+            tz = datetime.datetime.strptime(
+                value.replace(':', '').strip(), '%z').tzinfo
+            return dt.replace(tzinfo=tz)
+
+
+class ffprobe:
+
+    @classmethod
+    async def get_image_datetime(cls, path):
+        proc = await asyncio.create_subprocess_exec(
+            'ffprobe', '--', path,
+            stderr=asyncio.subprocess.PIPE,
+            stdout=asyncio.subprocess.PIPE)
+        stdout, stderr = await proc.communicate()
+
+        if proc.returncode != 0:
+            raise SubprocessError
+        match = [
+            line
+            for line in stderr.decode().splitlines()
+            if line.startswith('    creation_time   : ')
+        ]
+        if match:
+            value = match[0].split(':', maxsplit=1)[-1].strip()\
+                .removesuffix('Z')
+            return datetime.datetime.fromisoformat(value)
+
+
+class SubprocessError(Exception):
+    """Raised when an error occurs in a subprocess"""
+
+
+async def parse_date(path):
+    try:
+        dt = await exiv2.get_image_datetime(path)
+        if dt:
+            return dt
+    except Exception as e:
+        pass
+
+    try:
+        dt = await ffprobe.get_image_datetime(path)
+        if dt:
+            return dt
+    except Exception as e:
+        print(e)
+        pass
+
     try:
         if path.startswith(('DOC', 'IMG', 'VID')) and path[3] in ('-', '_'):
             dt = datetime.datetime(
@@ -62,7 +142,7 @@ def all_files(root):
     return sorted(files)
 
 
-def process_file(path, target_root, dry_run):
+async def process_file(path, target_root, dry_run):
     suffix = path.suffix.lower()
     if suffix in PHOTO_EXT:
         target_path = target_root.joinpath(PHOTO_DIR)
@@ -71,7 +151,7 @@ def process_file(path, target_root, dry_run):
     else:
         raise KeyError(f'unhandled suffix in {path}')
 
-    dt = parse_date(path.name)
+    dt = await parse_date(path.name)
 
     target_path = target_path.joinpath(
         str(dt.year),
@@ -86,7 +166,7 @@ def process_file(path, target_root, dry_run):
         path.rename(target_path)
 
 
-def main():
+async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--target',
@@ -99,11 +179,11 @@ def main():
     args = parser.parse_args()
 
     if args.path.is_file():
-        process_file(args.path, args.target, args.dry_run)
+        await process_file(args.path, args.target, args.dry_run)
     else:
         for path in all_files(args.path):
-            process_file(path, args.target, args.dry_run)
+            await process_file(path, args.target, args.dry_run)
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())
