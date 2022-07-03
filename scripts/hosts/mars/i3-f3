@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-autorandr --force --load mars-office-tv-speakers
+autorandr --force --load mars-office-tv

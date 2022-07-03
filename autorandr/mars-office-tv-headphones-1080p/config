@@ -6,7 +6,7 @@ output DisplayPort-1
 off
 output DisplayPort-0
 crtc 0
-mode 3840x2160
+mode 1920x1080
 pos 0x0
 primary
 rate 120.00

@@ -6,13 +6,15 @@ output DisplayPort-1
 off
 output DisplayPort-0
 crtc 0
-mode 3840x2160
+mode 2560x2048_120
+scale 0.5x0.5
 pos 0x0
+filter nearest
 primary
 rate 120.00
 x-prop-max_bpc 8
 x-prop-non_desktop 0
-x-prop-scaling_mode None
+x-prop-scaling_mode Center
 x-prop-tearfree on
 x-prop-underscan off
 x-prop-underscan_hborder 0
