@@ -32,7 +32,7 @@ if command -v mpd-notifier > /dev/null; then
 fi
 
 autorandr --change --force
-udiskie --tray &
+udiskie --no-automount --tray &
 blueman-applet &
 
 exec i3
