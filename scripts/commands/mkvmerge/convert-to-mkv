@@ -93,10 +93,13 @@ def main():
         if path.suffix.lower() in ('.mkv', *EXTENSIONS):
             dest = path.with_suffix('.mkv')
 
+            # cannot use path.stem in glob as glob characters may be in path
             subtitle_paths = [
                 p
-                for p in path.parent.glob(f'{path.stem}*')
-                if p.is_file() and p.suffix.lower() in SUBTITLE_EXTENSIONS
+                for p in path.parent.glob('*')
+                if p.name.lower().startswith(path.stem.lower())
+                and p.is_file()
+                and p.suffix.lower() in SUBTITLE_EXTENSIONS
             ]
 
             if (dest != path) or subtitle_paths:
