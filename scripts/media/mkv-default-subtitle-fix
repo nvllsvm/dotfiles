@@ -5,6 +5,11 @@ import pathlib
 import subprocess
 
 
+def is_mkv(path):
+    with open(path, 'rb') as handle:
+        return handle.read(4) == b'\x1aE\xdf\xa3'
+
+
 def mkv_info(path):
     proc = subprocess.run(
         ['mkvmerge', '-J', path],
@@ -14,6 +19,10 @@ def mkv_info(path):
 
 
 def process(path):
+    if not is_mkv(path):
+        print('Skipping, not mkv', path)
+        return
+
     info = mkv_info(path)
 
     subs = (
