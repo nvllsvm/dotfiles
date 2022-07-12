@@ -61,7 +61,7 @@ def main():
                         default=min(SUPPORTED_DPI),
                         help='(default: %(default)s)')
     parser.add_argument('-f', '--format', choices=FORMAT_SUFFIXES,
-                        default='jpeg',
+                        default='png',
                         help='(default: %(default)s)')
     parser.add_argument('output', nargs='?', type=pathlib.Path)
     args = parser.parse_args()
