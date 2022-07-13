@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+xrandr-custom-resolution DisplayPort-0 2560 2048 120
+hass office-tv-on
