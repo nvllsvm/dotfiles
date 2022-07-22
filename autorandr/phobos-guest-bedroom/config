@@ -17,7 +17,7 @@ rate 60.00
 x-prop-max_bpc 8
 x-prop-non_desktop 0
 x-prop-scaling_mode None
-x-prop-tearfree auto
+x-prop-tearfree on
 x-prop-underscan off
 x-prop-underscan_hborder 0
 x-prop-underscan_vborder 0
