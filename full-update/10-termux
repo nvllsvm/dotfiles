@@ -33,4 +33,5 @@ ln -sfT ~/storage/shared/Download ~/download
 
 yes | pkg upgrade
 yes | apt autoremove
-rm -rf ~/../usr/etc/motd
+
+touch ~/.hushlogin
