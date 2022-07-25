@@ -90,6 +90,7 @@ class Redump:
                 'gc',   # gamecube
                 'mac',  # macintosh
                 'mcd',  # SEGA Mega CD
+                'palm', # palm os
                 'pc',   # PC
                 'ps2',  # playstation 2
                 'ps3',  # playstation 3
