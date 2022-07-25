@@ -11,10 +11,6 @@ if command -v termux-info > /dev/null; then
     export HOST=termux
 fi
 
-if [ -d ~/.dotfiles/aweber ]; then
-    export HOST=workmac
-fi
-
 for plugin in "$DOTFILES"/zsh/plugins/*/.zshenv(N); do
     . "$plugin"
 done
