@@ -1,2 +1,0 @@
-#!/usr/bin/env sh
-exec python3 -m http.server --bind 0.0.0.0 --directory "$1"

@@ -1,5 +1,0 @@
-#!/usr/bin/env sh
-if [ "$(hostname)" != 'workmac' ]; then
-    exit
-fi
-aweber-dns --update
