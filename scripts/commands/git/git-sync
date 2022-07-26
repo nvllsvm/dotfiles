@@ -60,6 +60,9 @@ def main():
                 parts = path.split('/')
                 if parts[0] == 'packages':
                     path = parts[1]
+            elif parsed.netloc == 'gisual':
+                print('here')
+                path = '/'.join(parts[1:])
             else:
                 raise NotImplementedError(f'unhandled netloc: {parsed.netloc}')
         elif parsed.scheme:
