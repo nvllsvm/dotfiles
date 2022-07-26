@@ -1,2 +1,6 @@
 #!/usr/bin/env sh
-exec podman "$@"
+if [ -f /usr/bin/docker ]; then
+    exec /usr/bin/docker "$@"
+else
+    exec podman "$@"
+fi
