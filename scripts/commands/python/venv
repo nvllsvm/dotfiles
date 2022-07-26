@@ -52,7 +52,43 @@ class _PruneAction(argparse.Action):
         parser.exit()
 
 
+def _pyenv_versions(version):
+    # prefer pyenv's latest over system's
+    pyenv_root = os.environ.get('PYENV_ROOT')
+    if not pyenv_root:
+        return
+
+    pyenv_root = pathlib.Path(pyenv_root) / 'versions'
+    if not pyenv_root.is_dir():
+        return
+
+    versions = []
+    for path in pyenv_root.iterdir():
+        if not path.is_dir():
+            continue
+        name = path.name
+        if not name.startswith(version):
+            continue
+        if name.endswith('-dev'):
+            continue
+        if 'b' in name:
+            continue
+        major, minor, patch = (int(i) for i in name.split('.'))
+        versions.append((major, minor, patch))
+
+    if versions:
+        latest = sorted(versions)[-1]
+        return pyenv_root / '.'.join(str(v) for v in latest) / 'bin' / 'python'
+
+
 def _python_bin(python_bin):
+    path = pathlib.Path(python_bin)
+    if path.is_file():
+        return str(python_bin)
+
+    pyenv_version = _pyenv_versions(python_bin)
+    if pyenv_version:
+        return pyenv_version
     try:
         subprocess.run(
             [python_bin, '--version'],
