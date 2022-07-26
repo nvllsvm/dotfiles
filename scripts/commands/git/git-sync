@@ -5,7 +5,7 @@ import subprocess
 import sys
 import urllib.parse
 
-CODE_ROOT_DIR = pathlib.Path('~/code').expanduser()
+CODE_ROOT_DIR = pathlib.Path('~/src').expanduser()
 
 
 class Git:
