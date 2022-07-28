@@ -31,7 +31,7 @@ if command -v mpd-notifier > /dev/null; then
     mpd-notifier &
 fi
 
-autorandr --change --force
+autorandr --change --force --match-edid
 udiskie --no-automount --tray &
 blueman-applet &
 
