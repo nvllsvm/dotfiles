@@ -4,8 +4,9 @@ import sys
 import subprocess
 
 SHIPPERS = {
-    'usps': 'https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1={}',
+    'fedex': 'https://www.fedex.com/fedextrack/?tracknumbers={}',
     'ups': 'https://www.ups.com/track?trackNums={}',
+    'usps': 'https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1={}',
 }
 
 
