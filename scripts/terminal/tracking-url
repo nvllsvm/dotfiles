@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import argparse
-import sys
 import subprocess
 
 SHIPPERS = {
@@ -25,10 +24,6 @@ class Clipboard:
             stdout=subprocess.PIPE,
             check=True)
         return proc.stdout
-
-
-def _tracking_id(value):
-    return value
 
 
 def main():
