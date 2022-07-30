@@ -6,6 +6,7 @@ import chardet
 
 
 def convert_to_utf8(path):
+    path = pathlib.Path(path)
     data = path.read_bytes()
     text = data.decode(chardet.detect(data)['encoding'])
     text_utf8 = text.encode()
@@ -18,10 +19,11 @@ def convert_to_utf8(path):
 
 def main():
     parser = argparse.ArgumentParser(description='Reencode files in UTF-8')
-    parser.add_argument('file', type=pathlib.Path)
+    parser.add_argument('path', nargs='+')
     args = parser.parse_args()
 
-    convert_to_utf8(args.file)
+    for path in args.path:
+        convert_to_utf8(path)
 
 
 if __name__ == '__main__':
