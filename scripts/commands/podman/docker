@@ -1,6 +1,0 @@
-#!/usr/bin/env sh
-if [ -f /usr/bin/docker ]; then
-    exec /usr/bin/docker "$@"
-else
-    exec podman "$@"
-fi
