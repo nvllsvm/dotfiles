@@ -33,6 +33,22 @@ def installed_versions():
     return versions
 
 
+class CasefoldUnsupported(Exception):
+    """Raised when case casefolding is not supported"""
+
+
+def case_insensitivty(path):
+    # enable case-insensitivity (ext4)
+    proc = subprocess.run(
+        ['chattr', '+F', str(path)],
+        stderr=subprocess.PIPE)
+    if proc.returncode:
+        if proc.stderr.decode().startswith('chattr: Operation not supported while setting flags on '):
+            raise CasefoldUnsupported
+        else:
+            raise RuntimeError(proc.returncode)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--link', action='store_true')
@@ -86,8 +102,10 @@ def main():
 
     if not prefix.is_dir():
         prefix.mkdir(exist_ok=True, parents=True)
-        # enable case-insensitivity (ext4)
-        subprocess.run(['chattr', '+F', str(prefix)], check=True)
+        try:
+            case_insensitivty(prefix)
+        except CasefoldUnsupported:
+            print('Casefold not supported. Ignoring')
 
     if create_link:
         """
