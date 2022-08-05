@@ -2,6 +2,7 @@
 import argparse
 import asyncio
 import contextlib
+import json
 import logging
 import os
 import pathlib
@@ -22,9 +23,74 @@ def copy_tags(source, target):
     metadata_target.save()
 
 
+class ffprobe:
+    class ProcessError(Exception):
+        """Raised when ffprobe fails to run"""
+
+    @classmethod
+    async def stream_info(cls, path):
+        proc = await asyncio.create_subprocess_exec(
+            'ffprobe', '-v', 'error', '-show_streams',
+            '-print_format', 'json', '--', str(path),
+            stdout=asyncio.subprocess.PIPE)
+        stdout, _ = await proc.communicate()
+        if proc.returncode != 0:
+            raise cls.ProcessError
+
+        return json.loads(stdout)['streams']
+
+
 async def decode_ape(source, fd):
     proc = await asyncio.create_subprocess_exec(
         'mac', source, '-', '-d',
+        stderr=asyncio.subprocess.DEVNULL,
+        stdout=fd)
+
+    async def result():
+        await proc.wait()
+        if proc.returncode != 0:
+            raise DecodeError(source)
+    return result()
+
+
+class InvalidFileType(Exception):
+    """Raised when a file type is not what it appears to be"""
+
+
+async def decode_m4a(source, fd):
+    alac_stream = None
+
+    streams = await ffprobe.stream_info(source)
+    for stream in streams:
+        if stream['codec_type'] == 'audio':
+            if stream['codec_name'] == 'alac':
+                if alac_stream is not None:
+                    raise InvalidFileType('multiple ALAC streams')
+                alac_stream = stream
+            else:
+                raise InvalidFileType(
+                    f'unhandled audio type: {stream["codec_name"]}')
+        elif stream['codec_type'] == 'video':
+            if stream['codec_name'] != 'mjpeg':
+                raise InvalidFileType(
+                    f'unhandled video type: {stream["codec_name"]}')
+        else:
+            raise InvalidFileType(
+                f'unhandled stream type: {stream["codec_type"]}')
+
+    if alac_stream is None:
+        raise InvalidFileType('not ALAC file')
+
+    if alac_stream['sample_fmt'] != 's16p':
+        raise InvalidFileType('unhandled sample format')
+    if alac_stream['channels'] != 2:
+        raise InvalidFileType('unhandled channel count')
+    if alac_stream['channel_layout'] != 'stereo':
+        raise InvalidFileType('unhandled channel layout')
+
+    proc = await asyncio.create_subprocess_exec(
+        'ffmpeg', '-i', str(source), '-f', 'wav',
+        '-acodec', 'pcm_s16le', '-ac', '2', '-',
         stderr=asyncio.subprocess.DEVNULL,
         stdout=fd)
 
@@ -121,8 +187,9 @@ async def reencode(source):
     decode_contexts = {
         '.flac': decode_flac,
         '.ape': decode_ape,
+        '.m4a': decode_m4a,
         '.wv': decode_wv,
-        '.wav': decode_wav
+        '.wav': decode_wav,
     }
 
     read, write = os.pipe()
@@ -280,7 +347,7 @@ def main():
     executor = AsyncExecutor(max_pending=args.numprocs)
     num_items = 0
     for path in paths:
-        if path.suffix.lower() in ('.flac', '.ape', '.wav', '.wv'):
+        if path.suffix.lower() in ('.flac', '.ape', '.m4a', '.wav', '.wv'):
             num_items += 1
             executor.submit(reencode, path)
 
