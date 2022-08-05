@@ -12,7 +12,7 @@ def center_lines(lines):
     ]
 
 
-def print_label(lines):
+def print_label(lines, writepng=None):
     match len(lines):
         case 4:
             fontsize = 10
@@ -25,12 +25,14 @@ def print_label(lines):
         case _:
             raise ValueError('lines must be between 1 and 4 inclusive')
 
-    subprocess.run(
-        ['ptouch-print',
-         '--fontsize', str(fontsize),
-         '--font', 'DejaVuSansMono-Bold',
-         '--text', *lines],
-        check=True)
+    args = ['ptouch-print',
+     '--fontsize', str(fontsize),
+     '--font', 'DejaVuSansMono-Bold']
+    if writepng:
+        args.extend(['--writepng', writepng])
+
+    args.extend(['--text', *lines])
+    subprocess.run(args, check=True)
 
 
 def _lines(value):
@@ -45,6 +47,7 @@ def _lines(value):
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--writepng')
     parser.add_argument(
         '--space-between', metavar='NUM', type=int, default=2,
         help='number of spaces between labels (default: %(default)s)')
@@ -80,7 +83,7 @@ def main():
         lines.append((' ' * args.space_between).join(
             line[index] for line in labels))
 
-    print_label(lines)
+    print_label(lines, writepng=args.writepng)
 
 
 if __name__ == '__main__':
