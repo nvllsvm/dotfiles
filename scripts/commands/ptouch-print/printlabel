@@ -1,89 +1,40 @@
 #!/usr/bin/env python
 import argparse
 import subprocess
-import sys
+import tempfile
 
 
-def center_lines(lines):
-    max_length = max(len(line) for line in lines)
-    return [
-        line.center(max_length)
-        for line in lines
-    ]
+def build_png(label, path):
+    subprocess.run([
+        'magick',
+        '-gravity', 'center',
+        '+antialias',
+        '-background', 'white',
+        '-size', 'x76',
+        '-font', 'DejaVu-Sans'
+        f'label:{label}',
+        '-trim',
+        '+repage',
+        '-gravity', 'center',
+        '-extent', 'x68',
+        '-background', 'white',
+        '-gravity', 'south',
+        '-splice', '0x8', str(path)],
+                   check=True)
 
 
-def print_label(lines, writepng=None):
-    match len(lines):
-        case 4:
-            fontsize = 10
-        case 3:
-            fontsize = 15
-        case 2:
-            fontsize = 25
-        case 1:
-            fontsize = 50
-        case _:
-            raise ValueError('lines must be between 1 and 4 inclusive')
-
-    args = ['ptouch-print',
-     '--fontsize', str(fontsize),
-     '--font', 'DejaVuSansMono-Bold']
-    if writepng:
-        args.extend(['--writepng', writepng])
-
-    args.extend(['--text', *lines])
-    subprocess.run(args, check=True)
-
-
-def _lines(value):
-    lines = [
-        line.strip()
-        for line in value.split(r'\n')
-    ]
-    if len(lines) not in (1, 2, 3, 4):
-        raise argparse.ArgumentError
-    return lines
+def print_png(path):
+    subprocess.run(['ptouch-print', '--writepng', path], check=True)
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--writepng')
-    parser.add_argument(
-        '--space-between', metavar='NUM', type=int, default=2,
-        help='number of spaces between labels (default: %(default)s)')
+    parser.add_argument('label')
+    args = parser.parse_args()
 
-    # TODO fix
-    if sys.stdin.isatty():
-        parser.add_argument('label', nargs='+', type=_lines)
-        args = parser.parse_args()
-
-        input_labels = args.label
-    else:
-        args = parser.parse_args()
-        input_labels = [
-            _lines(label)
-            for label in sys.stdin.read().splitlines()
-        ]
-
-    num_lines = set()
-    labels = []
-    for label in input_labels:
-        print(label)
-        label = center_lines(label)
-        num_lines.add(len(label))
-        labels.append(label)
-
-    if len(num_lines) != 1:
-        print(num_lines)
-        raise ValueError('mixed number of lines')
-    num_lines = list(num_lines)[0]
-
-    lines = []
-    for index in range(num_lines):
-        lines.append((' ' * args.space_between).join(
-            line[index] for line in labels))
-
-    print_label(lines, writepng=args.writepng)
+    with tempfile.NamedTemporaryFile(suffix='.png') as tmp:
+        build_png(args.label, tmp.name)
+        print_png(tmp.name)
 
 
 if __name__ == '__main__':
