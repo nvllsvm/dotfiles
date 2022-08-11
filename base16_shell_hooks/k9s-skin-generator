@@ -11,16 +11,16 @@ k9s:
     bgColor: "#${BASE16_COLOR0}"
     logoColor: "#${BASE16_COLOR6}"
   info:
-    fgColor: "#${BASE16_COLOR2}"
+    fgColor: "#${BASE16_COLOR12}"
     sectionColor: "#${BASE16_COLOR7}"
   frame:
     border:
-      fgColor: "#${BASE16_COLOR4}"
-      focusColor: "#${BASE16_COLOR6}"
+      fgColor: "#${BASE16_COLOR120}"
+      focusColor: "#${BASE16_COLOR19}"
     menu:
       fgColor: "#${BASE16_COLOR7}"
-      keyColor: "#${BASE16_COLOR2}"
-      numKeyColor: "#${BASE16_COLOR2}"
+      keyColor: "#${BASE16_COLOR12}"
+      numKeyColor: "#${BASE16_COLOR12}"
     crumbs:
       fgColor: "#${BASE16_COLOR6}"
       bgColor: "#${BASE16_COLOR0}"
@@ -28,11 +28,11 @@ k9s:
     status:
       newColor: "#${BASE16_COLOR7}"
       modifyColor: "#${BASE16_COLOR3}"
-      addColor: "#${BASE16_COLOR2}"
+      addColor: "#${BASE16_COLOR12}"
       errorColor: "#${BASE16_COLOR1}"
       highlightcolor: "#${BASE16_COLOR6}"
       killColor: "#${BASE16_COLOR1}"
-      completedColor: "#${BASE16_COLOR2}"
+      completedColor: "#${BASE16_COLOR12}"
     title:
       fgColor: "#${BASE16_COLOR7}"
       bgColor: "#${BASE16_COLOR0}"
