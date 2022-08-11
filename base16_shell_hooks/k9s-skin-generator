@@ -1,0 +1,58 @@
+#!/usr/bin/env sh
+if ! command -v k9s > /dev/null; then
+    exit
+fi
+
+eval "$(base16-export)}"
+cat > ~/.config/k9s/skin.yml << EOF
+k9s:
+  body:
+    fgColor: "#${BASE16_COLOR7}"
+    bgColor: "#${BASE16_COLOR0}"
+    logoColor: "#${BASE16_COLOR6}"
+  info:
+    fgColor: "#${BASE16_COLOR2}"
+    sectionColor: "#${BASE16_COLOR7}"
+  frame:
+    border:
+      fgColor: "#${BASE16_COLOR4}"
+      focusColor: "#${BASE16_COLOR6}"
+    menu:
+      fgColor: "#${BASE16_COLOR7}"
+      keyColor: "#${BASE16_COLOR2}"
+      numKeyColor: "#${BASE16_COLOR2}"
+    crumbs:
+      fgColor: "#${BASE16_COLOR6}"
+      bgColor: "#${BASE16_COLOR0}"
+      activeColor: "#${BASE16_COLOR0}"
+    status:
+      newColor: "#${BASE16_COLOR7}"
+      modifyColor: "#${BASE16_COLOR3}"
+      addColor: "#${BASE16_COLOR2}"
+      errorColor: "#${BASE16_COLOR1}"
+      highlightcolor: "#${BASE16_COLOR6}"
+      killColor: "#${BASE16_COLOR1}"
+      completedColor: "#${BASE16_COLOR2}"
+    title:
+      fgColor: "#${BASE16_COLOR7}"
+      bgColor: "#${BASE16_COLOR0}"
+      highlightColor: "#${BASE16_COLOR5}"
+      counterColor: "#${BASE16_COLOR5}"
+      filterColor: "#${BASE16_COLOR5}"
+  views:
+    table:
+      fgColor: "#${BASE16_COLOR4}"
+      bgColor: "#${BASE16_COLOR0}"
+      cursorColor: "#${BASE16_COLOR6}"
+      header:
+        fgColor: "#${BASE16_COLOR4}"
+        bgColor: "#${BASE16_COLOR0}"
+        sorterColor: "#${BASE16_COLOR5}"
+    yaml:
+      keyColor: "#${BASE16_COLOR1}"
+      colonColor: "#${BASE16_COLOR6}"
+      valueColor: "#${BASE16_COLOR7}"
+    logs:
+      fgColor: "#${BASE16_COLOR7}"
+      bgColor: "#${BASE16_COLOR0}"
+EOF
