@@ -1,3 +1,4 @@
+hwdec=auto
 sid=no
 sub-scale=0.7
 tone-mapping=reinhard
