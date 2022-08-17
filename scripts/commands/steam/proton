@@ -6,7 +6,9 @@ import pathlib
 import subprocess
 import sys
 
-PREFIX_ROOT = pathlib.Path('~/.local/share/proton-prefixes').expanduser()
+PREFIX_ROOT = pathlib.Path(
+    os.environ.get('PROTON_PREFIX_ROOT', '~/.local/share/proton-prefixes')
+).expanduser()
 STEAM_ROOT = pathlib.Path('~/.local/share/Steam').expanduser()
 SYSTEM_PROTON = pathlib.Path('/usr/bin/proton')
 LINK_ROOT = pathlib.Path('~/.local/bin').expanduser()
