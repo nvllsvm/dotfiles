@@ -71,7 +71,7 @@ async def decode_m4a(source, fd):
                 raise InvalidFileType(
                     f'unhandled audio type: {stream["codec_name"]}')
         elif stream['codec_type'] == 'video':
-            if stream['codec_name'] != 'mjpeg':
+            if stream['codec_name'] not in ('mjpeg', 'png'):
                 raise InvalidFileType(
                     f'unhandled video type: {stream["codec_name"]}')
         else:
