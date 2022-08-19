@@ -30,6 +30,7 @@ setopt hist_ignore_space
 setopt inc_append_history
 setopt share_history
 setopt auto_pushd
+setopt null_glob
 
 unsetopt correct_all
 
