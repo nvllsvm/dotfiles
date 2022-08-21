@@ -38,6 +38,8 @@ def _pretty_json(data):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-u', '--unique', action='store_true')
+    parser.add_argument('--rm', action='store_true',
+                        help='remove duplicates (keeps first match)')
     parser.add_argument('path', default=[''], nargs='*',
                         type=lambda x: pathlib.Path(x).resolve().absolute())
     args = parser.parse_args()
@@ -73,7 +75,14 @@ def main():
             for k, v in hashes.items()
             if len(v) > 1
         }
-        print(_pretty_json(duplicates))
+        if args.rm:
+            for values in duplicates.values():
+                for path in values[1:]:
+                    path = pathlib.Path(path)
+                    print(path)
+                    path.unlink()
+        else:
+            print(_pretty_json(duplicates))
 
 
 if __name__ == '__main__':
