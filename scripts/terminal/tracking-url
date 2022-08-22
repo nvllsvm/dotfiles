@@ -3,6 +3,7 @@ import argparse
 import subprocess
 
 SHIPPERS = {
+    'aquiline': 'https://aquiline-tracking.com/data/TrackPackage{}',
     'fedex': 'https://www.fedex.com/fedextrack/?tracknumbers={}',
     'ups': 'https://www.ups.com/track?trackNums={}',
     'usps': 'https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1={}',
