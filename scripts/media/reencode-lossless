@@ -58,6 +58,8 @@ class InvalidFileType(Exception):
 
 
 async def decode_m4a(source, fd):
+    # m4a is a container format similar to mkv.
+    # it may or may not be a single, lossless audio track
     alac_stream = None
 
     streams = await ffprobe.stream_info(source)
