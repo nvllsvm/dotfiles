@@ -38,7 +38,7 @@ end
 
 -- Use a loop to conveniently call 'setup' on multiple servers and
 -- map buffer local keybindings when the language server attaches
-local servers = { "jedi_language_server", "rust_analyzer", "tsserver" }
+local servers = { "rust_analyzer", "tsserver" }
 for _, lsp in ipairs(servers) do
     nvim_lsp[lsp].setup({
         on_attach = on_attach,
@@ -47,3 +47,14 @@ for _, lsp in ipairs(servers) do
         },
     })
 end
+nvim_lsp["jedi_language_server"].setup({
+    on_attach = on_attach,
+    init_options = {
+        diagnostics = {
+            enable = false,
+        },
+    },
+    flags = {
+        debounce_text_changes = 150,
+    },
+})
