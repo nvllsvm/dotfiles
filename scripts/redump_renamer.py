@@ -2,6 +2,7 @@
 import argparse
 import asyncio
 import contextvars
+import gzip
 import hashlib
 import io
 import logging
@@ -23,6 +24,27 @@ NAME = 'redump-renamer'
 LOGGER = logging.getLogger(NAME)
 
 _LOG_CONTEXT = {}
+
+
+def _read_cache_file(path):
+    return pickle.loads(gzip.decompress(path.read_bytes()))
+
+
+def _write_cache_file(path, data):
+    data = gzip.compress(pickle.dumps(data))
+
+    # safely write the file
+    path = pathlib.Path(path)
+    with tempfile.NamedTemporaryFile(delete=False, dir=path.parent) as handle:
+        try:
+            temp_path = pathlib.Path(handle.name)
+            temp_path.write_bytes(data)
+            temp_path.rename(path)
+        finally:
+            try:
+                temp_path.unlink()
+            except FileNotFoundError:
+                pass
 
 
 def log_context(key, value):
@@ -61,10 +83,10 @@ def setup_logging(name, level=logging.INFO):
 class Redump:
     # im guessing a redump ID's hashes should never change so
     # this should be permanently cachable
-    SHA1_CACHE_FILE = pathlib.Path('/storage/Cache/redump/sha1.pickle')
+    SHA1_CACHE_FILE = pathlib.Path('/storage/Cache/redump/sha1.pickle.gz')
 
     # temporary cache to allow for updates
-    REDUMP_DAT_FILE = pathlib.Path('/tmp/redump.pickle')
+    REDUMP_DAT_FILE = pathlib.Path('/storage/Cache/redump/system_dat.pickle.gz')
 
     _DISC_PATH_PATTERN = re.compile(r'/disc/(\d+)/')
     _PAGE_PATH_PATTERN = re.compile(r'.*\?page=(\d+)')
@@ -75,15 +97,15 @@ class Redump:
         self.sha1_cache = None
         self.datfiles = None
 
-    async def download_datfiles(self):
+    async def download_datfiles(self, update):
         """
         Download the redump PC datfile.
 
         Note: the response does not contain an etag
         """
-        if self.REDUMP_DAT_FILE.exists():
+        if self.REDUMP_DAT_FILE.exists() and not update:
             LOGGER.debug('Using dat redump cache [%s]', self.REDUMP_DAT_FILE)
-            data = pickle.loads(self.REDUMP_DAT_FILE.read_bytes())
+            data = _read_cache_file(self.REDUMP_DAT_FILE)
         else:
             systems = [
                 'dc',   # dreamcast
@@ -102,6 +124,7 @@ class Redump:
             ]
             data = {}
             for system in systems:
+                LOGGER.debug('Downloading dat for %s', system)
                 response = await self.client.get(
                     str(self.url / 'datfile' / system))
                 response.raise_for_status()
@@ -112,7 +135,7 @@ class Redump:
                 dat_file.write(archive.read(archive.namelist()[0]))
                 dat_file.seek(0)
                 data[system] = xml.etree.ElementTree.parse(dat_file)
-            safe_write_bytes(self.REDUMP_DAT_FILE, pickle.dumps(data))
+            _write_cache_file(self.REDUMP_DAT_FILE, data)
         return data
 
     async def scrape_redump(self, name, system):
@@ -148,8 +171,8 @@ class Redump:
     async def download_sha1(self, redump_id):
         if self.sha1_cache is None:
             if self.SHA1_CACHE_FILE.exists():
-                self.sha1_cache = pickle.loads(
-                    self.SHA1_CACHE_FILE.read_bytes())
+                self.sha1_cache = _read_cache_file(
+                    self.SHA1_CACHE_FILE)
             else:
                 self.sha1_cache = {}
 
@@ -159,8 +182,7 @@ class Redump:
                 str(self.url / 'disc' / redump_id / 'sha1'))
             response.raise_for_status()
             self.sha1_cache[redump_id] = response.text
-            safe_write_bytes(
-                self.SHA1_CACHE_FILE, pickle.dumps(self.sha1_cache))
+            _write_cache_file(self.SHA1_CACHE_FILE, self.sha1_cache)
 
         hashes = {}
         for line in self.sha1_cache[redump_id].splitlines():
@@ -172,20 +194,6 @@ class Redump:
             key: hashes[key]
             for key in sorted(hashes)
         }
-
-
-def safe_write_bytes(path, data):
-    path = pathlib.Path(path)
-    with tempfile.NamedTemporaryFile(delete=False, dir=path.parent) as handle:
-        try:
-            temp_path = pathlib.Path(handle.name)
-            temp_path.write_bytes(data)
-            temp_path.rename(path)
-        finally:
-            try:
-                temp_path.unlink()
-            except FileNotFoundError:
-                pass
 
 
 def find_dump_hashes(root):
@@ -270,6 +278,7 @@ async def get_name(path, redump):
 async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--no-rename', action='store_true')
+    parser.add_argument('--update', action='store_true')
     parser.add_argument('--verbose', action='store_true')
     parser.add_argument('path', type=pathlib.Path, nargs='+')
     args = parser.parse_args()
@@ -278,7 +287,7 @@ async def main():
                   level=logging.DEBUG if args.verbose else logging.INFO)
 
     redump = Redump()
-    redump.datfiles = await redump.download_datfiles()
+    redump.datfiles = await redump.download_datfiles(update=args.update)
 
     for path in args.path:
         log_context('path', path)
