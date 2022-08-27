@@ -107,6 +107,7 @@ class Redump:
             LOGGER.debug('Using dat redump cache [%s]', self.REDUMP_DAT_FILE)
             data = _read_cache_file(self.REDUMP_DAT_FILE)
         else:
+            LOGGER.info('Updating .dat files')
             systems = [
                 'dc',   # dreamcast
                 'gc',   # gamecube
