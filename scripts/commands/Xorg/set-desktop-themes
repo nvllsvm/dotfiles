@@ -76,7 +76,8 @@ else
 
         if [ -n "$LARGE" ]; then
             DUNST_WIDTH=800
-            DUNST_OFFSET=0x56
+            # with DPI 192
+            DUNST_OFFSET=0x28
             FONT_SIZE=14
         elif [ -n "$MEDIUM_LARGE" ]; then
             DUNST_WIDTH=800
