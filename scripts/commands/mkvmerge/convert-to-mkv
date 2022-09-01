@@ -74,6 +74,8 @@ def mkvmerge(dest, *sources, delete_parts=True):
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--force', action='store_true',
+                        help='include files ending in .mkv')
     parser.add_argument('path', nargs='+', type=pathlib.Path)
     args = parser.parse_args()
 
@@ -102,7 +104,7 @@ def main():
                 and p.suffix.lower() in SUBTITLE_EXTENSIONS
             ]
 
-            if (dest != path) or subtitle_paths:
+            if args.force or (dest != path) or subtitle_paths:
                 mkvmerge(dest, path, *subtitle_paths)
         else:
             LOGGER.error('unrecognized extension: "%s"', path.suffix)

@@ -1,0 +1,250 @@
+#!/usr/bin/env python3
+import argparse
+import asyncio
+import logging
+import os
+import pathlib
+import re
+import sys
+
+
+LOGGER = logging.getLogger('media-validate')
+
+MKV_VOID_DATA_WARNING = re.compile(
+    r'^WRN0D0: There are \d+ bytes of void data$')
+
+MKV_SUPPRESS_WARNING = True
+
+
+async def validate_mkv(path):
+    args = []
+    if MKV_SUPPRESS_WARNING:
+        args.append('--no-warn')
+
+    proc = await asyncio.create_subprocess_exec(
+        'mkvalidator',
+        '--quiet',
+        *args,
+        str(path.absolute()),  # use absolute to avoid leading '-'
+        stderr=asyncio.subprocess.PIPE)
+    _, stderr = await proc.communicate()
+
+    is_valid = proc.returncode == 0
+    for line in stderr.strip().decode().splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        if MKV_VOID_DATA_WARNING.findall(line):
+            continue
+        LOGGER.debug('mkvalidator error: "%s" (%s)', line, path)
+        is_valid = False
+
+    return is_valid
+
+
+async def validate_mp3(path):
+    proc = await asyncio.create_subprocess_exec(
+        'mp3val',
+        '-si',  # suppress INFO messages
+        str(path.absolute()),  # use absolute to avoid leading '-'
+        stdout=asyncio.subprocess.PIPE)  # also exits 0 when file has errors
+
+    stdout, _ = await proc.communicate()
+    if proc.returncode != 0:
+        raise RuntimeError('process failure')
+
+    for line in stdout.splitlines():
+        if line.startswith(b'WARNING: ') \
+                and not line.endswith(b': No supported tags in the file'):
+            return False
+    return True
+
+
+async def validate_flac(path):
+    proc = await asyncio.create_subprocess_exec(
+        'flac',
+        '--totally-silent',
+        '--test',
+        '--',
+        str(path))
+    await proc.communicate()
+    return proc.returncode == 0
+
+
+async def validate_opus(path):
+    proc = await asyncio.create_subprocess_exec(
+        'opusdec',
+        '--quiet',
+        '--',
+        str(path),
+        '-',
+        stdout=asyncio.subprocess.DEVNULL)
+    await proc.communicate()
+    return proc.returncode == 0
+
+
+async def _identify_image(path):
+    proc = await asyncio.create_subprocess_exec(
+        'identify',
+        '-verbose',
+        '-regard-warnings',  # exit non-zero if error/warning
+        '--',
+        str(path),
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.DEVNULL)
+    stdout, _ = await proc.communicate()
+    lines = stdout.splitlines()
+    if proc.returncode != 0:
+        return False
+    if lines[0] != b'Image:':
+        return False
+    if lines[3].startswith(b'  Mime type: '):
+        mime = lines[3].decode().split(':', maxsplit=1)[1].strip()
+        # extra validation
+        a, b = mime.split('/')
+        return '/'.join((a, b))
+    return False
+
+
+async def validate_jpg(path):
+    return await _identify_image(path) == 'image/jpeg'
+
+
+async def validate_png(path):
+    return await _identify_image(path) == 'image/png'
+
+
+async def validate_webp(path):
+    return await _identify_image(path) == 'image/webp'
+
+
+async def validate_gif(path):
+    return await _identify_image(path) == 'image/gif'
+
+
+def all_files(root):
+    stack = [pathlib.Path(root)]
+    files = []
+    while stack:
+        for path in stack.pop().iterdir():
+            if path.is_file():
+                files.append(path)
+            elif path.is_dir():
+                stack.append(path)
+    return files
+
+
+class AsyncExecutor:
+    def __init__(self, max_pending=None):
+        self._max_pending = \
+            os.cpu_count() if max_pending is None else max_pending
+        self._queued = []
+        self._pending = set()
+
+    def submit(self, func, *args, **kwargs):
+        self._queued.append((func, args, kwargs))
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            pass
+        else:
+            self._fill()
+
+    async def as_completed(self):
+        while self._queued or self._pending:
+            self._fill()
+
+            done, self._pending = await asyncio.wait(
+                self._pending, return_when=asyncio.FIRST_COMPLETED)
+
+            for result in done:
+                yield result
+
+    def _fill(self):
+        for _ in range(self._max_pending - len(self._pending)):
+            if not self._queued:
+                return
+            func, args, kwargs = self._queued.pop()
+            self._pending.add(asyncio.create_task(func(*args, **kwargs)))
+
+
+async def validate(path):
+    LOGGER.debug('Validating %s', path)
+    match path.suffix.lower():
+        case '.mp3':
+            func = validate_mp3
+        case '.flac':
+            func = validate_flac
+        case '.opus':
+            func = validate_opus
+        case '.jpg' | '.jpeg':
+            func = validate_jpg
+        case '.png':
+            func = validate_png
+        case '.gif':
+            func = validate_gif
+        case '.webp':
+            func = validate_webp
+        case '.mkv':
+            func = validate_mkv
+        case _:
+            LOGGER.warning('Unhandled file: %s', path)
+            return
+
+    if not await func(path):
+        LOGGER.error('Invalid file: %s', path)
+        return False
+    return True
+
+
+async def async_main(args):
+    has_error = False
+
+    # abuse a dict as an ordered set
+    paths = {}
+    for path in args.path:
+        if path.is_dir():
+            for p in all_files(path):
+                paths.setdefault(p, None)
+        else:
+            paths.setdefault(path, None)
+
+    executor = AsyncExecutor(max_pending=args.numprocs)
+
+    has_error = False
+    for path in paths:
+        executor.submit(validate, path)
+
+    async for result in executor.as_completed():
+        if result.result() is False:
+            has_error = True
+
+    sys.exit(1 if has_error else 0)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-n', dest='numprocs', metavar='NUMPROCS', type=int)
+
+    log_group = parser.add_mutually_exclusive_group()
+    log_group.add_argument('--verbose', action='store_true')
+    log_group.add_argument('-q', '--quiet', action='store_true')
+
+    parser.add_argument('path', type=pathlib.Path, nargs='+')
+    args = parser.parse_args()
+
+    logging.basicConfig(format='%(levelname)-8s %(message)s')
+    if args.verbose:
+        log_level = logging.DEBUG
+    elif args.quiet:
+        log_level = logging.ERROR
+    else:
+        log_level = logging.INFO
+
+    LOGGER.setLevel(log_level)
+
+    asyncio.run(async_main(args))
+
+
+if __name__ == '__main__':
+    main()
