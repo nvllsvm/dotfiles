@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily zpool-check-health of storage pool
+
+[Timer]
+OnCalendar=daily
+AccuracySec=1h
+Persistent=true
+
+[Install]
+WantedBy=multi-user.target

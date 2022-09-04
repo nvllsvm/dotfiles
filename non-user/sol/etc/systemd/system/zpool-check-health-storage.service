@@ -1,0 +1,8 @@
+[Unit]
+Description=zpool-check-health for storage
+
+[Service]
+Nice=19
+IOSchedulingClass=idle
+KillSignal=SIGINT
+ExecStart=/home/ar/.dotfiles/public/commands/zdb/zpool-check-health --num-disks 12 --pool storage

@@ -15,6 +15,7 @@ SYSTEM_UNITS = {
     'shadow.service',
     'systemd-tmpfiles-clean.service',
     'zfs-scrub@storage.service',
+    'zpool-check-health-storage.service',
 }
 
 USER_UNITS = {

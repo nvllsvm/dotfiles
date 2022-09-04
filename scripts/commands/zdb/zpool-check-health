@@ -1,0 +1,156 @@
+#!/usr/bin/env python3
+# TODO compare error log count with history
+#      - create a .fail file to result in this script failing until the .fail
+#        file is remoscript failing until the .fail file is removed
+import argparse
+import asyncio
+import contextvars
+import json
+import logging
+import pathlib
+import re
+import sys
+
+DRIVE_PATTERN = re.compile(r'(/dev/sd[a-z])\d+')
+LOGGER = logging.getLogger('check-zpool-health')
+
+_LOG_CONTEXT = {}
+
+
+def log_context(key, value):
+    global _LOG_CONTEXT
+
+    if key not in _LOG_CONTEXT:
+        _LOG_CONTEXT[key] = contextvars.ContextVar(key, default=None)
+
+    _LOG_CONTEXT[key].set(value)
+
+
+class _LogFormatter(logging.Formatter):
+    def format(self, record):
+        parts = [super().format(record)]
+
+        for key, cvar in _LOG_CONTEXT.items():
+            value = cvar.get()
+            if value:
+                parts.append(f'[{key} {value}]')
+
+        return ' '.join(parts)
+
+
+def setup_logging(level=logging.INFO):
+    logger = logging.getLogger()
+    logger.setLevel(level)
+
+    fmt = _LogFormatter('%(levelname)-8s %(name)s %(message)s')
+
+    sh = logging.StreamHandler()
+    sh.setLevel(level)
+    sh.setFormatter(fmt)
+    logger.addHandler(sh)
+
+
+async def zfs_disk_paths(pool):
+    proc = await asyncio.create_subprocess_exec(
+        'zdb', '-C', '--', pool,
+        stdout=asyncio.subprocess.PIPE)
+    stdout, _ = await proc.communicate()
+    if proc.returncode:
+        raise RuntimeError(proc.returncode)
+    paths = set()
+    for line in stdout.decode().splitlines():
+        line = line.strip()
+        if line.startswith('path: '):
+            paths.add(line.removeprefix('path: ').strip("'"))
+    return sorted(paths)
+
+
+def find_disk(path):
+    path = str(pathlib.Path(path).resolve())
+    matches = DRIVE_PATTERN.findall(path)
+    if len(matches) == 1:
+        return matches[0]
+    else:
+        raise RuntimeError(f'cannot determine disk: {path}')
+
+
+class SMARTError(Exception):
+    """Raised when a SMART problem is found with a drive"""
+
+
+async def disk_smart_info(path):
+    proc = await asyncio.create_subprocess_exec(
+        'smartctl', '--all', '--json', '--', str(path),
+        stdout=asyncio.subprocess.PIPE)
+    stdout, _ = await proc.communicate()
+    return json.loads(stdout)
+
+
+async def is_disk_healthy(path):
+    log_context('disk', path)
+    LOGGER.debug('checking disk')
+
+    is_healthy = True
+    smart_info = await disk_smart_info(path)
+
+    ata_smart_error_log = smart_info['ata_smart_error_log']['summary']['count']
+
+    # 1 or 2 seems to be common
+    if ata_smart_error_log > 2:
+        LOGGER.error('Error log count: %s', ata_smart_error_log)
+        is_healthy = False
+
+    attributes = {
+        item['name']: item
+        for item in smart_info['ata_smart_attributes']['table']
+    }
+
+    check_attrs = [
+        'Raw_Read_Error_Rate',
+        'Seek_Error_Rate',
+    ]
+
+    for key in check_attrs:
+        if value := attributes[key]['raw']['value']:
+            LOGGER.error('Attribute "%s" value "%s"', key, value)
+            is_healthy = False
+
+    if not is_healthy:
+        LOGGER.error('Unhealthy disk')
+
+    return is_healthy
+
+
+async def async_main(args):
+    disks = set()
+    for path in await zfs_disk_paths(args.pool):
+        disk = find_disk(path)
+        disks.add(disk)
+
+    if len(disks) != args.num_disks:
+        LOGGER.error('Unexpected number of disks:', len(disks))
+        sys.exit(1)
+
+    unhealthy_disks = False
+    for disk in sorted(disks):
+        if not await is_disk_healthy(disk):
+            unhealthy_disks = True
+
+    if unhealthy_disks:
+        sys.exit(1)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--num-disks', type=int, required=True)
+    parser.add_argument('--pool', required=True)
+    parser.add_argument('--verbose', action='store_true')
+    args = parser.parse_args()
+
+    setup_logging(level=logging.DEBUG if args.verbose else logging.INFO)
+
+    asyncio.run(async_main(args))
+
+
+if __name__ == '__main__':
+    main()
