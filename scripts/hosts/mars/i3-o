@@ -3,6 +3,7 @@ options() {
     cat << EOF
 at-monitor-desk
 at-tv-desk
+closet-lights
 fan-off
 fan-max
 fan-silent
