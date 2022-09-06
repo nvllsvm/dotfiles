@@ -26,6 +26,7 @@ else
         application/epub+zip|\
         application/gzip|\
         application/java-archive|\
+        application/vnd.comicbook-rar|\
         application/vnd.comicbook+zip|\
         application/vnd.google-earth.kmz|\
         application/vnd.ms-cab-compressed|\
