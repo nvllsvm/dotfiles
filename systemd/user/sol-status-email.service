@@ -3,5 +3,4 @@ Description=Run sol-status-email
 
 [Service]
 ExecStart=zsh -lc sol-status-email
-EnvironmentFile=/home/ar/.dotfiles/private/sol-status-email.env
 SyslogIdentifier=sol-status-email
