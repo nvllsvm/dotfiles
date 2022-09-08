@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
+import argparse
 import collections
 import datetime
 import subprocess
 
-import configargparse
 import jinja2
 
 
@@ -30,7 +30,7 @@ USER_UNITS = {
 }
 
 
-TEMPLATE = """
+TEMPLATE = """\
 <html>
 <style>
 table, th, td {
@@ -87,13 +87,11 @@ table tr.failure {
 </html>"""
 
 
-def send_html_email(content, subject, from_email, to_email):
+def send_html_email(content, subject):
     args = [
-        'mailx',
+        'sol-notification-mailx',
         '-M', 'text/html',
-        '-A', from_email,
         '-s', subject,
-        to_email
     ]
     subprocess.run(args, input=content, text=True, check=True)
 
@@ -123,19 +121,9 @@ def unit_properties(service, user=False):
 
 
 def main():
-    parser = configargparse.ArgumentParser()
+    parser = argparse.ArgumentParser()
     parser.add_argument('--dummy', action='store_true')
-    parser.add_argument('--from', dest='from_email', env_var='FROM_EMAIL')
-    parser.add_argument('--to', dest='to_email', env_var='TO_EMAIL')
     args = parser.parse_args()
-
-    if not args.dummy:
-        if args.from_email is None:
-            parser.error('--from is required')
-            parser.exit(1)
-        if args.to_email is None:
-            parser.error('--to is required')
-            parser.exit(1)
 
     template = jinja2.Template(TEMPLATE)
 
@@ -156,10 +144,11 @@ def main():
     subject = '{} Report {}'.format(
         '✅' if success else '❌',
         datetime.datetime.now().strftime('%Y-%m-%d %H:%M'))
+
     if args.dummy:
         print(output)
     else:
-        send_html_email(output, subject, args.from_email, args.to_email)
+        send_html_email(output, subject)
         print('Sent')
 
 
