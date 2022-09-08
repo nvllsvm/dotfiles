@@ -105,6 +105,8 @@ SCALING_FACTOR="$SCALING_FACTOR"
 EOF
 fi
 
+gsettings set org.gnome.desktop.interface color-scheme prefer-dark
+
 # changing org.gnome.desktop.interface cursor-size after xrdb steps
 # fucks up i3's scaling...
 gsettings set org.gnome.desktop.interface cursor-size "$CURSOR_SIZE"
@@ -258,7 +260,6 @@ EOF
 font pango:${FONT_NAME} ${FONT_SIZE}
 EOF
 fi
-
 
 if pidof sway > /dev/null; then
     swaymsg reload
