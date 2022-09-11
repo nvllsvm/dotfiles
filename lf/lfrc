@@ -25,3 +25,6 @@ cmd nopreview &{{
 }}
 map <tab> nopreview
 set autoquit
+
+# disable tagging
+map t
