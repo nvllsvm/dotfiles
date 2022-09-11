@@ -94,8 +94,12 @@ class Redump:
     def __init__(self):
         self.client = httpx.AsyncClient()
         self.url = yarl.URL('http://redump.org')
-        self.sha1_cache = None
         self.datfiles = None
+
+        if self.SHA1_CACHE_FILE.exists():
+            self.sha1_cache = _read_cache_file(self.SHA1_CACHE_FILE)
+        else:
+            self.sha1_cache = {}
 
     async def download_datfiles(self, update):
         """
@@ -185,8 +189,12 @@ class Redump:
             self.sha1_cache[redump_id] = response.text
             _write_cache_file(self.SHA1_CACHE_FILE, self.sha1_cache)
 
+        return self._parse_sha1_response(self.sha1_cache[redump_id])
+
+    @staticmethod
+    def _parse_sha1_response(data):
         hashes = {}
-        for line in self.sha1_cache[redump_id].splitlines():
+        for line in data.splitlines():
             sha1_hash, name = line.split(maxsplit=1)
             if not name.lower().endswith(SUFFIXES):
                 continue
@@ -195,6 +203,13 @@ class Redump:
             key: hashes[key]
             for key in sorted(hashes)
         }
+
+    def lookup_by_hash(self, hashes):
+        hashes = tuple(hashes)
+        for redump_id, text in self.sha1_cache.items():
+            response = self._parse_sha1_response(text)
+            if hashes == tuple(response.values()):
+                return redump_id
 
 
 def find_dump_hashes(root):
@@ -266,6 +281,10 @@ async def get_name(path, redump):
 
     # fix for games like 'Fury^3'
     name = name.replace('^', '')
+
+    if redump_id := redump.lookup_by_hash(expected):
+        LOGGER.info('Found redump match %s "%s"', redump_id, name)
+        return redump_id, name.replace('/', '')
 
     async for redump_id in redump.scrape_redump(name, system):
         sha1 = await redump.download_sha1(redump_id)
