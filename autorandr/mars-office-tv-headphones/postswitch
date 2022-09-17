@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-set-desktop-themes --dpi 96
+set-desktop-themes --dpi 192 --large
 
 pactl-set-only \
     --profile alsa_card.usb-Schiit_Audio_I_m_Fulla_Schiit-00 output:iec958-stereo
