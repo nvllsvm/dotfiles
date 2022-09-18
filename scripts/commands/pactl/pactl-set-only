@@ -1,54 +1,63 @@
 #!/usr/bin/env python
 import argparse
+import json
 import subprocess
 
 
-def cards():
-    proc = subprocess.run(
-        ['pactl', 'list', 'cards'],
-        stdout=subprocess.PIPE,
-        check=True)
-    return [
-        line.strip().split(maxsplit=1)[1]
-        for line in proc.stdout.decode().splitlines()
-        if line.startswith('\tName: ')
-    ]
+class pactl:
 
+    @staticmethod
+    def list_cards():
+        proc = subprocess.run(
+            ['pactl', '--format=json', 'list', 'cards'],
+            stdout=subprocess.PIPE,
+            check=True)
 
-def set_profile(card_name, profile_name):
-    subprocess.run(
-        ['pactl', 'set-card-profile', card_name, profile_name],
-        check=True)
+        return json.loads(proc.stdout.decode())
 
+    @staticmethod
+    def set_profile(card_name, profile_name):
+        subprocess.run(
+            ['pactl', 'set-card-profile', card_name, profile_name],
+            check=True)
 
-def set_sink_mute():
-    subprocess.run(
-        ['pactl', 'set-sink-mute', '@DEFAULT_SINK@', '0'],
-        check=True)
+    @staticmethod
+    def set_sink_mute():
+        subprocess.run(
+            ['pactl', 'set-sink-mute', '@DEFAULT_SINK@', '0'],
+            check=True)
 
-
-def set_source_mute():
-    subprocess.run(
-        ['pactl', 'set-source-mute', '@DEFAULT_SOURCE@', '0'],
-        check=True)
+    @staticmethod
+    def set_source_mute():
+        subprocess.run(
+            ['pactl', 'set-source-mute', '@DEFAULT_SOURCE@', '0'],
+            check=True)
 
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--list', action='store_true')
     parser.add_argument('--profile', nargs=2, action='append')
     args = parser.parse_args()
+
+    if args.list:
+        for card in pactl.list_cards():
+            for profile, properties in card['profiles'].items():
+                if properties['available']:
+                    print(card['name'], profile)
+        parser.exit()
 
     active_cards = set()
     for card_name, profile_name in args.profile:
         active_cards.add(card_name)
-        set_profile(card_name, profile_name)
+        pactl.set_profile(card_name, profile_name)
 
-    for card_name in cards():
-        if card_name not in active_cards:
-            set_profile(card_name,  'off')
+    for card in pactl.list_cards():
+        if card['name'] not in active_cards:
+            pactl.set_profile(card['name'],  'off')
 
-    set_sink_mute()
-    set_source_mute()
+    pactl.set_sink_mute()
+    pactl.set_source_mute()
 
 
 if __name__ == '__main__':
