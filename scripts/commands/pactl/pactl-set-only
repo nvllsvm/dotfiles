@@ -1,37 +1,67 @@
 #!/usr/bin/env python
+import asyncio
 import argparse
 import json
-import subprocess
 
 
 class pactl:
 
     @staticmethod
-    def list_cards():
-        proc = subprocess.run(
-            ['pactl', '--format=json', 'list', 'cards'],
-            stdout=subprocess.PIPE,
-            check=True)
-
-        return json.loads(proc.stdout.decode())
-
-    @staticmethod
-    def set_profile(card_name, profile_name):
-        subprocess.run(
-            ['pactl', 'set-card-profile', card_name, profile_name],
-            check=True)
+    async def list_cards():
+        proc = await asyncio.create_subprocess_exec(
+            'pactl', '--format=json', 'list', 'cards',
+            stdout=asyncio.subprocess.PIPE)
+        stdout, _ = await proc.communicate()
+        if proc.returncode != 0:
+            raise RuntimeError(f'returncode {proc.returncode}')
+        return json.loads(stdout.decode())
 
     @staticmethod
-    def set_sink_mute():
-        subprocess.run(
-            ['pactl', 'set-sink-mute', '@DEFAULT_SINK@', '0'],
-            check=True)
+    async def set_profile(card_name, profile_name):
+        proc = await asyncio.create_subprocess_exec(
+            'pactl', 'set-card-profile', card_name, profile_name)
+        await proc.communicate()
+        if proc.returncode != 0:
+            raise RuntimeError(f'returncode {proc.returncode}')
 
     @staticmethod
-    def set_source_mute():
-        subprocess.run(
-            ['pactl', 'set-source-mute', '@DEFAULT_SOURCE@', '0'],
-            check=True)
+    async def set_sink_mute():
+        proc = await asyncio.create_subprocess_exec(
+            'pactl', 'set-sink-mute', '@DEFAULT_SINK@', '0')
+        await proc.communicate()
+        if proc.returncode != 0:
+            raise RuntimeError(f'returncode {proc.returncode}')
+
+    @staticmethod
+    async def set_source_mute():
+        proc = await asyncio.create_subprocess_exec(
+            'pactl', 'set-source-mute', '@DEFAULT_SOURCE@', '0')
+        await proc.communicate()
+        if proc.returncode != 0:
+            raise RuntimeError(f'returncode {proc.returncode}')
+
+
+async def async_main(args):
+    cards = await pactl.list_cards()
+
+    if args.list:
+        for card in cards:
+            for profile, properties in card['profiles'].items():
+                if properties['available']:
+                    print(card['name'], profile)
+        return
+
+    active_cards = set()
+    for card_name, profile_name in args.profile:
+        active_cards.add(card_name)
+        await pactl.set_profile(card_name, profile_name)
+
+    await asyncio.gather(
+        *[pactl.set_profile(card['name'],  'off')
+          for card in cards
+          if card['name'] not in active_cards]
+    )
+    await asyncio.gather(pactl.set_sink_mute(), pactl.set_source_mute())
 
 
 def main():
@@ -40,24 +70,7 @@ def main():
     parser.add_argument('--profile', nargs=2, action='append')
     args = parser.parse_args()
 
-    if args.list:
-        for card in pactl.list_cards():
-            for profile, properties in card['profiles'].items():
-                if properties['available']:
-                    print(card['name'], profile)
-        parser.exit()
-
-    active_cards = set()
-    for card_name, profile_name in args.profile:
-        active_cards.add(card_name)
-        pactl.set_profile(card_name, profile_name)
-
-    for card in pactl.list_cards():
-        if card['name'] not in active_cards:
-            pactl.set_profile(card['name'],  'off')
-
-    pactl.set_sink_mute()
-    pactl.set_source_mute()
+    asyncio.run(async_main(args))
 
 
 if __name__ == '__main__':
