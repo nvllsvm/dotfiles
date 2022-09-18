@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
 set-desktop-themes --dpi 192 --large
+hass office-studio-monitors-off &
 
 pactl-set-only \
     --profile alsa_card.pci-0000_0b_00.1 output:hdmi-stereo-extra2
