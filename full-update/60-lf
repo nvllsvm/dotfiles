@@ -9,4 +9,7 @@ else
         rm -rf ~/.config/lf
         ln -s "${DOTFILES}/lf" ~/.config/lf
     fi
+    rm -f \
+        ~/.local/share/lf/marks \
+        ~/.local/share/lf/tags
 fi
