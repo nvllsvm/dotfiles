@@ -6,7 +6,6 @@ transform_matrix() {
 }
 
 set_input_enable() {
-    return
     xinput set-prop 'ELAN1201:00 04F3:3098 Touchpad' 'Device Enabled' "$1"
     for id in $(xinput --list | rg '↳ Asus Keyboard ' | rg 'slave  keyboard' | awk '{print $4}' | tr '=' ' ' | awk '{print $2}'); do
         xinput set-prop $id 'Device Enabled' $1
