@@ -124,6 +124,9 @@ def main():
                     continue
                 suffix = MIME_SUFFIXES[mime][0]
                 for path in paths:
+                    path = pathlib.Path(path)
+                    if path.suffix == suffix:
+                        continue
                     sep_cnt = 0
                     while True:
                         target = pathlib.Path(f'{path}{sep_cnt * "_"}{suffix}')
