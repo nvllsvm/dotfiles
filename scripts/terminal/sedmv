@@ -7,6 +7,10 @@ for f in "$@"; do
     base="$(basename "$f")"
     new="$(printf %s "$base" | sed "$pattern")"
     if [ "$new" != "$base" ]; then
-        mv --no-clobber "$f" "$dir/$new"
+        if [ -e "$new" ]; then
+            printf 'error: target exists "%s" (original "%s")\n' "$new" "$base" >&2
+        else
+            mv --no-clobber "$f" "$dir/$new"
+        fi
     fi
 done
