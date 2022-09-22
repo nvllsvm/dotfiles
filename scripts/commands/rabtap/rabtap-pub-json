@@ -1,0 +1,47 @@
+#!/usr/bin/env python
+import argparse
+import base64
+import json
+import subprocess
+import sys
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--exchange', required=True)
+    parser.add_argument('--routing', required=True)
+    parser.add_argument('body', nargs='?')
+    args = parser.parse_args()
+
+    body = base64.b64encode(
+        json.dumps(
+            json.loads(
+                args.body if sys.stdin.isatty() else sys.stdin.read()
+            )
+        ).encode()
+    ).decode()
+
+    data = {
+      'ContentType': 'application/json',
+      'Exchange': 'rpc',
+      'RoutingKey': 'intel.collect.v1',
+      'ContentEncoding': '',
+      'DeliveryMode': 0,
+      'Priority': 0,
+      'CorrelationID': '',
+      'ReplyTo': '',
+      'Expiration': '',
+      'MessageID': '',
+      'Type': '',
+      'UserID': '',
+      'AppID': '',
+      'Body': body
+    }
+    subprocess.run(
+        ['rabtap', 'pub', '--format=json'],
+        input=json.dumps(data).encode(),
+        check=True)
+
+
+if __name__ == '__main__':
+    main()
