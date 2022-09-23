@@ -72,13 +72,14 @@ LOGGER = logging.getLogger('music-organizer')
 
 
 def folder_name(tag_value):
-    name = ''.join(
-        c
-        for c in tag_value
-        if c not in ('/', '\\', ':', '*', '?', '"', '<', '>', '|', '.')
-    )
-    if name == '..':
-        raise ValueError('invalid folder name')
+    chars = []
+    for c in tag_value:
+        if not chars and c == '.':
+            continue
+        if c in ('/', '\\', ':', '*', '?', '"', '<', '>', '|'):
+            continue
+        chars.append(c)
+    name = ''.join(chars)
     return ' '.join(part for part in name.split())
 
 
