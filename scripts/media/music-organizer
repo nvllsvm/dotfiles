@@ -75,7 +75,7 @@ def folder_name(tag_value):
     name = ''.join(
         c
         for c in tag_value
-        if c not in ('/', '\\', ':', '*', '?', '"', '<', '>', '|')
+        if c not in ('/', '\\', ':', '*', '?', '"', '<', '>', '|', '.')
     )
     if name == '..':
         raise ValueError('invalid folder name')
