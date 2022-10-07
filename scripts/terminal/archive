@@ -880,6 +880,50 @@ class cabextract:
         return [path]
 
 
+class unshield:
+    @staticmethod
+    @functools.cache
+    def check():
+        if not shutil.which('unshield'):
+            raise KeyError
+
+    @staticmethod
+    async def contents(path):
+        proc = await asyncio.create_subprocess_exec(
+            'unshield', 'l', '--', path,
+            stdout=asyncio.subprocess.PIPE)
+        stdout, _ = await proc.communicate()
+        if proc.returncode:
+            raise ProcessError(proc.returncode)
+        contents = []
+        for line in stdout.splitlines()[1:-2]:
+            # convert windows-separated (\) path to local
+            p = pathlib.Path(
+                pathlib.PureWindowsPath(
+                    line.strip().split(maxsplit=1)[-1].decode()
+                )
+            )
+            contents.append(bytes(p))
+        return contents
+
+    @staticmethod
+    async def extract(path, dest, paths=None, password=None, overwrite=False):
+        if paths:
+            raise NotImplementedError
+        if overwrite:
+            raise NotImplementedError
+        proc = await asyncio.create_subprocess_exec(
+            'unshield', 'x', '-d', dest, '--', path,
+            stdout=asyncio.subprocess.DEVNULL)
+        await proc.wait()
+        if proc.returncode != 0:
+            raise RuntimeError('exit code {proc.returncode}')
+
+    @staticmethod
+    async def volumes(path, password=''):
+        return [path]
+
+
 class xorriso:
     @staticmethod
     @functools.cache
@@ -1600,6 +1644,9 @@ async def _get_class(path):
         # microsoft cabinet file
         elif start.startswith(b'MSCF'):
             return cabextract
+        # unshield CAB
+        elif start.startswith(b'ISc('):
+            return unshield
         # lz4
         elif start.startswith(b'\x04"M\x18'):
             return lz4
