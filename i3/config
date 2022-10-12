@@ -174,7 +174,7 @@ bindsym XF86TouchpadToggle exec --no-startup-id toggle-touchpad-while-typing
 bindsym XF86Launch1 exec --no-startup-id mpd-control toggle
 
 bindsym $mod+backslash exec --no-startup-id i3-scratchpad-alacritty todo.md notes todo.md
-bindsym $mod+n exec --no-startup-id i3-scratchpad-alacritty notes notes
+bindsym $mod+n exec --no-startup-id i3-scratchpad-alacritty tmux tmux-attach
 
 exec_always --no-startup-id i3-autoscratchpad
 
