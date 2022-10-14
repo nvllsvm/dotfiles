@@ -136,7 +136,7 @@ for_window [instance="i3-scratchpad"] move scratchpad
 bindsym $mod+b bar mode toggle
 bindsym $mod+m move position center
 
-bindsym $mod+Return exec --no-startup-id i3-scratchpad-alacritty tmux tmux-attach
+bindsym $mod+Return exec --no-startup-id i3-scratchpad-alacritty tmux-attach
 bindsym $mod+space exec --no-startup-id desktop-launcher
 bindsym $mod+ctrl+space exec --no-startup-id rofimoji --skin-tone neutral
 bindsym $mod+Escape exec --no-startup-id xss-lock-cmd
@@ -159,7 +159,7 @@ bindsym XF86AudioRaiseVolume exec --no-startup-id set-volume output-up
 
 bindsym Shift+XF86AudioMute exec --no-startup-id toggle-source-mute
 bindsym XF86AudioMicMute exec --no-startup-id toggle-source-mute
-bindsym Shift+XF86AudioPlay exec --no-startup-id i3-scratchpad-alacritty ncmpcpp ncmpcpp
+bindsym Shift+XF86AudioPlay exec --no-startup-id i3-scratchpad-alacritty ncmpcpp
 
 bindsym XF86AudioPlay exec --no-startup-id mpd-control toggle
 bindsym XF86AudioPrev exec --no-startup-id mpd-control prev
@@ -173,7 +173,7 @@ bindsym XF86KbdBrightnessUp exec --no-startup-id set-keyboard-backlight inc
 bindsym XF86TouchpadToggle exec --no-startup-id toggle-touchpad-while-typing
 bindsym XF86Launch1 exec --no-startup-id mpd-control toggle
 
-bindsym $mod+backslash exec --no-startup-id i3-scratchpad-alacritty todo.md notes todo.md
+bindsym $mod+backslash exec --no-startup-id i3-scratchpad-alacritty notes todo.md
 
 exec_always --no-startup-id i3-autoscratchpad
 
