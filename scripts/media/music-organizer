@@ -227,7 +227,7 @@ def rename_from_tags(path, metadata):
     if tracknumber < 10:
         tracknumber = f'{tracknumber:02d}'
 
-    for char in ('/', '.'):
+    for char in ('/', '\\', '.', ':', '*', '?', '"', '<', '>', '|'):
         title = title.replace(char, ' ')
     title = ' '.join(title.split())
     safe_rename(path, f'{tracknumber} - {title}{path.suffix}')
