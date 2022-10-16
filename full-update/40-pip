@@ -27,13 +27,22 @@ if [ "$(pip list | grep -c -e '^pip ' -e '^setuptools ' -e '^wheel ')" != '3' ];
     pip install --quiet --user --upgrade --force-reinstall pip setuptools wheel
 fi
 
-if command -v nvim > /dev/null; then
-    if ! pip show jedi-language-server > /dev/null; then
-        pip install jedi-language-server
-    fi
-fi
+pip_outdated() {
+    pip list --outdated | python -c '
+import sys
 
-ood_packages="$(pip list --outdated --format=freeze)"
+lines = sys.stdin.read().splitlines()
+if lines:
+    package_versions = []
+    for line in lines[2:]:
+        package, _, latest, _ = line.split(maxsplit=4)
+        package_versions.append(f"{package}={latest}")
+    print("\n".join(package_versions))
+
+'
+}
+
+ood_packages="$(pip_outdated)"
 if [ -n "${ood_packages}" ]; then
     echo 'Updating out-of-date packages'
     pip install --user --upgrade $(echo "${ood_packages}" | cut -d = -f 1)

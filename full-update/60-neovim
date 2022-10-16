@@ -11,4 +11,12 @@ if [ "$(realpath ~/.config/nvim)" != "$DOTFILES/nvim" ]; then
     ln -sT "${DOTFILES}/nvim" ~/.config/nvim
 fi
 
+
+if command -v pip > /dev/null; then
+    export PIP_REQUIRE_VIRTUALENV=0
+    unset VIRTUAL_ENV
+    if ! pip show jedi-language-server > /dev/null; then
+        pip install jedi-language-server
+    fi
+fi
 nvim -c 'autocmd User PackerComplete quitall' -c 'PackerSync'
