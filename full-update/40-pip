@@ -28,17 +28,12 @@ if [ "$(pip list | grep -c -e '^pip ' -e '^setuptools ' -e '^wheel ')" != '3' ];
 fi
 
 pip_outdated() {
-    pip list --outdated | python -c '
+    pip list --outdated --format=json | python -c '
+import json
 import sys
 
-lines = sys.stdin.read().splitlines()
-if lines:
-    package_versions = []
-    for line in lines[2:]:
-        package, _, latest, _ = line.split(maxsplit=4)
-        package_versions.append(f"{package}={latest}")
-    print("\n".join(package_versions))
-
+for item in json.loads(sys.stdin.read()):
+    print("=".join([item["name"], item["latest_version"]]))
 '
 }
 
