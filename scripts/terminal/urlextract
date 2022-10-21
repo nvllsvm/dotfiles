@@ -3,7 +3,7 @@ import argparse
 import re
 import sys
 
-pattern = re.compile(r'http[s]?://[^ \'"]*')
+pattern = re.compile(r'http[s]?://[^ \\\'"]*')
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
