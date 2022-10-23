@@ -1,8 +1,25 @@
 #!/usr/bin/env sh
 set -e
 
+note_contents_rg() {
+    rg \
+        -0 \
+        --glob '!\.git/' \
+        --sortr modified \
+        --hidden \
+        '.+'
+}
+
+note_contents() {
+    note_contents_rg | sed 's/\x0/\x0 /' | uniq
+}
+
+show_fzf() {
+    fzf --literal --bind ctrl-l:clear-query | tr '\0' '\n' | head -n 1
+}
+
 set_note_file() {
-    NOTE_FILE="$(srch)"
+    NOTE_FILE="$(note_contents | show_fzf)"
     if [ -z "$NOTE_FILE" ]; then
         NOTE_FILE="$(printf '' | fzf --print-query || true)"
     fi
@@ -19,6 +36,7 @@ fi
 cd "${NOTES_DIR}"
 
 SHOW_PATH=
+NO_FZF=
 while true; do
     case "$1" in
         -p)
@@ -33,10 +51,19 @@ while true; do
             set_note_file
             exec notes "$NOTE_FILE"
             ;;
+        --no-fzf)
+            NO_FZF=1
+            shift
+            ;;
         *)
             break
     esac
 done
+
+if [ -n "$NO_FZF" ]; then
+    note_contents
+    exit
+fi
 
 NOTE_FILE=
 case $# in
