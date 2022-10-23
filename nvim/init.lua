@@ -42,6 +42,7 @@ let g:lf_height = 1.0
 filetype plugin indent on
 
 let $FZF_DEFAULT_COMMAND = "fd --type file --ignore-file ~/.config/nvim/fzf_fd_ignore"
+let g:fzf_preview_window = ['right,50%,<70(hidden,right,50%)', 'ctrl-/']
 
 autocmd StdinReadPre * let s:std_in=1
 
