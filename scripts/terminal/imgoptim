@@ -221,6 +221,9 @@ class AsyncExecutor:
             func, args, kwargs = self._queued.pop()
             self._pending.add(asyncio.create_task(func(*args, **kwargs)))
 
+    def __len__(self):
+        return len(self._queued) + len(self._pending)
+
 
 class SizeDiffPrinter:
     def __init__(self, num_items):
@@ -297,7 +300,6 @@ async def main():
             files.update(all_files(path))
 
     executor = AsyncExecutor(max_pending=args.num_procs)
-    num_items = 0
     for f in sorted(files):
         try:
             mimetype = determine_mime(f)
@@ -309,10 +311,9 @@ async def main():
             continue
 
         if func := _MIME_OPTIMIZATIONS.get(mimetype):
-            num_items += 1
             executor.submit(_process, func, f, args.strip)
 
-    size_diff_printer = SizeDiffPrinter(num_items=num_items)
+    size_diff_printer = SizeDiffPrinter(num_items=len(executor))
     async for result in executor.as_completed():
         try:
             path, before, after = result.result()

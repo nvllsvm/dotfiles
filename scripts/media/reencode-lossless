@@ -231,10 +231,10 @@ def all_files(root):
     return files
 
 
-async def run(executor, num_items):
+async def run(executor):
     errors = []
 
-    size_diff_printer = SizeDiffPrinter(num_items)
+    size_diff_printer = SizeDiffPrinter(len(executor))
 
     async for result in executor.as_completed():
         try:
@@ -283,6 +283,9 @@ class AsyncExecutor:
                 return
             func, args, kwargs = self._queued.pop()
             self._pending.add(asyncio.create_task(func(*args, **kwargs)))
+
+    def __len__(self):
+        return len(self._queued) + len(self._pending)
 
 
 class SizeDiffPrinter:
@@ -347,13 +350,11 @@ def main():
             paths.add(path)
 
     executor = AsyncExecutor(max_pending=args.numprocs)
-    num_items = 0
     for path in paths:
         if path.suffix.lower() in ('.flac', '.ape', '.m4a', '.wav', '.wv'):
-            num_items += 1
             executor.submit(reencode, path)
 
-    asyncio.run(run(executor, num_items))
+    asyncio.run(run(executor))
 
 
 if __name__ == '__main__':

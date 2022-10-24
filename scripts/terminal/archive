@@ -464,6 +464,9 @@ class AsyncExecutor:
             func, args, kwargs = self._queued.pop()
             self._pending.add(asyncio.create_task(func(*args, **kwargs)))
 
+    def __len__(self):
+        return len(self._queued) + len(self._pending)
+
 
 class SizeDiffPrinter:
     def __init__(self):
