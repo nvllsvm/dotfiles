@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+for f in "$@"; do
+    ffmpeg -i "$f" -ss 00:00:01.000 -vframes 1 "$f".png
+done

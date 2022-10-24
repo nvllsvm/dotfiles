@@ -24,6 +24,12 @@ MIME_SUFFIXES = {
     'audio/mpeg': [
         '.mp3'
     ],
+    'image/avif': [
+        '.avif',
+    ],
+    'image/bmp': [
+        '.bmp',
+    ],
     'image/gif': [
         '.gif',
     ],
@@ -52,6 +58,12 @@ MIME_SUFFIXES = {
     ],
     'video/mp4': [
         '.mp4',
+    ],
+    'video/x-m4v': [
+        '.m4v',
+    ],
+    'video/mp2t': [
+        '.mp2t',
     ],
     'text/html': [
         '.html',
@@ -90,7 +102,7 @@ def main():
             paths.add(path)
 
     for path in sorted(paths):
-        mime = magic.from_file(str(path), mime=True)
+        mime = magic.from_file(str(path), mime=True).lower()
         exts[mime].add(path)
 
     if args.check:
