@@ -109,20 +109,22 @@ def get_url(path, start, end):
 
         parsed = urllib.parse.urlparse(url)
         netloc = parsed.netloc.lower()
-        if netloc.endswith('github.com'):
+
+        # purposefully fuzzy for the sake of internal deployments
+        if 'github' in netloc:
             url = '/'.join([url, 'blob', preferred, *path_parts])
             if start:
                 url = f'{url}#L{start}'
                 if end:
                     url = f'{url}-L{end}'
-        elif netloc.endswith('gitlab.com'):
+        if 'gitlab' in netloc:
             url = '/'.join([url, '-', 'blob', preferred, *path_parts])
             if start:
                 url = f'{url}#L{start}'
                 if end:
                     url = f'{url}-{end}'
         else:
-            raise NotImplementedError
+            print('error: unhandled git host', file=sys.stderr)
     return url
 
 
