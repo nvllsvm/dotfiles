@@ -1,60 +1,143 @@
-#!/usr/bin/env sh
-set -e
-
-get_ssh_hostname() {
-    awk -v target_host="$1" '
-        tolower($1) == "host" {
-            host = $2;
-            next;
-        }
-        tolower($1) == "hostname" && host == target_host {
-            printf "%s", $2;
-        }' \
-        ~/.ssh/config
-}
-
-if [ -n "$1" ]; then
-    url="$1"
-else
-    for remote in upstream origin; do
-        url="$(git remote get-url "$remote" 2> /dev/null || true)"
-        if [ -n "$url" ]; then
-            break
-        fi
-    done
-fi
+#!/usr/bin/env python3
+import argparse
+import os
+import pathlib
+import subprocess
+import sys
+import urllib.parse
 
 
-if [ -z "$url" ]; then
-    echo error: cannot determine remote 2> /dev/null
-    exit 1
-fi
+SSH_CONFIG_PATH = pathlib.Path('~/.ssh/config').expanduser()
 
-git_path="${url#*:}"
-git_host="${url%:*}"
 
-ssh_hostname="$(get_ssh_hostname "$git_host")"
-case "$(echo "$url" | tr '[:upper:]' '[:lower:]')" in
-    https://*|http://*)
-        url="${url}"
-        ;;
-    *@*:*)
-        url="${url#*@}"
-        git_path="${url#*:}"
-        git_host="${url%:*}"
-        url="http://${git_host}/${git_path}"
-        ;;
-    *)
-        if [ -n "$ssh_hostname" ]; then
-            url="https://${ssh_hostname}/${git_path}"
-        else
-            echo "error: cannot open \"${url}\"" >&2
-            exit 1
-        fi
-esac
+def ssh_hostmap():
+    hostmap = {}
 
-if [ -t 1 ] && [ -z "$SSH_TTY" ]; then
-    open "$url"
-else
-    echo "$url"
-fi
+    host = None
+    for line in SSH_CONFIG_PATH.read_text().splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        key, value = line.split(maxsplit=1)
+        if key.lower() == 'host':
+            host = value
+        elif key.lower() == 'hostname':
+            hostmap[host] = value
+    return hostmap
+
+
+class Git:
+    @staticmethod
+    def toplevel(path):
+        wdir = path.parent if path.is_file() else path
+        proc = subprocess.run(
+            ['git', '-C', wdir, 'rev-parse', '--show-toplevel'],
+            stdout=subprocess.PIPE,
+            check=True)
+        lines = proc.stdout.decode().splitlines()
+        if len(lines) != 1:
+            raise RuntimeError(lines)
+        return pathlib.Path(lines[0])
+
+    @staticmethod
+    def remote_url(path):
+        wdir = path.parent if path.is_file() else path
+        for remote in ('upstream', 'origin'):
+            proc = subprocess.run(
+                ['git', '-C', wdir, 'remote', 'get-url', remote],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL)
+            if proc.returncode == 0:
+                return remote, proc.stdout.decode().strip()
+        raise RuntimeError
+
+    @staticmethod
+    def remote_branches(path):
+        wdir = path.parent if path.is_file() else path
+        proc = subprocess.run(
+            ['git', '-C', wdir, 'branch', '--all'],
+            stdout=subprocess.PIPE,
+            check=True)
+
+        branches = {}
+        for line in proc.stdout.decode().splitlines():
+            name = line[2:].split()[0]
+            if name.startswith('remotes/'):
+                _, remote, branch, *_ = name.split('/')
+                branches.setdefault(remote, set())
+                branches[remote].add(branch)
+        return branches
+
+    @staticmethod
+    def current_branch(path):
+        wdir = path.parent if path.is_file() else path
+        proc = subprocess.run(
+            ['git', '-C', wdir, 'branch', '--show-current'],
+            stdout=subprocess.PIPE,
+            check=True)
+        return proc.stdout.decode().strip()
+
+
+def get_url(path, start, end):
+    if path is None:
+        path = Git.toplevel(pathlib.Path())
+    path = path.absolute()
+
+    remote, remote_url = Git.remote_url(path)
+    if remote_url.lower().startswith(('http://', 'https://')):
+        url = remote_url
+    elif ':' in remote_url:
+        host, urlpath = remote_url.split(':', maxsplit=1)
+        hostname = ssh_hostmap()[host]
+        url = f'https://{hostname}/{urlpath}'
+    else:
+        raise NotImplementedError(remote_url)
+
+    toplevel = Git.toplevel(path)
+    path_parts = path.relative_to(toplevel).parts if toplevel != path else []
+
+    if path_parts or start:
+        branches = Git.remote_branches(path)
+        current_branch = Git.current_branch(path)
+
+        if current_branch in ('main', 'master'):
+            preferred = current_branch
+        else:
+            for branch in ('main', 'master', current_branch):
+                if branch in branches[remote]:
+                    preferred = branch
+
+        parsed = urllib.parse.urlparse(url)
+        netloc = parsed.netloc.lower()
+        if netloc.endswith('github.com'):
+            url = '/'.join([url, 'blob', preferred, *path_parts])
+            if start:
+                url = f'{url}#L{start}'
+                if end:
+                    url = f'{url}-L{end}'
+        elif netloc.endswith('gitlab.com'):
+            url = '/'.join([url, '-', 'blob', preferred, *path_parts])
+            if start:
+                url = f'{url}#L{start}'
+                if end:
+                    url = f'{url}-{end}'
+        else:
+            raise NotImplementedError
+    return url
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('path', type=pathlib.Path, nargs='?')
+    parser.add_argument('--start', type=int)
+    parser.add_argument('--end', type=int)
+    args = parser.parse_args()
+
+    url = get_url(args.path, start=args.start, end=args.end)
+    print(url)
+    if sys.stdout.isatty() and not os.environ.get('SSH_TTY'):
+        subprocess.run(['open', url])
+
+
+if __name__ == '__main__':
+    main()
