@@ -4,9 +4,9 @@ syntax case match
 syn match mkdDue /due:\d\d\d\d-\d\d-\d\d/ containedin=htmlH[1-6],mkdNonListItemBlock,mkdListItemLine
 hi def link mkdDue Todo
 
-" date|est|goal
-syn match mkdDate /\(date\|est\|goal\):\d\d\d\d-\d\d-\d\d/ containedin=htmlH[1-6],mkdNonListItemBlock,mkdListItemLine,mkdLink
-hi mkdDate cterm=bold ctermfg=2
+" date|est|goal|after
+syn match mkdDate /\(date\|est\|goal\|after\):\d\d\d\d-\d\d-\d\d/ containedin=htmlH[1-6],mkdNonListItemBlock,mkdListItemLine,mkdLink
+hi mkdDate cterm=bold ctermfg=6
 
 " todo
 syn match mkdTodo /TODO:\?/ containedin=htmlH[1-6],mkdNonListItemBlock,mkdListItemLine,mkdLink
