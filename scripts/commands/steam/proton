@@ -59,6 +59,7 @@ def main():
                         default='win64')
     parser.add_argument('-p', '--prefix', default='default', nargs='?')
     parser.add_argument('--use', metavar='VERSION', default='system')
+    parser.add_argument('--cd', action='store_true')
     parser.add_argument('args', nargs='*')
 
     script_path = pathlib.Path(__file__)
@@ -75,6 +76,10 @@ def main():
         args = parser.parse_args()
         create_link = args.link
 
+    if args.cd:
+        parser.error('cd zsh integration failure')
+        parser.exit(1)
+
     if args.prefix is None:
         print('\n'.join(sorted(
             path.name
@@ -89,8 +94,6 @@ def main():
         for version in sorted(versions):
             print(version)
         parser.exit()
-
-    prefix = PREFIX_ROOT / args.prefix
 
     proton_bin = versions[args.use]
 
