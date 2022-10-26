@@ -1,0 +1,3 @@
+#compdef visidata
+## the completion in cluded in arch package 2.10.2-3 is FUCKED
+_files
