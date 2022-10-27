@@ -231,12 +231,28 @@ def all_files(root):
     return files
 
 
-async def run(executor):
+async def run(args):
+    logging.basicConfig(
+        format='%(levelname)s %(message)s',
+        level=logging.INFO)
+
+    paths = set()
+    for path in args.path:
+        if path.is_dir():
+            paths.update(all_files(path))
+        else:
+            paths.add(path)
+
+    executor = AsyncExecutor(args.numprocs)
+    for path in paths:
+        if path.suffix.lower() in ('.flac', '.ape', '.m4a', '.wav', '.wv'):
+            executor.submit(reencode, path)
+
     errors = []
 
     size_diff_printer = SizeDiffPrinter(len(executor))
 
-    async for result in executor.as_completed():
+    async for result in executor:
         try:
             source, before, after = result.result()
         except Exception as e:
@@ -252,40 +268,48 @@ async def run(executor):
 
 
 class AsyncExecutor:
-    def __init__(self, max_pending=None):
-        self._max_pending = \
-            os.cpu_count() if max_pending is None else max_pending
+    def __init__(self, max_concurrent=None):
+        self._max_concurrent = \
+            os.cpu_count() if max_concurrent is None else max_concurrent
         self._queued = []
         self._pending = set()
+        self._completed = set()
 
     def submit(self, func, *args, **kwargs):
-        self._queued.append((func, args, kwargs))
-        try:
-            asyncio.get_running_loop()
-        except RuntimeError:
-            pass
-        else:
-            self._fill()
+        event = asyncio.Event()
+        task = asyncio.create_task(self._wrap(event, func, args, kwargs))
+        self._queued.append((event, task))
+        return task
 
-    async def as_completed(self):
-        while self._queued or self._pending:
-            self._fill()
-
-            done, self._pending = await asyncio.wait(
-                self._pending, return_when=asyncio.FIRST_COMPLETED)
-
-            for result in done:
-                yield result
+    @staticmethod
+    async def _wrap(event, func, args, kwargs):
+        await event.wait()
+        return await func(*args, **kwargs)
 
     def _fill(self):
-        for _ in range(self._max_pending - len(self._pending)):
+        for _ in range(self._max_concurrent - len(self._pending)):
             if not self._queued:
                 return
-            func, args, kwargs = self._queued.pop()
-            self._pending.add(asyncio.create_task(func(*args, **kwargs)))
+            event, task = self._queued.pop(0)
+            event.set()
+            self._pending.add(task)
 
     def __len__(self):
-        return len(self._queued) + len(self._pending)
+        return len(self._queued) + len(self._pending) + len(self._completed)
+
+    def __aiter__(self):
+        return self
+
+    async def __anext__(self):
+        if not len(self):
+            raise StopAsyncIteration
+
+        if not self._completed:
+            self._fill()
+            self._completed, self._pending = await asyncio.wait(
+                self._pending, return_when=asyncio.FIRST_COMPLETED)
+
+        return self._completed.pop()
 
 
 class SizeDiffPrinter:
@@ -338,23 +362,7 @@ def main():
     parser.add_argument('path', type=pathlib.Path, nargs='+')
     args = parser.parse_args()
 
-    logging.basicConfig(
-        format='%(levelname)s %(message)s',
-        level=logging.INFO)
-
-    paths = set()
-    for path in args.path:
-        if path.is_dir():
-            paths.update(all_files(path))
-        else:
-            paths.add(path)
-
-    executor = AsyncExecutor(max_pending=args.numprocs)
-    for path in paths:
-        if path.suffix.lower() in ('.flac', '.ape', '.m4a', '.wav', '.wv'):
-            executor.submit(reencode, path)
-
-    asyncio.run(run(executor))
+    asyncio.run(run(args))
 
 
 if __name__ == '__main__':

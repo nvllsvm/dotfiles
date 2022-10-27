@@ -432,40 +432,48 @@ def _num_procs(value):
 
 
 class AsyncExecutor:
-    def __init__(self, max_pending=None):
-        self._max_pending = \
-            os.cpu_count() if max_pending is None else max_pending
+    def __init__(self, max_concurrent=None):
+        self._max_concurrent = \
+            os.cpu_count() if max_concurrent is None else max_concurrent
         self._queued = []
         self._pending = set()
+        self._completed = set()
 
     def submit(self, func, *args, **kwargs):
-        self._queued.append((func, args, kwargs))
-        try:
-            asyncio.get_running_loop()
-        except RuntimeError:
-            pass
-        else:
-            self._fill()
+        event = asyncio.Event()
+        task = asyncio.create_task(self._wrap(event, func, args, kwargs))
+        self._queued.append((event, task))
+        return task
 
-    async def as_completed(self):
-        while self._queued or self._pending:
-            self._fill()
-
-            done, self._pending = await asyncio.wait(
-                self._pending, return_when=asyncio.FIRST_COMPLETED)
-
-            for result in done:
-                yield result
+    @staticmethod
+    async def _wrap(event, func, args, kwargs):
+        await event.wait()
+        return await func(*args, **kwargs)
 
     def _fill(self):
-        for _ in range(self._max_pending - len(self._pending)):
+        for _ in range(self._max_concurrent - len(self._pending)):
             if not self._queued:
                 return
-            func, args, kwargs = self._queued.pop()
-            self._pending.add(asyncio.create_task(func(*args, **kwargs)))
+            event, task = self._queued.pop(0)
+            event.set()
+            self._pending.add(task)
 
     def __len__(self):
-        return len(self._queued) + len(self._pending)
+        return len(self._queued) + len(self._pending) + len(self._completed)
+
+    def __aiter__(self):
+        return self
+
+    async def __anext__(self):
+        if not len(self):
+            raise StopAsyncIteration
+
+        if not self._completed:
+            self._fill()
+            self._completed, self._pending = await asyncio.wait(
+                self._pending, return_when=asyncio.FIRST_COMPLETED)
+
+        return self._completed.pop()
 
 
 class SizeDiffPrinter:
@@ -540,7 +548,7 @@ def archive_main():
     async def run(args):
         has_error = False
 
-        executor = AsyncExecutor(max_pending=args.num_procs)
+        executor = AsyncExecutor(args.num_procs)
 
         sources = []
         for source in args.source:
@@ -553,7 +561,7 @@ def archive_main():
                             parent=args.parent)
 
         size_diff_printer = SizeDiffPrinter()
-        async for future in executor.as_completed():
+        async for future in executor:
             try:
                 dest, before, after = future.result()
             except FileExistsError as e:
@@ -1853,7 +1861,7 @@ async def extract_main():
 
     password = getpass.getpass('Password: ') if args.password else None
 
-    executor = AsyncExecutor(max_pending=args.num_procs)
+    executor = AsyncExecutor(args.num_procs)
 
     all_volumes = set()
     if args.stdout:
@@ -1888,7 +1896,7 @@ async def extract_main():
             executor.submit(
                 process_archive, cls, volumes, path, paths, password, args)
 
-    async for future in executor.as_completed():
+    async for future in executor:
         future.result()
 
 
