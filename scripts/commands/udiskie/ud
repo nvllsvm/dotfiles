@@ -1,0 +1,150 @@
+#!/usr/bin/env python3
+import argparse
+import subprocess
+import sys
+
+
+class udiskie:
+
+    @staticmethod
+    def info():
+        columns = [
+            'autoclear',
+            'device_file',
+            'device_id',
+            'device_presentation',
+            'device_size',
+            'drive_label',
+            'drive_model',
+            'drive_vendor',
+            'has_media',
+            'id_label',
+            'id_type',
+            'id_usage',
+            'id_uuid',
+            'in_use',
+            'is_block',
+            'is_crypto',
+            'is_detachable',
+            'is_drive',
+            'is_ejectable',
+            'is_external',
+            'is_filesystem',
+            'is_ignored',
+            'is_loop',
+            'is_luks',
+            'is_luks_cleartext',
+            'is_mounted',
+            'is_partition',
+            'is_partition_table',
+            'is_systeminternal',
+            'is_toplevel',
+            'is_unlocked',
+            'loop_file',
+            'mount_path',
+            'mount_paths',
+            'setup_by_uid',
+            'should_automount',
+            'symlinks',
+            'ui_device_label',
+            'ui_device_presentation',
+            'ui_id_label',
+            'ui_id_uuid',
+            'ui_label',
+        ]
+        output_arg = '\t'.join('{' + c + '}' for c in columns)
+        proc = subprocess.run(
+            ['udiskie-info', '--all', '--output', output_arg],
+            stdout=subprocess.PIPE,
+            check=True)
+
+        items = []
+        for line in proc.stdout.decode().splitlines():
+            items.append({
+                key: value
+                for key, value in zip(columns, line.split('\t'))
+            })
+        return items
+
+    @staticmethod
+    def umount(device):
+        subprocess.run(
+            ['udiskie-umount', device],
+            check=True)
+
+    @staticmethod
+    def mount(device, options=''):
+        subprocess.run(
+            ['udiskie-mount', '--options', options, device],
+            check=True)
+
+
+def fzf(data):
+    proc = subprocess.run(
+        ['fzf', '--black', '--prompt=', '--no-info', '--exact', '--no-sort',
+         '--no-extended', '-i', '--layout=reverse', '--print-query'],
+        input='\n'.join(data).encode(),
+        stdout=subprocess.PIPE,
+    )
+    try:
+        result = proc.stdout.decode().splitlines()[-1]
+    except IndexError:
+        result = None
+
+    return result
+
+
+def _parser_umount(args):
+    filesystems = {}
+    for item in udiskie.info():
+        if item['is_filesystem'] == 'False':
+            # /dev/sda of /dev/sda1
+            continue
+        if item['is_mounted'] != 'True':
+            continue
+        key = item['ui_label']
+        if key in filesystems:
+            raise RuntimeError
+        filesystems[key] = item
+    if not filesystems:
+        sys.exit(1)
+    result = fzf(sorted(filesystems))
+    if not result:
+        sys.exit(1)
+    item = filesystems[result]
+    udiskie.umount(item['device_file'])
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-o', '--options', default='')
+    args = parser.parse_args()
+
+    filesystems = {}
+    for item in udiskie.info():
+        if item['is_filesystem'] == 'False':
+            # /dev/sda of /dev/sda1
+            continue
+        key = '\t'.join([
+            'mount' if item['is_mounted'] == 'False' else 'umount',
+            item['ui_label']
+        ])
+        if key in filesystems:
+            raise RuntimeError
+        filesystems[key] = item
+    if not filesystems:
+        sys.exit(1)
+    result = fzf(sorted(filesystems))
+    if not result:
+        sys.exit(1)
+    action, _ = result.split('\t')
+    item = filesystems[result]
+    if action == 'mount':
+        udiskie.mount(item['device_file'],
+                      options=args.options)
+    elif action == 'umount':
+        udiskie.umount(item['device_file'])
+
+
+if __name__ == '__main__':
+    main()
