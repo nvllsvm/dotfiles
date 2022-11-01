@@ -19,7 +19,8 @@ lsdvd -x "$DEVICE"
 
 LABEL="$(blkid -o value -s LABEL "$DEVICE")"
 if [ -z "$DESTINATION" ]; then
-    DESTINATION="$LABEL"
+    DRIVE_LABEL="$(udiskie-info --output '{drive_label}' "${DEVICE}")"
+    DESTINATION="${LABEL} - ${DRIVE_LABEL}"
 fi
 
 OUTFILE="${DESTINATION}/${LABEL}.iso"

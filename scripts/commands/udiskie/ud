@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import argparse
+import json
+import pathlib
 import subprocess
 import sys
 
@@ -73,9 +75,16 @@ class udiskie:
             check=True)
 
     @staticmethod
-    def mount(device, options=''):
+    def mount(device, options='', recursive=False):
+        args = []
+        if options:
+            args.extend(['--options', options])
+        if recursive:
+            args.append('--recursive')
+        else:
+            args.append('--no-recursive')
         subprocess.run(
-            ['udiskie-mount', '--options', options, device],
+            ['udiskie-mount', *args, device],
             check=True)
 
 
@@ -94,55 +103,49 @@ def fzf(data):
     return result
 
 
-def _parser_umount(args):
-    filesystems = {}
-    for item in udiskie.info():
-        if item['is_filesystem'] == 'False':
-            # /dev/sda of /dev/sda1
-            continue
-        if item['is_mounted'] != 'True':
-            continue
-        key = item['ui_label']
-        if key in filesystems:
-            raise RuntimeError
-        filesystems[key] = item
-    if not filesystems:
-        sys.exit(1)
-    result = fzf(sorted(filesystems))
-    if not result:
-        sys.exit(1)
-    item = filesystems[result]
-    udiskie.umount(item['device_file'])
-
-
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('image', type=pathlib.Path, nargs='?')
+    parser.add_argument('--json', action='store_true')
     parser.add_argument('-o', '--options', default='')
     args = parser.parse_args()
 
-    filesystems = {}
+    if args.json:
+        print(json.dumps(udiskie.info(), indent=2, sort_keys=True))
+        return
+
+    if args.image is not None:
+        udiskie.mount(args.image, options=args.options)
+        return
+
+    items = {}
     for item in udiskie.info():
-        if item['is_filesystem'] == 'False':
-            # /dev/sda of /dev/sda1
+        if item['is_filesystem'] == 'True':
+            key = '\t'.join([
+                'mount' if item['is_mounted'] == 'False' else 'umount',
+                item['ui_label']
+            ])
+        elif item['is_loop'] == 'True' and item['is_toplevel'] == 'True':
+            key = '\t'.join(['detach', item['ui_label']])
+        else:
             continue
-        key = '\t'.join([
-            'mount' if item['is_mounted'] == 'False' else 'umount',
-            item['ui_label']
-        ])
-        if key in filesystems:
+
+        if key in items:
             raise RuntimeError
-        filesystems[key] = item
-    if not filesystems:
+        items[key] = item
+    if not items:
         sys.exit(1)
-    result = fzf(sorted(filesystems))
+    result = fzf(sorted(items))
     if not result:
         sys.exit(1)
     action, _ = result.split('\t')
-    item = filesystems[result]
+    item = items[result]
     if action == 'mount':
         udiskie.mount(item['device_file'],
                       options=args.options)
     elif action == 'umount':
+        udiskie.umount(item['device_file'])
+    elif action == 'detach':
         udiskie.umount(item['device_file'])
 
 
