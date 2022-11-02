@@ -11,7 +11,7 @@ hi mkdDate cterm=bold ctermfg=6
 " todo
 syn match mkdTodo /TODO:\?/ containedin=htmlH[1-6],mkdNonListItemBlock,mkdListItemLine,mkdLink
 hi def link mkdTodo Todo
-hi Todo cterm=bold
+hi Todo cterm=bold ctermfg=5
 
 " checkbox
 syn match mkdCheckboxUnchecked /\[ \]/ containedin=htmlH[1-6],mkdNonListItemBlock,mkdListItemLine
