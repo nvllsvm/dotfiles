@@ -341,6 +341,10 @@ _FORMATS = {
         'func': create_7z,
         'suffix': '.7z',
     },
+    'cbz': {
+        'func': create_zip,
+        'suffix': '.cbz',
+    },
     'epub': {
         'func': create_epub,
         'suffix': '.epub',
