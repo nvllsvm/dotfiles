@@ -1,4 +1,4 @@
-if [ -t 0 ] && [ -n "$SSH_TTY" ] && [ -z "$TMUX" ]; then
+if [ -t 0 ] && [ -n "$SSH_TTY" ] && [ -z "$TMUX" ] && command -v tmux-attach > /dev/null; then
     if [ "$HOST" = 'termux' ]; then
         # exec is broken in termux
         tmux-attach
