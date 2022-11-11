@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
+set -eu
 VERBOSE=
 ALL=
 while [ $# -gt 0 ]; do
