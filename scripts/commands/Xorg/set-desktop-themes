@@ -16,6 +16,7 @@ EOF
 
 LARGE=
 MEDIUM_LARGE=
+DPI=96
 
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -42,7 +43,7 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -z "$DPI" ]; then
+if [ -z "$DPI" ] && [ -e "$CURRENT_THEME" ]; then
     . "$CURRENT_THEME"
 else
     FONT_NAME='monospace'
@@ -123,6 +124,7 @@ fi
 
 eval "$(base16-export)"
 
+if command -v xrdb > /dev/null; then
 # update xresources
 xrdb << EOF
 *facename: ${FONT_NAME}
@@ -158,6 +160,7 @@ Xcursor.size: ${CURSOR_SIZE}
 *foreground: #${BASE16_FOREGROUND}
 *background: #${BASE16_BACKGROUND}
 EOF
+fi
 
 rm -rf ~/.config/rofi
 mkdir -p ~/.config/rofi
@@ -192,7 +195,9 @@ entry {
 EOF
 
 # fails in sway
-xrandr --dpi "$DPI" || true
+if command -v xrandr > /dev/null; then
+    xrandr --dpi "$DPI" || true
+fi
 
 alacritty-config-reload
 
@@ -209,23 +214,27 @@ colors:
     background: '0x${BASE16_BACKGROUND}'
 EOF
 
-hsetroot -solid "#${BASE16_BACKGROUND}"
+if command -v hsetroot > /dev/null; then
+    hsetroot -solid "#${BASE16_BACKGROUND}"
+fi
 
 if pidof i3 > /dev/null; then
     i3 restart > /dev/null 2>&1 || true
 fi
 
-pkill -9 dunst || true
+if command -v dunst > /dev/null; then
+    pkill -9 dunst || true
 
-FONT_NAME="${FONT_NAME}" \
-FONT_SIZE="${FONT_SIZE}" \
-FRAME_WIDTH="${DUNST_FRAME_WIDTH}" \
-MAX_ICON_SIZE="${MAX_ICON_SIZE}" \
-WIDTH="${DUNST_WIDTH}" \
-OFFSET="${DUNST_OFFSET}" \
-    dunst-build-config
+    FONT_NAME="${FONT_NAME}" \
+    FONT_SIZE="${FONT_SIZE}" \
+    FRAME_WIDTH="${DUNST_FRAME_WIDTH}" \
+    MAX_ICON_SIZE="${MAX_ICON_SIZE}" \
+    WIDTH="${DUNST_WIDTH}" \
+    OFFSET="${DUNST_OFFSET}" \
+        dunst-build-config
 
-dunst -config /tmp/dunstrc 2>&1 &
+    dunst -config /tmp/dunstrc 2>&1 &
+fi
 
 if [ -d ~/.config/sway ]; then
     cat > ~/.config/sway/config.d/10-colors << EOF
