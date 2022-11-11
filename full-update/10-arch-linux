@@ -50,8 +50,8 @@ sudo touch \
        /usr/lib/slack/libappindicator3.so.1 \
     2> /dev/null || true
 
-log 'Updating file cache'
 if command -v pkgfile > /dev/null; then
+    log 'Updating file cache'
     sudo pkgfile --update > /dev/null
 fi
 
