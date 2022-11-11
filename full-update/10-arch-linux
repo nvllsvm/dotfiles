@@ -51,7 +51,9 @@ sudo touch \
     2> /dev/null || true
 
 log 'Updating file cache'
-sudo pkgfile --update > /dev/null
+if command -v pkgfile > /dev/null; then
+    sudo pkgfile --update > /dev/null
+fi
 
 log 'Pruning package cache'
 yay -Sc --noconfirm > /dev/null
