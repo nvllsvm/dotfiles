@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
+set -eu
 if ! command -v zsh > /dev/null; then
     rm -rf ~/.zlogin
     rm -rf ~/.zshenv

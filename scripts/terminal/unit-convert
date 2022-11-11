@@ -6,6 +6,12 @@ import string
 _ALLOWED_CHARS = set((*string.digits, *string.ascii_letters, '.', ' '))
 
 
+BYTE_MAGNITUDE = {
+    1000: ['B', 'KB',  'MB',  'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
+    1024: ['B', 'KiB', 'MiB',  'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'],
+}
+
+
 METRIC_DISTANCE_TO_MM = {
     'mm': 1,
     'cm': 10,
