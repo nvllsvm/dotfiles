@@ -124,8 +124,8 @@ def mkv_files(root):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('input_directory', type=pathlib.Path, nargs='?')
-    parser.add_argument('output_directory', type=pathlib.Path, nargs='?')
+    parser.add_argument('input', type=pathlib.Path, nargs='?')
+    parser.add_argument('output', type=pathlib.Path, nargs='?')
     parser.add_argument(
         '-k',
         '--keep',
@@ -144,24 +144,34 @@ def main():
         action='store_true'
     )
     args = parser.parse_args()
-    input_directory = args.input_directory.absolute()
+
+    files = []
+    if args.input.is_dir():
+        files.extend([
+            path.relative_to(args.input)
+            for path in mkv_files(args.input)
+        ])
+    else:
+        files.append(args.input)
 
     if args.info:
-        for path in mkv_files(input_directory):
+        for path in files:
             mkv = MKVFile(path)
-            print(path.relative_to(input_directory), mkv.languages)
+            print(path, mkv.languages)
     else:
-        output_directory = args.output_directory.absolute()
+        if args.output.exists() and args.output.is_file():
+            raise RuntimeError
+        args.output.mkdir(exist_ok=True, parents=True)
 
         valid_languages = set(args.keep) if args.keep else DEFAULT_LANGUAGES
         if 'und' in valid_languages:
             valid_languages.add(None)
 
-        for path in mkv_files(input_directory):
+        for path in files:
             print(path)
             mkv = MKVFile(path)
             invalid_languages = mkv.languages - valid_languages
-            target = output_directory / path.relative_to(input_directory)
+            target = args.output / path.name
             audio = mkv.matching_audio_tracks(invalid_languages)
             subtitle = mkv.matching_subtitle_tracks(invalid_languages)
 
