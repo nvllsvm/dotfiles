@@ -67,7 +67,7 @@ def configure_partition_for_windows98(partition_path, vol_id):
     subprocess.run(
         ['mkfs.fat',
          '-F32',
-         '-g', '240',  # number of heads
+         '-g', '240/63',  # number of heads
          partition_path],
         stdout=subprocess.DEVNULL,
         check=True)
