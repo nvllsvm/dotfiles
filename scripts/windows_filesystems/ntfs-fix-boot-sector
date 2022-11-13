@@ -1,16 +1,12 @@
 #!/usr/bin/env python3
 import argparse
+import struct
 
 
 def fix_ntfs_partition(partition_path, start_offset):
-    hex_offset = hex(start_offset)[2:].zfill(8)
-    value = ''.join(
-        hex_offset[v]
-        for v in [6, 7, 4, 5, 2, 3, 0, 1]
-    )
     with open(partition_path, 'rb+') as handle:
         handle.seek(0x1c)
-        handle.write(bytes.fromhex(value))
+        handle.write(struct.pack('<I', start_offset))
 
 
 def main():
