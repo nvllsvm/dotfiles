@@ -1,1 +1,1 @@
-export PATH="$DOTFILES/scripts/fat_filesystem/:$PATH"
+export PATH="$DOTFILES/scripts/windows_filesystems/:$PATH"
