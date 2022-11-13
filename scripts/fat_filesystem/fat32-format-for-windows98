@@ -2,7 +2,6 @@
 import argparse
 import base64
 import json
-import pathlib
 import struct
 import subprocess
 
@@ -85,7 +84,7 @@ def configure_partition_for_windows98(partition_path, vol_id):
     with open(partition_path, 'wb') as handle:
         # set OEM ID
         handle.seek(3)
-        handle.write(struct.pack('<8s', b'MSWIN4.1')):
+        handle.write(struct.pack('<8s', b'MSWIN4.1'))
 
         # set Volume ID
         handle.seek(67)
@@ -100,7 +99,7 @@ def configure_partition_for_windows98(partition_path, vol_id):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--vol-id', type=int, default=3347998142)
-    parser.add_argument('path', type=pathlib.Path)
+    parser.add_argument('path')
     args = parser.parse_args()
 
     configure_partition_for_windows98(args.path, args.vol_id)
