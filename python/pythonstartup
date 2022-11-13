@@ -48,6 +48,7 @@ import shlex
 import shutil
 import smtplib
 import socket
+import stat
 import string
 import subprocess
 import sys
