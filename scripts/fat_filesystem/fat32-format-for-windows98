@@ -46,8 +46,6 @@ def configure_partition_for_windows98(partition_path, vol_id):
     parent_path = devices[0]['pkname']
     if parent_path is None:
         raise ValueError('cannot determine parent device')
-    if devices[0]['fstype'] != 'vfat':
-        raise ValueError('partition type must be fat32')
 
     # info - lsblk (parent)
     proc = subprocess.run(
