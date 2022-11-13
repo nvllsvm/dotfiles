@@ -1,2 +1,5 @@
 # Cable Matters SATA to USB-C 3.1 aluminum enclosure (model 201079)
 ACTION=="add|change", ATTRS{idVendor}=="174c", ATTRS{idProduct}=="235c", SUBSYSTEM=="scsi_disk", ATTR{provisioning_mode}="unmap"
+
+# StarTech.com SATA to USB-C 3.1 adapter (model USB31CSAT3CB)
+ACTION=="add|change", ATTRS{idVendor}=="14b0", ATTRS{idProduct}=="0208", SUBSYSTEM=="scsi_disk", ATTR{provisioning_mode}="unmap"
