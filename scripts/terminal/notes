@@ -4,7 +4,10 @@ set -e
 note_contents_rg() {
     rg \
         -0 \
-        --glob '!\.git/' \
+        --glob '!*.dot' \
+        --glob '!*.drawio' \
+        --glob '!*.svg' \
+        --glob '!.git/' \
         --sortr modified \
         --hidden \
         '.+'
