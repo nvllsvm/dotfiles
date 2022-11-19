@@ -124,8 +124,8 @@ def mkv_files(root):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('input', type=pathlib.Path, nargs='?')
-    parser.add_argument('output', type=pathlib.Path, nargs='?')
+    parser.add_argument('input', type=pathlib.Path)
+    parser.add_argument('output', type=pathlib.Path)
     parser.add_argument(
         '-k',
         '--keep',
@@ -138,6 +138,9 @@ def main():
         action='store_true',
         help='Show track language information'
     )
+    parser.add_argument(
+        '--rm',
+        action='store_true')
     parser.add_argument(
         '-d',
         '--dryrun',
@@ -182,6 +185,8 @@ def main():
                 print(' '.join(shlex.quote(str(part)) for part in parts))
             else:
                 mkv.remove_tracks(target, audio=audio, subtitle=subtitle)
+                if args.rm:
+                    path.unlink()
 
 
 if __name__ == '__main__':
