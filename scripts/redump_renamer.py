@@ -13,7 +13,7 @@ import tempfile
 import xml.etree.ElementTree
 import zipfile
 
-import bs4
+import bs4  # beautifulsoup4
 import httpx
 import yarl
 
