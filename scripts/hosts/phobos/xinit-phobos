@@ -7,6 +7,8 @@ xinput --set-prop "$TOUCHPAD_ID" 'libinput Middle Emulation Enabled' 1
 xinput --set-prop "$TOUCHPAD_ID" 'libinput Natural Scrolling Enabled' 1
 xinput --set-prop "$TOUCHPAD_ID" 'libinput Tapping Enabled' 1
 
-phobos-autorotate &
+# disabled due to being annoying
+# phobos-autorotate &
+
 set-keyboard-backlight idle-toggle &
 disown
