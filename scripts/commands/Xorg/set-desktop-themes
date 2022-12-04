@@ -43,7 +43,7 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -z "$DPI" ] && [ -e "$CURRENT_THEME" ]; then
+if [ -e "$CURRENT_THEME" ]; then
     . "$CURRENT_THEME"
 else
     FONT_NAME='monospace'
