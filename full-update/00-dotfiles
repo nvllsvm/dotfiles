@@ -43,7 +43,7 @@ update_non_user() {
 
 update_repo() {
     dotfiles_root="$2"
-    if [ -d "$dotfiles_root/.git" ]; then
+    if [ -z "${FULL_UPDATE_READ_ONLY:-}" ]; then
         printf "%bUpdating %s (%s)...%b\n" "$MAGENTA" "$1" "$dotfiles_root" "$RESET"
         git auto-update "$dotfiles_root"
     fi
