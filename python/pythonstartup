@@ -76,6 +76,7 @@ for name in [
         'psycopg',
         'redis',
         'requests',
+        'rich',
         'tabulate',
         'toml',
         'tqdm',

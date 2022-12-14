@@ -85,6 +85,12 @@ async def office_on_cool(_):
         'scene', 'turn_on', entity_id='scene.office_on_cyan')
 
 
+async def office_desk_lamp_toggle(_):
+    hass = HASS(URL, TOKEN)
+    await hass.post_services(
+        'light', 'toggle', entity_id='light.office_desk_lamp')
+
+
 async def office_closet_lights_toggle(_):
     hass = HASS(URL, TOKEN)
     await hass.post_services(
@@ -243,6 +249,11 @@ async def main():
         'office-closet-lights')
     office_closet_lights_on_parser.set_defaults(
         func=office_closet_lights_toggle)
+
+    office_desk_lamp_on_parser = subparsers.add_parser(
+        'office-desk-lamp')
+    office_desk_lamp_on_parser.set_defaults(
+        func=office_desk_lamp_toggle)
 
     office_fan_light_toggle_parser = subparsers.add_parser(
         'office-fan-light')
