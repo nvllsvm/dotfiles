@@ -1,12 +1,5 @@
 #!/usr/bin/env sh
 set -e
-IMAGE=docker.io/nvllsvm/harmonize
-
 SOURCE=/storage/Audio/Library
-TARGET_128=/storage/Audio/Lossy_opus_128
-
-harmonize_128() { 
-    harmonize "$@"
-}
-
-harmonize_128 -n "$(nproc)" "$SOURCE" "$TARGET_128" --codec opus --bitrate 128 --music
+TARGET=/storage/Audio/Lossy_opus_128
+harmonize "$SOURCE" "$TARGET" --codec opus --bitrate 128 --music
