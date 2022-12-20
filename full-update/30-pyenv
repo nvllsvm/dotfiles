@@ -15,4 +15,9 @@ else
     git pull
 fi
 
+if command -v yay > /dev/null; then
+    if ! yay -Qi tk > /dev/null 2>&1; then
+        yay -S --noconfirm tk
+    fi
+fi
 "$INSTALL_DIR"/bin/pyenv rehash
