@@ -94,6 +94,7 @@ mode "resize" {
 bindsym $mod+r mode "resize"
 
 bar {
+    modifier none
     status_command    i3-custom-status
     position          top
     workspace_buttons yes
