@@ -27,6 +27,8 @@ async def main():
             continue
         if v.endswith('-dev'):
             continue
+        if 'a' in v:
+            continue
         if 'b' in v:
             continue
         major, minor, patch = (int(i) for i in v.split('.'))
