@@ -37,7 +37,7 @@ async def validate_mkv(path):
             continue
         if MKV_VOID_DATA_WARNING.findall(line):
             continue
-        LOGGER.debug('mkvalidator error: "%s" (%s)', line, path)
+        LOGGER.info('mkvalidator error: "%s" (%s)', line, path)
         is_valid = False
 
     return is_valid
@@ -200,7 +200,7 @@ def main():
     parser.add_argument('path', type=pathlib.Path, nargs='+')
     args = parser.parse_args()
 
-    logging.basicConfig(format='%(levelname)-8s %(message)s')
+    logging.basicConfig(format='%(message)s')
     if args.verbose:
         log_level = logging.DEBUG
     elif args.quiet:
