@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+import argparse
+import pathlib
+
+
+METADATA_EXTENSIONS = {
+    '.arp',
+    '.xmp',
+}
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='remove orphan image metadata files ({})'.format(
+            ' '.join(sorted(METADATA_EXTENSIONS))))
+    parser.add_argument('-n', '--dry-run', action='store_true')
+    parser.add_argument('path', type=pathlib.Path)
+    args = parser.parse_args()
+
+    if args.path.is_file():
+        files = [args.path]
+    else:
+        files = []
+        stack = [args.path]
+        while stack:
+            for path in stack.pop().iterdir():
+                if path.is_file():
+                    files.append(path)
+                else:
+                    stack.append(path)
+
+    for path in files:
+        if not path.stem:
+            continue
+        if path.suffix.lower() not in ('.arp', '.xmp'):
+            continue
+        if pathlib.Path(path.stem).exists():
+            continue
+        print(path)
+        if not args.dry_run:
+            path.unlink()
+
+
+if __name__ == '__main__':
+    main()
