@@ -32,12 +32,7 @@ if ! command -v yay > /dev/null 2>&1; then
 fi
 
 log 'Updating packages'
-if [ "$(hostname)" = 'mars' ]; then
-    # UMC404HD broken in 6.1.1
-    yay -Syu --noconfirm --devel --ignore linux-zen --ignore linux-zen-headers
-else
-    yay -Syu --noconfirm --devel
-fi
+yay -Syu --noconfirm --devel
 
 log 'Removing bullshit gcr-prompter 🖕'
 sudo rm -f /usr/lib/gcr-prompter
