@@ -4,7 +4,7 @@ if [ "$(hostname)" != 'retropc' ]; then
     exit
 fi
 
-if [ "$(realpath ~/.ssh/authorized_keys)" != "${DOTFILES}/retropc/ssh/authorized_keys" ]; then
+if ! [ -f ~/.ssh/authorized_keys ] || [ "$(realpath ~/.ssh/authorized_keys)" != "${DOTFILES}/retropc/ssh/authorized_keys" ]; then
     mkdir -p ~/.ssh
     rm -f ~/.ssh/authorized_keys
     ln -sT "${DOTFILES}/retropc/ssh/authorized_keys" ~/.ssh/authorized_keys
