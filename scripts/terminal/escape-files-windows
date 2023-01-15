@@ -3,7 +3,7 @@ import argparse
 import pathlib
 import string
 
-VALID = [*" .-_()[]'", *string.ascii_letters, *string.digits]
+VALID = [*" .,-_()[]'", *string.ascii_letters, *string.digits]
 
 
 def all_files(root):
