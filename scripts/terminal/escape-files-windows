@@ -50,17 +50,18 @@ def rename_files(root, dry_run=True):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('path', type=pathlib.Path)
+    parser.add_argument('path', type=pathlib.Path, nargs='+')
     parser.add_argument('-c', '--commit',
                         action='store_true',
                         help='commit renames to disk. otherwise dry run')
     args = parser.parse_args()
 
-    # always perform a dry run to check for errors
-    rename_files(args.path, dry_run=True)
+    for path in args.path:
+        # always perform a dry run to check for errors
+        rename_files(path, dry_run=True)
 
-    if args.commit:
-        rename_files(args.path, dry_run=False)
+        if args.commit:
+            rename_files(path, dry_run=False)
 
 
 if __name__ == '__main__':
