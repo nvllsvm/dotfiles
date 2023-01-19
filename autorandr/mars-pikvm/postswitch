@@ -1,6 +1,0 @@
-#!/usr/bin/env sh
-set-desktop-themes --dpi 96
-
-pactl-set-only \
-    --profile alsa_card.usb-Schiit_Audio_USB_Modi_Device-00 output:iec958-stereo \
-    --profile alsa_card.usb-audio-technica_AT2020USB_-00 input:analog-stereo
