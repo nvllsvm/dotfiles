@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-import asyncio
 import argparse
+import asyncio
 import datetime
 import pathlib
+import shutil
 import string
 import sys
 
@@ -27,37 +28,23 @@ class exiv2:
 
     @classmethod
     async def get_image_datetime(cls, path):
-        proc = await asyncio.create_subprocess_exec(
-            'exiv2', '--key', 'Exif.Image.DateTime', '--', path,
-            stderr=asyncio.subprocess.PIPE,
-            stdout=asyncio.subprocess.PIPE)
-        stdout, stderr = await proc.communicate()
+        keys = [
+            'Exif.Image.DateTime',
+            'Exif.Photo.DateTimeOriginal',
+        ]
+        for key in keys:
+            proc = await asyncio.create_subprocess_exec(
+                'exiv2', '--key', key, '--', path,
+                stderr=asyncio.subprocess.PIPE,
+                stdout=asyncio.subprocess.PIPE)
+            stdout, stderr = await proc.communicate()
 
-        # Exif.Image.Orientation not present in file
-        if proc.returncode == 1 and not stderr:
-            return None
-        elif proc.returncode != 0:
-            raise SubprocessError
-        _, _, _, value = stdout.decode().split(maxsplit=3)
-        value = value.strip()
-        if value != '(0)':
-            dt = datetime.datetime.strptime(value, '%Y:%m:%d %H:%M:%S')
-
-        proc = await asyncio.create_subprocess_exec(
-            'exiv2', '--key', 'Exif.Photo.OffsetTime', '--', path,
-            stderr=asyncio.subprocess.PIPE,
-            stdout=asyncio.subprocess.PIPE)
-        stdout, stderr = await proc.communicate()
-
-        if proc.returncode == 1 and not stderr:
-            return dt
-        elif proc.returncode != 0:
-            raise SubprocessError
-        else:
-            _, _, _, value = stdout.decode().split(maxsplit=3)
-            tz = datetime.datetime.strptime(
-                value.replace(':', '').strip(), '%z').tzinfo
-            return dt.replace(tzinfo=tz)
+            if proc.returncode == 0:
+                _, _, _, value = stdout.decode().split(maxsplit=3)
+                value = value.strip()
+                if value != '(0)':
+                    dt = datetime.datetime.strptime(value, '%Y:%m:%d %H:%M:%S')
+                    return dt
 
 
 class ffprobe:
@@ -105,14 +92,15 @@ async def parse_date(path):
         pass
 
     try:
-        if path.startswith(('DOC', 'IMG', 'VID')) and path[3] in ('-', '_'):
+        name = path.name
+        if name.startswith(('DOC', 'IMG', 'VID')) and name[3] in ('-', '_'):
             dt = datetime.datetime(
-                int(path[4:8]),
-                int(path[8:10]),
-                int(path[10:12])
+                int(name[4:8]),
+                int(name[8:10]),
+                int(name[10:12])
             )
-        elif not set(path[:10]) - set(string.digits):
-            dt = datetime.datetime.utcfromtimestamp(int(path[:10]))
+        elif not set(name[:10]) - set(string.digits):
+            dt = datetime.datetime.utcfromtimestamp(int(name[:10]))
         else:
             raise ValueError('unknown date format')
 
@@ -163,9 +151,11 @@ async def process_file(path, target_root, dry_run):
     )
     print(target_path.relative_to(target_root))
 
+    if target_path.exists():
+        raise RuntimeError(f'path exists: {path} {target_path}')
     if not dry_run:
         target_path.parent.mkdir(parents=True, exist_ok=True)
-        path.rename(target_path)
+        shutil.move(path, target_path)
 
 
 async def main():
