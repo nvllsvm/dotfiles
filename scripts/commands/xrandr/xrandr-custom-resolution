@@ -5,10 +5,22 @@ if [ $# != '4' ]; then
     exit 1
 fi
 
-cvt_output=$(cvt $2 $3 $4 | tail -n 1 | awk '{$1=$2=""}1')
+if command -v cvt12 > /dev/null; then
+    cvt_output=$(cvt12 $2 $3 $4 --rb-v2 | tail -n 1 | awk '{$1=$2=""}1')
+else
+    case "$4" in
+        60|120|180|240)
+            reduced='--reduced'
+            ;;
+        *)
+            reduced=''
+    esac
+    cvt_output=$(cvt $reduced $2 $3 $4 | tail -n 1 | awk '{$1=$2=""}1')
+fi
 mode_name="$2x$3_$4"
 echo "$mode_name"
 
+xrandr --delmode $1 "$mode_name"
 xrandr --rmmode "$mode_name"
 xrandr --newmode $mode_name $cvt_output
 xrandr --addmode $1 $mode_name
