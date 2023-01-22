@@ -152,6 +152,8 @@ async def process_file(path, target_root, dry_run):
     print(target_path.relative_to(target_root))
 
     if target_path.exists():
+        print(f'path exists: {path} {target_path}')
+        return
         raise RuntimeError(f'path exists: {path} {target_path}')
     if not dry_run:
         target_path.parent.mkdir(parents=True, exist_ok=True)
