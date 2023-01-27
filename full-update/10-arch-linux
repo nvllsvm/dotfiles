@@ -16,6 +16,7 @@ log() {
 
 if ! [ -d ~/.config/pacman ] || [ "$(realpath ~/.config/pacman)" != "${DOTFILES}/pacman" ]; then
     rm -rf ~/.config/pacman
+    mkdir ~/.config/
     ln -sfT "${DOTFILES}/pacman" ~/.config/pacman
 fi
 
