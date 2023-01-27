@@ -216,6 +216,29 @@ async def create_zstd(path, dest, fast=False):
     assert zstd_proc.returncode == 0
 
 
+async def create_rvz(path, dest, fast=False):
+    if path.is_dir():
+        raise RuntimeError
+
+    level = '1' if fast else '22'
+
+    # need tempdir to allow for concurrent processes
+    with tempfile.TemporaryDirectory(
+            dir=dest.parent, prefix='.archive_',
+            suffix=dest.name + '.tmp') as tmp:
+        proc = await asyncio.create_subprocess_exec(
+            'dolphin-tool', 'convert',
+            f'--user={tmp}',
+            f'--compression_level={level}',
+            '--format=rvz',
+            '--block_size=131072',
+            '--compression=zstd',
+            f'--input={path}',
+            f'--output={dest}')
+        await proc.wait()
+        assert proc.returncode == 0
+
+
 async def create_tar(path, dest, fast=False):
     if path.is_dir():
         cwd = path
@@ -354,6 +377,10 @@ _FORMATS = {
     'gz': {
         'func': create_gzip,
         'suffix': '.gz',
+    },
+    'rvz': {
+        'func': create_rvz,
+        'suffix': '.rvz'
     },
     'tar': {
         'func': create_tar,
@@ -643,6 +670,39 @@ class cli_7zip:
         else:
             volumes = [path]
         return volumes
+
+
+class dolphin_tool:
+    @staticmethod
+    @functools.cache
+    def check():
+        if not shutil.which('dolphin-tool'):
+            raise KeyError
+
+    @staticmethod
+    async def contents(path):
+        return [path.with_suffix('').name.encode()]
+
+    @staticmethod
+    async def extract(path, dest, paths=None, password=None, overwrite=False):
+        if paths:
+            raise NotImplementedError
+        if overwrite:
+            raise NotImplementedError
+        target = dest / path.with_suffix('').name
+        proc = await asyncio.create_subprocess_exec(
+            'dolphin-tool', 'convert',
+            '--format=iso',
+            f'--input={path}',
+            f'--output={target}',
+            stdout=asyncio.subprocess.DEVNULL)
+        await proc.wait()
+        if proc.returncode:
+            raise ProcessError(proc.returncode)
+
+    @staticmethod
+    async def volumes(path, password=''):
+        return [path]
 
 
 class udisksctl:
@@ -1694,6 +1754,8 @@ async def _get_class(path):
             return xorriso
 
     if suffixes := [suffix.lower() for suffix in path.suffixes]:
+        if suffixes[-1] == '.rvz':
+            return dolphin_tool
         # ffs - brotli doesn't have a file signature
         if suffixes[-1] == '.br':
             return brotli
