@@ -17,8 +17,10 @@ EOF
 LARGE=
 MEDIUM_LARGE=
 DPI=96
+HASARGS=
 
 while [ $# -gt 0 ]; do
+    HASARGS=1
     case "$1" in
         --dpi)
             DPI="$2"
@@ -43,7 +45,7 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -e "$CURRENT_THEME" ]; then
+if [ -z "$HASARGS" ] && [ -e "$CURRENT_THEME" ]; then
     . "$CURRENT_THEME"
 else
     FONT_NAME='monospace'
