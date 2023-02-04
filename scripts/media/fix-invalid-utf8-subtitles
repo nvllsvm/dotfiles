@@ -4,13 +4,16 @@ import pathlib
 
 
 def all_files(root):
-    stack = [root]
-    while stack:
-        for path in stack.pop().iterdir():
-            if path.is_dir():
-                stack.append(path)
-            else:
-                yield path
+    if root.is_dir():
+        stack = [root]
+        while stack:
+            for path in stack.pop().iterdir():
+                if path.is_dir():
+                    stack.append(path)
+                else:
+                    yield path
+    else:
+        yield root
 
 
 def main():
