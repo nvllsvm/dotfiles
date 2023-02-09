@@ -9,11 +9,20 @@ import sys
 import magic  # package: python-magic
 
 MIME_SUFFIXES = {
+    'application/x-7z-compressed': [
+        '.7z',
+    ],
+    'application/x-ace-compressed': [
+        '.ace',
+    ],
     'application/x-bittorrent': [
         '.torrent',
     ],
     'application/x-rar': [
         '.rar',
+    ],
+    'application/x-tar': [
+        '.tar',
     ],
     'application/pdf': [
         '.pdf',
