@@ -9,14 +9,26 @@ import sys
 import magic  # package: python-magic
 
 MIME_SUFFIXES = {
+    'application/x-dosexec': [
+        '.exe',
+    ],
+    'application/vnd.microsoft.portable-executable': [
+        '.exe',
+    ],
     'application/x-7z-compressed': [
         '.7z',
     ],
     'application/x-ace-compressed': [
         '.ace',
     ],
+    'application/zip': [
+        '.zip',
+    ],
     'application/x-bittorrent': [
         '.torrent',
+    ],
+    'application/gzip': [
+        '.gzip',
     ],
     'application/x-rar': [
         '.rar',
@@ -99,6 +111,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--check', action='store_true', default=False)
     parser.add_argument('--fix', action='store_true', default=False)
+    parser.add_argument('--force-fix', action='store_true', default=False,
+                        help='Set suffix for txt, octet-streams, and unknown')
     parser.add_argument('path', type=pathlib.Path, nargs='+')
     args = parser.parse_args()
 
@@ -114,6 +128,29 @@ def main():
         mime = magic.from_file(str(path), mime=True).lower()
         exts[mime].add(path)
 
+    if args.force_fix:
+        for mime, paths in exts.items():
+            if mime == 'text/plain':
+                suffix = '.txt'
+            elif suffixes := MIME_SUFFIXES.get(mime):
+                suffix = suffixes[0]
+            else:
+                suffix = '.unknown'
+            for path in paths:
+                if path.suffix == suffix:
+                    continue
+                sep_count = 0
+                while True:
+                    target = path.with_name(
+                        f'{path.name}{"_"*sep_count}{suffix}')
+                    if target.exists():
+                        sep_count += 1
+                    else:
+                        break
+                print(f'Renaming "{path}" to "{target}"')
+                path.rename(target)
+        exit()
+
     if args.check:
         missing = set()
         invalid = collections.defaultdict(set)
@@ -121,7 +158,8 @@ def main():
             suffixes = MIME_SUFFIXES.get(mime)
             if mime == 'text/plain' or not suffixes:
                 missing.add(mime)
-                continue
+                if not args.always_fix:
+                    continue
 
             for path in paths:
                 if mime == 'text/plain':
