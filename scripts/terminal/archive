@@ -1898,6 +1898,7 @@ async def extract_main():
         archives = args.archive
         paths = None
 
+    error_paths = []
     task_to_path = {}
     for path in archives:
         path = path.absolute()
@@ -1915,13 +1916,17 @@ async def extract_main():
             sys.stdout.buffer.write(b'\n'.join(contents) + b'\n')
             sys.stdout.buffer.flush()
         else:
-            volumes = await cls.volumes(path, password)
+            try:
+                volumes = await cls.volumes(path, password)
+            except Exception as e:
+                LOGGER.exception(e)
+                error_paths.append(path)
+                continue
             all_volumes.update(volumes)
             task = executor.submit(
                 process_archive, cls, volumes, path, paths, password, args)
             task_to_path[task] = path
 
-    error_paths = []
     async for task in executor:
         path = task_to_path.pop(task)
         try:
