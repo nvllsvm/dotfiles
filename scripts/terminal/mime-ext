@@ -28,7 +28,7 @@ MIME_SUFFIXES = {
         '.torrent',
     ],
     'application/gzip': [
-        '.gzip',
+        '.gz',
     ],
     'application/x-rar': [
         '.rar',
