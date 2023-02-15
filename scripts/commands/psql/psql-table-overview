@@ -5,13 +5,12 @@ import subprocess
 
 
 SQL = """
-SELECT table_catalog,
-       table_schema,
+SELECT table_schema,
        table_name,
        ordinal_position,
        column_name
   FROM information_schema.columns
-  ORDER BY 1, 2, 3, 4
+  ORDER BY 1, 2, 3
 """
 
 
@@ -41,27 +40,33 @@ def pretty_json(data):
 
 
 def get_tree(url):
-    catalogs = {}
+    schemas = {}
     proc = subprocess.run(
         ['psql', url, '--no-psqlrc', '--tuples-only', '--csv', '--command', SQL],
         stdout=subprocess.PIPE,
         check=True)
     for line in proc.stdout.decode().splitlines():
-        catalog, schema, table, _, column_name = line.split(',')
-        catalogs.setdefault(catalog, {})
-        catalogs[catalog].setdefault(schema, {})
-        catalogs[catalog][schema].setdefault(table, [])
-        catalogs[catalog][schema][table].append(column_name)
-    return catalogs
+        schema, table, _, column_name = line.split(',')
+        schemas.setdefault(schema, {})
+        schemas[schema].setdefault(table, [])
+        schemas[schema][table].append(column_name)
+    return schemas
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--flat', action='store_true')
+    parser.add_argument('--schema', action='append')
     parser.add_argument('url')
     args = parser.parse_args()
 
     tree = get_tree(args.url)
+    if args.schema:
+        tree = {
+            key: value
+            for key, value in tree.items()
+            if key in args.schema
+        }
 
     if args.flat:
         for key, values in flatten_dict(tree, '.').items():
