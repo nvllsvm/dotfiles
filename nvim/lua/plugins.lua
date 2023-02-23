@@ -36,6 +36,8 @@ require("packer").startup({
 
         use("chrisbra/csv.vim")
 
+        use("ledger/vim-ledger")
+
         use({
             "nvim-treesitter/nvim-treesitter",
             run = ":TSUpdate",
