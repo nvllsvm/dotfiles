@@ -1,8 +1,11 @@
 #!/usr/bin/env sh
-CONF="${TMPDIR:-/tmp}/i3status-rs"
+CONF="${TMPDIR:-/tmp}/i3status-rs.toml"
 cat > "$CONF" << EOF
+[theme]
 theme = "native"
-icons = "awesome"
+
+[icons]
+icons = "awesome4"
 EOF
 
 case "$(hostname)" in
@@ -20,18 +23,22 @@ cat >> "$CONF" << EOF
 block = "sound"
 device_kind = "source"
 max_vol = 100
-on_click = "toggle-source-mute"
+[[block.click]]
+button = "left"
+cmd = "toggle-source-mute"
 
 [[block]]
 block = "sound"
 device_kind = "sink"
 max_vol = 100
-on_click = "set-volume --toggle-mute"
+[[block.click]]
+button = "left"
+cmd = "set-volume --toggle-mute"
 
 [[block]]
 block = "time"
 interval = 30
-format = "%F %R"
+format = "\$timestamp.datetime(f:'%Y-%m-%d %R')"
 EOF
 
 exec i3status-rs "$CONF"
