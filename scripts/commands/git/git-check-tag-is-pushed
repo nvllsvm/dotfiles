@@ -1,62 +1,26 @@
-#!/usr/bin/env python3
-import argparse
-import subprocess
-import sys
+#!/usr/bin/env sh
+set -e
 
+REMOTE=origin
+BRANCH=main
+TAG="$1"
 
-def local_tag_ref(tag):
-    proc = subprocess.run(
-        ['git', 'show-ref', '--hash', tag],
-        stdout=subprocess.PIPE,
-        check=True)
-    return proc.stdout.decode().strip()
+local_ref="$(git show-ref --hash "$TAG")"
+remote_ref="$(git ls-remote "$REMOTE" "$TAG" | cut -f1)"
 
+if [ -z "$local_ref" ]; then
+    echo 'error: local tag not found' >&2
+    exit 1
+elif [ -z "$remote_ref" ]; then
+    echo 'error: remote tag not found' >&2
+    exit 1
+elif [ "$local_ref" != "$remote_ref" ]; then
+    echo 'error: local tag ref does not match remote tag ref' >&2
+    exit 1
+fi
 
-def remote_tag_ref(remote, tag):
-    proc = subprocess.run(
-        ['git', 'ls-remote', remote, tag],
-        stdout=subprocess.PIPE,
-        check=True)
-    if stdout := proc.stdout.decode():
-        return stdout.strip().split()[0]
-
-
-def unpushed_commits(remote, branch, tag):
-    proc = subprocess.run(
-        ['git', 'rev-list', f'{remote}/{branch}..{tag}'],
-        stdout=subprocess.PIPE,
-        check=True)
-    return proc.stdout.decode().splitlines()
-
-
-def main():
-    parser = argparse.ArgumentParser(
-        description='Check that a tag exists in a remote branch')
-    parser.add_argument('--remote', default='origin')
-    parser.add_argument('--branch', default='main')
-    parser.add_argument('tag')
-    args = parser.parse_args()
-
-    local_ref = local_tag_ref(args.tag)
-    if not local_ref:
-        print('error: local tag not found', file=sys.stderr)
-        sys.exit(1)
-
-    remote_ref = remote_tag_ref(args.remote, args.tag)
-    if not remote_ref:
-        print('error: remote tag not found', file=sys.stderr)
-        sys.exit(1)
-
-    if local_ref != remote_ref:
-        print('error: local tag ref does not match remote tag ref:',
-              local_ref, remote_ref,
-              file=sys.stderr)
-        sys.exit(1)
-
-    if unpushed_commits(args.remote, args.branch, args.tag):
-        print('error: unpushed tag commits', file=sys.stderr)
-        sys.exit(1)
-
-
-if __name__ == '__main__':
-    main()
+unpushed_commits="$(git rev-list "${REMOTE}/${BRANCH}..${TAG}")"
+if [ -n "$unpushed_commits" ]; then
+    echo 'error: unpushed commits' >&2
+    exit 1
+fi
