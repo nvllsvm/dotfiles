@@ -1,9 +1,14 @@
 #!/usr/bin/env sh
 set -e
 
-REMOTE=origin
-BRANCH=main
+REMOTE="${GIT_REMOTE:-origin}"
+BRANCH="${GIT_BRANCH:-main}"
 TAG="$1"
+
+if [ $# -ne 1 ]; then
+    echo 'usage: git-check-tag-is-pushed <TAG>' >&2
+    exit 1
+fi
 
 local_ref="$(git show-ref --hash "$TAG")"
 remote_ref="$(git ls-remote "$REMOTE" "$TAG" | cut -f1)"
