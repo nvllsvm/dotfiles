@@ -4,28 +4,27 @@ import subprocess
 import sys
 
 
-def local_tags():
+def local_tag_ref(tag):
     proc = subprocess.run(
-        ['git', 'tag', '--list'],
+        ['git', 'show-ref', '--hash', tag],
         stdout=subprocess.PIPE,
         check=True)
-    return proc.stdout.decode().splitlines()
+    if stdout := proc.stdout.decode():
+        return stdout.strip()
 
 
-def remote_tags():
+def remote_tag_ref(remote, tag):
     proc = subprocess.run(
-        ['git', 'ls-remote', '--tags', '--quiet'],
+        ['git', 'ls-remote', remote, tag],
         stdout=subprocess.PIPE,
         check=True)
-    return [
-        line.split()[-1].removeprefix('refs/tags/')
-        for line in proc.stdout.decode().splitlines()
-    ]
+    if stdout := proc.stdout.decode():
+        return stdout.strip().split()[0]
 
 
-def unpushed_commits(remote_branch, tag):
+def unpushed_commits(remote, branch, tag):
     proc = subprocess.run(
-        ['git', 'rev-list', f'{remote_branch}..{tag}'],
+        ['git', 'rev-list', f'{remote}/{branch}..{tag}'],
         stdout=subprocess.PIPE,
         check=True)
     return proc.stdout.decode().splitlines()
@@ -33,22 +32,31 @@ def unpushed_commits(remote_branch, tag):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--remote-branch', default='origin/main')
+    parser.add_argument('--remote', default='origin')
+    parser.add_argument('--branch', default='main')
     parser.add_argument('tag')
     args = parser.parse_args()
 
-    has_error = False
-
-    if unpushed_commits(args.remote_branch, args.tag):
-        has_error = True
-        print('error: tag commits not pushed', file=sys.stderr)
-
-    if args.tag in set(local_tags()) - set(remote_tags()):
-        has_error = True
-        print('error: tag not pushed', file=sys.stderr)
-
-    if has_error:
+    local_ref = local_tag_ref(args.tag)
+    if not local_ref:
+        print('error: local tag not found', file=sys.stderr)
         sys.exit(1)
+
+    remote_ref = remote_tag_ref(args.remote, args.tag)
+    if not remote_ref:
+        print('error: remote tag not found', file=sys.stderr)
+        sys.exit(1)
+
+    if local_ref != remote_ref:
+        print('error: local tag ref does not match remote tag ref:',
+              local_ref, remote_ref,
+              file=sys.stderr)
+        sys.exit(1)
+
+    if unpushed_commits(args.remote, args.branch, args.tag):
+        print('error: unpushed tag commits', file=sys.stderr)
+        sys.exit(1)
+
 
 if __name__ == '__main__':
     main()
