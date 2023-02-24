@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+import argparse
+import subprocess
+import sys
+
+
+def local_tags():
+    proc = subprocess.run(
+        ['git', 'tag', '--list'],
+        stdout=subprocess.PIPE,
+        check=True)
+    return proc.stdout.decode().splitlines()
+
+
+def remote_tags():
+    proc = subprocess.run(
+        ['git', 'ls-remote', '--tags', '--quiet'],
+        stdout=subprocess.PIPE,
+        check=True)
+    tags = []
+    for line in proc.stdout.decode().splitlines():
+        _, ref = line.split()
+        tag = ref.removeprefix('refs/tags/')
+        tags.append(tag)
+    return tags
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('tag')
+    args = parser.parse_args()
+
+    unpushed_tags = set(local_tags()) - set(remote_tags())
+    if args.tag in unpushed_tags:
+        print(f'error: tag does not exist in remote: "{args.tag}"',
+              file=sys.stderr)
+        sys.exit(1)
+
+
+if __name__ == '__main__':
+    main()
