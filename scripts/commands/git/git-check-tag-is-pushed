@@ -30,9 +30,8 @@ def unpushed_commits(remote, branch, tag):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="""
-    Check that a tag exists remotely in a specific branch
-    """)
+    parser = argparse.ArgumentParser(
+        description='Check that a tag exists in a remote branch')
     parser.add_argument('--remote', default='origin')
     parser.add_argument('--branch', default='main')
     parser.add_argument('tag')
