@@ -17,25 +17,38 @@ def remote_tags():
         ['git', 'ls-remote', '--tags', '--quiet'],
         stdout=subprocess.PIPE,
         check=True)
-    tags = []
-    for line in proc.stdout.decode().splitlines():
-        _, ref = line.split()
-        tag = ref.removeprefix('refs/tags/')
-        tags.append(tag)
-    return tags
+    return [
+        line.split()[-1].removeprefix('refs/tags/')
+        for line in proc.stdout.decode().splitlines()
+    ]
+
+
+def unpushed_commits(remote_branch, tag):
+    proc = subprocess.run(
+        ['git', 'rev-list', f'{remote_branch}..{tag}'],
+        stdout=subprocess.PIPE,
+        check=True)
+    return proc.stdout.decode().splitlines()
 
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--remote-branch', default='origin/main')
     parser.add_argument('tag')
     args = parser.parse_args()
 
-    unpushed_tags = set(local_tags()) - set(remote_tags())
-    if args.tag in unpushed_tags:
-        print(f'error: tag does not exist in remote: "{args.tag}"',
-              file=sys.stderr)
-        sys.exit(1)
+    has_error = False
 
+    if unpushed_commits(args.remote_branch, args.tag):
+        has_error = True
+        print('error: tag commits not pushed', file=sys.stderr)
+
+    if args.tag in set(local_tags()) - set(remote_tags()):
+        has_error = True
+        print('error: tag not pushed', file=sys.stderr)
+
+    if has_error:
+        sys.exit(1)
 
 if __name__ == '__main__':
     main()
