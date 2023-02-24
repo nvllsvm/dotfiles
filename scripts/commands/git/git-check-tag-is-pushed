@@ -9,8 +9,7 @@ def local_tag_ref(tag):
         ['git', 'show-ref', '--hash', tag],
         stdout=subprocess.PIPE,
         check=True)
-    if stdout := proc.stdout.decode():
-        return stdout.strip()
+    return proc.stdout.decode().strip()
 
 
 def remote_tag_ref(remote, tag):
