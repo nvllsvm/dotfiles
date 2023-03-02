@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="video/x-dv">
+    <glob pattern="*.dif"/>
+    <comment>DV</comment>
+  </mime-type>
+</mime-info>
