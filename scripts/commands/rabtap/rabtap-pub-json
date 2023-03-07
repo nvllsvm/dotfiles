@@ -35,14 +35,12 @@ def main():
         'Type': '',
         'UserID': '',
         'AppID': '',
-        'Body': body
-    }
-
-    if args.header:
-        data['Headers'] = {
+        'Headers': {
             key: value
             for key, value in args.header
-        }
+        },
+        'Body': body
+    }
 
     subprocess.run(
         ['rabtap', 'pub', '--format=json'],
