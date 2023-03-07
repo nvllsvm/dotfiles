@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import argparse
 import base64
 import json
@@ -10,14 +10,14 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--exchange', required=True)
     parser.add_argument('--routing', required=True)
-    parser.add_argument('body', nargs='?')
+    parser.add_argument('--header', nargs=2, action='append')
+    parser.add_argument('body', default=sys.stdin, type=argparse.FileType('r'),
+                        nargs='?')
     args = parser.parse_args()
 
     body = base64.b64encode(
         json.dumps(
-            json.loads(
-                args.body if sys.stdin.isatty() else sys.stdin.read()
-            )
+            json.load(args.body)
         ).encode()
     ).decode()
 
@@ -37,6 +37,13 @@ def main():
       'AppID': '',
       'Body': body
     }
+
+    if args.header:
+        data['Headers'] = {
+            key: value
+            for key, value in args.header
+        }
+
     subprocess.run(
         ['rabtap', 'pub', '--format=json'],
         input=json.dumps(data).encode(),
