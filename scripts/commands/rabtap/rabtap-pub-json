@@ -23,8 +23,8 @@ def main():
 
     data = {
       'ContentType': 'application/json',
-      'Exchange': 'rpc',
-      'RoutingKey': 'intel.collect.v1',
+      'Exchange': args.exchange,
+      'RoutingKey': args.routing,
       'ContentEncoding': '',
       'DeliveryMode': 0,
       'Priority': 0,
