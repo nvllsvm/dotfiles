@@ -21,8 +21,6 @@ if command -v xinit-$(hostname) > /dev/null; then
     xinit-$(hostname)
 fi
 
-nm-applet &
-
 if command -v syncthingtray > /dev/null; then
     syncthingtray --wait &
 fi

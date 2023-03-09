@@ -7,8 +7,6 @@ set +a
 
 /usr/lib/gsd-xsettings &
 
-nm-applet &
-
 if command -v syncthingtray > /dev/null; then
     syncthingtray --wait &
 fi
