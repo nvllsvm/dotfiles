@@ -33,6 +33,5 @@ fi
 
 autorandr --change --force --match-edid
 udiskie --no-automount --tray &
-blueman-applet &
 
 exec i3

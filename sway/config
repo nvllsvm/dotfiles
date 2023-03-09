@@ -119,5 +119,4 @@ exec set-desktop-themes
 exec syncthingtray --wait
 exec swayidle -w before-sleep 'swaylock -f'
 exec nm-applet --indicator
-exec blueman-applet
 exec udiskie --tray
