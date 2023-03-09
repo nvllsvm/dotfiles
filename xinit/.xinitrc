@@ -31,5 +31,6 @@ fi
 
 autorandr --change --force --match-edid
 udiskie --no-automount --no-tray &
+nmcli networking on &
 
 exec i3
