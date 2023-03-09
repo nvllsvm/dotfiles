@@ -32,6 +32,6 @@ if command -v mpd-notifier > /dev/null; then
 fi
 
 autorandr --change --force --match-edid
-udiskie --no-automount --tray &
+udiskie --no-automount --no-tray &
 
 exec i3
