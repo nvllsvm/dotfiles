@@ -13,9 +13,10 @@ def alacritty_args(args, hold=False, window_class=None, window_title=None):
         command_args.extend(['--title', window_title])
     if hold:
         command_args.append('--hold')
-    command_args.extend([
-        '--command', 'zsh', '-ic', shlex.quote(shlex.join(args))
-    ])
+    if args:
+        command_args.extend([
+            '--command', 'zsh', '-ic', shlex.quote(shlex.join(args))
+        ])
     return command_args
 
 
@@ -24,7 +25,7 @@ def main():
     parser.add_argument('--hold', action='store_true')
     parser.add_argument('--class', dest='window_class')
     parser.add_argument('--title', dest='window_title')
-    parser.add_argument('args', nargs='+')
+    parser.add_argument('args', nargs='*')
     args = parser.parse_args()
 
     command = alacritty_args(
