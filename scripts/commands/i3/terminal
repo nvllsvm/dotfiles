@@ -25,10 +25,15 @@ def main():
     args = parser.parse_args()
 
     command = alacritty_args(args.args, args.window_class, args.window_title)
+
     if 'I3SOCK' in os.environ:
-        subprocess.run(['i3-msg', '--', 'exec', '--no-startup-id', *command])
-    else:
-        raise NotImplementedError
+        # remove as it can be stale.
+        # maybe check for running process?
+        os.environ.pop('I3SOCK')
+
+    # TODO add support for sway
+    print(command)
+    subprocess.run(['i3-msg', '--', 'exec', '--no-startup-id', *command])
 
 
 if __name__ == '__main__':
