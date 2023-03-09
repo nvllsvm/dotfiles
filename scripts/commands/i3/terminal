@@ -1,0 +1,35 @@
+#!/usr/bin/env python3
+import argparse
+import os
+import shlex
+import subprocess
+
+
+def alacritty_args(args, window_class=None, window_title=None):
+    command_args = ['alacritty']
+    if window_class:
+        command_args.extend(['--class', window_class])
+    if window_title:
+        command_args.extend(['--title', window_title])
+    command_args.extend([
+        '--command', 'zsh', '-ic', shlex.quote(shlex.join(args))
+    ])
+    return command_args
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--class', dest='window_class')
+    parser.add_argument('--title', dest='window_title')
+    parser.add_argument('args', nargs='+')
+    args = parser.parse_args()
+
+    command = alacritty_args(args.args, args.window_class, args.window_title)
+    if 'I3SOCK' in os.environ:
+        subprocess.run(['i3-msg', '--', 'exec', '--no-startup-id', *command])
+    else:
+        raise NotImplementedError
+
+
+if __name__ == '__main__':
+    main()
