@@ -1,24 +1,19 @@
-#!/usr/bin/env sh
-CONF="${TMPDIR:-/tmp}/i3status-rs.toml"
-cat > "$CONF" << EOF
 [theme]
 theme = "native"
 
 [icons]
 icons = "awesome4"
-EOF
 
-case "$(hostname)" in
-    deimos|phobos)
-        cat >> "$CONF" << EOF
 [[block]]
 block = "battery"
-device = "BAT0"
-EOF
-        ;;
-esac
+missing_format = ""
 
-cat >> "$CONF" << EOF
+# Sony WH-1000XM4
+[[block]]
+block = "bluetooth"
+mac = "F8:4E:17:93:84:67"
+disconnected_format = ""
+
 [[block]]
 block = "sound"
 device_kind = "source"
@@ -38,7 +33,4 @@ cmd = "set-volume --toggle-mute"
 [[block]]
 block = "time"
 interval = 30
-format = "\$timestamp.datetime(f:'%Y-%m-%d %R')"
-EOF
-
-exec i3status-rs "$CONF"
+format = "$timestamp.datetime(f:'%Y-%m-%d %R')"
