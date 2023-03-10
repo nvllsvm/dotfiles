@@ -26,10 +26,11 @@ def main():
     if not found:
         command = [
             'exec',
-            '--no-startup-id', 'terminal',
+            '--no-startup-id',
+            'terminal',
             '--class', 'i3-scratchpad',
             '--title', title,
-            '--', *args.args
+            *args.args,
         ]
         conn.command(' '.join(command))
         for attempt in range(1, 10):
