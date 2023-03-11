@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+import argparse
+import pathlib
+import subprocess
+
+
+AUTORANDR_ROOT = pathlib.Path('~/.config/autorandr').expanduser()
+
+
+def base16_theme():
+    proc = subprocess.run(
+        ['base16-export'],
+        stdout=subprocess.PIPE,
+        check=True
+    )
+    colors = {}
+    for line in proc.stdout.decode().splitlines():
+        name, color = line\
+            .removeprefix('export BASE16_')\
+            .replace("'", '')\
+            .split('=')
+        colors[name.lower()] = f'#{color}'
+    assert len(colors) == 24
+    return colors
+
+
+def current_autorandr_profile():
+    proc = subprocess.run(['autorandr', '--current'],
+                          stdout=subprocess.PIPE,
+                          check=True)
+    return proc.stdout.decode().splitlines()[0]
+
+
+def set_wallpaper_color(color):
+    subprocess.run(
+        ['hsetroot', '-solid', color],
+        stdout=subprocess.PIPE,
+        check=True)
+
+
+def set_wallpaper_image(path):
+    subprocess.run(
+        ['hsetroot', '-cover', path],
+        stdout=subprocess.PIPE,
+        check=True)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('path', type=pathlib.Path, nargs='?')
+    args = parser.parse_args()
+
+    profile = current_autorandr_profile()
+    profile_wallpaper = AUTORANDR_ROOT / profile / 'wallpaper'
+
+    if args.path:
+        if not args.path.is_file():
+            raise argparse.ArgumentError('does not exist')
+        profile_wallpaper.unlink(missing_ok=True)
+        profile_wallpaper.symlink_to(args.path)
+
+    if profile_wallpaper.exists():
+        set_wallpaper_image(profile_wallpaper)
+    else:
+        colors = base16_theme()
+        set_wallpaper_color(colors['background'])
+
+        profile_wallpaper.unlink(missing_ok=True)
+
+
+if __name__ == '__main__':
+    main()
