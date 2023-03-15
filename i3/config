@@ -95,7 +95,7 @@ bindsym $mod+r mode "resize"
 
 bar {
     modifier $mod+ctrl
-    status_command    i3status-rs
+    status_command    i3status-rs-custom
     position          top
     workspace_buttons yes
     tray_output       primary
