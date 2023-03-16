@@ -214,6 +214,8 @@ font:
 colors:
   primary:
     background: '0x${BASE16_BACKGROUND}'
+mouse:
+    hide_when_typing: true
 EOF
 
 set-wallpaper
