@@ -1,0 +1,4 @@
+polkit.addRule(function(action, subject) {
+    if (action.id == "org.freedesktop.NetworkManager.network-control")
+        return "yes";
+});
