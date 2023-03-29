@@ -1,5 +1,11 @@
 #!/usr/bin/env sh
 set -e
+STAGED=
+if [ "$1" = '--staged' ]; then
+    STAGED=1
+    shift
+fi
+
 if [ -z $1 ]; then
     if git status 2> /dev/null; then
         GIT_DIR='.'
@@ -18,7 +24,9 @@ if [ "$(git rev-parse HEAD)" != "$(git rev-parse @{u})" ]; then
 fi
 
 if [ "$(git status --porcelain | wc -l)" -gt 0 ]; then
-    git add -A
+    if [ -z "$STAGED" ]; then
+        git add -A
+    fi
     git commit -m "git-auto-update $(TZ=UTC date -Is)"
 fi
 
