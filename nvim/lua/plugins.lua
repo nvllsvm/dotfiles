@@ -34,8 +34,6 @@ require("packer").startup({
         use("junegunn/fzf.vim")
         use("L3MON4D3/LuaSnip")
 
-        use("chrisbra/csv.vim")
-
         use("ledger/vim-ledger")
 
         use({
