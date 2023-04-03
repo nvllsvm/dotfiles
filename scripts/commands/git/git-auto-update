@@ -19,7 +19,7 @@ fi
 
 cd "${GIT_DIR}"
 git fetch
-if [ "$(git rev-parse HEAD)" != "$(git rev-parse @{u})" ]; then
+if [ "$(git rev-parse HEAD)" != "$(git rev-parse '@{u}')" ]; then
     git merge
 fi
 
