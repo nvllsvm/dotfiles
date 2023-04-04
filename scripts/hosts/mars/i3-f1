@@ -1,3 +1,0 @@
-#!/usr/bin/env sh
-hass post-services media_player turn_off media_player.office_tv
-autorandr --force --load mars-office
