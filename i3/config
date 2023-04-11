@@ -135,6 +135,9 @@ for_window [class="Signal"] move to workspace 9
 for_window [class="Element"] move to workspace 10
 for_window [instance="i3-scratchpad"] move scratchpad
 
+# vuescan continuously steals focus while scanning
+for_window [class="vuescan"] focus_on_window_activation none
+
 bindsym $mod+b bar mode toggle
 bindsym $mod+m move position center
 
