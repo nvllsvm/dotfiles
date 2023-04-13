@@ -1,0 +1,46 @@
+#!/usr/bin/env sh
+set -eux
+thedomain="$1"
+snapshotname="$2"
+targetdisk="hda"
+
+# notice path to hda has now changed to snapshot file
+virsh domblklist $thedomain
+
+# <source> has changed to snapshot file
+virsh dumpxml $thedomain | grep '<disk' -A5
+
+# pull default pool path from xml
+pooldir=$(virsh pool-dumpxml default | grep -Po "(?<=path\>)[^<]+")
+echo "default pool dir: $pooldir"
+
+# should see two files starting with $thedomain
+# the one named $thedomain.$snapshotname is the snapshot
+cd $pooldir
+ls -latr $thedomain*
+
+# snapshot points to backing file, which is original disk
+sudo qemu-img info $thedomain.$snapshotname -U --backing-chain
+
+# capture original backing file name so we can revert
+backingfile=$(qemu-img info $thedomain.$snapshotname -U | grep -Po 'backing file:\s\K(.*)')
+echo "backing file: $backingfile"
+
+#exit
+# stop VM
+virsh destroy $thedomain || true
+
+# edit hda path back to original qcow2 disk
+virt-xml $thedomain --edit target=$targetdisk --disk path=$backingfile --update || true
+
+# validate that we are now pointing back at original qcow2 disk
+virsh domblklist $thedomain
+
+# delete snapshot metadata
+virsh snapshot-delete --metadata $thedomain $snapshotname
+
+# delete snapshot qcow2 file
+sudo rm $pooldir/$thedomain.$snapshotname
+
+# start guest domain
+virsh start $thedomain
