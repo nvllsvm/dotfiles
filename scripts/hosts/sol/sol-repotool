@@ -26,7 +26,11 @@ repotool_update() {
         echo "Checking ${pkg}"
         escaped_pkg="$(printf '%s' "$pkg" | sed 's/\+/\\+/g')"
         repo_ver="$(aur repo --database "$DATABASE" --list | grep -P "^$escaped_pkg\t")"
-        current_ver="$(aur srcver "$pkg")"
+        current_ver="$(aur srcver "$pkg" || true)"
+        if [ -z "$current_ver" ]; then
+            repotool_add "$pkg"
+        fi
+
         ood="$(printf '%s' "$repo_ver" | aur vercmp -p <(printf '%s' "$current_ver"))"
         if [ -n "$ood" ]; then
             repotool_add "$pkg"
