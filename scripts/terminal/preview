@@ -25,6 +25,7 @@ else
     case "$mimetype" in
         application/epub+zip|\
         application/gzip|\
+        application/x-rpm|\
         application/java-archive|\
         application/vnd.comicbook-rar|\
         application/vnd.comicbook+zip|\
