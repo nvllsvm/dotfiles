@@ -36,7 +36,21 @@ def _mpd_client(*args, **kwargs):
         client.disconnect()
 
 
+def tmp_art_path():
+    """
+    Fixes bug in Dunst where image is not updated when:
+    - notification is currently show
+    - track changes
+
+    Seems to be caching the image. Tested with dunst 1.9.2
+    """
+    while True:
+        yield _ALBUMART_PATH + '_a'
+        yield _ALBUMART_PATH + '_b'
+
+
 def _run(client):
+    art_path_iterator = tmp_art_path()
     while True:
         status = client.status()
         client.idle()
@@ -63,7 +77,7 @@ def _run(client):
             print(e, file=sys.stderr)
             break
         if albumart:
-            art_path = _ALBUMART_PATH
+            art_path = next(art_path_iterator)
             with open(art_path, 'wb') as f:
                 f.write(albumart['binary'])
         else:
