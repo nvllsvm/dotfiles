@@ -4,7 +4,7 @@ import json
 import os
 import pathlib
 
-import mpd
+import mpd  # python-mpd2
 
 
 def pretty_json(data):

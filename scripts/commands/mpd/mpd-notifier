@@ -8,7 +8,7 @@ import subprocess
 import sys
 import time
 
-import mpd
+import mpd  # python-mpd2
 
 _LOGGER = logging.getLogger('mpd-notifier')
 
