@@ -15,8 +15,8 @@ fi
 if command -v pip > /dev/null; then
     export PIP_REQUIRE_VIRTUALENV=0
     unset VIRTUAL_ENV
-    if ! pip show jedi-language-server > /dev/null; then
-        pip install jedi-language-server
+    if ! pip show pyright > /dev/null; then
+        pip install pyright
     fi
 fi
 nvim -c 'autocmd User PackerComplete quitall' -c 'PackerSync'

@@ -98,7 +98,7 @@ fi
 if command -v pip > /dev/null; then
     pip install \
         flake8 \
-        jedi-language-server \
+        pyright \
         pint \
         speedtest-cli \
         virtualenv
