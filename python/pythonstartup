@@ -82,6 +82,7 @@ for name in [
         'tqdm',
         'yaml',
         'yarl',
+        'zstandard',
 ]:
     try:
         exec(f'import {name}')
