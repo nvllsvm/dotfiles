@@ -1533,7 +1533,7 @@ class zstd:
     async def extract(path, dest, paths=None, password=None, overwrite=False):
         if paths:
             raise NotImplementedError
-        args = ['zstd', '-d', '--output-dir-flat', dest]
+        args = ['zstd', '-d', '--quiet', '--output-dir-flat', dest]
         if overwrite:
             args.append('-f')
 
