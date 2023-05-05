@@ -2,12 +2,10 @@
 import argparse
 import asyncio
 import contextvars
-import gzip
 import hashlib
 import io
 import logging
 import pathlib
-import pickle
 import re
 import tempfile
 import xml.etree.ElementTree
@@ -15,7 +13,9 @@ import zipfile
 
 import bs4  # beautifulsoup4
 import httpx
+import sqlitedict
 import yarl
+import zstandard
 
 SUFFIXES = ('.bin', '.iso', '.mdf')
 
@@ -26,25 +26,14 @@ LOGGER = logging.getLogger(NAME)
 _LOG_CONTEXT = {}
 
 
-def _read_cache_file(path):
-    return pickle.loads(gzip.decompress(path.read_bytes()))
-
-
-def _write_cache_file(path, data):
-    data = gzip.compress(pickle.dumps(data))
-
-    # safely write the file
-    path = pathlib.Path(path)
-    with tempfile.NamedTemporaryFile(delete=False, dir=path.parent) as handle:
-        try:
-            temp_path = pathlib.Path(handle.name)
-            temp_path.write_bytes(data)
-            temp_path.rename(path)
-        finally:
-            try:
-                temp_path.unlink()
-            except FileNotFoundError:
-                pass
+def disk_cache(path):
+    return sqlitedict.SqliteDict(
+        path,
+        decode=lambda obj: sqlitedict.decode(zstandard.decompress(obj)),
+        encode=lambda obj: zstandard.compress(bytes(sqlitedict.encode(obj))),
+        encode_key=sqlitedict.encode_key,
+        decode_key=sqlitedict.decode_key,
+        autocommit=True)
 
 
 def log_context(key, value):
@@ -81,67 +70,62 @@ def setup_logging(name, level=logging.INFO):
 
 
 class Redump:
-    # im guessing a redump ID's hashes should never change so
-    # this should be permanently cachable
-    SHA1_CACHE_FILE = pathlib.Path('/storage/Cache/redump/sha1.pickle.gz')
-
-    # temporary cache to allow for updates
-    REDUMP_DAT_FILE = pathlib.Path('/storage/Cache/redump/system_dat.pickle.gz')
-
     _DISC_PATH_PATTERN = re.compile(r'/disc/(\d+)/')
     _PAGE_PATH_PATTERN = re.compile(r'.*\?page=(\d+)')
 
+    _DEFAULT_SHA1_PATH = '/storage/Cache/redump/sha1'
+    _DEFAULT_DAT_PATH = '/storage/Cache/redump/dat'
+
     def __init__(self):
+        # im guessing a redump ID's hashes should never change so
+        # this should be permanently cachable
+        pathlib.Path(self._DEFAULT_SHA1_PATH).parent.mkdir(
+            parents=True, exist_ok=True)
+        self.sha1_cache = disk_cache(self._DEFAULT_SHA1_PATH)
+
+        # temporary cache to allow for updates
+        self.dat_cache = disk_cache(self._DEFAULT_DAT_PATH)
+        pathlib.Path(self._DEFAULT_DAT_PATH).parent.mkdir(
+            parents=True, exist_ok=True)
+
         self.client = httpx.AsyncClient()
         self.url = yarl.URL('http://redump.org')
-        self.datfiles = None
 
-        if self.SHA1_CACHE_FILE.exists():
-            self.sha1_cache = _read_cache_file(self.SHA1_CACHE_FILE)
-        else:
-            self.sha1_cache = {}
-
-    async def download_datfiles(self, update):
+    async def download_datfiles(self):
         """
         Download the redump PC datfile.
 
         Note: the response does not contain an etag
         """
-        if self.REDUMP_DAT_FILE.exists() and not update:
-            LOGGER.debug('Using dat redump cache [%s]', self.REDUMP_DAT_FILE)
-            data = _read_cache_file(self.REDUMP_DAT_FILE)
-        else:
-            LOGGER.info('Updating .dat files')
-            systems = [
-                'dc',   # dreamcast
-                'gc',   # gamecube
-                'mac',  # macintosh
-                'mcd',  # SEGA Mega CD
-                'palm', # palm os
-                'pc',   # PC
-                'ps2',  # playstation 2
-                'ps3',  # playstation 3
-                'psp',  # playstation portable
-                'psx',  # playstation
-                'ss',   # SEGA Saturn
-                'wii',  # wii
-                'xbox', # xbox
-            ]
-            data = {}
-            for system in systems:
-                LOGGER.debug('Downloading dat for %s', system)
-                response = await self.client.get(
-                    str(self.url / 'datfile' / system))
-                response.raise_for_status()
-                archive = zipfile.ZipFile(io.BytesIO(response.content))
-                if len(archive.namelist()) != 1:
-                    raise RuntimeError('expected archive to contain one file')
-                dat_file = io.BytesIO()
-                dat_file.write(archive.read(archive.namelist()[0]))
-                dat_file.seek(0)
-                data[system] = xml.etree.ElementTree.parse(dat_file)
-            _write_cache_file(self.REDUMP_DAT_FILE, data)
-        return data
+        LOGGER.info('Updating .dat files')
+        systems = [
+            'dc',   # dreamcast
+            'gc',   # gamecube
+            'mac',  # macintosh
+            'mcd',  # SEGA Mega CD
+            'palm', # palm os
+            'pc',   # PC
+            'ps2',  # playstation 2
+            'ps3',  # playstation 3
+            'psp',  # playstation portable
+            'psx',  # playstation
+            'ss',   # SEGA Saturn
+            'wii',  # wii
+            'xbox', # xbox
+        ]
+        data = {}
+        for system in systems:
+            LOGGER.debug('Downloading dat for %s', system)
+            response = await self.client.get(
+                str(self.url / 'datfile' / system))
+            response.raise_for_status()
+            archive = zipfile.ZipFile(io.BytesIO(response.content))
+            if len(archive.namelist()) != 1:
+                raise RuntimeError('expected archive to contain one file')
+            dat_file = io.BytesIO()
+            dat_file.write(archive.read(archive.namelist()[0]))
+            dat_file.seek(0)
+            self.dat_cache[system] = xml.etree.ElementTree.parse(dat_file)
 
     async def scrape_redump(self, name, system):
         part = name.split()[0]
@@ -174,21 +158,12 @@ class Redump:
             current_page += 1
 
     async def download_sha1(self, redump_id):
-        if self.sha1_cache is None:
-            if self.SHA1_CACHE_FILE.exists():
-                self.sha1_cache = _read_cache_file(
-                    self.SHA1_CACHE_FILE)
-            else:
-                self.sha1_cache = {}
-
         redump_id = str(redump_id)
         if redump_id not in self.sha1_cache:
             response = await self.client.get(
                 str(self.url / 'disc' / redump_id / 'sha1'))
             response.raise_for_status()
             self.sha1_cache[redump_id] = response.text
-            _write_cache_file(self.SHA1_CACHE_FILE, self.sha1_cache)
-
         return self._parse_sha1_response(self.sha1_cache[redump_id])
 
     @staticmethod
@@ -256,7 +231,7 @@ async def get_name(path, redump):
     expected = tuple(arg_hashes.values())
 
     hashes = {}
-    for system, x in redump.datfiles.items():
+    for system, x in redump.dat_cache.items():
         for thing in x.getroot():
             if thing.tag != 'game':
                 continue
@@ -295,6 +270,9 @@ async def get_name(path, redump):
     raise RuntimeError('wtf')
 
 
+REDUMP_ID_PATH_PATTERN = re.compile(r'^redump_(?P<redump_id>\d+) ')
+
+
 async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--no-rename', action='store_true')
@@ -307,7 +285,8 @@ async def main():
                   level=logging.DEBUG if args.verbose else logging.INFO)
 
     redump = Redump()
-    redump.datfiles = await redump.download_datfiles(update=args.update)
+    if args.update or not redump.dat_cache:
+        await redump.download_datfiles()
 
     for path in args.path:
         log_context('path', path)
@@ -335,13 +314,19 @@ async def main():
             if path == target:
                 LOGGER.info('✅ VALIDATED')
                 continue
-            if target.exists():
-                raise RuntimeError(f'target exists {target}')
-            LOGGER.info('✅ RENAMING %s', target)
 
-            if not args.no_rename:
+            current_redump_id = REDUMP_ID_PATH_PATTERN.match(path.name)\
+                .groupdict().get('redump_id')
+
+            if current_redump_id != redump_id:
+                LOGGER.error('🚫 ERROR: CURRENT PATH REDUMP ID IS INCORRECT %s', target)
+            elif not args.no_rename:
+                LOGGER.info('ℹ️  RENAMING %s', target)
+                if target.exists():
+                    raise RuntimeError(f'target exists {target}')
                 path.rename(target)
-
+            else:
+                LOGGER.info('ℹ️  REDUMP ID CORRECT, BUT NAME DIFFERS %s', target)
         else:
             LOGGER.error('⚠  ERROR: unknown')
             if not path.name.startswith('unknown '):

@@ -39,8 +39,8 @@ def safe_write(path, data):
     if isinstance(data, str):
         data = data.encode()
     with tempfile.NamedTemporaryFile(delete=False, dir=path.parent) as handle:
+        temp_path = pathlib.Path(handle.name)
         try:
-            temp_path = pathlib.Path(handle.name)
             temp_path.write_bytes(data)
             temp_path.rename(path)
         finally:
