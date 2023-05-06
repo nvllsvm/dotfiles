@@ -62,12 +62,12 @@ def main():
     else:
         results = {}
 
-    # TODO prune non-existent results
-
+    found = set()
     for path in all_files(args.path):
         if path == args.output:
             continue
         name = str(path.relative_to(args.path))
+        found.add(name)
         stat = path.stat()
         if name in results \
                 and results[name]['mtime'] == stat.st_mtime \
@@ -84,6 +84,17 @@ def main():
             'md5':  hashes['md5'],
         }
         results[name] = data
+        safe_write(
+            args.output,
+            json.dumps(results, indent=2, sort_keys=True),
+        )
+
+    modified = False
+    for name in list(results):
+        if name not in found:
+            results.pop(name)
+            modified = True
+    if modified:
         safe_write(
             args.output,
             json.dumps(results, indent=2, sort_keys=True),
