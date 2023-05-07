@@ -28,6 +28,7 @@ image/tiff=org.nomacs.ImageLounge.desktop
 image/webp=org.nomacs.ImageLounge.desktop
 image/x-canon-cr2=org.nomacs.ImageLounge.desktop
 image/x-canon-cr3=org.nomacs.ImageLounge.desktop
+inode/directory=org.kde.dolphin.desktop
 text/csv=neovim-dotfiles.desktop
 text/html=web-browser-dotfiles.desktop
 text/plain=neovim-dotfiles.desktop
