@@ -4,6 +4,7 @@ import hashlib
 import json
 import pathlib
 import tempfile
+import zlib
 
 
 def all_files(root):
@@ -19,15 +20,18 @@ def all_files(root):
 
 
 def multi_hash(path):
+    checksum_crc32 = 0
     hasher_md5 = hashlib.md5()
     hasher_sha1 = hashlib.sha1()
     hasher_sha256 = hashlib.sha256()
     with open(path, 'rb') as handle:
         while data := handle.read(65536):
+            checksum_crc32 = zlib.crc32(data, checksum_crc32)
             hasher_md5.update(data)
             hasher_sha1.update(data)
             hasher_sha256.update(data)
     return {
+        'crc32': hex(checksum_crc32)[2:],
         'md5': hasher_md5.hexdigest(),
         'sha1': hasher_sha1.hexdigest(),
         'sha256': hasher_sha256.hexdigest(),
@@ -52,21 +56,33 @@ def safe_write(path, data):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('path', type=pathlib.Path)
     parser.add_argument('-f', '--force', action='store_true')
-    parser.add_argument('-o', '--output', type=pathlib.Path, required=True)
+    parser.add_argument('-o', '--output', type=pathlib.Path)
+    parser.add_argument('path', nargs='+')
     args = parser.parse_args()
 
-    if args.output.exists():
-        results = json.loads(args.output.read_text())
-    else:
-        results = {}
+    results = {}
+    ingnore_paths = set()
+    output_path = None
+    if args.output is not None:
+        output_path = args.output
+        ingnore_paths.add(output_path)
+        if output_path.exists():
+            results = json.loads(output_path.read_text())
 
     found = set()
-    for path in all_files(args.path):
-        if path == args.output:
+    paths = []
+    for path in args.path:
+        path = pathlib.Path(path)
+        if path.is_file():
+            paths.append(path)
+        else:
+            paths.extend(all_files(path))
+
+    for path in paths:
+        if path in ingnore_paths:
             continue
-        name = str(path.relative_to(args.path))
+        name = str(path.relative_to(path))
         found.add(name)
         stat = path.stat()
         if name in results \
@@ -74,7 +90,6 @@ def main():
                 and results[name]['size'] == stat.st_size \
                 and not args.force:
             continue
-        print(path)
         hashes = multi_hash(path)
         data = {
             'mtime': stat.st_mtime,
@@ -82,21 +97,24 @@ def main():
             'sha1': hashes['sha1'],
             'sha256':  hashes['sha256'],
             'md5':  hashes['md5'],
+            'crc32':  hashes['crc32'],
         }
+        print(data)
         results[name] = data
-        safe_write(
-            args.output,
-            json.dumps(results, indent=2, sort_keys=True),
-        )
+        if output_path:
+            safe_write(
+                output_path,
+                json.dumps(results, indent=2, sort_keys=True),
+            )
 
     modified = False
     for name in list(results):
         if name not in found:
             results.pop(name)
             modified = True
-    if modified:
+    if modified and output_path:
         safe_write(
-            args.output,
+            output_path,
             json.dumps(results, indent=2, sort_keys=True),
         )
 
