@@ -29,8 +29,6 @@ def run_lgogdownloader():
          '-v', f'{CACHE_DIR}:/cache',
          '-v', f'{CONFIG_DIR}:/config',
          IMAGE],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
         check=True)
 
 
