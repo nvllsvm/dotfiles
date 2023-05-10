@@ -5,13 +5,6 @@ transform_matrix() {
     xinput set-prop "$1" --type=float "Coordinate Transformation Matrix" $matrix
 }
 
-set_input_enable() {
-    xinput set-prop 'ELAN1201:00 04F3:3098 Touchpad' 'Device Enabled' "$1"
-    for id in $(xinput --list | rg '↳ Asus Keyboard ' | rg 'slave  keyboard' | awk '{print $4}' | tr '=' ' ' | awk '{print $2}'); do
-        xinput set-prop $id 'Device Enabled' $1
-    done
-}
-
 
 monitor-sensor \
     | grep --line-buffered "Accelerometer orientation changed" \
@@ -19,31 +12,23 @@ monitor-sensor \
     | while read -r line; do
         line="${line#??}"
         if [ "$line" = "normal" ]; then
-            set_input_enable 1
-
             rotate=normal
             matrix="0 0 0 0 0 0 0 0 0"
             transform_matrix 'ELAN9008:00 04F3:2C82'
             transform_matrix 'ELAN9008:00 04F3:2C82 Stylus Pen (0)'
         elif [ "$line" = "left-up" ]; then
-            set_input_enable 0
-
             rotate=left
             matrix="0 -1 1 1 0 0 0 0 1"
             transform_matrix 'ELAN9008:00 04F3:2C82'
             matrix='0 -1 1 1 0 0 0 0 1'
             transform_matrix 'ELAN9008:00 04F3:2C82 Stylus Pen (0)'
         elif [ "$line" = "right-up" ]; then
-            set_input_enable 0
-
             rotate=right
             matrix="0 1 0 -1 0 1 0 0 1"
             transform_matrix 'ELAN9008:00 04F3:2C82'
             matrix='0 1 0 -1 0 1 0 0 1'
             transform_matrix 'ELAN9008:00 04F3:2C82 Stylus Pen (0)'
         elif [ "$line" = "bottom-up" ]; then
-            set_input_enable 0
-
             rotate=inverted
             matrix="-1 0 1 0 -1 1 0 0 1"
             transform_matrix 'ELAN9008:00 04F3:2C82'
@@ -51,7 +36,6 @@ monitor-sensor \
         else
             echo "Unknown rotation: $line"
             continue
-            set_input_enable 1
         fi
 
         echo $rotate
