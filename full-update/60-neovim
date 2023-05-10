@@ -12,11 +12,11 @@ if [ "$(realpath ~/.config/nvim)" != "$DOTFILES/nvim" ]; then
 fi
 
 
-if command -v pip > /dev/null; then
-    export PIP_REQUIRE_VIRTUALENV=0
-    unset VIRTUAL_ENV
-    if ! pip show pyright > /dev/null; then
-        pip install pyright
+if command -v pipx > /dev/null; then
+    if ! command -v pyright > /dev/null; then
+        pipx install pyright
+    else
+        pipx upgrade --pip-args='--upgrade-strategy=eager' pyright
     fi
 fi
 nvim -c 'autocmd User PackerComplete quitall' -c 'PackerSync'
