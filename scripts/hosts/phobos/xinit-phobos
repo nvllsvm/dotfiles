@@ -11,4 +11,3 @@ xinput --set-prop "$TOUCHPAD_ID" 'libinput Tapping Enabled' 1
 # phobos-autorotate &
 
 set-keyboard-backlight idle-toggle &
-disown
