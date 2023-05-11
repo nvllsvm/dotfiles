@@ -8,3 +8,7 @@ if ! command -v pipx > /dev/null; then
     python /tmp/pipx.pyz install pipx
     rm /tmp/pipx.pyz
 fi
+
+for package in $(pipx list --short | cut -d' ' -f1); do
+    pipx upgrade --pip-args='--upgrade-strategy=eager' "$package"
+done
