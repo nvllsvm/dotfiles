@@ -7,17 +7,14 @@ import io
 import json
 import logging
 import pathlib
+import pickle
 import re
 import subprocess
 import tempfile
 import xml.etree.ElementTree
 import zipfile
 
-import bs4  # beautifulsoup4
 import httpx
-import sqlitedict
-import yarl
-import zstandard
 
 SUFFIXES = ('.bin', '.iso', '.mdf')
 
@@ -26,16 +23,6 @@ NAME = 'redump-renamer'
 LOGGER = logging.getLogger(NAME)
 
 _LOG_CONTEXT = {}
-
-
-def disk_cache(path):
-    return sqlitedict.SqliteDict(
-        path,
-        decode=lambda obj: sqlitedict.decode(zstandard.decompress(obj)),
-        encode=lambda obj: zstandard.compress(bytes(sqlitedict.encode(obj))),
-        encode_key=sqlitedict.encode_key,
-        decode_key=sqlitedict.decode_key,
-        autocommit=True)
 
 
 def log_context(key, value):
@@ -72,26 +59,16 @@ def setup_logging(name, level=logging.INFO):
 
 
 class Redump:
-    _DISC_PATH_PATTERN = re.compile(r'/disc/(\d+)/')
-    _PAGE_PATH_PATTERN = re.compile(r'.*\?page=(\d+)')
-
-    _DEFAULT_SHA1_PATH = '/storage/Cache/redump/sha1'
-    _DEFAULT_DAT_PATH = '/storage/Cache/redump/dat'
+    _DEFAULT_DAT_PATH = pathlib.Path('/storage/Cache/redump.pickle')
 
     def __init__(self):
-        # im guessing a redump ID's hashes should never change so
-        # this should be permanently cachable
-        pathlib.Path(self._DEFAULT_SHA1_PATH).parent.mkdir(
-            parents=True, exist_ok=True)
-        self.sha1_cache = disk_cache(self._DEFAULT_SHA1_PATH)
-
-        # temporary cache to allow for updates
-        self.hashes = disk_cache(self._DEFAULT_DAT_PATH)
         pathlib.Path(self._DEFAULT_DAT_PATH).parent.mkdir(
             parents=True, exist_ok=True)
 
-        self.client = httpx.AsyncClient()
-        self.url = yarl.URL('http://redump.org')
+        if self._DEFAULT_DAT_PATH.exists():
+            self.hashes = pickle.loads(self._DEFAULT_DAT_PATH.read_bytes())
+        else:
+            self.hashes = {}
 
     async def download_datfiles(self):
         """
@@ -116,10 +93,11 @@ class Redump:
             'wii',  # wii
             'xbox', # xbox
         ]
+        client = httpx.AsyncClient()
         for system in systems:
             LOGGER.debug('Downloading dat for %s', system)
-            response = await self.client.get(
-                str(self.url / 'datfile' / system))
+            url = f'http://redump.org/datfile/{system}'
+            response = await client.get(url)
             response.raise_for_status()
             archive = zipfile.ZipFile(io.BytesIO(response.content))
             if len(archive.namelist()) != 1:
@@ -146,67 +124,7 @@ class Redump:
                     for name in sorted(hashes_by_name)
                 )
                 self.hashes[thing_hashes] = system, thing.attrib['name']
-
-    async def scrape_redump(self, name, system):
-        LOGGER.debug('scraping redump for %s (%s)', name, system)
-        part = name.split()[0]
-        url = self.url / 'discs' / 'system' / system / 'quicksearch' / part
-
-        current_page = 1
-        max_pages = 1
-        while current_page <= max_pages:
-            response = await self.client.get(
-                str(url.with_query({'page': str(current_page)})),
-                follow_redirects=True)
-            response.raise_for_status()
-
-            # handle redirect to specific item when only single match.
-            # ex. searching 'Cryptic' for 'Cryptic Passage for Blood'
-            if match := self._DISC_PATH_PATTERN.findall(
-                    yarl.URL(str(response.url)).path):
-                yield int(match[0])
-                return
-
-            soup = bs4.BeautifulSoup(response.text, 'lxml')
-
-            for link in soup.find_all('a'):
-                if path := link.get('href'):
-                    if found := self._PAGE_PATH_PATTERN.findall(path):
-                        max_pages = max(max_pages, int(found[0]))
-                    elif found := self._DISC_PATH_PATTERN.findall(path):
-                        redump_id = int(found[0])
-                        yield redump_id
-            current_page += 1
-
-    async def download_sha1(self, redump_id):
-        redump_id = str(redump_id)
-        if redump_id not in self.sha1_cache:
-            LOGGER.debug('downloading sha1 for redump %s', redump_id)
-            response = await self.client.get(
-                str(self.url / 'disc' / redump_id / 'sha1'))
-            response.raise_for_status()
-            self.sha1_cache[redump_id] = response.text
-        return self._parse_sha1_response(self.sha1_cache[redump_id])
-
-    @staticmethod
-    def _parse_sha1_response(data):
-        hashes = {}
-        for line in data.splitlines():
-            sha1_hash, name = line.split(maxsplit=1)
-            if not name.lower().endswith(SUFFIXES):
-                continue
-            hashes[name] = sha1_hash
-        return {
-            key: hashes[key]
-            for key in sorted(hashes)
-        }
-
-    def lookup_by_hash(self, hashes):
-        hashes = tuple(hashes)
-        for redump_id, text in self.sha1_cache.items():
-            response = self._parse_sha1_response(text)
-            if hashes == tuple(response.values()):
-                return redump_id
+        self._DEFAULT_DAT_PATH.write_bytes(pickle.dumps(self.hashes))
 
 
 def find_dump_hashes(root):
@@ -256,30 +174,12 @@ async def extract(path, dest_dir):
 
 async def get_name(path, redump):
     arg_hashes = find_dump_hashes(path)
-    expected = tuple(arg_hashes.values())
-
     try:
         system, name = redump.hashes[tuple(arg_hashes.values())]
     except KeyError:
         LOGGER.warning('No redump match found')
         return None, path.name
-
     return system, name
-
-    # fix for games like 'Fury^3'
-    name = name.replace('^', '')
-
-    if redump_id := redump.lookup_by_hash(expected):
-        LOGGER.info('Found redump match %s "%s"', redump_id, name)
-        return redump_id, name.replace('/', '')
-
-    async for redump_id in redump.scrape_redump(name, system):
-        sha1 = await redump.download_sha1(redump_id)
-        if expected == tuple(sha1.values()):
-            LOGGER.info('Found redump match %s "%s"', redump_id, name)
-            return redump_id, name.replace('/', '')
-
-    raise RuntimeError('wtf')
 
 
 REDUMP_ID_PATH_PATTERN = re.compile(r'^redump_(?P<redump_id>\d+) ')

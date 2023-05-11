@@ -58,7 +58,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', '--force', action='store_true')
     parser.add_argument('-o', '--output', type=pathlib.Path)
-    parser.add_argument('path', nargs='+')
+    parser.add_argument('path', type=pathlib.Path)
     args = parser.parse_args()
 
     results = {}
@@ -71,18 +71,10 @@ def main():
             results = json.loads(output_path.read_text())
 
     found = set()
-    paths = []
-    for path in args.path:
-        path = pathlib.Path(path)
-        if path.is_file():
-            paths.append(path)
-        else:
-            paths.extend(all_files(path))
-
-    for path in paths:
+    for path in all_files(args.path):
         if path in ingnore_paths:
             continue
-        name = str(path.relative_to(path))
+        name = str(path.relative_to(args.path))
         found.add(name)
         stat = path.stat()
         if name in results \
@@ -99,7 +91,6 @@ def main():
             'md5':  hashes['md5'],
             'crc32':  hashes['crc32'],
         }
-        print(data)
         results[name] = data
         if output_path:
             safe_write(

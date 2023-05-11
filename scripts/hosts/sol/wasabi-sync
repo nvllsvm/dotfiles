@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-set -eu
+set -eux
 export RCLONE_CONFIG="${DOTFILES_PRIVATE}/wasabi/rclone.conf"
 
 PREFIX='wasabi:nullsum-sol'
@@ -12,11 +12,19 @@ rclone_sync() {
     [ $NEW_RET -gt $RET ] && RET=$NEW_RET
 }
 
-rclone_sync /storage/Games "${PREFIX}"/storage1/Games --exclude /PC/GOG.com/ --exclude /Nintendo\ Switch/
-rclone_sync /storage/Audio "${PREFIX}"/storage1/Audio --exclude /Lossy*/
-rclone_sync /storage/Syncthing/Default/Bitwig\ Studio "${PREFIX}"/storage1/Bigwig\ Studio
-rclone_sync /storage/Books "${PREFIX}"/storage1/Books
-rclone_sync /storage/Pictures "${PREFIX}"/storage1/Pictures
+rclone_sync /storage/Games \
+    "${PREFIX}"/storage1/Games \
+    --exclude /PC/GOG.com/ \
+    --exclude /Nintendo\ Switch/
+rclone_sync /storage/Audio \
+    "${PREFIX}"/storage1/Audio \
+    --exclude /Lossy*/
+rclone_sync /storage/Syncthing/Default/Bitwig\ Studio \
+    "${PREFIX}"/storage1/Bigwig\ Studio
+rclone_sync /storage/Books \
+    "${PREFIX}"/storage1/Books
+rclone_sync /storage/Pictures \
+    "${PREFIX}"/storage1/Pictures
 
 rclone size "${PREFIX}"
 exit $RET
