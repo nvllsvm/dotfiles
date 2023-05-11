@@ -1,12 +1,20 @@
 #!/usr/bin/env sh
+set -e
 if ! command -v pip > /dev/null; then
     exit
 fi
 
 if ! command -v pipx > /dev/null; then
-    curl -L https://github.com/pypa/pipx/releases/latest/download/pipx.pyz -o /tmp/pipx.pyz
-    python /tmp/pipx.pyz install pipx
-    rm /tmp/pipx.pyz
+    cleanup() {
+        rm -f "${TEMP_FILE}"
+    }
+
+    trap cleanup EXIT
+    TEMP_FILE="$(mktemp)"
+
+    curl -L https://github.com/pypa/pipx/releases/latest/download/pipx.pyz -o "${TEMP_FILE}"
+    python "${TEMP_FILE}" install pipx
+    rm "${TEMP_FILE}"
 fi
 
 for package in $(pipx list --short | cut -d' ' -f1); do
