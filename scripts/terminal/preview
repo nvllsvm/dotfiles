@@ -71,7 +71,7 @@ else
             exiftool "$1"
             ;;
         image/*)
-            exiv2 "$1"
+            exiv2 "$1" || true
             ;;
         application/octet-stream)
             case "$(printf %s "$1" | tr '[:upper:]' '[:lower:]')" in
