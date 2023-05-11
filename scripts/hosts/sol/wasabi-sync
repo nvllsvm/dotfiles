@@ -1,4 +1,7 @@
 #!/usr/bin/env sh
+set -eu
+export RCLONE_CONFIG="${DOTFILES_PRIVATE}/wasabi/rclone.conf"
+
 PREFIX='wasabi:nullsum-sol'
 
 RET=0
