@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+if ! command -v pip > /dev/null; then
+    exit
+fi
+
+if ! command -v pipx > /dev/null; then
+    curl -L https://github.com/pypa/pipx/releases/latest/download/pipx.pyz -o /tmp/pipx.pyz
+    python /tmp/pipx.pyz install pipx
+    rm /tmp/pipx.pyz
+fi
