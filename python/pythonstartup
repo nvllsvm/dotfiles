@@ -74,7 +74,6 @@ for name in [
         'magic',
         'mutagen',
         'requests',
-        'rich',
         'sqlitedict',
         'tabulate',
         'toml',
@@ -87,6 +86,13 @@ for name in [
         exec(f'import {name}')
     except ModuleNotFoundError:
         pass
+
+
+try:
+    import rich
+    print = rich.print
+except ModuleNotFoundError:
+    pass
 
 
 try:
