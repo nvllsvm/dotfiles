@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-set -eux
+set -eu
 export RCLONE_CONFIG="${DOTFILES_PRIVATE}/wasabi/rclone.conf"
 
 PREFIX='wasabi:nullsum-sol'
@@ -7,6 +7,7 @@ PREFIX='wasabi:nullsum-sol'
 HAS_ERROR=
 
 rclone_sync() {
+    echo "Syncing $1"
     rclone sync "$@" -v || true
     NEW_RET=$?
     case "$NEW_RET" in
@@ -33,6 +34,7 @@ rclone_sync /storage/Books \
 rclone_sync /storage/Pictures \
     "${PREFIX}"/storage1/Pictures
 
+echo 'Determing bucket size'
 rclone size "${PREFIX}"
 if [ -n "$HAS_ERROR" ]; then
     exit 1
