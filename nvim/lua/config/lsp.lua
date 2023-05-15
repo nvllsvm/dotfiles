@@ -47,3 +47,15 @@ for _, lsp in ipairs(servers) do
         },
     })
 end
+nvim_lsp.pyright.setup{
+  on_attach = on_attach,
+  flags = lsp_flags,
+  settings = {
+    python = {
+      analysis = {
+        -- pyright's type checking is often wrong 
+        typeCheckingMode = "off"
+      }
+    }
+  }
+}
