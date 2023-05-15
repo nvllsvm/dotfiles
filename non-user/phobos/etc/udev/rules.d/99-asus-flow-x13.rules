@@ -8,4 +8,4 @@ ACTION=="add", SUBSYSTEM=="pci", DRIVER=="nvme", TEST=="power/control", ATTR{pow
 ACTION=="add", SUBSYSTEM=="leds", KERNEL=="asus::kbd_backlight", ATTR{brightness}="0", GROUP="video", MODE="0664"
 
 # tablet switch
-SUBSYSTEM=="input", ENV{ID_PATH}=="platform-asus-nb-wmi", MODE="0644"
+SUBSYSTEM=="input", ENV{ID_PATH}=="platform-asus-nb-wmi", MODE="0666"
