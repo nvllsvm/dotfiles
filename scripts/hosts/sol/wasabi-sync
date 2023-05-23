@@ -11,6 +11,8 @@ rclone_sync() {
     rclone sync "$@" -v || true
     NEW_RET=$?
     case "$NEW_RET" in
+        0)
+            ;;
         9)
             # no files transferred
             ;;
