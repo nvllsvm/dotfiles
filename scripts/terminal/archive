@@ -237,6 +237,35 @@ async def create_rvz(path, dest, fast=False):
             f'--output={dest}')
         await proc.wait()
         assert proc.returncode == 0
+        raise NotImplementedError
+
+
+async def create_nsz(path, dest, fast=False):
+    if path.is_dir():
+        raise RuntimeError
+
+    level = '1' if fast else '22'
+
+    # need tempdir to allow for concurrent processes
+    with tempfile.TemporaryDirectory(
+            dir=dest.parent, prefix='.archive_',
+            suffix=dest.name + '.tmp') as tmp:
+        proc = await asyncio.create_subprocess_exec(
+            'nsz',
+            '-C',  # compress
+            '--long',
+            f'--level={level}',
+            f'--output={tmp}',
+            path,
+            # DEVNULL causes issues, idk why
+            stdout=asyncio.subprocess.PIPE)
+        await proc.communicate()
+        assert proc.returncode == 0
+        tmp_files = list(pathlib.Path(tmp).iterdir())
+        assert len(tmp_files) == 1
+        tmp_file = tmp_files[0]
+        assert tmp_file.is_file()
+        tmp_file.rename(dest)
 
 
 async def create_tar(path, dest, fast=False):
@@ -361,6 +390,29 @@ async def optimize_zip(path):
     assert proc.returncode == 0
 
 
+def _build_archive_dest(source, suffix, parent=None):
+    parent = parent if parent is not None else source.parent
+    increment = 0
+    while True:
+        dest = parent / pathlib.Path(
+            ''.join([
+                source.name,
+                f'_{increment}' if increment else '',
+                suffix]))
+
+        if not dest.exists():
+            dest.parent.mkdir(exist_ok=True, parents=True)
+            return dest.absolute()
+
+        increment += 1
+
+
+def _build_archive_dest_nsz(source, suffix, parent=None):
+    if source.suffix.lower() == '.nsp':
+        source = source.with_suffix('')
+    return _build_archive_dest(source, suffix, parent)
+
+
 _FORMATS = {
     '7z': {
         'func': create_7z,
@@ -377,6 +429,11 @@ _FORMATS = {
     'gz': {
         'func': create_gzip,
         'suffix': '.gz',
+    },
+    'nsz': {
+        'func': create_nsz,
+        'suffix': '.nsz',
+        'build_dest': _build_archive_dest_nsz,
     },
     'rvz': {
         'func': create_rvz,
@@ -413,30 +470,14 @@ _FORMATS = {
 }
 
 
-def _build_archive_dest(source, suffix, parent=None):
-    parent = parent if parent is not None else source.parent
-    increment = 0
-    while True:
-        dest = parent / pathlib.Path(
-            ''.join([
-                source.name,
-                f'_{increment}' if increment else '',
-                suffix]))
-
-        if not dest.exists():
-            dest.parent.mkdir(exist_ok=True, parents=True)
-            return dest.absolute()
-
-        increment += 1
-
-
 async def process(source, archive_format, remove, fast=False, parent=None):
     formats = _FORMATS[archive_format]
 
     source = source.absolute()
     suffix = formats['suffix']
+    build_dest = formats.get('build_dest', _build_archive_dest)
 
-    dest = _build_archive_dest(source, suffix, parent=parent)
+    dest = build_dest(source, suffix, parent=parent)
 
     before = sum(path.lstat().st_size for path in _all_paths(source))
     with TempPath(dir=dest.parent, prefix='.archive_',
