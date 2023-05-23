@@ -606,6 +606,58 @@ def archive_main():
     sys.exit(1 if asyncio.run(run(args)) else 0)
 
 
+class nsz:
+    @staticmethod
+    @functools.cache
+    def check():
+        if not shutil.which('nsz'):
+            raise KeyError
+
+    @classmethod
+    async def contents(cls, path):
+        cls._check_is_nsz(path)
+        return [path.with_suffix('.nsp').name.encode()]
+
+    @classmethod
+    async def extract(cls, path, dest, paths=None, password=None, overwrite=False):
+        cls._check_is_nsz(path)
+        if paths:
+            raise NotImplementedError
+        if overwrite:
+            raise NotImplementedError
+        target = dest / path.with_suffix('.nsp')
+        if target.exists():
+            raise RuntimeError
+        with tempfile.TemporaryDirectory(
+                dir=dest, prefix='.extract_',
+                suffix=dest.name + '.tmp') as tmp:
+            proc = await asyncio.create_subprocess_exec(
+                'nsz',
+                '-D',  # decompress
+                f'--output={tmp}',
+                path,
+                # DEVNULL causes issues, idk why
+                stdout=asyncio.subprocess.PIPE)
+            await proc.communicate()
+            assert proc.returncode == 0
+            tmp_files = list(pathlib.Path(tmp).iterdir())
+            assert len(tmp_files) == 1
+            tmp_file = tmp_files[0]
+            assert tmp_file.is_file()
+            if target.exists():
+                raise RuntimeError
+            tmp_file.rename(target)
+
+    @staticmethod
+    async def volumes(path, password=''):
+        return [path]
+
+    @staticmethod
+    def _check_is_nsz(path):
+        if path.suffix.lower() != '.nsz':
+            raise ValueError('does not end with .nsz')
+
+
 class cli_7zip:
     _PART_RE = re.compile(r'(.*\.part)(\d+)(\.rar)$')
     _ALT_PART_RE = re.compile(r'(.*\.)(\d+)$')
@@ -1797,6 +1849,8 @@ async def _get_class(path):
     if suffixes := [suffix.lower() for suffix in path.suffixes]:
         if suffixes[-1] == '.rvz':
             return dolphin_tool
+        if suffixes[-1] == '.nsz':
+            return nsz
         # ffs - brotli doesn't have a file signature
         if suffixes[-1] == '.br':
             return brotli
