@@ -92,6 +92,7 @@ class VueScanDownloader:
         self.path = path
         self.max_concurrent = max_concurrent
         self.client = httpx.AsyncClient()
+        self.client.headers['User-Agent'] = 'download-latest-version-version (https://github.com/nvllsvm/dotfiles/blob/master/scripts/download-latest-vuescan-version)'
 
     async def get_latest_version(self):
         response = await self.client.get(
