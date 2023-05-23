@@ -1,0 +1,189 @@
+#!/usr/bin/env python3
+import argparse
+import asyncio
+import contextvars
+import logging
+import pathlib
+import string
+import tempfile
+
+import async_executor
+import httpx
+
+
+LOGGER = logging.getLogger('download-latest-vuescan-version')
+
+_LOG_CONTEXT = {}
+
+
+def log_context(key, value):
+    global _LOG_CONTEXT
+
+    if key not in _LOG_CONTEXT:
+        _LOG_CONTEXT[key] = contextvars.ContextVar(key, default=None)
+
+    _LOG_CONTEXT[key].set(value)
+
+
+class _LogFormatter(logging.Formatter):
+    def format(self, record):
+        parts = [super().format(record)]
+
+        for key, cvar in _LOG_CONTEXT.items():
+            value = cvar.get()
+            if value:
+                parts.append(f'[{key} {value}]')
+
+        return ' '.join(parts)
+
+
+def setup_logging(level=logging.INFO):
+    logger = logging.getLogger()
+    logger.setLevel(level)
+
+    fmt = _LogFormatter('%(levelname)-8s %(name)s %(message)s')
+
+    sh = logging.StreamHandler()
+    sh.setLevel(level)
+    sh.setFormatter(fmt)
+    logger.addHandler(sh)
+
+
+class VueScanDownloader:
+    _FILENAME_CHARS = {'-', '.', *string.ascii_letters, *string.digits}
+    _VALID_SUFFIX = {
+        '.deb',
+        '.dmg',
+        '.exe',
+        '.rpm',
+        '.tgz',
+    }
+    VERSION_SERIES = '9.8.'
+    DOWNLOAD_LINKS = {
+        'ARM 32-bit': [
+            'https://www.hamrick.com/files/vuea3298.deb',
+            'https://www.hamrick.com/files/vuea3298.rpm',
+            'https://www.hamrick.com/files/vuea3298.tgz',
+        ],
+        'ARM 64-bit': {
+            'https://www.hamrick.com/files/vuea6498.deb',
+            'https://www.hamrick.com/files/vuea6498.dmg',
+            'https://www.hamrick.com/files/vuea6498.exe',
+            'https://www.hamrick.com/files/vuea6498.rpm',
+            'https://www.hamrick.com/files/vuea6498.tgz',
+        },
+        'Intel 32-bit': [
+            'https://www.hamrick.com/files/vuex3298.deb',
+            'https://www.hamrick.com/files/vuex3298.dmg',
+            'https://www.hamrick.com/files/vuex3298.exe',
+            'https://www.hamrick.com/files/vuex3298.rpm',
+            'https://www.hamrick.com/files/vuex3298.tgz',
+        ],
+        'Intel 64-bit': [
+            'https://www.hamrick.com/files/vuex6498.deb',
+            'https://www.hamrick.com/files/vuex6498.dmg',
+            'https://www.hamrick.com/files/vuex6498.exe',
+            'https://www.hamrick.com/files/vuex6498.rpm',
+            'https://www.hamrick.com/files/vuex6498.tgz',
+        ],
+    }
+
+    def __init__(self, path, max_concurrent=None):
+        self.path = path
+        self.max_concurrent = max_concurrent
+        self.client = httpx.AsyncClient()
+
+    async def get_latest_version(self):
+        response = await self.client.get(
+            'http://static.hamrick.com/vuescan_version.txt')
+        response.raise_for_status()
+        return response.text.strip()
+
+    async def download_all(self):
+        latest_version = await self.get_latest_version()
+        LOGGER.info('Latest version: %s', latest_version)
+        if not latest_version.startswith(self.VERSION_SERIES):
+            raise NotImplementedError(f'unsupported version: {latest_version}')
+
+        executor = async_executor.AsyncExecutor(
+            max_concurrent=self.max_concurrent)
+        for architecture, urls in self.DOWNLOAD_LINKS.items():
+            for url in urls:
+                executor.submit(self._download, url, latest_version,
+                                architecture)
+        if not executor:
+            print('Nothing to do: already downloaded')
+            return
+        async for task in executor:
+            task.result()
+
+    async def _download(self, url, version, architecture):
+        log_context('architecture', architecture)
+        log_context('url', url)
+
+        LOGGER.info('Downloading')
+        async with self.client.stream('GET', url, follow_redirects=True) as response:
+            try:
+                response.raise_for_status()
+            except Exception as e:
+                LOGGER.exception(e)
+                raise
+
+            response_filename = response.headers['content-disposition']\
+                .removeprefix('attachment; filename="')\
+                .removesuffix('";')
+            assert not (set(response_filename) - self._FILENAME_CHARS)
+
+            parent_path = self.path / f'VueScan {version}' / architecture
+            dest = parent_path / response_filename
+            assert dest.suffix in self._VALID_SUFFIX
+            assert dest.stem.endswith(f'-{version}')
+
+            if dest.is_file():
+                LOGGER.info('Already downloaded')
+                return
+
+            dest.parent.mkdir(exist_ok=True, parents=True)
+            safe_write(dest, await response.aread())
+            LOGGER.info('Download complete')
+
+
+def safe_write(path, data):
+    path = pathlib.Path(path)
+    if isinstance(data, str):
+        data = data.encode()
+    with tempfile.NamedTemporaryFile(delete=False, dir=path.parent) as handle:
+        temp_path = pathlib.Path(handle.name)
+        try:
+            temp_path.write_bytes(data)
+            temp_path.rename(path)
+        finally:
+            try:
+                temp_path.unlink()
+            except FileNotFoundError:
+                pass
+
+
+async def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--max-concurrent', type=int, default=2,
+                        help='(default: %(default)s)')
+    parser.add_argument('--dest', type=pathlib.Path,
+                        default=pathlib.Path('/storage/Software/Vuescan/'),
+                        help='(default: %(default)s)')
+    parser.add_argument('--verbose', action='store_true')
+    args = parser.parse_args()
+
+    setup_logging(level=logging.DEBUG if args.verbose else logging.INFO)
+    if not args.verbose:
+        logging.getLogger('httpx').setLevel(logging.WARNING)
+
+    client = VueScanDownloader(
+        path=args.dest,
+        max_concurrent=args.max_concurrent)
+
+    await client.download_all()
+
+
+if __name__ == '__main__':
+    asyncio.run(main())
