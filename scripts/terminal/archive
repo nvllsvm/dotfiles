@@ -648,8 +648,9 @@ class nsz:
                 raise RuntimeError
             tmp_file.rename(target)
 
-    @staticmethod
-    async def volumes(path, password=''):
+    @classmethod
+    async def volumes(cls, path, password=''):
+        cls._check_is_nsz(path)
         return [path]
 
     @staticmethod
@@ -772,12 +773,14 @@ class dolphin_tool:
         if not shutil.which('dolphin-tool'):
             raise KeyError
 
-    @staticmethod
-    async def contents(path):
-        return [path.with_suffix('').name.encode()]
+    @classmethod
+    async def contents(cls, path):
+        cls._check_is_rvz(path)
+        return [path.with_suffix('.iso').name.encode()]
 
-    @staticmethod
-    async def extract(path, dest, paths=None, password=None, overwrite=False):
+    @classmethod
+    async def extract(cls, path, dest, paths=None, password=None, overwrite=False):
+        cls._check_is_rvz(path)
         if paths:
             raise NotImplementedError
         if overwrite:
@@ -793,9 +796,15 @@ class dolphin_tool:
         if proc.returncode:
             raise ProcessError(proc.returncode)
 
-    @staticmethod
-    async def volumes(path, password=''):
+    @classmethod
+    async def volumes(cls, path, password=''):
+        cls._check_is_rvz(path)
         return [path]
+
+    @staticmethod
+    def _check_is_rvz(path):
+        if path.suffix.lower() != '.rvz':
+            raise ValueError('does not end with .rvz')
 
 
 class udisksctl:
