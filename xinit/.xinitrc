@@ -33,6 +33,10 @@ if command -v kdeconnect-indicator > /dev/null; then
     kdeconnect-indicator &
 fi
 
+if command -v blueman-applet > /dev/null; then
+    blueman-applet &
+fi
+
 autorandr --change --force --match-edid
 udiskie --no-automount --no-tray &
 nmcli networking on &
