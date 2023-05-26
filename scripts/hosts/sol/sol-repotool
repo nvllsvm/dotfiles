@@ -70,13 +70,44 @@ repotool_remove() {
     sudo pacsync "$DATABASE" > /dev/null
 }
 
+repotool_prune() {
+    python << EOF
+import pathlib
+import subprocess
+import shutil
+
+DATABASE = '${DATABASE}'
+
+def get_packages():
+    proc = subprocess.run(
+        ['aur', 'repo', f'--database={DATABASE}', '--list'],
+        stdout=subprocess.PIPE,
+        check=True)
+    return [
+        line.split()[0]
+        for line in proc.stdout.decode().splitlines()
+    ]
+
+packages = get_packages()
+
+for path in pathlib.Path('~/.cache/aurutils/sync').expanduser().iterdir():
+    if path.name not in packages:
+        print('Clearing cache for', path.name)
+        shutil.rmtree(path)
+EOF
+}
+
+repotool_list() {
+    aur repo --database="$DATABASE" --list | cut -f1
+}
+
 sync_nullsum() {
     rsync -av --progress --delete-after /var/cache/pacman/sol/ nullsum.net:~/srv/http/repo/arch/x86_64
 }
 
 usage() {
     cat << EOF
-usage: sol-repotool (add|remove|update)
+usage: sol-repotool (add|list|prune|remove|update)
 EOF
 }
 
@@ -98,6 +129,14 @@ case "$1" in
         repotool_remove "$@"
         sync_nullsum
         exit
+        ;;
+    prune)
+        shift
+        repotool_prune
+        ;;
+    list)
+        shift
+        repotool_list
         ;;
     --help)
         usage
