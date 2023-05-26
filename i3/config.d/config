@@ -1,4 +1,10 @@
 set $mod Mod4
+set $gap_size 10px
+set $border_size 2px
+set $bar_padding_top 0px
+set $bar_padding_bottom 0px
+set $bar_padding_left 0px
+set $bar_padding_right 0px
 
 set_from_resource $color_bg background #000000
 set_from_resource $color_fg foreground #000000
@@ -27,6 +33,9 @@ set_from_resource $color_21 color21 #000000
 
 set_from_resource $font facename Monospace
 set_from_resource $fontSize fontsize 11
+
+include config.d/config
+
 font pango:$font $fontSize
 
 floating_modifier $mod
@@ -102,7 +111,7 @@ bar {
     separator_symbol  "   "
 
     # top+bottom left+right
-    padding           0px 0px
+    padding           $bar_padding_top $bar_padding_left $bar_padding_bottom $bar_padding_left
 
     colors {
         background $color_bg
@@ -126,9 +135,9 @@ client.placeholder      $color_19 $color_bg $color_fg $color_08 $color_18
 
 client.background       $color_bg
 
-gaps inner 10px
+gaps inner $gap_size
 
-for_window [title="^.*"] border pixel 2
+for_window [title="^.*"] border pixel $border_size
 for_window [class="dosbox-staging"] fullscreen
 for_window [class="deadcells"] fullscreen
 for_window [class=".*Foliate.*" title="^Open.*"] floating disable

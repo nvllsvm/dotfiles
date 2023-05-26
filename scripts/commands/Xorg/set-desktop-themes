@@ -220,6 +220,11 @@ EOF
 
 set-wallpaper
 
+if command -v i3 > /dev/null; then
+    export FONT_NAME
+    export FONT_SIZE
+    i3-build-config
+fi
 if pidof i3 > /dev/null; then
     i3 restart > /dev/null 2>&1 || true
 fi
