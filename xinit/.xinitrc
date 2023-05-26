@@ -29,6 +29,10 @@ if command -v mpd-notifier > /dev/null; then
     mpd-notifier &
 fi
 
+if command -v kdeconnect-indicator > /dev/null; then
+    kdeconnect-indicator &
+fi
+
 autorandr --change --force --match-edid
 udiskie --no-automount --no-tray &
 nmcli networking on &
