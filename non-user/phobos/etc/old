@@ -1,4 +1,0 @@
-[sol]
-Server = https://sol.nullsum.net/arch/$arch
-Server = https://repo.nullsum.net/arch/$arch
-SigLevel = Never
