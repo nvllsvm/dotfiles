@@ -25,7 +25,7 @@ def device_events():
 def transform_matrix(input_name, matrix):
     subprocess.run(
         ['xinput', 'set-prop', input_name,
-         '--type=float', 'Coordinate Transformation Matrix', matrix],
+         '--type=float', 'Coordinate Transformation Matrix', *matrix.split()],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
         # ignore missing devicess
@@ -40,6 +40,13 @@ def xrandr_rotate(orientation):
         check=True)
 
 
+def i3_scratchpad_hide():
+    subprocess.run(
+        ['i3-scratchpad-hide'],
+        # i3 may not be running
+        check=False)
+
+
 def set_orientation(orientation):
     print('Setting orientation to:', orientation)
     match orientation:
@@ -49,24 +56,28 @@ def set_orientation(orientation):
             transform_matrix('ELAN9008:00 04F3:2C82 Stylus Pen (0)',
                              '0 0 0 0 0 0 0 0 0')
             xrandr_rotate('normal')
+            i3_scratchpad_hide()
         case 'left-up':
             transform_matrix('ELAN9008:00 04F3:2C82',
                              '0 -1 1 1 0 0 0 0 1')
             transform_matrix('ELAN9008:00 04F3:2C82 Stylus Pen (0)',
                              '0 -1 1 1 0 0 0 0 1')
             xrandr_rotate('left')
+            i3_scratchpad_hide()
         case 'right-up':
             transform_matrix('ELAN9008:00 04F3:2C82',
                              '0 1 0 -1 0 1 0 0 1')
             transform_matrix('ELAN9008:00 04F3:2C82 Stylus Pen (0)',
                              '0 1 0 -1 0 1 0 0 1')
             xrandr_rotate('right')
+            i3_scratchpad_hide()
         case 'bottom-up':
             transform_matrix('ELAN9008:00 04F3:2C82',
                              '-1 0 1 0 -1 1 0 0 1')
             transform_matrix('ELAN9008:00 04F3:2C82 Stylus Pen (0)',
                              '-1 0 1 0 -1 1 0 0 1')
             xrandr_rotate('inverted')
+            i3_scratchpad_hide()
         case _:
             raise ValueError('invalid orientation')
 

@@ -1,0 +1,13 @@
+#!/usr/bin/env python3
+import i3ipc
+
+
+def main():
+    conn = i3ipc.Connection()
+    for item in conn.get_tree().find_instanced('i3-scratchpad'):
+        if item.ipc_data['output'] != '__i3':
+            item.command('scratchpad show')
+
+
+if __name__ == '__main__':
+    main()
