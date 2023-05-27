@@ -164,14 +164,15 @@ def _convert(value, from_unit, to_unit):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('from_value')
-    parser.add_argument('to_value')
+    parser.add_argument('to_unit')
+    parser.add_argument('from_value', nargs='+')
     args = parser.parse_args()
 
-    from_num, from_unit = _parse_from(args.from_value)
-    to_unit = _parse_to(args.to_value)
-    result = _convert(from_num, from_unit, to_unit)
-    print(round(result, 6))
+    for value in args.from_value:
+        from_num, from_unit = _parse_from(value)
+        to_unit = _parse_to(args.to_unit)
+        result = _convert(from_num, from_unit, to_unit)
+        print(round(result, 6))
 
 
 if __name__ == '__main__':
