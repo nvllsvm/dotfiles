@@ -64,5 +64,6 @@ set \$color_21 #${BASE16_COLOR21}
 set \$font ${FONT_NAME}
 set \$fontSize ${FONT_SIZE}
 
-include config.d/config
+include config.d/*.conf
+include config.d/hostname/\`hostname\`.conf
 EOF

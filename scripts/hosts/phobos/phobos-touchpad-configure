@@ -6,7 +6,3 @@ xinput --set-prop "$TOUCHPAD_ID" 'libinput Accel Speed' 0
 xinput --set-prop "$TOUCHPAD_ID" 'libinput Middle Emulation Enabled' 1
 xinput --set-prop "$TOUCHPAD_ID" 'libinput Natural Scrolling Enabled' 1
 xinput --set-prop "$TOUCHPAD_ID" 'libinput Tapping Enabled' 1
-
-phobos-auto-tablet &
-
-set-keyboard-backlight idle-toggle &
