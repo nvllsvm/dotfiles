@@ -1,9 +1,27 @@
 #!/usr/bin/env python3
-import shlex
-import subprocess
-import sys
+import argparse
 
-args = ' '.join(shlex.quote(v) for v in ['printlabel', *sys.argv[1:]])
-args = shlex.quote(args)
-proc = subprocess.run(['ssh', 'ptouch-print', 'sh', '-c', args])
-sys.exit(proc.returncode)
+import httpx
+
+URL = 'http://ptouch-print'
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--monospace', action='store_true')
+    parser.add_argument('--bold', action='store_true')
+    parser.add_argument('--justify', choices=['center', 'west', 'east'])
+    parser.add_argument('label', nargs='+')
+    args = parser.parse_args()
+
+    response = httpx.post(f'{URL}/print', json={
+        'monospace': args.monospace,
+        'bold': args.bold,
+        'justify': args.justify,
+        'text': args.label
+    })
+    response.raise_for_status()
+
+
+if __name__ == '__main__':
+    main()

@@ -55,6 +55,12 @@ def main():
                 if len(parts) < 2:
                     raise RuntimeError('invalid github url')
                 path = '/'.join(parts[0:2])
+            elif parsed.netloc in ('www.gitlab.com', 'gitlab.com'):
+                host = 'gitlab'
+                parts = path.split('/')
+                if len(parts) < 2:
+                    raise RuntimeError('invalid gitlab url')
+                path = '/'.join(parts[0:])
             elif parsed.netloc == 'aur.archlinux.org':
                 host = 'aur'
                 parts = path.split('/')
