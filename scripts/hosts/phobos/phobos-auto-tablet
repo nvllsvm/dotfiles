@@ -97,7 +97,13 @@ def child_process():
         set_orientation(change)
 
 
+def start_onboard():
+    return subprocess.run(['onboard'])
+
+
 def main():
+    onboard = None
+
     child = None
     previous = None
     for is_tablet_mode in device_events():
@@ -108,9 +114,17 @@ def main():
             print('Starting child')
             child = multiprocessing.Process(target=child_process)
             child.start()
+            if not onboard:
+                onboard = subprocess.run(['onboard'])
         else:
+            if onboard:
+                onboard.terminate()
+                onboard.kill()
+                onboard.join()
+                onboard.close()
+                onboard = None
             if child:
-                print('Stoppgin child')
+                print('Stopping child')
                 child.kill()
                 child.join()
                 child.close()
