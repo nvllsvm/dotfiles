@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import argparse
-import math
 import string
 
 _ALLOWED_CHARS = set((*string.digits, *string.ascii_letters, '.', ' '))
