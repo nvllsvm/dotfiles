@@ -16,7 +16,7 @@ METRIC_DISTANCE_TO_MM = {
     'mm': 1,
     'cm': 10,
     'm': 100,
-    'km': 1000,
+    'km': 100000,
 }
 
 
