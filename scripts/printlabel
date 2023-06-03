@@ -4,6 +4,7 @@ import argparse
 import httpx
 
 URL = 'http://ptouch-print'
+TIMEOUT = 90
 
 
 def main():
@@ -14,12 +15,16 @@ def main():
     parser.add_argument('label', nargs='+')
     args = parser.parse_args()
 
-    response = httpx.post(f'{URL}/print', json={
-        'monospace': args.monospace,
-        'bold': args.bold,
-        'justify': args.justify,
-        'text': args.label
-    })
+    response = httpx.post(
+        f'{URL}/print',
+        json={
+            'monospace': args.monospace,
+            'bold': args.bold,
+            'justify': args.justify,
+            'text': args.label
+        },
+        timeout=TIMEOUT,
+    )
     response.raise_for_status()
 
 
