@@ -30,7 +30,8 @@ change_pamixer() {
         5|0)
             ;;
         *)
-            #VOLUME="$(python -c 'import sys; volume=sys.argv[1]; sys.stdout.write(int(volume / 5)*5)')"
+            VOLUME="$(python -c 'import sys; volume=int(sys.argv[1]); sys.stdout.write(str(int(volume / 5)*5))' "$VOLUME")"
+            res="$(pamixer --get-mute --get-volume --unmute --set-volume "$VOLUME")"
             ;;
     esac
 
