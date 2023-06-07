@@ -36,7 +36,7 @@ change_pamixer() {
             ;;
         *)
             VOLUME="$(round_to_5 "$VOLUME")"
-            res="$(pamixer --get-mute --get-volume --unmute --set-volume "$VOLUME")"
+            pamixer --set-volume "$VOLUME"
             ;;
     esac
 
