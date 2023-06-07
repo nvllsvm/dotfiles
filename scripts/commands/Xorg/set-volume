@@ -26,6 +26,14 @@ change_pamixer() {
     MUTED="$1"
     VOLUME="$2"
 
+    case "$VOLUME" in
+        5|0)
+            ;;
+        *)
+            #VOLUME="$(python -c 'import sys; volume=sys.argv[1]; sys.stdout.write(int(volume / 5)*5)')"
+            ;;
+    esac
+
     case "$MUTED" in
         true)
             notify 🔇
