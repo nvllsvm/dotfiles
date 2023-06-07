@@ -6,6 +6,11 @@ notify() {
         'Volume' "$@"
 }
 
+round_to_5() {
+    python -c 'import sys; volume=int(sys.argv[1]); sys.stdout.write(str(int(volume / 5)*5))' "$1"
+}
+
+
 change_pamixer() {
     case "$1" in
         toggle-mute)
@@ -30,7 +35,7 @@ change_pamixer() {
         5|0)
             ;;
         *)
-            VOLUME="$(python -c 'import sys; volume=int(sys.argv[1]); sys.stdout.write(str(int(volume / 5)*5))' "$VOLUME")"
+            VOLUME="$(round_to_5 "$VOLUME")"
             res="$(pamixer --get-mute --get-volume --unmute --set-volume "$VOLUME")"
             ;;
     esac
