@@ -4,6 +4,7 @@ set -e
 note_contents_rg() {
     rg \
         -0 \
+        --glob '!*.bkp' \
         --glob '!*.dot' \
         --glob '!*.drawio' \
         --glob '!*.svg' \
