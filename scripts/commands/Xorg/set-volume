@@ -32,7 +32,7 @@ change_pamixer() {
     VOLUME="$2"
 
     case "$VOLUME" in
-        5|0)
+        0|5)
             ;;
         *)
             VOLUME="$(round_to_5 "$VOLUME")"
