@@ -47,11 +47,16 @@ def set_wallpaper_image(path):
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--none', action='store_true')
     parser.add_argument('path', type=pathlib.Path, nargs='?')
     args = parser.parse_args()
 
     profile = current_autorandr_profile()
     profile_wallpaper = AUTORANDR_ROOT / profile / 'wallpaper'
+
+    if args.none:
+        if profile_wallpaper.exists():
+            profile_wallpaper.unlink()
 
     if args.path:
         path = args.path.absolute()
