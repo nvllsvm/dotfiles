@@ -1,5 +1,0 @@
-#!/usr/bin/env sh
-if ! command -v venv > /dev/null; then
-    exit
-fi
-venv --prune

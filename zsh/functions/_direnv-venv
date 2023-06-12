@@ -1,8 +1,8 @@
-#compdef venv
+#compdef direnv-venv
 
 typeset -A opt_args
 
-_venv() {
+_direnv-venv() {
 
   # Global flags (i.e. ones not associated with a subcommand)
   _arguments \
@@ -11,4 +11,4 @@ _venv() {
     '(-d --delete)'{-d,--delete}'[delete the current virtual env]'
 
 }
-_venv
+_direnv-venv
