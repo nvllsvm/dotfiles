@@ -22,10 +22,10 @@ rclone_sync() {
     esac
 }
 
-rclone_sync /storage/Games \
-    "${PREFIX}"/storage1/Games \
-    --exclude /PC/GOG.com/ \
-    --exclude /Nintendo\ Switch/
+#rclone_sync /storage/Games \
+#    "${PREFIX}"/storage1/Games \
+#    --exclude /PC/GOG.com/ \
+#    --exclude /Nintendo\ Switch/
 rclone_sync /storage/Audio \
     "${PREFIX}"/storage1/Audio \
     --exclude /Lossy*/
