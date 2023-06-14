@@ -104,8 +104,10 @@ async def main():
 
     for conn in await fzf(lines):
         if conn['DEVICE']:
+            print('Down', conn['NAME'])
             await nmcli.down(conn['UUID'])
         else:
+            print('Up', conn['NAME'])
             await nmcli.up(conn['UUID'])
 
 
