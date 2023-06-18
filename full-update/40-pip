@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-set -ex
+set -e
 
 export PIP_REQUIRE_VIRTUALENV=0
 
