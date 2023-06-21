@@ -218,7 +218,8 @@ mouse:
     hide_when_typing: true
 EOF
 
-set-wallpaper
+# let it fail
+set-wallpaper || true
 
 if command -v i3 > /dev/null; then
     export FONT_NAME
