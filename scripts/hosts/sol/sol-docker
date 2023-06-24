@@ -37,6 +37,8 @@ def _command_restart_hass():
     docker_compose('kill', *[c for c in containers if c in KILLABLE])
     docker_compose('rm', '-fs', *containers)
     docker_compose('up', '-d', '--no-recreate', *containers, check=True)
+    docker_compose('kill', 'nginx')
+    docker_compose('up', '-d', '--no-recreate', 'nginx')
 
 
 def _command_restart():
