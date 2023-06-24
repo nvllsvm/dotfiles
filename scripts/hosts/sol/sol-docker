@@ -9,7 +9,6 @@ SOL_DOCKER_PATH = pathlib.Path('~/src/sol-docker').expanduser()
 
 
 KILLABLE = [
-    'home-assistant',
     'omada-controller',
     'rtl_433_mqtt',
     'wakeonlan',
