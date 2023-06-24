@@ -1,5 +1,64 @@
-#!/usr/bin/env sh
-export COMPOSE_PROJECT_NAME=sol-docker
-export COMPOSE_FILE="$HOME/src/sol-docker/docker-compose.yaml"
+#!/usr/bin/env python3
+import os
+import pathlib
+import subprocess
+import sys
 
-exec docker-compose "$@"
+COMPOSE_PROJECT_NAME = 'sol-docker'
+SOL_DOCKER_PATH = pathlib.Path('~/src/sol-docker').expanduser()
+
+
+KILLABLE = [
+    'home-assistant',
+    'omada-controller',
+    'rtl_433_mqtt',
+    'wakeonlan',
+    'zigbee2mqtt',
+    'zwavejs2mqtt',
+]
+
+
+def docker_compose(*args, **kwargs):
+    env = os.environ.copy()
+    env.update({
+        'COMPOSE_PROJECT_NAME': COMPOSE_PROJECT_NAME,
+        'COMPOSE_FILE': str(SOL_DOCKER_PATH / 'docker-compose.yaml'),
+    })
+    return subprocess.run(['docker-compose', *args], env=env, **kwargs)
+
+
+def _command_restart_hass():
+    containers = [
+        'home-assistant',
+        'rtl_433_mqtt',
+        'zigbee2mqtt',
+        'zwavejs2mqtt',
+    ]
+    docker_compose('kill', *[c for c in containers if c in KILLABLE])
+    docker_compose('rm', '-fs', *containers)
+    docker_compose('up', '-d', '--no-recreate', *containers, check=True)
+
+
+def _command_restart():
+    docker_compose('kill', *KILLABLE)
+    docker_compose('rm', '-fs')
+    docker_compose('up', '-d', check=True)
+
+
+COMMANDS = {
+    'restart-hass': _command_restart_hass,
+    'restart': _command_restart,
+}
+
+
+def main():
+    args = sys.argv[1:]
+
+    if args and args[0] in COMMANDS:
+        COMMANDS[args[0]]()
+    else:
+        docker_compose(*args)
+
+
+if __name__ == '__main__':
+    main()
