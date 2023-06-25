@@ -1,18 +1,9 @@
 # reload the rules by running:
 # udevadm hwdb --update
 
-# gpdwin 2
-evdev:input:b0003v258Ap6A99*
- KEYBOARD_KEY_70039=esc       # capslock
- KEYBOARD_KEY_70065=leftmeta  # menu
-
 # built in keyboards
 evdev:atkbd:dmi:*
  KEYBOARD_KEY_3a=esc       # capslock
-
-# surface go type cover
-evdev:input:b0003v045Ep096F*
- KEYBOARD_KEY_70039=esc       # capslock
 
 # logitech k400 plus
 evdev:input:b0003v046Dp404D*
@@ -23,7 +14,3 @@ evdev:name:Asus Keyboard:dmi:bvn*:bvr*:bd*:svnASUSTeKCOMPUTERINC.:pnROGFlowX13GV
  KEYBOARD_KEY_70039=esc         # capslock -> escape
  KEYBOARD_KEY_ff31007c=f20      # mic-mute -> mic-mute
  KEYBOARD_KEY_ff310038=prog1    # rog button -> program1
-
-# thinkpad keyboard
-evdev:name:Lenovo ThinkPad Compact USB Keyboard with TrackPoint:dmi:bvn*:bvr*:bd*:svn*:pn*
- KEYBOARD_KEY_70039=esc         # capslock -> escape
