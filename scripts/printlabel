@@ -11,18 +11,28 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--monospace', action='store_true')
     parser.add_argument('--bold', action='store_true')
-    parser.add_argument('--justify', choices=['center', 'west', 'east'])
+    parser.add_argument('--justify', choices=['center', 'left', 'right'])
+    parser.add_argument('--separator-width', metavar='pixels', type=int)
+    parser.add_argument('--separator-filled', action='store_true')
     parser.add_argument('label', nargs='+')
     args = parser.parse_args()
 
+    data = {
+        'text': args.label
+    }
+    if args.separator_width is not None:
+        data['separator_width_px'] = args.separator_width
+    if args.separator_filled is not None:
+        data['separator_is_filled'] = args.separator_filled
+    if args.justify:
+        data['justify'] = args.justify
+    if args.monospace:
+        data['monospace'] = args.monospace
+    if args.bold:
+        data['bold'] = args.bold
     response = httpx.post(
         f'{URL}/print',
-        json={
-            'monospace': args.monospace,
-            'bold': args.bold,
-            'justify': args.justify,
-            'text': args.label
-        },
+        json=data,
         timeout=TIMEOUT,
     )
     response.raise_for_status()
