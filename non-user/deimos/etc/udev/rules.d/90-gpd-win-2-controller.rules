@@ -1,2 +1,0 @@
-ACTION=="add", KERNEL=="js*", SUBSYSTEMS=="input", ATTRS{name}=="GPD Win 2 X-Box Controller", RUN+="/usr/bin/jscal -u 8,0,1,3,4,2,5,16,17,11,304,305,307,308,310,311,314,315,316,317,318 /dev/input/%k"
-ACTION=="add", KERNEL=="js*", SUBSYSTEMS=="input", ATTRS{name}=="GPD Win 2 X-Box Controller", RUN+="/usr/bin/jscal -s 8,1,0,0,0,16384,16384,1,0,-1,-1,16384,16383,1,0,0,0,16384,16384,1,0,-1,-1,16384,16383,1,0,127,127,4227201,4194176,1,0,127,127,4227201,4194176,1,0,0,0,536854528,536854528,1,0,0,0,536854528,536854528 /dev/input/%k"

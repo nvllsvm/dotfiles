@@ -1,5 +1,0 @@
-#!/usr/bin/env sh
-set-desktop-themes --dpi 96 --large
-xinput set-prop \
-    "$(xinput | grep Goodix | grep pointer | awk '{print $6}' | cut -d= -f2)" \
-    'Coordinate Transformation Matrix' 0 1 0 -1 0 1 0 0 1
