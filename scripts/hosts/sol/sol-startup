@@ -30,14 +30,10 @@ systemctl --user enable --now wasabi-sync.timer
 
 echo Starting Docker ...
 sudo systemctl start docker
+sol-docker startup
 
 echo Starting podman ...
 podman system migrate || true
-
-sol-docker down --remove-orphans
-sol-docker up -d
-sol-docker kill nginx
-sol-docker up -d
 
 echo Starting wireguard ...
 sudo wg-quick up sol

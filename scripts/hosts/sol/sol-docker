@@ -26,7 +26,7 @@ def docker_compose(*args, **kwargs):
     return subprocess.run(['docker-compose', *args], env=env, **kwargs)
 
 
-def _command_restart_hass():
+def restart_hass():
     containers = [
         'home-assistant',
         'rtl_433_mqtt',
@@ -36,8 +36,16 @@ def _command_restart_hass():
     docker_compose('kill', *[c for c in containers if c in KILLABLE])
     docker_compose('rm', '-fs', *containers)
     docker_compose('up', '-d', '--no-recreate', *containers, check=True)
+
+
+def restart_nginx():
     docker_compose('kill', 'nginx')
     docker_compose('up', '-d', '--no-recreate', 'nginx')
+
+
+def _command_restart_hass():
+    restart_hass()
+    restart_nginx()
 
 
 def _command_restart():
@@ -46,9 +54,17 @@ def _command_restart():
     docker_compose('up', '-d', check=True)
 
 
+def _command_startup():
+    docker_compose('down', '--remove-orphans')
+    docker_compose('up', '-d', check=True)
+    restart_hass()
+    restart_nginx()
+
+
 COMMANDS = {
     'restart-hass': _command_restart_hass,
     'restart': _command_restart,
+    'startup': _command_startup,
 }
 
 
