@@ -29,7 +29,8 @@ def main():
     }
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--mode', choices=_modes, default='regex')
+    parser.add_argument('--mode', choices=_modes,
+                        default='bs4' if bs4 else 'regex')
     parser.add_argument(
         'data',
         nargs='?',
