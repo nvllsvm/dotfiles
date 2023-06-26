@@ -3,16 +3,46 @@ import argparse
 import re
 import sys
 
-pattern = re.compile(r'http[s]?://[^ \\\'"]*')
+try:
+    import bs4
+except ImportError:
+    bs4 = None
 
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    'data',
-    nargs='?',
-    default=sys.stdin,
-    type=argparse.FileType('r')
-)
-args = parser.parse_args()
 
-for url in set(pattern.findall(args.data.read())):
-    print(url)
+def _mode_regex(data):
+    pattern = re.compile(r'http[s]?://[^ \\\'"]*')
+    return set(pattern.findall(data))
+
+
+def _mode_bs4(data):
+    soup = bs4.BeautifulSoup(data, 'html.parser')
+    return {
+        tag['href']
+        for tag in soup.find_all('a')
+    }
+
+
+def main():
+    _modes = {
+        'regex': _mode_regex,
+        'bs4': _mode_bs4,
+    }
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--mode', choices=_modes, default='regex')
+    parser.add_argument(
+        'data',
+        nargs='?',
+        default=sys.stdin,
+        type=argparse.FileType('r')
+    )
+    args = parser.parse_args()
+
+    data = args.data.read()
+    urls = _modes[args.mode](data)
+    for url in sorted(urls):
+        print(url)
+
+
+if __name__ == '__main__':
+    main()
