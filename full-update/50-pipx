@@ -12,9 +12,15 @@ if ! command -v pipx > /dev/null; then
     trap cleanup EXIT
     TEMP_FILE="$(mktemp)"
 
+    export PIPX_HOME=~/.local/pipx
+    export PIPX_BIN_DIR="${PIPX_HOME}/bin"
     curl -L https://github.com/pypa/pipx/releases/latest/download/pipx.pyz -o "${TEMP_FILE}"
     python "${TEMP_FILE}" install pipx
     rm "${TEMP_FILE}"
+
+    pipx() {
+        "${PIPX_BIN_DIR}/pipx" "$@"
+    }
 fi
 
 for package in $(pipx list --short | cut -d' ' -f1); do
