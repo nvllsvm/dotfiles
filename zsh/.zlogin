@@ -22,4 +22,10 @@ case "$HOST" in
             exec startx
         fi
         ;;
+    termux)
+        if [ -z "$TMUX" ]; then
+            tmux-attach
+            exit
+        fi
+        ;;
 esac
