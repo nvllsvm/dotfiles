@@ -26,7 +26,7 @@ Subsystem sftp /data/data/com.termux/files/usr/libexec/sftp-server
 EOF
 fi
 
-yes | termux-setup-storage
+#yes | termux-setup-storage
 ln -sfT ~/storage/shared/syncthing/default/notes ~/notes
 ln -sfT ~/storage/shared/syncthing ~/syncthing
 ln -sfT ~/storage/shared/Download ~/download
