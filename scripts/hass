@@ -70,7 +70,7 @@ async def office_at_tv_desk(_):
 async def office_on(_):
     hass = HASS(URL, TOKEN)
     await hass.post_services(
-        'scene', 'turn_on', entity_id='scene.office_on')
+        'script', 'turn_on', entity_id='script.office_on')
 
 
 async def office_dark(_):
