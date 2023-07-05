@@ -6,6 +6,29 @@ import subprocess
 import sys
 
 
+class sshfs:
+
+    @staticmethod
+    def info():
+        mounted = []
+        for line in pathlib.Path('/proc/mounts').read_text().splitlines():
+            device, mount_point, fs_type, *_ = line.split(maxsplit=4)
+            if fs_type != 'fuse.sshfs':
+                continue
+            info = {
+                'device': device,
+                'mount_point': mount_point,
+            }
+            mounted.append(info)
+        return mounted
+
+    @staticmethod
+    def unmount(mount_point):
+        subprocess.run(
+            ['fusermount3', '-quz', '--', mount_point],
+            check=True)
+
+
 class udiskie:
 
     @staticmethod
@@ -69,7 +92,7 @@ class udiskie:
         return items
 
     @staticmethod
-    def umount(device):
+    def unmount(device):
         subprocess.run(
             ['udiskie-umount', device],
             check=True)
@@ -122,7 +145,7 @@ def main():
     for item in udiskie.info():
         if item['is_filesystem'] == 'True':
             key = '\t'.join([
-                'mount' if item['is_mounted'] == 'False' else 'umount',
+                'mount' if item['is_mounted'] == 'False' else 'unmount',
                 item['ui_label']
             ])
         elif item['is_loop'] == 'True' and item['is_toplevel'] == 'True':
@@ -132,21 +155,31 @@ def main():
 
         if key in items:
             raise RuntimeError
-        items[key] = item
+        items[key] = ['udiskie', item]
+
+    for item in sshfs.info():
+        key = '\t'.join(['unmount', item['mount_point']])
+        items[key] = ['sshfs', item]
+
     if not items:
         sys.exit(1)
     result = fzf(sorted(items))
     if not result:
         sys.exit(1)
+
+    item_type, item = items[result]
     action, _ = result.split('\t')
-    item = items[result]
-    if action == 'mount':
-        udiskie.mount(item['device_file'],
-                      options=args.options)
-    elif action == 'umount':
-        udiskie.umount(item['device_file'])
-    elif action == 'detach':
-        udiskie.umount(item['device_file'])
+    if item_type == 'udiskie':
+        if action == 'mount':
+            udiskie.mount(item['device_file'],
+                          options=args.options)
+        elif action == 'unmount':
+            udiskie.unmount(item['device_file'])
+        elif action == 'detach':
+            udiskie.unmount(item['device_file'])
+    elif item_type == 'sshfs':
+        if action == 'unmount':
+            sshfs.unmount(item['mount_point'])
 
 
 if __name__ == '__main__':
