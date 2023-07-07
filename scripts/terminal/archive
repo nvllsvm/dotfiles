@@ -298,9 +298,15 @@ async def create_tar_gz(path, dest, fast=False):
         cwd = path.parent
         paths = (path,)
 
+    if fast:
+        gzip_arg = 'gzip --fast'
+    else:
+        gzip_arg = 'gzip --best'
+
     # TODO specify gzip compression level
     tar_proc = await asyncio.create_subprocess_exec(
-        'tar', 'czf', dest, '-C', cwd, '--no-recursion',
+        'tar', 'cf', dest, '-C', cwd, '--no-recursion',
+        '-I', gzip_arg,
         '--verbatim-files-from', '--null', '-T', '-',
         stdin=asyncio.subprocess.PIPE)
 

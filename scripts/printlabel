@@ -3,7 +3,7 @@ import argparse
 
 import httpx
 
-URL = 'http://ptouch-print'
+URL = 'http://localhost:8000'
 TIMEOUT = 90
 
 
