@@ -15,20 +15,13 @@ for plugin in "$DOTFILES"/zsh/plugins/*/.zshenv(N); do
     . "$plugin"
 done
 
-pushd "$DOTFILES/scripts/commands" > /dev/null
-for c in *; do
-    if command -v "$c" > /dev/null; then
-        path=("$DOTFILES/scripts/commands/$c" "$path[@]")
-    fi
-done
-
 path=(
+    "${DOTFILES}/bin_link"
     "${DOTFILES}/scripts/hosts/${HOST}"
     "${DOTFILES}"/scripts/terminal
     "$path[@]"
 )
 
-popd > /dev/null
 zshenv_host="$DOTFILES/zsh/hosts/$HOST/.zshenv"
 if [[ -r "$zshenv_host" ]]; then
     . "$zshenv_host"

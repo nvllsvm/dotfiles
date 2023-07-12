@@ -63,9 +63,10 @@ update_repo() {
 
 update_repo "DOTFILES" "$DOTFILES"
 
-
 for d in $(env | grep ^DOTFILES_ | sort); do
     name="$(echo "$d" | cut -d = -f 1)"
     loc="$(echo "$d" | cut -d = -f 2)"
     update_repo "$name" "$loc"
 done
+
+dotfiles-link-bin
