@@ -5,7 +5,7 @@ link_all() {
     for source_dir in "$@"; do
         if [ -d "$source_dir" ]; then
             for c in "$source_dir"/*; do
-                if [ -x "$c" ]; then
+                if [ -f "$c" ]; then
                     n="$(basename "$c")"
                     ln -sf "$(realpath "$c")" "${TMP_BIN}/${n}"
                 fi
@@ -19,6 +19,7 @@ if ! [ -d "$DOTFILES" ]; then
 fi
 DEST_BIN="${DOTFILES}/.bin"
 
+HOST="${HOST:-$(hostname)}"
 link_all \
     "${DOTFILES}/scripts/hosts/${HOST}" \
     "${DOTFILES_PRIVATE}/scripts/hosts/${HOST}" \
