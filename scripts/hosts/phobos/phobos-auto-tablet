@@ -115,13 +115,10 @@ def main():
             child = multiprocessing.Process(target=child_process)
             child.start()
             if not onboard:
-                onboard = subprocess.run(['onboard'])
+                onboard = subprocess.Popen(['onboard'])
         else:
             if onboard:
                 onboard.terminate()
-                onboard.kill()
-                onboard.join()
-                onboard.close()
                 onboard = None
             if child:
                 print('Stopping child')
