@@ -1,28 +1,25 @@
 #!/usr/bin/env sh
-TMP_BIN="$(mktemp -d)"
-
 link_bin() {
     root="$1"/scripts/commands
     if ! [ -d "$root" ]; then
         return
     fi
 
+    tmp_bin="$(mktemp -d)"
     for d in "${root}"/*; do
         c="$(basename "$d")"
         if command -v "$(basename "$d")" > /dev/null; then
             for c in "${d}"/*; do
                 n="$(basename "$c")"
-                ln -sf "$(realpath "$c")" "${TMP_BIN}/${n}"
+                ln -sf "$(realpath "$c")" "${tmp_bin}/${n}"
             done
         fi
     done
+    rm -rf "$1/bin"
+    mv "$tmp_bin" "$1/bin"
 }
 
-link_bin "$DOTFILES"
-
-for d in $(env | grep ^DOTFILES_ | sort); do
+for d in "$DOTFILES" $(env | grep ^DOTFILES_ | sort); do
     link_bin "$d"
 done
 
-rm -rf "${DOTFILES}/bin_links"
-mv "$TMP_BIN" "${DOTFILES}/bin_links"

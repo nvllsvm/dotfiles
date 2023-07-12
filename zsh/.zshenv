@@ -16,7 +16,7 @@ for plugin in "$DOTFILES"/zsh/plugins/*/.zshenv(N); do
 done
 
 path=(
-    "${DOTFILES}/bin_links"
+    "${DOTFILES}/bin"
     "${DOTFILES}/scripts/hosts/${HOST}"
     "${DOTFILES}"/scripts/terminal
     "$path[@]"
