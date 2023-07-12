@@ -60,12 +60,5 @@ fi
 #log 'Pruning package cache'
 #yay -Sc --noconfirm > /dev/null
 
-GIMP_BIN="$(which 'gimp-2.99' 2> /dev/null || true)"
-if [ -n "$GIMP_BIN" ]; then
-    log 'Linking gimp-2.99 to gimp'
-    rm -rf ~/.local/bin/gimp
-    ln -sT "$GIMP_BIN" ~/.local/bin/gimp
-fi
-
 log 'Locating .pac* files'
 sudo find /etc -regextype posix-extended -regex ".+\.pac(new|save)" 2> /dev/null || true
