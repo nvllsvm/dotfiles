@@ -51,10 +51,10 @@ else
     FONT_NAME='monospace'
 
     if [ "$DPI" -le 138 ]; then
-        BORDER_WIDTH=2
+        BORDER_WIDTH=4
         CURSOR_SIZE=16
         DUNST_MAX_ICON_SIZE=64
-        DUNST_FRAME_WIDTH=2
+        DUNST_FRAME_WIDTH=4
         SCALING_FACTOR=1
 
         if [ -n "$LARGE" ]; then
@@ -71,9 +71,9 @@ else
             FONT_SIZE=9
         fi
     else
-        BORDER_WIDTH=3
+        BORDER_WIDTH=4
         CURSOR_SIZE=48
-        DUNST_FRAME_WIDTH=2
+        DUNST_FRAME_WIDTH=4
         DUNST_MAX_ICON_SIZE=128
         SCALING_FACTOR=2
 
