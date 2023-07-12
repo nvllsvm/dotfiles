@@ -1,8 +1,0 @@
-#!/usr/bin/env sh
-set -e
-TOUCHPAD_ID='ELAN1201:00 04F3:3098 Touchpad'
-
-xinput --set-prop "$TOUCHPAD_ID" 'libinput Accel Speed' 0
-xinput --set-prop "$TOUCHPAD_ID" 'libinput Middle Emulation Enabled' 1
-xinput --set-prop "$TOUCHPAD_ID" 'libinput Natural Scrolling Enabled' 1
-xinput --set-prop "$TOUCHPAD_ID" 'libinput Tapping Enabled' 1
