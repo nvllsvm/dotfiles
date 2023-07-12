@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import os
 import pathlib
-import shutil
 
 
 def has_battery():
@@ -10,10 +9,6 @@ def has_battery():
         if not path.name.startswith('hidpp_'):
             return True
     return False
-
-
-def has_bluetooth():
-    return bool(shutil.which('bluetoothctl'))
 
 
 config = """
@@ -29,15 +24,6 @@ if has_battery():
 [[block]]
 block = "battery"
 missing_format = ""
-"""
-
-if has_bluetooth():
-    config += """
-# Sony WH-1000XM4
-[[block]]
-block = "bluetooth"
-mac = "F8:4E:17:93:84:67"
-disconnected_format = ""
 """
 
 config += """
@@ -56,10 +42,6 @@ max_vol = 100
 [[block.click]]
 button = "left"
 cmd = "set-volume --toggle-mute"
-
-[[block]]
-block = "net"
-format = "$icon"
 
 [[block]]
 block = "time"

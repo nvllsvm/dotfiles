@@ -9,12 +9,6 @@ icons = "awesome4"
 block = "battery"
 missing_format = ""
 
-# Sony WH-1000XM4
-[[block]]
-block = "bluetooth"
-mac = "F8:4E:17:93:84:67"
-disconnected_format = ""
-
 [[block]]
 block = "sound"
 device_kind = "source"
@@ -30,10 +24,6 @@ max_vol = 100
 [[block.click]]
 button = "left"
 cmd = "set-volume --toggle-mute"
-
-[[block]]
-block = "net"
-format = "$icon"
 
 [[block]]
 block = "time"
