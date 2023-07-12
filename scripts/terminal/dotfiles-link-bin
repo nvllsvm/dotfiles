@@ -12,7 +12,6 @@ link_bin() {
         if command -v "$(basename "$d")" > /dev/null; then
             for c in "${d}"/*; do
                 n="$(basename "$c")"
-                echo "$n"
                 ln -sf "$(realpath "$c")" "${TMP_BIN}/${n}"
             done
         fi
