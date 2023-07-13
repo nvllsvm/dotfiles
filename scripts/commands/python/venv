@@ -176,16 +176,18 @@ def main():
         env_folder = ENV_ROOT / hashlib.sha256(
             f'{cwd}{args.python}'.encode()).hexdigest()
 
-    try:
-        shutil.rmtree(env_folder)
-    except FileNotFoundError:
-        pass
+    if not args.env or args.delete:
+        try:
+            shutil.rmtree(env_folder)
+        except FileNotFoundError:
+            pass
 
     if args.delete:
         parser.exit()
 
-    create_virtualenv(args.python, env_folder)
-    upgrade_virtualenv(env_folder)
+    if not env_folder.exists():
+        create_virtualenv(args.python, env_folder)
+        upgrade_virtualenv(env_folder)
 
     env_folder.joinpath('.parent').symlink_to(cwd)
     activate_path = shlex.quote(str(env_folder.joinpath('bin/activate')))
