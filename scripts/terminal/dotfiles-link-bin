@@ -10,7 +10,7 @@ link_all() {
                     if [ -h "$c" ]; then
                         cp "$c" "${TMP_BIN}/${n}"
                     else
-                        ln -sf "$(realpath "$c")" "${TMP_BIN}/${n}"
+                        ln -sf "$c" "${TMP_BIN}/${n}"
                     fi
                 fi
             done
