@@ -8,7 +8,7 @@ link_all() {
                 if [ -f "$c" ]; then
                     n="${c##*/}"
                     if [ -h "$c" ]; then
-                        cp "$c" "${TMP_BIN}/${n}"
+                        cp "$(realpath "$c")" "${TMP_BIN}/${n}"
                     else
                         ln -sf "$c" "${TMP_BIN}/${n}"
                     fi
