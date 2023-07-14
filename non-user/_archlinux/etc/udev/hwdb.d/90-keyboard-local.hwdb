@@ -3,19 +3,20 @@
 
 # built in keyboards
 evdev:atkbd:dmi:*
- KEYBOARD_KEY_3a=esc            # capslock
+ KEYBOARD_KEY_3a=esc            # capslock -> escape
 
 # logitech k400 plus
 evdev:input:b0003v046Dp404D*
- KEYBOARD_KEY_70039=esc         # capslock
+ KEYBOARD_KEY_70039=esc         # capslock -> escape
 
 # Rii K06 mini keyboard
 evdev:name:Telink Wireless Receiver:*
- KEYBOARD_KEY_70039=esc         # capslock
- KEYBOARD_KEY_70029=capslock    # escape
+ KEYBOARD_KEY_70039=esc         # capslock -> escape
+ KEYBOARD_KEY_70029=capslock    # escape -> capslock
 
 # asus flow x13 gv301qe
 evdev:name:Asus Keyboard:dmi:bvn*:bvr*:bd*:svnASUSTeKCOMPUTERINC.:pnROGFlowX13GV301QE*
  KEYBOARD_KEY_70039=esc         # capslock -> escape
+ KEYBOARD_KEY_70029=capslock    # escape -> capslock
  KEYBOARD_KEY_ff31007c=f20      # mic-mute -> mic-mute
  KEYBOARD_KEY_ff310038=prog1    # rog button -> program1
