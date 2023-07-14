@@ -1,5 +1,8 @@
-# reload the rules by running:
-# udevadm hwdb --update
+# reload the rules:
+#   systemd-hwdb update
+#
+# apply the rules without reboot (X being a number):
+#   udevadm trigger /dev/input/eventX
 
 # built in keyboards
 evdev:atkbd:dmi:*
