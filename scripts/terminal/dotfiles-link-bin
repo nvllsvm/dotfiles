@@ -6,8 +6,12 @@ link_all() {
         if [ -d "$source_dir" ]; then
             for c in "$source_dir"/*; do
                 if [ -f "$c" ]; then
-                    n="$(basename "$c")"
-                    ln -sf "$(realpath "$c")" "${TMP_BIN}/${n}"
+                    n="${c##*/}"
+                    if [ -h "$c" ]; then
+                        cp "$c" "${TMP_BIN}/${n}"
+                    else
+                        ln -sf "$(realpath "$c")" "${TMP_BIN}/${n}"
+                    fi
                 fi
             done
         fi
