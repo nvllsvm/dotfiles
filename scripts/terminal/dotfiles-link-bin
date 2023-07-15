@@ -31,6 +31,8 @@ def main():
     all_commands = set()
     for path in os.environ['PATH'].split(':'):
         path = pathlib.Path(path)
+        if not path.is_dir():
+            continue
         if path == dest:
             continue
         all_commands.update(
