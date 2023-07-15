@@ -77,10 +77,13 @@ def main():
     for source in sources:
         if not source.is_dir():
             continue
-        links.update({
-            path.name: path.readlink() if path.is_symlink() else path
-            for path in source.iterdir()
-        })
+        for path in source.iterdir():
+            name = path.name
+            if path.is_symlink():
+                path = path.readlink()
+                if not path.is_absolute():
+                    path = source / path
+            links[name] = path.absolute()
 
     for path in dest.iterdir():
         if path.name not in links:

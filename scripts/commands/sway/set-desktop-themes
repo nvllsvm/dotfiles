@@ -1,2 +1,1 @@
-#!/usr/bin/env sh
-exec "${DOTFILES}/scripts/commands/Xorg/set-desktop-themes" "$@"
+../../set-desktop-themes

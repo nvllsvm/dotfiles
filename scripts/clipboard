@@ -4,8 +4,18 @@ case "$1" in
         MODE="$1"
         ;;
     *)
-        echo 'usage: clipboard (copy|paste)'
-        exit 1
+        case "$0" in
+            *copy)
+                MODE='copy'
+                ;;
+            *paste)
+                MODE='paste'
+                ;;
+        esac
+        if [ -z "$MODE" ]; then
+            echo 'usage: clipboard (copy|paste)'
+            exit 1
+        fi
 esac
 
 clipboard_wayland() {
