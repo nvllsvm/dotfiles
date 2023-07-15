@@ -3,9 +3,6 @@ import os
 import pathlib
 import socket
 
-NVM_DIR = pathlib.Path('~/.local/share/nvm').expanduser()
-BASE16_SHELL_DIR = pathlib.Path('~/.local/share/base16-shell').expanduser()
-
 
 def find_executables(directory):
     executables = set()
@@ -56,12 +53,6 @@ def main():
     if dotfiles_private:
         sources.append(dotfiles_private / 'scripts' / 'terminal')
 
-    if NVM_DIR.is_dir():
-        sources.append(dotfiles / 'scripts' / 'nvm')
-
-    if BASE16_SHELL_DIR.is_dir():
-        sources.append(dotfiles / 'scripts' / 'base16')
-
     match hostname:
         case 'mars':
             sources.extend([
@@ -97,7 +88,7 @@ def main():
 
     for name, path in links.items():
         target = dest / name
-        if target.exists():
+        if target.exists() or target.is_symlink():
             if target.is_symlink() and target.readlink() == path:
                 continue
             target.unlink()
