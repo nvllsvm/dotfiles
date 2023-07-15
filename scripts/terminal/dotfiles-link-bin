@@ -1,62 +1,106 @@
-#!/usr/bin/env sh
-TMP_BIN="$(mktemp -d)"
+#!/usr/bin/env python3
+import os
+import pathlib
+import socket
 
-link_all() {
-    for source_dir in "$@"; do
-        if [ -d "$source_dir" ]; then
-            for c in "$source_dir"/*; do
-                if [ -f "$c" ]; then
-                    n="${c##*/}"
-                    if [ -h "$c" ]; then
-                        cp "$(realpath "$c")" "${TMP_BIN}/${n}"
-                    else
-                        ln -sf "$c" "${TMP_BIN}/${n}"
-                    fi
-                fi
-            done
-        fi
-    done
-}
+NVM_DIR = pathlib.Path('~/.local/share/nvm').expanduser()
+BASE16_SHELL_DIR = pathlib.Path('~/.local/share/base16-shell').expanduser()
 
-if ! [ -d "$DOTFILES" ]; then
-    exit 1
-fi
-DEST_BIN="${DOTFILES}/.bin"
 
-HOST="${HOST:-$(hostname)}"
-link_all \
-    "${DOTFILES}/scripts/hosts/${HOST}" \
-    "${DOTFILES_PRIVATE}/scripts/hosts/${HOST}" \
-    "${DOTFILES}"/scripts/commands/* \
-    "${DOTFILES}/scripts/terminal" \
-    "${DOTFILES_PRIVATE}/scripts/terminal" \
+def find_executables(directory):
+    executables = set()
+    for path in directory.iterdir():
+        try:
+            if path.is_file() and os.access(path, os.X_OK):
+                executables.add(path)
+        except PermissionError:
+            pass
+    return executables
 
-if [ -d ~/.local/share/nvm ]; then
-    link_all \
-        "${DOTFILES}/scripts/nvm"
-fi
 
-if [ -d ~/.local/share/base16-shell ]; then
-    link_all \
-        "${DOTFILES}/scripts/base16"
-fi
+def main():
+    dotfiles = pathlib.Path(os.environ['DOTFILES'])
+    try:
+        dotfiles_private = pathlib.Path(os.environ['DOTFILES_PRIVATE'])
+    except KeyError:
+        dotfiles_private = None
 
-case "$HOST" in
-    mars)
-        link_all \
-            "${DOTFILES_PRIVATE}/scripts/gisual" \
-           "${DOTFILES}/scripts/media"
-        ;;
-    phobos)
-        link_all \
-            "${DOTFILES_PRIVATE}/scripts/gisual" \
-            "${DOTFILES}/scripts/media"
-        ;;
-    sol)
-        link_all \
-            "${DOTFILES}/scripts/media"
-        ;;
-esac
+    dest = dotfiles / '.bin'
+    dest.mkdir(exist_ok=True)
 
-rm -rf "$DEST_BIN"
-mv "$TMP_BIN" "$DEST_BIN"
+    all_commands = set()
+    for path in os.environ['PATH'].split(':'):
+        path = pathlib.Path(path)
+        if path == dest:
+            continue
+        all_commands.update(
+            p.name
+            for p in find_executables(path)
+        )
+
+    hostname = socket.gethostname()
+
+    sources = [
+        dotfiles / 'scripts' / 'hosts' / hostname,
+    ]
+    if dotfiles_private:
+        sources.append(dotfiles_private / 'scripts' / 'hosts' / hostname)
+
+    for path in (dotfiles / 'scripts' / 'commands').iterdir():
+        if path.name in all_commands:
+            sources.append(path)
+
+    sources.append(dotfiles / 'scripts' / 'terminal')
+    if dotfiles_private:
+        sources.append(dotfiles_private / 'scripts' / 'terminal')
+
+    if NVM_DIR.is_dir():
+        sources.append(dotfiles / 'scripts' / 'nvm')
+
+    if BASE16_SHELL_DIR.is_dir():
+        sources.append(dotfiles / 'scripts' / 'base16')
+
+    match hostname:
+        case 'mars':
+            sources.extend([
+                dotfiles_private / 'scripts' / 'gisual',
+                dotfiles / 'scripts' / 'media'
+            ])
+        case 'phobos':
+            sources.extend([
+                dotfiles_private / 'scripts' / 'gisual',
+                dotfiles / 'scripts' / 'media'
+            ])
+        case 'sol':
+            sources.append(dotfiles / 'scripts' / 'media')
+
+    sources = [
+        path
+        for path in sources
+        if path.is_dir()
+    ]
+
+    links = {}
+    for source in sources:
+        if not source.is_dir():
+            continue
+        links.update({
+            path.name: path.readlink() if path.is_symlink() else path
+            for path in source.iterdir()
+        })
+
+    for path in dest.iterdir():
+        if path.name not in links:
+            path.unlink()
+
+    for name, path in links.items():
+        target = dest / name
+        if target.exists():
+            if target.is_symlink() and target.readlink() == path:
+                continue
+            target.unlink()
+        target.symlink_to(path)
+
+
+if __name__ == '__main__':
+    main()
