@@ -7,6 +7,7 @@ import shutil
 import string
 import sys
 
+import async_executor
 
 DEFAULT_TARGET = pathlib.Path('/storage/Personal Creations')
 PHOTO_DIR = 'Photos'
@@ -173,10 +174,16 @@ async def main():
     args = parser.parse_args()
 
     if args.path.is_file():
-        await process_file(args.path, args.target, args.dry_run)
+        paths = [args.path]
     else:
-        for path in all_files(args.path):
-            await process_file(path, args.target, args.dry_run)
+        paths = all_files(args.path)
+
+    executor = async_executor.AsyncExecutor()
+    for path in paths:
+        executor.submit(process_file, path, args.target, args.dry_run)
+
+    async for task in executor:
+        task.result()
 
 
 if __name__ == '__main__':
