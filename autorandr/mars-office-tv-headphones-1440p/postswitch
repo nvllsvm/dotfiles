@@ -1,8 +1,0 @@
-#!/usr/bin/env sh
-set-desktop-themes --dpi 96
-
-hass office-studio-monitors-off &
-pactl-set-only \
-    --profile alsa_card.usb-Schiit_Audio_I_m_Fulla_Schiit-00 output:iec958-stereo
-
-i3-move-ws

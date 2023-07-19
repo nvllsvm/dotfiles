@@ -3,5 +3,4 @@ set-desktop-themes --dpi 96
 hass office-studio-monitors-off &
 
 pactl-set-only \
-    --profile alsa_card.pci-0000_0b_00.1 output:hdmi-stereo-extra2
-
+    --profile 'alsa_card.pci-0000_0b_00.1.5 output:hdmi-stereo-extra2'
