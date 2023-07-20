@@ -54,13 +54,8 @@ def main():
     paths = sorted(set(args.path)) or [pathlib.Path()]
 
     for parent_path in paths:
-        parent_paths = reversed(
-            sorted(
-                empty_dirs(
-                    parent_path, include_parent=args.include_parent)
-            )
-        )
-        for path in parent_paths:
+        parent_paths = empty_dirs(parent_path, include_parent=args.parent)
+        for path in sorted(parent_paths, reverse=True):
             print(path)
             if args.remove:
                 # prefer over shutil.rmtree to ensure nothing added since scan
