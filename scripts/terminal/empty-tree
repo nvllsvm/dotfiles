@@ -4,11 +4,11 @@ import pathlib
 import sys
 
 
-def iter_dirs(root):
+def iter_dirs(parent):
     other = set()
     dirs = set()
 
-    stack = [root]
+    stack = [parent]
     while stack:
         try:
             for path in stack.pop().iterdir():
@@ -25,11 +25,13 @@ def iter_dirs(root):
     return dirs, other
 
 
-def empty_dirs(root):
+def empty_dirs(parent, include_parent=False):
     empty = set()
-    dirs, other = iter_dirs(root)
+    dirs, _ = iter_dirs(parent)
+    if include_parent is True:
+        dirs.add(parent)
     for d in dirs:
-        subdirs, subfiles = iter_dirs(d)
+        _, subfiles = iter_dirs(d)
         if not subfiles:
             empty.add(d)
     return empty
@@ -40,6 +42,9 @@ def main():
         description='List the tops of empty directory trees.'
     )
     parser.add_argument(
+        '--parent', action='store_true',
+        help='allow the parent to be removed if empty')
+    parser.add_argument(
         '-r', dest='remove', action='store_true',
         help='remove the trees from disk'
     )
@@ -49,7 +54,13 @@ def main():
     paths = sorted(set(args.path)) or [pathlib.Path()]
 
     for parent_path in paths:
-        for path in reversed(sorted(empty_dirs(parent_path))):
+        parent_paths = reversed(
+            sorted(
+                empty_dirs(
+                    parent_path, include_parent=args.include_parent)
+            )
+        )
+        for path in parent_paths:
             print(path)
             if args.remove:
                 # prefer over shutil.rmtree to ensure nothing added since scan
@@ -57,10 +68,10 @@ def main():
                     path.rmdir()
                 except PermissionError as e:
                     print(e, file=sys.stderr)
+                except FileNotFoundError:
+                    pass
                 except OSError:
                     # directory not empty
-                    pass
-                except FileNotFoundError:
                     pass
 
 
