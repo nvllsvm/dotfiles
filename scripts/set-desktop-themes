@@ -99,8 +99,6 @@ else
         fi
     fi
 
-export BORDER_WIDTH
-
     # save settings
     cat > "$CURRENT_THEME" << EOF
 BORDER_WIDTH="$BORDER_WIDTH"
@@ -230,6 +228,7 @@ EOF
 set-wallpaper || true
 
 if command -v i3 > /dev/null; then
+    export BORDER_WIDTH
     export FONT_NAME
     export FONT_SIZE
     i3-build-config
