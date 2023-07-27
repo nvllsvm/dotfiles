@@ -18,12 +18,18 @@ LARGE=
 MEDIUM_LARGE=
 DPI=96
 HASARGS=
+BORDER_WIDTH=
 
 while [ $# -gt 0 ]; do
     HASARGS=1
     case "$1" in
         --dpi)
             DPI="$2"
+            shift
+            shift
+            ;;
+        --border)
+            BORDER_WIDTH="$2"
             shift
             shift
             ;;
@@ -51,10 +57,10 @@ else
     FONT_NAME='monospace'
 
     if [ "$DPI" -le 138 ]; then
-        BORDER_WIDTH=4
+        BORDER_WIDTH=${BORDER_WIDTH:-4}
         CURSOR_SIZE=16
         DUNST_MAX_ICON_SIZE=64
-        DUNST_FRAME_WIDTH=4
+        DUNST_FRAME_WIDTH=${BORDER_WIDTH:-4}
         SCALING_FACTOR=1
 
         if [ -n "$LARGE" ]; then
@@ -71,9 +77,9 @@ else
             FONT_SIZE=9
         fi
     else
-        BORDER_WIDTH=4
+        BORDER_WIDTH=${BORDER_WIDTH:-4}
         CURSOR_SIZE=48
-        DUNST_FRAME_WIDTH=4
+        DUNST_FRAME_WIDTH=${BORDER_WIDTH:-4}
         DUNST_MAX_ICON_SIZE=128
         SCALING_FACTOR=2
 
@@ -92,6 +98,8 @@ else
             FONT_SIZE=10
         fi
     fi
+
+export BORDER_WIDTH
 
     # save settings
     cat > "$CURRENT_THEME" << EOF

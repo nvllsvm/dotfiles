@@ -24,13 +24,15 @@ BASE16_COLOR19="${BASE16_COLOR19:-000000}"
 BASE16_COLOR20="${BASE16_COLOR20:-000000}"
 BASE16_COLOR21="${BASE16_COLOR21:-000000}"
 
+BORDER_WIDTH="${BORDER_WIDTH:-4}"
+
 FONT_NAME="${FONT_NAME:-Monospace}"
 FONT_SIZE="${FONT_SIZE:-11}"
 
 cat > ~/.config/i3/config << EOF
 set \$mod Mod4
 set \$gap_size 0px
-set \$border_size 4px
+set \$border_size ${BORDER_WIDTH}px
 set \$bar_padding_top 0px
 set \$bar_padding_bottom 0px
 set \$bar_padding_left 0px
