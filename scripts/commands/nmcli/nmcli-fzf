@@ -91,6 +91,9 @@ class nmcli:
 async def main():
     lines = []
     for conn in await nmcli.get_connections():
+        if conn['TYPE'] in ('bridge', 'loopback', 'tun'):
+            continue
+
         text = ' '.join([
             '*' if conn['DEVICE'] else ' ',
             conn['TYPE'],
