@@ -50,15 +50,22 @@ async def get_itunes_art(*terms, country='us', entity='album', limit=None):
 async def download_image(url):
     response = await CLIENT.get(str(url))
     response.raise_for_status()
-    return response.read()
+    data = response.read()
+
+    image = PIL.Image.open(io.BytesIO(data))
+    image.verify()
+    if image.format == 'TIFF':
+        data = await convert_to_png(data)
+    return data
 
 
 def get_suffix(data):
     image = PIL.Image.open(io.BytesIO(data))
-    image.verify()
     match image.format:
         case 'JPEG':
             return '.jpg'
+        case 'PNG':
+            return '.png'
         case _:
             raise ValueError(image.format)
 
@@ -74,6 +81,20 @@ def build_image_path(name, suffix):
             break
         iteration += 1
     return path
+
+
+async def convert_to_png(data):
+    # use imagemagick instead of Pillow as Pillow's TIFF support doesn't
+    # work without special compile flags
+    proc = await asyncio.create_subprocess_exec(
+        'convert', '-', 'png:-',
+        stdin=asyncio.subprocess.PIPE,
+        stdout=asyncio.subprocess.PIPE,
+    )
+    stdout, _ = await proc.communicate(data)
+    if proc.returncode != 0:
+        raise RuntimeError
+    return stdout
 
 
 async def main():
