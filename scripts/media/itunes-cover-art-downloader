@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 import argparse
 import asyncio
-import mimetypes
+import io
 import os
 import pathlib
 
 import async_executor
 import httpx
+import PIL.Image
 import tqdm.asyncio
 import yarl
 
@@ -52,20 +53,23 @@ async def download_image(url):
     return response.read()
 
 
-def validate_jpeg(path):
-    # make accept bytes
-    mime, _ = mimetypes.guess_type(path)
-    if mime != 'image/jpeg':
-        raise ValueError('not jpeg')
+def get_suffix(data):
+    image = PIL.Image.open(io.BytesIO(data))
+    image.verify()
+    match image.format:
+        case 'JPEG':
+            return '.jpg'
+        case _:
+            raise ValueError(image.format)
 
 
-def build_image_path(name):
+def build_image_path(name, suffix):
     name = name.replace(os.sep, '').strip()
     if not name:
         raise ValueError()
     iteration = 0
     while True:
-        path = pathlib.Path(f'itunes_artwork_({name}){"_"*iteration}.jpg')
+        path = pathlib.Path(f'itunes_artwork_({name}){"_"*iteration}{suffix}')
         if not path.exists():
             break
         iteration += 1
@@ -94,9 +98,9 @@ async def main():
             print(e)
             continue
 
-        path = build_image_path(name)
+        suffix = get_suffix(data)
+        path = build_image_path(name, suffix)
         path.write_bytes(data)
-        validate_jpeg(path)
 
 
 if __name__ == '__main__':
