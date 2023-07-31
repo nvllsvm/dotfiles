@@ -65,7 +65,7 @@ def build_image_path(name):
         raise ValueError()
     iteration = 0
     while True:
-        path = pathlib.Path(f'artwork_({name}){"_"*iteration}.jpg')
+        path = pathlib.Path(f'itunes_artwork_({name}){"_"*iteration}.jpg')
         if not path.exists():
             break
         iteration += 1
