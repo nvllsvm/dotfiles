@@ -176,6 +176,22 @@ async def encode_flac(fd, dest):
     return result()
 
 
+async def encode_wav(fd, dest):
+    # seems dirty, but allows for async
+    proc = await asyncio.create_subprocess_exec(
+        'tee', '--', dest,
+        stdin=fd,
+        stdout=asyncio.subprocess.DEVNULL,
+        stderr=asyncio.subprocess.DEVNULL,
+    )
+
+    async def result():
+        await proc.wait()
+        if proc.returncode != 0:
+            raise EncodeError()
+    return result()
+
+
 class DecodeError(Exception):
     """Raised when an error occurs while decoding audio"""
 
@@ -184,7 +200,19 @@ class EncodeError(Exception):
     """Raised when an error occurs while encoding audio"""
 
 
-async def reencode(source):
+ENCODE_FORMAT = {
+    'flac': {
+        'encode_func': encode_flac,
+        'suffix': '.flac',
+    },
+    'wav': {
+        'encode_func': encode_wav,
+        'suffix': '.wav',
+    },
+}
+
+
+async def reencode(source, encode_format='flac'):
     suffix = source.suffix.lower()
 
     decode_contexts = {
@@ -200,10 +228,13 @@ async def reencode(source):
     decode = await decode_contexts[suffix](source, write)
     os.close(write)
 
+    suffix = ENCODE_FORMAT[encode_format]['suffix']
+    encode_func = ENCODE_FORMAT[encode_format]['encode_func']
+
     before = source.stat().st_size
 
-    with TempPath(dir=source.parent, suffix='.flac') as tmp:
-        encode = await encode_flac(read, tmp)
+    with TempPath(dir=source.parent, suffix=suffix) as tmp:
+        encode = await encode_func(read, tmp)
         os.close(read)
 
         await asyncio.gather(decode, encode)
@@ -213,7 +244,7 @@ async def reencode(source):
         except Exception:
             pass
         source.unlink()
-        dest = source.with_suffix('.flac')
+        dest = source.with_suffix(suffix)
         tmp.rename(dest)
 
     after = dest.stat().st_size
@@ -247,7 +278,7 @@ async def run(args):
     executor = async_executor.AsyncExecutor(args.numprocs)
     for path in paths:
         if path.suffix.lower() in ('.flac', '.ape', '.m4a', '.wav', '.wv'):
-            executor.submit(reencode, path)
+            executor.submit(reencode, path, encode_format=args.format)
 
     errors = []
 
@@ -315,6 +346,7 @@ class SizeDiffPrinter:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-n', dest='numprocs', metavar='NUMPROCS', type=int)
+    parser.add_argument('--format', choices=ENCODE_FORMAT, default='flac')
     parser.add_argument('path', type=pathlib.Path, nargs='+')
     args = parser.parse_args()
 
