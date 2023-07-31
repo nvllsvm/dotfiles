@@ -1,0 +1,103 @@
+#!/usr/bin/env python3
+import argparse
+import asyncio
+import mimetypes
+import os
+import pathlib
+
+import async_executor
+import httpx
+import tqdm.asyncio
+import yarl
+
+SEARCH_URL = yarl.URL('https://itunes.apple.com/search')
+BASE_URL = yarl.URL('https://a5.mzstatic.com/us/r1000/0/')
+
+CLIENT = httpx.AsyncClient()
+
+
+async def get_itunes_art(*terms, country='us', entity='album', limit=None):
+    query = {
+        'country': country,
+        'entity': entity,
+        'term': ' '.join(terms),
+    }
+    if limit:
+        limit = int(limit)
+        query['limit'] = limit
+
+    url = SEARCH_URL.with_query(query)
+    response = await CLIENT.get(str(url))
+    response.raise_for_status()
+
+    results = response.json()
+    if results['resultCount'] == 0:
+        raise KeyError
+    if limit and results['resultCount'] == limit:
+        raise NotImplementedError('limit too low')
+
+    for result in results['results']:
+        thumb_url = result['artworkUrl100']
+        url = BASE_URL
+        for part in thumb_url.split('/')[5:-1]:
+            url = url / part
+        result['artworkUrl'] = str(url)
+
+    return results['results']
+
+
+async def download_image(url):
+    response = await CLIENT.get(str(url))
+    response.raise_for_status()
+    return response.read()
+
+
+def validate_jpeg(path):
+    # make accept bytes
+    mime, _ = mimetypes.guess_type(path)
+    if mime != 'image/jpeg':
+        raise ValueError('not jpeg')
+
+
+def build_image_path(name):
+    name = name.replace(os.sep, '').strip()
+    if not name:
+        raise ValueError()
+    iteration = 0
+    while True:
+        path = pathlib.Path(f'artwork_({name}){"_"*iteration}.jpg')
+        if not path.exists():
+            break
+        iteration += 1
+    return path
+
+
+async def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('terms', nargs='+')
+    args = parser.parse_args()
+
+    executor = async_executor.AsyncExecutor()
+    task_names = {}
+    for result in await get_itunes_art(*args.terms):
+        name = '{} - {}'.format(
+            result['artistName'],
+            result['collectionName'])
+        task = executor.submit(download_image, result['artworkUrl'])
+        task_names[task] = name
+
+    async for task in tqdm.asyncio.tqdm(executor):
+        name = task_names[task]
+        try:
+            data = task.result()
+        except Exception as e:
+            print(e)
+            continue
+
+        path = build_image_path(name)
+        path.write_bytes(data)
+        validate_jpeg(path)
+
+
+if __name__ == '__main__':
+    asyncio.run(main())
