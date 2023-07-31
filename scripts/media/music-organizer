@@ -76,7 +76,7 @@ def folder_name(tag_value):
     for c in tag_value:
         if not chars and c == '.':
             continue
-        if c in ('/', '\\', ':', '*', '?', '"', '<', '>', '|'):
+        if c in ('/', '\\', ':', '*', '?', '"', "'", '<', '>', '|'):
             continue
         chars.append(c)
     name = ''.join(chars)
