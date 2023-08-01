@@ -54,6 +54,8 @@ def main():
     paths = sorted(set(args.path)) or [pathlib.Path()]
 
     for parent_path in paths:
+        if not parent_path.exists():
+            continue
         parent_paths = empty_dirs(parent_path, include_parent=args.parent)
         for path in sorted(parent_paths, reverse=True):
             print(path)
