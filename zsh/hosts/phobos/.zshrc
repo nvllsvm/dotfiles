@@ -1,1 +1,1 @@
-. "${DOTFILES_PRIVATE}/zsh/plugins/gisual/.zshrc"
+. "${DOTFILES_GISUAL}/zsh/.zshrc"
