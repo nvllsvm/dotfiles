@@ -1,6 +1,10 @@
 #!/usr/bin/env sh
 set -e
 
+connected_outputs() {
+    xrandr | grep ' connected ' | awk '{print $1}'
+}
+
 clear_existing_calibration() {
     dispwin -h 2>&1 | grep Output | awk '{print $1}' | xargs -n 1 dispwin -c -d > /dev/null 2>&1
 }
@@ -28,6 +32,7 @@ while true; do
             exit
             ;;
         *)
+            clear_existing_calibration
             if [ $# -eq 1 ]; then
                 if ! [ -f "$1" ]; then
                     echo 'error: profile not found' >&2
@@ -35,27 +40,44 @@ while true; do
                 fi
                 PROFILE="$1"
             elif [ $# -eq 0 ]; then
-                # xrandr-edid $(xrandr-primary-output) | base64 -w0
-                edid_b64="$(xrandr-edid "$(xrandr-primary-output)" | base64 -w0)"
-                echo "EDID Base64: ${edid_b64}"
-                case "$edid_b64" in
-                    # mars lounge - Dell U2412M
-                    AP///////wAQrHqgU0RKMBEXAQOANCB46u6Vo1RMmSYPUFShCACBQIGAqUCzANHAAQEBAQEBKDyAoHCwI0AwIDYABkQhAAAaAAAA/wBZTVlIMTM0TDBKRFMKAAAA/ABERUxMIFUyNDEyTQogAAAA/QAyPR5TEQAKICAgICAgAAY=)
-                        PROFILE="${DOTFILES}/icc/mars_lounge U2412M #1 2022-03-15 19-25 D6500 2.2 F-S XYZLUT+MTX.icc"
-                        ;;
-                    # mars office - LG 34GP83A-B
-                    AP///////wAebUt31PYBAAIfAQS1UCF4n/Z1r05CqyYOUFQhCQBxQIGAgcCpwLMA0cCBANHP2qdwUNWgNFCQIDowIE8xAAAaAAAA/QAwkOHhUAEKICAgICAgAAAA/ABMRyBVTFRSQUdFQVIKAAAA/wAxMDJOVEpKM1M3MjQKAnQCAzBxIwkHB0cQBAMBHxMSgwEAAOMFwADiAGrmBgUBYWE9bRoAAAIFMJAABGE9YT1O1HDQ0KAyUDAgOgAgTzEAABoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA7nASeQAAAwEUZjgBhm8N7wAvgB8AnwVFAAIACQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuQ)
-                        PROFILE="${DOTFILES}/icc/mars_office LG34GP83A-B 2022-03-15 19-52 D6500 2.2 F-S XYZLUT+MTX.icc"
-                        ;;
-                    # phobos - Asus Flow X13
-                    AP///////wBNEB4VAAAAADEeAQSlHRJ4B95Qo1RMmSYPUFQAAAABAQEBAQEBAQEBAQEBAQEB7XuAoHCwR0AwIDYAILQQAAAY9z2AoHCwR0AwIDYAILQQAAAYAAAA/QAweJmZIAEKICAgICAgAAAA/ABMUTEzNE4xSlc1MgogAAo=)
-                        PROFILE="${DOTFILES}/icc/phobos_flowx13 LQ134N1JW52 #1 2022-03-15 14-14 D6500 2.2 F-S XYZLUT+MTX.icc"
-                        ;;
-                    # gisual - Sceptre M27
-                    AP///////wBOFAVsAAAAADIeAQSlPCF4O44FrU8zsCYNUFSlSwCBwIGAlQCpwLMA0cABAQEBAjqAGHE4LUAwIDUACEAhAAAaG4KAiHA4LUAYIDUAVlAhAAAeAAAA/QAwpt7ePAEKICAgICAgAAAA/ABTY2VwdHJlIE0yNwogAQECAybxSwEDAAAEEx8SAhGQIwkHB4MBAABtGgAAAgEwpQAAAAAAAIGRgIhwOBJAGCA1AFZQIQAAGPglAKBQOC1AMCBFAFZQIQAAHmYhVqpRAB4wRo8zAFZQIQAAGGYhULBRABswQHA2AFZQIQAAHgAAAAAAAAAAAAAAAAAAAAAABg==)
-                        PROFILE="${DOTFILES}/icc/gisual sceptre M27 #1 2023-08-02 13-19 D6500 2.2 F-S XYZLUT+MTX (red 49, green, 48, blue 49, gamma 2.2).icc"
-                        ;;
-                esac
+                for output in $(xrandr | grep ' connected ' | awk '{print $1}'); do
+                    edid_b64="$(xrandr-edid "$output" | base64 -w0)"
+                    #echo "EDID Base64: ${edid_b64}"
+                    case "$edid_b64" in
+                        # mars lounge - Dell U2412M
+                        AP///////wAQrHqgU0RKMBEXAQOANCB46u6Vo1RMmSYPUFShCACBQIGAqUCzANHAAQEBAQEBKDyAoHCwI0AwIDYABkQhAAAaAAAA/wBZTVlIMTM0TDBKRFMKAAAA/ABERUxMIFUyNDEyTQogAAAA/QAyPR5TEQAKICAgICAgAAY=)
+                            PROFILE="${DOTFILES}/icc/mars_lounge U2412M #1 2022-03-15 19-25 D6500 2.2 F-S XYZLUT+MTX.icc"
+                            ;;
+                        # mars office - LG 34GP83A-B
+                        AP///////wAebUt31PYBAAIfAQS1UCF4n/Z1r05CqyYOUFQhCQBxQIGAgcCpwLMA0cCBANHP2qdwUNWgNFCQIDowIE8xAAAaAAAA/QAwkOHhUAEKICAgICAgAAAA/ABMRyBVTFRSQUdFQVIKAAAA/wAxMDJOVEpKM1M3MjQKAnQCAzBxIwkHB0cQBAMBHxMSgwEAAOMFwADiAGrmBgUBYWE9bRoAAAIFMJAABGE9YT1O1HDQ0KAyUDAgOgAgTzEAABoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA7nASeQAAAwEUZjgBhm8N7wAvgB8AnwVFAAIACQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuQ)
+                            PROFILE="${DOTFILES}/icc/mars_office LG34GP83A-B 2022-03-15 19-52 D6500 2.2 F-S XYZLUT+MTX.icc"
+                            ;;
+                        # phobos - Asus Flow X13
+                        AP///////wBNEB4VAAAAADEeAQSlHRJ4B95Qo1RMmSYPUFQAAAABAQEBAQEBAQEBAQEBAQEB7XuAoHCwR0AwIDYAILQQAAAY9z2AoHCwR0AwIDYAILQQAAAYAAAA/QAweJmZIAEKICAgICAgAAAA/ABMUTEzNE4xSlc1MgogAAo=)
+                            PROFILE="${DOTFILES}/icc/phobos_flowx13 LQ134N1JW52 #1 2022-03-15 14-14 D6500 2.2 F-S XYZLUT+MTX.icc"
+                            ;;
+                        # gisual - Sceptre M27
+                        AP///////wBOFAVsAAAAADIeAQSlPCF4O44FrU8zsCYNUFSlSwCBwIGAlQCpwLMA0cABAQEBAjqAGHE4LUAwIDUACEAhAAAaG4KAiHA4LUAYIDUAVlAhAAAeAAAA/QAwpt7ePAEKICAgICAgAAAA/ABTY2VwdHJlIE0yNwogAQECAybxSwEDAAAEEx8SAhGQIwkHB4MBAABtGgAAAgEwpQAAAAAAAIGRgIhwOBJAGCA1AFZQIQAAGPglAKBQOC1AMCBFAFZQIQAAHmYhVqpRAB4wRo8zAFZQIQAAGGYhULBRABswQHA2AFZQIQAAHgAAAAAAAAAAAAAAAAAAAAAABg==)
+                            PROFILE="${DOTFILES}/icc/gisual sceptre M27 #1 2023-08-02 13-19 D6500 2.2 F-S XYZLUT+MTX (red 49, green, 48, blue 49, gamma 2.2).icc"
+                            ;;
+                        # gisual - Sceptre M27
+                        AP///////wBOFAVsAQAAADIeAQOAPCF4Krbgo1ZQoCcOUFS/7wCVAIGAswCBwEVoRXxhaGF8AjqAGHE4LUBYLEUAVlAhAAAeAAAA/QAwkB6gJAAKICAgICAgKkSAoHA4J0AwIDUAVlAhAAAAAAAA/ABTY2VwdHJlIE0yNwogAf4CAy7xSx8AAAQTAxICEQGQIwkHB4MBAABnAwwAIAAYRG0aAAACATCQ7QAAAAAAhm+AoHA4QEAwIDUAVlAhAAAe+CUAoFA4LUAwIDYAVlAhAAAa/n6AiHA4EkAYIDUAVlAhAAB/ZiFWqlEAHjBGjzMAVlAhAAB/AAAAAAAAAAAAVg==)
+                            PROFILE="${DOTFILES}/icc/gisual sceptre M27 #1 2023-08-02 13-19 D6500 2.2 F-S XYZLUT+MTX (red 49, green, 48, blue 49, gamma 2.2).icc"
+                            ;;
+                    esac
+
+                    if [ -z "$PROFILE" ]; then
+                        echo "error: no profile detected for ${output}" >&2
+                    fi
+
+                    echo "Profile for ${output}: $PROFILE"
+                    for dispwin_number in $(dispwin -h 2>&1 | grep Output | awk '{print $1}'); do
+                        dispwin_output="$(dispwin -h 2>&1 | grep Output | awk '{print $1, $6}' | grep "^${dispwin_number} " | awk '{print $2}')"
+                        if [ "$dispwin_output" = "$output" ]; then
+                            dispwin -d${dispwin_number} "$PROFILE" 2> /dev/null
+                        fi
+                    done
+                done
             else
                 show_help
                 echo error: unknown arguments >&2
@@ -64,14 +86,3 @@ while true; do
             break
     esac
 done
-
-
-clear_existing_calibration
-
-if [ -z "$PROFILE" ]; then
-    echo "error: no profile detected" >&2
-    exit 1
-fi
-
-echo "Profile: $PROFILE"
-dispwin -d1 "$PROFILE" 2> /dev/null
