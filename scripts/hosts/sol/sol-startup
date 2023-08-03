@@ -11,7 +11,7 @@ sudo systemctl start zfs-mount
 sudo systemctl start zfs-share.service
 sudo systemctl start zpool-check-health-storage.service
 
-zpool status -v
+sudo zpool status -v
 
 echo Starting NFS binds ...
 sudo mount --bind ~ar /srv/nfs4/ar
