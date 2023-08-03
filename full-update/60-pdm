@@ -1,9 +1,0 @@
-#!/usr/bin/env sh
-set -e
-if ! command -v pdm > /dev/null; then
-    rm -f ~/.local/zshfpath/_pdm
-    exit
-fi
-
-mkdir -p ~/.local/zshfpath
-pdm completion zsh > ~/.local/zshfpath/_pdm

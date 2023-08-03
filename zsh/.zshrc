@@ -105,11 +105,6 @@ for plugin in "$DOTFILES"/zsh/plugins/*/.zshrc(N); do
     . "$plugin"
 done
 
-fpath=(
-    ~/.local/zshfpath
-    "$fpath[@]"
-)
-
 compinit -C
 
 zsh_reload_comp() {
