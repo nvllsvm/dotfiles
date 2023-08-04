@@ -125,7 +125,7 @@ class LGC1:
 
     def is_muted(self):
         self.serial.write(b'ke 0 FF\r')
-        return bool(int(self.read_response(), 16))
+        return not bool(int(self.read_response(), 16))
 
     def mute(self):
         self.serial.write(b'ke 0 01\r')
