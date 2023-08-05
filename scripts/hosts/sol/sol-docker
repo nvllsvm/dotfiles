@@ -17,13 +17,17 @@ KILLABLE = [
 ]
 
 
-def docker_compose(*args, **kwargs):
+def docker_compose(*args, exec=False, **kwargs):
     env = os.environ.copy()
     env.update({
         'COMPOSE_PROJECT_NAME': COMPOSE_PROJECT_NAME,
         'COMPOSE_FILE': str(SOL_DOCKER_PATH / 'docker-compose.yaml'),
     })
-    return subprocess.run(['docker-compose', *args], env=env, **kwargs)
+    if exec:
+        os.execlpe('docker', 'docker', 'compose', *args, env)
+    else:
+        return subprocess.run(
+            ['docker', 'compose', *args], env=env, **kwargs)
 
 
 def restart_hass():
@@ -74,7 +78,7 @@ def main():
     if args and args[0] in COMMANDS:
         COMMANDS[args[0]]()
     else:
-        docker_compose(*args)
+        docker_compose(*args, exec=True)
 
 
 if __name__ == '__main__':
