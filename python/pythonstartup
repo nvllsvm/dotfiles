@@ -57,7 +57,6 @@ import tarfile
 import tempfile
 import textwrap
 import time
-import tomllib
 import typing
 import unicodedata
 import unittest
@@ -68,6 +67,10 @@ import uuid
 import zipfile
 import zlib
 import zoneinfo
+
+if (sys.version_info.major, sys.version_info.minor) >= (3, 11):
+    import tomllib
+
 
 for name in [
         'arrow',
