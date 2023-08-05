@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
+office-tv off
 set-desktop-themes --dpi 96
 hass office-studio-monitors-on &
 pactl-set-only \
