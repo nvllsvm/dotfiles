@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+exec rsync \
+    -av \
+    --progress \
+    --delete \
+    --exclude .cache/ \
+    lounge-htpc:/home/lounge-htpc/ \
+    /storage/Backup/lounge-htpc/

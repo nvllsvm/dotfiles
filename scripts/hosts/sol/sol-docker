@@ -67,6 +67,7 @@ def _command_startup():
 
 COMMANDS = {
     'restart-hass': _command_restart_hass,
+    'restart-nginx': restart_nginx,
     'restart': _command_restart,
     'startup': _command_startup,
 }
