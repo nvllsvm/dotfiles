@@ -1,10 +1,19 @@
 #!/usr/bin/env python3
 import argparse
 import curses
+import enum
 
 import serial
 
 DEV = '/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_AQ044DAC-if00-port0'
+
+
+class Input(str, enum.Enum):
+    hdmi1= '90'
+    hdmi2= '91'
+    hdmi3= '91'
+    hdmi4= '93'
+
 
 
 class LGC1:
@@ -173,6 +182,9 @@ class LGC1:
     def home(self):
         self.send_key_code(self.KEY_CODES['Smart / Home'])
 
+    def select_input(self, value):
+        self.serial.write(f'bx 0 {value}\r'.encode())
+
 
 def run_curses_app(stdscr, tv):
     stdscr.refresh()
@@ -231,8 +243,13 @@ def run_curses_app(stdscr, tv):
 
 def main():
     tv = LGC1(DEV)
+
+    def turn_on():
+        tv.turn_on()
+        tv.select_input(Input.hdmi4)
+
     COMMANDS = {
-        'on': tv.turn_on,
+        'on': turn_on,
         'off': tv.turn_off,
         'power': tv.power_toggle,
         'volume-up': tv.volume_up,

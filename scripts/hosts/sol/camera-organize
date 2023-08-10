@@ -170,13 +170,15 @@ async def main():
         default=DEFAULT_TARGET,
         help='target directory (default: %(default)s)')
     parser.add_argument('-d', '--dry-run', action='store_true')
-    parser.add_argument('path', type=pathlib.Path)
+    parser.add_argument('path', type=pathlib.Path, nargs='+')
     args = parser.parse_args()
 
-    if args.path.is_file():
-        paths = [args.path]
-    else:
-        paths = all_files(args.path)
+    paths = set()
+    for path in args.path:
+        if path.is_file():
+            paths.add(path)
+        else:
+            paths.update(all_files(path))
 
     executor = async_executor.AsyncExecutor()
     for path in paths:
