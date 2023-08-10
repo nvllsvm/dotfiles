@@ -1,3 +1,4 @@
-if [ -f "/tmp/xorg_${USER}.env" ]; then
-    . "/tmp/xorg_${USER}.env"
+if [ -f /tmp/.X0-lock ]; then
+    export XAUTHORITY=~/.Xauthority
+    export DISPLAY=':0'
 fi
