@@ -94,7 +94,10 @@ def get_url(path, lines):
             if '@' in host:
                 host = host.split('@', maxsplit=1)[-1]
                 hostname = host.split(':', maxsplit=1)[0]
-        url = f'https://{hostname}/{urlpath}'
+        if hostname == 'aur.archlinux.org':
+            url = f'https://aur.archlinux.org/packages/{urlpath}'
+        else:
+            url = f'https://{hostname}/{urlpath}'
     else:
         raise NotImplementedError(remote_url)
 

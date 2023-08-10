@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-set-desktop-themes --dpi 192 --large
+set-desktop-themes --dpi 96 --medium-large
 hass office-studio-monitors-off &
 
 pactl-set-only \
