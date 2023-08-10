@@ -27,7 +27,7 @@ def show_scratchpad(conn, item):
     item.command(
         'scratchpad show, '
         f'resize set width {width} px height {height} px, '
-        'move absolute position center'
+        'move position center'
     )
 
 
