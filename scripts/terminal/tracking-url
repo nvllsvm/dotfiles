@@ -33,7 +33,7 @@ def main():
     parser.add_argument('id', nargs='?')
     args = parser.parse_args()
 
-    tracking_id = args.id or Clipboard.paste().decode()
+    tracking_id = (args.id or Clipboard.paste().decode()).strip()
     if tracking_id.lower().startswith(('http://', 'https://')):
         raise ValueError('invalid tracking id')
 
