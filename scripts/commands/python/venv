@@ -189,7 +189,8 @@ def main():
         create_virtualenv(args.python, env_folder)
         upgrade_virtualenv(env_folder)
 
-    env_folder.joinpath('.parent').symlink_to(cwd)
+    if not args.env:
+        env_folder.joinpath('.parent').symlink_to(cwd)
     activate_path = shlex.quote(str(env_folder.joinpath('bin/activate')))
     cwd_envrc.write_text(ENVRC.format(activate_path=activate_path))
     shutil.copyfile(cwd_envrc, env_folder.joinpath('.envrc'))
