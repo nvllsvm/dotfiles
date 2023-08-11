@@ -5,7 +5,7 @@ off
 output HDMI-A-0
 off
 output DisplayPort-1
-crtc 1
+crtc 0
 mode 3840x2160
 pos 0x0
 primary
