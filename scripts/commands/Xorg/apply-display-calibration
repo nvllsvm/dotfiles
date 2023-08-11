@@ -21,6 +21,19 @@ EOF
 }
 
 
+apply_profile() {
+    OUTPUT="$1"
+    PROFILE="$2"
+    for dispwin_number in $(dispwin -h 2>&1 | grep Output | awk '{print $1}'); do
+        dispwin_output="$(dispwin -h 2>&1 | grep Output | awk '{print $1, $6}' | grep "^${dispwin_number} " | awk '{print $2}')"
+        if [ "$dispwin_output" = "$OUTPUT" ]; then
+            echo "Applying profile to ${OUTPUT}: ${PROFILE}"
+            dispwin -d${dispwin_number} "$PROFILE" 2> /dev/null
+        fi
+    done
+}
+
+
 while true; do
     case "$1" in
         --help)
@@ -33,15 +46,19 @@ while true; do
             ;;
         *)
             clear_existing_calibration
-            if [ $# -eq 1 ]; then
-                if ! [ -f "$1" ]; then
-                    echo 'error: profile not found' >&2
-                    exit 1
-                fi
+            if [ $# -eq 2 ]; then
                 PROFILE="$1"
+                OUTPUT="$2"
+                apply_profile "$OUTPUT" "$PROFILE"
+            elif [ $# -eq 1 ]; then
+                PROFILE="$1"
+                for OUTPUT in $(xrandr | grep ' connected ' | awk '{print $1}'); do
+                    apply_profile "$OUTPUT" "$PROFILE"
+                done
             elif [ $# -eq 0 ]; then
-                for output in $(xrandr | grep ' connected ' | awk '{print $1}'); do
-                    edid_b64="$(xrandr-edid "$output" | base64 -w0)"
+                for OUTPUT in $(xrandr | grep ' connected ' | awk '{print $1}'); do
+                    PROFILE=
+                    edid_b64="$(xrandr-edid "$OUTPUT" | base64 -w0)"
                     #echo "EDID Base64: ${edid_b64}"
                     case "$edid_b64" in
                         # mars lounge - Dell U2412M
@@ -64,19 +81,17 @@ while true; do
                         AP///////wBOFAVsAQAAADIeAQOAPCF4Krbgo1ZQoCcOUFS/7wCVAIGAswCBwEVoRXxhaGF8AjqAGHE4LUBYLEUAVlAhAAAeAAAA/QAwkB6gJAAKICAgICAgKkSAoHA4J0AwIDUAVlAhAAAAAAAA/ABTY2VwdHJlIE0yNwogAf4CAy7xSx8AAAQTAxICEQGQIwkHB4MBAABnAwwAIAAYRG0aAAACATCQ7QAAAAAAhm+AoHA4QEAwIDUAVlAhAAAe+CUAoFA4LUAwIDYAVlAhAAAa/n6AiHA4EkAYIDUAVlAhAAB/ZiFWqlEAHjBGjzMAVlAhAAB/AAAAAAAAAAAAVg==)
                             PROFILE="${DOTFILES}/icc/gisual Sceptre E275B-FPT165 D6500 2.2 F-S XYZLUT+MTX (monitor settings - red 49, green, 48, blue 49, gamma 2.2).icc"
                             ;;
+                        # mars office - LG C2 42"
+                        AP///////wAebcjAAQEBAQEfAQOAoFp4CO6Ro1RMmSYPUFShCAAxQEVAYUBxQIGA0cABAQEBCOgAMPJwWoCwWIoAQIRjAAAeb8IAoKCgVVAwIDUAQIRjAAAeAAAA/QAYeB7/dwAKICAgICAgAAAA/ABMRyBUViBTU0NSMgogAWcCA2ryV2FgdnUQHwQTBRQDAhIgISIVAV1eXz9ALAlXBxUHUFcHAWcEA20DDABAALg8LABgAQIDathdxAF4gFsCKHhtGgAAAgEoeAAAAAAAAOIAz+MFwADjBg0B4g//6wFG0ABIA3aCXm2VAAAAAAAAAAAAAAAAAAAAAAAAAAAAng==)
+                            PROFILE="${DOTFILES}/icc/FINAL SDR TV SSCR2 #1 2023-02-03 12-27 D6500 2.2 M-S 3xCurve.icm"
+                            ;;
                     esac
 
                     if [ -z "$PROFILE" ]; then
-                        echo "error: no profile detected for ${output}" >&2
+                        echo "error: no profile detected for ${OUTPUT}" >&2
+                    else
+                        apply_profile "$OUTPUT" "$PROFILE"
                     fi
-
-                    echo "Profile for ${output}: $PROFILE"
-                    for dispwin_number in $(dispwin -h 2>&1 | grep Output | awk '{print $1}'); do
-                        dispwin_output="$(dispwin -h 2>&1 | grep Output | awk '{print $1, $6}' | grep "^${dispwin_number} " | awk '{print $2}')"
-                        if [ "$dispwin_output" = "$output" ]; then
-                            dispwin -d${dispwin_number} "$PROFILE" 2> /dev/null
-                        fi
-                    done
                 done
             else
                 show_help

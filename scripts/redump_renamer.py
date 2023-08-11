@@ -193,11 +193,21 @@ async def main():
     parser.add_argument('--no-rename', action='store_true')
     parser.add_argument('--update', action='store_true')
     parser.add_argument('--verbose', action='store_true')
-    parser.add_argument('path', type=pathlib.Path, nargs='+')
+    parser.add_argument('path', type=pathlib.Path, nargs='*')
     args = parser.parse_args()
+
+    if not args.update and not args.path:
+        parser.error('a path is required')
 
     setup_logging(NAME,
                   level=logging.DEBUG if args.verbose else logging.INFO)
+
+    redump = Redump()
+    if args.update or not redump.hashes:
+        await redump.download_datfiles()
+
+    if args.update and not args.path:
+        parser.exit()
 
     if args.hashes:
         subprocess.run(
@@ -206,10 +216,6 @@ async def main():
              args.hashes.parent],
             check=True)
         FILE_HASH_RECORDER.update(json.loads(args.hashes.read_text()))
-
-    redump = Redump()
-    if args.update or not redump.hashes:
-        await redump.download_datfiles()
 
     for path in args.path:
         log_context('path', path)
