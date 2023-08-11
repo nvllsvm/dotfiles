@@ -36,10 +36,9 @@ class GitRepo:
 
         proc = await asyncio.create_subprocess_exec(
             *args, stdout=asyncio.subprocess.PIPE)
-        await proc.wait()
+        stdout, _ = await proc.communicate()
         if proc.returncode:
             raise RuntimeError(proc.returncode)
-        stdout = await proc.stdout.read()
 
         return {
             line
