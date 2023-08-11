@@ -5,7 +5,7 @@ else
     lf() {
         local tmp="$(mktemp)"
         # redirect stderr https://github.com/gokcehan/lf/issues/1167
-        "$__lf" -last-dir-path="$tmp" "$@"
+        "$__lf" -single -last-dir-path="$tmp" "$@"
         if [ -f "$tmp" ]; then
             local dir="$(cat "$tmp")"
             rm -f "$tmp"
