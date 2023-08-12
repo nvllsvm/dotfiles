@@ -57,7 +57,8 @@ class Dispwin:
     @staticmethod
     async def reset_calibration(display_num):
         proc = await asyncio.create_subprocess_exec(
-            'dispwin', '-c', '-d', str(display_num))
+            'dispwin', '-c', '-d', str(display_num),
+            stderr=asyncio.subprocess.DEVNULL)
         await proc.communicate()
         if proc.returncode:
             raise RuntimeError

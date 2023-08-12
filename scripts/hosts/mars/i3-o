@@ -14,10 +14,21 @@ on
 on-cool
 studio-monitors-on
 studio-monitors-off
+sound-tv
+sound-schiit-fulla
 EOF
 }
 
 OPTION="$(options | rofi -dmenu -p '' -i)"
-if [ -n "$OPTION" ]; then
-    hass office-"$OPTION"
-fi
+case "$OPTION" in
+    sound-tv)
+        pactl-set-only --profile 'alsa_card.pci-0000_0b_00.1' 'output:hdmi-stereo-extra2'
+        ;;
+    sound-schiit-fulla)
+        pactl-set-only --profile 'alsa_card.usb-Schiit_Audio_I_m_Fulla_Schiit-00' 'pro-audio'
+        ;;
+    *)
+        if [ -n "$OPTION" ]; then
+            hass office-"$OPTION"
+        fi
+esac

@@ -1,6 +1,4 @@
 #!/usr/bin/env sh
-office-tv off
 set-desktop-themes --dpi 96
-hass office-studio-monitors-on &
 pactl-set-only \
     --profile alsa_card.usb-BEHRINGER_UMC404HD_192k-00 pro-audio

@@ -44,6 +44,12 @@ class pactl:
 async def async_main(args):
     cards = await pactl.list_cards()
 
+    if args.list_active:
+        for card in cards:
+            if card['active_profile'] != 'off':
+                print(card['name'], card['active_profile'])
+        return
+
     if args.list:
         for card in cards:
             for profile, properties in card['profiles'].items():
@@ -67,6 +73,7 @@ async def async_main(args):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--list', action='store_true')
+    parser.add_argument('--list-active', action='store_true')
     parser.add_argument('--profile', nargs=2, action='append')
     args = parser.parse_args()
 
