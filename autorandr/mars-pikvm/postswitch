@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 set-desktop-themes --dpi 96
 pactl-set-only \
-    --profile alsa_card.usb-BEHRINGER_UMC404HD_192k-00 pro-audio
+    --profile 'UMC404HD 192k' 'Pro Audio'

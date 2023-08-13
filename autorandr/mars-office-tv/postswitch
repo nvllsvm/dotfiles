@@ -1,6 +1,8 @@
 #!/usr/bin/env sh
 set-desktop-themes --dpi 96 --medium-large
 
-pactl-set-only --profile 'alsa_card.usb-Schiit_Audio_I_m_Fulla_Schiit-00' 'pro-audio'
+pactl-set-only \
+    --profile 'BRIO Ultra HD Webcam' 'Digital Stereo (IEC958) Input' \
+    --profile "I'm Fulla Schiit" 'Pro Audio'
 
 i3-move-ws

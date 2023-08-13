@@ -47,25 +47,35 @@ async def async_main(args):
     if args.list_active:
         for card in cards:
             if card['active_profile'] != 'off':
-                print(card['name'], card['active_profile'])
+                print(card['properties']['device.product.name'])
+                print('  ', card['profiles'][card['active_profile']]['description'])
         return
 
     if args.list:
         for card in cards:
+            print(card['properties']['device.product.name'])
             for profile, properties in card['profiles'].items():
                 if properties['available']:
-                    print(card['name'], profile)
+                    print('  ', properties['description'])
         return
 
-    active_cards = set()
+    active_card_profiles = {}
     for card_name, profile_name in args.profile:
-        active_cards.add(card_name)
-        await pactl.set_profile(card_name, profile_name)
+        for card in cards:
+            if card['properties']['device.product.name'] == card_name:
+                for profile_id, profile in card['profiles'].items():
+                    if profile['description'] == profile_name:
+                        active_card_profiles[card['name']] = profile_id
+
+    await asyncio.gather(*[
+        pactl.set_profile(card_name, profile_name)
+        for card_name, profile_name in active_card_profiles.items()
+    ])
 
     await asyncio.gather(
         *[pactl.set_profile(card['name'],  'off')
           for card in cards
-          if card['name'] not in active_cards]
+          if card['name'] not in active_card_profiles]
     )
     await asyncio.gather(pactl.set_sink_mute(), pactl.set_source_mute())
 
@@ -74,7 +84,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--list', action='store_true')
     parser.add_argument('--list-active', action='store_true')
-    parser.add_argument('--profile', nargs=2, action='append')
+    parser.add_argument(
+        '--profile', metavar=('PRODUCT_NAME', 'PROFILE_DESCRIPTION'),
+        nargs=2, action='append')
     args = parser.parse_args()
 
     asyncio.run(async_main(args))

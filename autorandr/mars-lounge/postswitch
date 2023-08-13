@@ -1,8 +1,0 @@
-#!/usr/bin/env sh
-set-desktop-themes --dpi 96
-
-pactl-set-only \
-    --profile alsa_card.usb-046d_Logitech_BRIO_0EF7D381-03 input:iec958-stereo \
-    --profile alsa_card.usb-Schiit_Audio_I_m_Fulla_Schiit-00 output:iec958-stereo
-
-i3-move-ws
