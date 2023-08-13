@@ -22,10 +22,10 @@ EOF
 OPTION="$(options | rofi -dmenu -p '' -i)"
 case "$OPTION" in
     sound-tv)
-        pactl-set-only --profile 'alsa_card.pci-0000_0b_00.1.3' 'output:hdmi-stereo-extra2'
+        pactl-set-only --profile 'Navi 21/23 HDMI/DP Audio Controller' 'Digital Stereo (HDMI 3) Output'
         ;;
     sound-schiit-fulla)
-        pactl-set-only --profile 'alsa_card.usb-Schiit_Audio_I_m_Fulla_Schiit-00.3' 'pro-audio'
+        pactl-set-only --profile "I'm Fulla Schiit" 'Pro Audio'
         ;;
     *)
         if [ -n "$OPTION" ]; then
