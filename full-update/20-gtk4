@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+if command -v gtk4-launch > /dev/null; then
+    DEST=~/.config/'gtk-4.0'
+    if [ -d "$DEST" ] && [ "$(readlink -f "$DEST")" != "$DOTFILES/gtk-4.0" ]; then
+        echo 'error: unexpectedly exists' >&2
+        exit 1
+    else
+        mkdir -p ~/.config
+        ln -sf "$DOTFILES/gtk-4.0" "$DEST"
+    fi
+else
+    rm -rf "$DEST"
+fi
