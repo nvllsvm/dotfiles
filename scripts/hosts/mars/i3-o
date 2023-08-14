@@ -1,8 +1,6 @@
 #!/usr/bin/env sh
 options() {
     cat << EOF
-at-monitor-desk
-at-tv-desk
 closet-lights
 desk-lamp
 fan-light
