@@ -24,9 +24,9 @@ show_fzf() {
 
 set_note_file() {
     NOTE_FILE="$(note_contents | show_fzf)"
-    if [ -z "$NOTE_FILE" ]; then
-        NOTE_FILE="$(printf '' | fzf --print-query || true)"
-    fi
+    #if [ -z "$NOTE_FILE" ]; then
+    #    NOTE_FILE="$(printf '' | fzf --print-query || true)"
+    #fi
     if [ -z "$NOTE_FILE" ]; then
         exit
     fi
