@@ -1,77 +1,76 @@
-#!/usr/bin/env python3
-import argparse
-import asyncio
+#!/usr/bin/env sh
+notify() {
+    dunstify \
+        --hints=string:x-dunst-stack-tag:set-volume \
+        --hints=int:transient:1 \
+        'Volume' "$@"
+}
 
-
-async def notify(*args, transient=False, tag=None):
-    proc_args = [
-        'dunstify',
-    ]
-    if tag is not None:
-        proc_args.append(f'--hints=string:x-dunst-stack-tag:{tag}')
-    if transient:
-        proc_args.append('--hints=int:transient:1')
-    proc_args.extend(args)
-    proc = await asyncio.create_subprocess_exec(*proc_args)
-    await proc.communicate()
-
-
-async def action_input(args):
-    is_muted, _ = await pamixer(*args)
-    if is_muted:
-        await notify('🎙️ Microphone', '🚫', tag='sound-input')
-    else:
-        await notify('🎙️ Microphone', 'Recording', tag='sound-input')
-
-
-async def action_output(args):
-    is_muted, volume = await pamixer(*args)
-    rounded_volume = int(volume / VOLUME_STEP) * VOLUME_STEP
-    if volume != rounded_volume:
-        is_muted, volume = await pamixer('--set-volume', str(rounded_volume))
-    if is_muted:
-        await notify('Volume', '🔇', tag='sound-output')
-    else:
-        await notify('Volume', '-h', f'int:value:{volume}', tag='sound-output')
-
-
-async def pamixer(*args):
-    proc = await asyncio.create_subprocess_exec(
-        'pamixer', '--get-mute', '--get-volume', *args,
-        stdout=asyncio.subprocess.PIPE,
-    )
-    stdout, _ = await proc.communicate()
-    is_muted, volume = stdout.decode().strip().split()
-    is_muted = True if is_muted == 'true' else False
-    volume = int(volume)
-    return is_muted, volume
-
-
-ACTIONS = {
-    'output-up': (
-        action_output,
-        ['--unmute', '--increase', '5']),
-    'output-down': (
-        action_output,
-        ['--unmute', '--decrease', '5']),
-    'output-toggle-mute': (
-        action_output,
-        ['--toggle-mute']),
-    'input-toggle-mute': (
-        action_input,
-        ['--set-volume', '100', '--toggle-mute', '--default-source']),
+round_to_5() {
+    python -c 'import sys; volume=int(sys.argv[1]); sys.stdout.write(str(int(volume / 5)*5))' "$1"
 }
 
 
-async def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('action', choices=ACTIONS)
-    args = parser.parse_args()
+change_pamixer() {
+    case "$1" in
+        toggle-mute)
+            res="$(pamixer --get-mute --get-volume --toggle-mute)"
+            ;;
+        output-up)
+            res="$(pamixer --get-mute --get-volume --unmute --increase 5)"
+            ;;
+        output-down)
+            res="$(pamixer --get-mute --get-volume --unmute --decrease 5)"
+            ;;
+        *)
+            echo 'error: unexpected arguments' >&2
+            exit 1
+    esac
 
-    action_func, action_args = ACTIONS[args.action]
-    await action_func(action_args)
+    set -- $res
+    MUTED="$1"
+    VOLUME="$2"
 
+    case "$VOLUME" in
+        0|5)
+            ;;
+        *)
+            VOLUME="$(round_to_5 "$VOLUME")"
+            pamixer --set-volume "$VOLUME"
+            ;;
+    esac
 
-VOLUME_STEP = 5
-if __name__ == '__main__':
-    asyncio.run(main())
+    case "$MUTED" in
+        true)
+            notify 🔇
+            ;;
+        *)
+            notify -h "int:value:${VOLUME}"
+            ;;
+    esac
+}
+
+change_office_tv() {
+    case "$1" in
+        toggle-mute)
+            office-tv mute
+            ;;
+        output-up)
+            office-tv volume-up
+            ;;
+        output-down)
+            office-tv volume-down
+            ;;
+        *)
+            echo 'error: unexpected arguments' >&2
+            exit 1
+    esac
+}
+
+case "$(pamixer --get-default-sink)" in
+    *alsa_output.pci-0000_0b_00.1.5.hdmi-stereo*)
+        change_office_tv "$@"
+        ;;
+    *)
+        change_pamixer "$@"
+esac
