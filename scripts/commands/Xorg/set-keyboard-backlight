@@ -1,45 +1,94 @@
-#!/usr/bin/env sh
-DEV='/sys/class/leds/asus::kbd_backlight'
-IDLE_TIMEOUT=10
-STATE="${TMPDIR:-/tmp}/set-keyboard-backlight.state"
+#!/usr/bin/env python3
+import asyncio
+import argparse
+import enum
+import pathlib
 
-current() {
-    cat "${DEV}/brightness"
-}
+STATE_PATH = pathlib.Path('/tmp/set-keyboard-backlight.state')
+BACKLIGHT = pathlib.Path('/sys/class/leds/asus::kbd_backlight/brightness')
+KB_DEV = [
+    '/dev/input/by-id/usb-ASUSTeK_Computer_Inc._N-KEY_Device-event-if00',
+    '/dev/input/by-id/usb-ASUSTeK_Computer_Inc._N-KEY_Device-if02-event-kbd',
+]
+TOUCHPAD_SYS = '/sys/devices/platform/AMDI0010:03/i2c-1/i2c-ELAN1201:00/0018:04F3:3098.000A/input'
 
-usage() {
-    echo 'usage: set-keyboard-backlight (inc|dec|idle-toggle)'
-}
+TIMEOUT = 5
 
-case $# in
-    0)
-        echo "${CURRENT}"
-        exit
-        ;;
-    1)
-        case "$1" in
-            inc)
-                new_brightness="$(($(current) + 1))"
-                echo "$new_brightness" | tee "${DEV}/brightness" "${STATE}"
-                ;;
-            dec)
-                new_brightness="$(($(current) - 1))"
-                if [ "$new_brightness" -ge 0 ]; then
-                    echo "$new_brightness" | tee "${DEV}/brightness" "${STATE}"
-                fi
-                ;;
-            idle-toggle)
-                current > "${STATE}"
-                exec xidlehook --timer "${IDLE_TIMEOUT}" "echo 0 > ${DEV}/brightness" "cat ${STATE} > ${DEV}/brightness"
-                ;;
-            *)
-                usage >&2
-                echo 'error: unknown action' >&2
-                exit 1
-        esac
-        ;;
-    *)
-        usage >&2
-        echo 'error: unexpected arguments' >&2
-        exit 1
-esac
+
+class Backlight(enum.Enum):
+    off = 0
+    low = 1
+    medium = 2
+    high = 3
+
+    @classmethod
+    def get(cls):
+        return cls(int(BACKLIGHT.read_text()))
+
+    @classmethod
+    def set(cls, value):
+        BACKLIGHT.write_text(str(value.value))
+
+    @classmethod
+    def increase(cls):
+        current = cls.get()
+        if current.value < cls.high.value:
+            BACKLIGHT.write_text(str(cls(current.value+1).value))
+
+    @classmethod
+    def decrease(cls):
+        current = cls.get()
+        if current.value > cls.off.value:
+            BACKLIGHT.write_text(str(cls(current.value-1).value))
+
+
+
+def get_devices():
+    devices = [*KB_DEV]
+    for path in pathlib.Path(TOUCHPAD_SYS).glob('**/event*'):
+        dev_path = pathlib.Path('/dev/input') / path.name
+        if dev_path.exists():
+            devices.append(dev_path)
+    return devices
+
+
+async def autodim_idle():
+    devices = get_devices()
+    proc = await asyncio.create_subprocess_exec(
+        'inotifywait', '-mrcq', *devices,
+        stdout=asyncio.subprocess.PIPE)
+
+    is_timedout = False
+    while True:
+        timeout = None if is_timedout else TIMEOUT
+        try:
+            await asyncio.wait_for(proc.stdout.readline(), timeout)
+        except asyncio.TimeoutError:
+            is_timedout = True
+            STATE_PATH.write_text(str(Backlight.get().value))
+            Backlight.set(Backlight.off)
+        else:
+            if is_timedout:
+                try:
+                    state = Backlight(int(STATE_PATH.read_text()))
+                except Exception:
+                    state = Backlight.off
+                Backlight.set(state)
+                is_timedout = False
+
+
+async def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('action')
+    args = parser.parse_args()
+
+    if args.action == 'inc':
+        Backlight.increase()
+    elif args.action == 'dec':
+        Backlight.decrease()
+    elif args.action == 'autodim-idle':
+        await autodim_idle()
+
+
+if __name__ == '__main__':
+    asyncio.run(main())
