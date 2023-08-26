@@ -1,0 +1,25 @@
+#!/usr/bin/env sh
+options() {
+    cat << EOF
+autorandr-internal
+autorandr-internal-120
+autorandr-gisual-desk
+EOF
+}
+
+OPTION="$(options | rofi -dmenu -p '' -i)"
+case "$OPTION" in
+    autorandr-internal)
+        autorandr --force --load phobos-internal
+        ;;
+    autorandr-internal-120)
+        autorandr --force --load phobos-internal-120
+        ;;
+    autorandr-gisual-desk)
+        autorandr --force --load phobos-gisual-desk
+        ;;
+    *)
+        if [ -n "$OPTION" ]; then
+            hass office-"$OPTION"
+        fi
+esac
