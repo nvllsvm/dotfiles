@@ -56,7 +56,7 @@ class VolumeOutput:
 
     async def action(self, action):
         is_muted, volume = await self.pamixer(*self.ACTIONS[action])
-        rounded_volume = self.round_to_nearest(volume, 5)
+        rounded_volume = round_to_nearest(volume, 5)
         if volume != rounded_volume:
             is_muted, volume = await self.pamixer(
                 '--set-volume', str(rounded_volume))
@@ -136,20 +136,36 @@ class DisplayBacklight:
     STEP = 10
 
     ACTIONS = {
-        'up': 1,
-        'down': -1,
+        'up',
+        'down',
     }
 
     def __init__(self, dbus):
         self.dbus = dbus
+        self.dbus_replaces_id = None
 
     async def action(self, action):
-        backlight = await self.get_backlight()
-        if backlight == 100:
-            return
-        step = self.ACTIONS[action] * self.STEP
-        new_backlight = round_to_nearest(backlight + step, self.STEP)
-        await self.set_backlight(new_backlight)
+        backlight = round(await self.get_backlight())
+        if action == 'up':
+            new_backlight = min(self.MAX_VALUE, backlight + self.STEP)
+        elif action == 'down':
+            new_backlight = max(self.MIN_VALUE, backlight - self.STEP)
+        if self.MIN_VALUE < new_backlight < self.MAX_VALUE:
+            new_backlight = round_to_nearest(new_backlight, self.STEP)
+        print(backlight, new_backlight)
+        if new_backlight != backlight:
+            await self.set_backlight(new_backlight)
+
+        hints = {
+            'x-dunst-stack-tag': 'hotkey-daemon-display-backlight',
+            'value': new_backlight,
+            'transient': 1,
+            'urgency': 1,
+        }
+        self.dbus_replaces_id = self.dbus.notify(
+            summary='Backlight',
+            hints=hints,
+            replaces_id=self.dbus_replaces_id)
 
     @staticmethod
     async def set_backlight(value):
