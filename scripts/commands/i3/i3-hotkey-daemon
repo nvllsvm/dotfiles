@@ -129,6 +129,36 @@ def round_to_nearest(value, nearest):
     return int(value / nearest) * nearest
 
 
+class KeyboardBacklight:
+    DEV = '/sys/class/leds/asus::kbd_backlight/brightness'
+    STATE = '/tmp/set-keyboard-backlight.state'
+
+    ACTIONS = {
+        'up',
+        'down',
+    }
+
+    MIN_VALUE = 0
+    MAX_VALUE = 3
+
+    def __init__(self):
+        self.dev = pathlib.Path(self.DEV)
+
+    async def action(self, action):
+        match action:
+            case 'up':
+                brightness = min(self.MAX_VALUE, self.current_brightness() + 1)
+            case 'down':
+                brightness = max(self.MIN_VALUE, self.current_brightness() - 1)
+        self.set_brightness(brightness)
+
+    def current_brightness(self):
+        return int(self.dev.read_text())
+
+    def set_brightness(self, value):
+        self.dev.write_text(str(value))
+
+
 class DisplayBacklight:
     MAX_VALUE = 100
     MIN_VALUE = 1
@@ -203,7 +233,6 @@ def cleanup_lingering_predecessors():
     for proc in psutil.process_iter(['pid', 'cmdline']):
         if proc.pid == pid:
             continue
-        name = proc.cmdline()
         for arg in proc.cmdline():
             if 'i3-hotkey-daemon' in arg or 'i3-hotkey-client' in arg:
                 os.kill(proc.pid, 9)
@@ -215,15 +244,17 @@ async def action_loop():
 
     dbus_notifier = DBusNotifier()
     action_types = {
-        'volume-output': VolumeOutput(dbus_notifier),
-        'volume-input': VolumeInput(dbus_notifier),
         'display-backlight': DisplayBacklight(dbus_notifier),
+        'keyboard-backlight': KeyboardBacklight(),
+        'volume-input': VolumeInput(dbus_notifier),
+        'volume-output': VolumeOutput(dbus_notifier),
     }
 
     while True:
         with open_fifo() as fifo:
             for line in fifo:
                 action_type, action = line.split()
+                print(action_type, action)
                 try:
                     await action_types[action_type].action(action)
                 except Exception as e:

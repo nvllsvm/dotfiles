@@ -13,9 +13,6 @@ missing_format = ""
 block = "sound"
 device_kind = "source"
 max_vol = 100
-[[block.click]]
-button = "left"
-cmd = "toggle-source-mute"
 
 [[block]]
 block = "sound"
