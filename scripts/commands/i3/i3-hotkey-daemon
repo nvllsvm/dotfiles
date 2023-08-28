@@ -1,0 +1,229 @@
+#!/usr/bin/env python3
+import argparse
+import asyncio
+import contextlib
+import os
+import pathlib
+import subprocess
+import sys
+
+import dbus
+import psutil
+
+FIFO_PATH = '/tmp/i3-hotkey-daemon.fifo'
+
+
+class DBusNotifier:
+    BUS_NAME = 'org.freedesktop.Notifications'
+    OBJECT_PATH = '/org/freedesktop/Notifications'
+
+    def __init__(self):
+        self.interface = dbus.Interface(
+            dbus.SessionBus().get_object(self.BUS_NAME,
+                                         self.OBJECT_PATH),
+            self.BUS_NAME)
+
+    def notify(self,
+               /,
+               app_name='',
+               replaces_id=None,
+               app_icon='',
+               summary='',
+               body='',
+               actions=None,
+               hints=None,
+               expire_timeout=-1):
+
+        replaces_id = replaces_id or 0
+        actions = actions or []
+        hints = hints or {}
+
+        return self.interface.Notify(
+            app_name, replaces_id, app_icon, summary, body, actions, hints,
+            expire_timeout)
+
+
+class VolumeOutput:
+    ACTIONS = {
+        'up': ['--increase', '5'],
+        'down': ['--decrease', '5'],
+        'toggle-mute': ['--toggle-mute'],
+    }
+
+    def __init__(self, dbus):
+        self.dbus = dbus
+        self.dbus_replaces_id = None
+
+    async def action(self, action):
+        is_muted, volume = await self.pamixer(*self.ACTIONS[action])
+        rounded_volume = self.round_to_nearest(volume, 5)
+        if volume != rounded_volume:
+            is_muted, volume = await self.pamixer(
+                '--set-volume', str(rounded_volume))
+
+        hints = {
+            'x-dunst-stack-tag': 'hotkey-daemon-volume-output',
+            'transient': 1,
+            'urgency': 1,
+        }
+        if is_muted:
+            body = '🔇'
+        else:
+            body = ''
+            hints['value'] = volume
+        self.dbus_replaces_id = self.dbus.notify(
+            summary='Volume',
+            body=body,
+            hints=hints,
+            replaces_id=self.dbus_replaces_id)
+
+    @staticmethod
+    async def pamixer(*args):
+        proc = await asyncio.create_subprocess_exec(
+            'pamixer', '--get-mute', '--get-volume', *args,
+            stdout=asyncio.subprocess.PIPE,
+        )
+        stdout, _ = await proc.communicate()
+        is_muted, volume = stdout.decode().strip().split()
+        is_muted = True if is_muted == 'true' else False
+        volume = int(volume)
+        return is_muted, volume
+
+
+class VolumeInput:
+    ACTIONS = {
+        'toggle-mute': ['--toggle-mute', '--set-volume', '100'],
+    }
+
+    def __init__(self, dbus):
+        self.dbus = dbus
+        self.dbus_replaces_id = None
+
+    async def action(self, action):
+        is_muted = await self.pamixer(*self.ACTIONS[action])
+        hints = {
+            'x-dunst-stack-tag': 'hotkey-daemon-volume-input',
+            'transient': 1,
+            'urgency': 1,
+        }
+        body = '🚫' if is_muted else 'Recording'
+        self.dbus_replaces_id = self.dbus.notify(
+            summary='🎙️ Microphone',
+            body=body,
+            hints=hints,
+            replaces_id=self.dbus_replaces_id)
+
+    @staticmethod
+    async def pamixer(*args):
+        proc = await asyncio.create_subprocess_exec(
+            'pamixer', '--get-mute', '--default-source', *args,
+            stdout=asyncio.subprocess.PIPE,
+        )
+        stdout, _ = await proc.communicate()
+        is_muted = stdout.decode().strip()
+        is_muted = True if is_muted == 'true' else False
+        return is_muted
+
+
+def round_to_nearest(value, nearest):
+    return int(value / nearest) * nearest
+
+
+class DisplayBacklight:
+    MAX_VALUE = 100
+    MIN_VALUE = 1
+
+    STEP = 10
+
+    ACTIONS = {
+        'up': 1,
+        'down': -1,
+    }
+
+    def __init__(self, dbus):
+        self.dbus = dbus
+
+    async def action(self, action):
+        backlight = await self.get_backlight()
+        if backlight == 100:
+            return
+        step = self.ACTIONS[action] * self.STEP
+        new_backlight = round_to_nearest(backlight + step, self.STEP)
+        await self.set_backlight(new_backlight)
+
+    @staticmethod
+    async def set_backlight(value):
+        proc = await asyncio.create_subprocess_exec(
+            'light', '-S', str(value))
+        await proc.communicate()
+        if proc.returncode != 0:
+            raise RuntimeError
+
+    @staticmethod
+    async def get_backlight():
+        proc = await asyncio.create_subprocess_exec(
+            'light',
+            stdout=asyncio.subprocess.PIPE)
+        stdout, _ = await proc.communicate()
+        if proc.returncode != 0:
+            raise RuntimeError
+        return float(stdout.decode().strip())
+
+
+@contextlib.contextmanager
+def open_fifo():
+    fifo_path = pathlib.Path(FIFO_PATH)
+    try:
+        fifo_path.unlink()
+    except FileNotFoundError:
+        pass
+    os.mkfifo(fifo_path)
+    with open(fifo_path, 'r') as fifo:
+        yield fifo
+
+
+def cleanup_lingering_predecessors():
+    pid = os.getpid()
+    for proc in psutil.process_iter(['pid', 'cmdline']):
+        if proc.pid == pid:
+            continue
+        name = proc.cmdline()
+        for arg in proc.cmdline():
+            if 'i3-hotkey-daemon' in arg or 'i3-hotkey-client' in arg:
+                os.kill(proc.pid, 9)
+                break
+
+
+async def action_loop():
+    cleanup_lingering_predecessors()
+
+    dbus_notifier = DBusNotifier()
+    action_types = {
+        'volume-output': VolumeOutput(dbus_notifier),
+        'volume-input': VolumeInput(dbus_notifier),
+        'display-backlight': DisplayBacklight(dbus_notifier),
+    }
+
+    while True:
+        with open_fifo() as fifo:
+            for line in fifo:
+                action_type, action = line.split()
+                try:
+                    await action_types[action_type].action(action)
+                except Exception as e:
+                    print(e, file=sys.stderr)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--loop', action='store_true')
+    args = parser.parse_args()
+
+    if args.loop:
+        asyncio.run(action_loop())
+    else:
+        subprocess.Popen(['i3-hotkey-daemon', '--loop'])
+
+
+if __name__ == '__main__':
+    main()

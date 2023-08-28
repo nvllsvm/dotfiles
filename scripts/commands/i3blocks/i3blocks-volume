@@ -1,6 +1,0 @@
-#!/usr/bin/env sh
-if [ "$relative_x" -gt "$(expr "$width" / 2)" ]; then
-    set-volume --unmute --increase 5
-else
-    set-volume --unmute --decrease 5
-fi
