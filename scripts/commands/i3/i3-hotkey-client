@@ -1,3 +1,2 @@
 #!/usr/bin/env sh
-printf 'i3-hotkey-client' > /proc/$$/comm
 printf '%s' "$*" >> /tmp/i3-hotkey-daemon.fifo
