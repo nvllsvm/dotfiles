@@ -45,8 +45,8 @@ class DBusNotifier:
 
 class VolumeOutput:
     ACTIONS = {
-        'up': ['--increase', '5'],
-        'down': ['--decrease', '5'],
+        'up': ['--unmute', '--increase', '5'],
+        'down': ['--unmute', '--decrease', '5'],
         'toggle-mute': ['--toggle-mute'],
     }
 
