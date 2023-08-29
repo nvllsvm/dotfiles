@@ -1,4 +1,8 @@
 #!/usr/bin/env sh
-set-desktop-themes --dpi 96
+set-desktop-themes --dpi 96 --medium-large
+
 pactl-set-only \
-    --profile 'UMC404HD 192k' 'Pro Audio'
+    --profile 'BRIO Ultra HD Webcam' 'Digital Stereo (IEC958) Input' \
+    --profile "I'm Fulla Schiit" 'Pro Audio'
+
+i3-move-ws
