@@ -9,7 +9,6 @@ import subprocess
 import sys
 
 import dbus
-import mpd  # python-mpd2
 import psutil
 
 FIFO_PATH = '/tmp/i3-hotkey-daemon.fifo'
@@ -43,51 +42,6 @@ class DBusNotifier:
         return self.interface.Notify(
             app_name, replaces_id, app_icon, summary, body, actions, hints,
             expire_timeout)
-
-
-class MPD:
-    ACTIONS = {
-        'next',
-        'prev',
-        'toggle',
-    }
-
-    def __init__(self, dbus):
-        self.dbus = dbus
-        self.dbus_replaces_id = None
-        self.connect()
-
-    async def action(self, action):
-        match action:
-            case 'toggle':
-                if self.is_playing():
-                    if self.is_streaming():
-                        self.mpd.stop()
-                    else:
-                        self.mpd.pause()
-                else:
-                    self.mpd.play()
-            case 'next':
-                self.mpd.next()
-            case 'prev':
-                self.mpd.previous()
-
-    def connect(self):
-        runtime_dir = os.environ['XDG_RUNTIME_DIR']
-        if runtime_dir:
-            socket = pathlib.Path(runtime_dir) / 'mpd' / 'socket'
-            if socket.exists():
-                mpd_host = str(socket)
-        self.mpd = mpd.MPDClient()
-        self.mpd.connect(mpd_host)
-
-    def is_streaming(self):
-        current_file = self.mpd.currentsong().get('file', '')
-        return current_file.lower().startswith(('http://', 'https://'))
-
-    def is_playing(self):
-        return self.mpd.status()['state'] == 'play'
-
 
 
 class VolumeOutput:
@@ -383,7 +337,6 @@ async def action_loop():
     action_types = {
         'display-backlight': DisplayBacklight(dbus_notifier),
         'keyboard-backlight': KeyboardBacklight(),
-        'mpd': MPD(dbus_notifier),
         'touchpad': Touchpad(dbus_notifier),
         'volume-input': VolumeInput(dbus_notifier),
         'volume-output': VolumeOutput(dbus_notifier),
@@ -397,10 +350,7 @@ async def action_loop():
                 except Exception:
                     continue
                 print(action_type, action)
-                try:
-                    await action_types[action_type].action(action)
-                except Exception as e:
-                    print(e, file=sys.stderr)
+                await action_types[action_type].action(action)
 
 
 def main():
