@@ -79,6 +79,7 @@ for name in [
         'iso8601',
         'magic',
         'mutagen',
+        'psutil',
         'requests',
         'sqlitedict',
         'tabulate',

@@ -368,13 +368,12 @@ def open_fifo():
 
 def cleanup_lingering_predecessors():
     pid = os.getpid()
-    for proc in psutil.process_iter(['pid', 'cmdline']):
+    pathlib.Path(f'/proc/{pid}/comm').write_text('i3-hotkey-daemon\n')
+    for proc in psutil.process_iter(['pid', 'name']):
         if proc.pid == pid:
             continue
-        for arg in proc.cmdline():
-            if 'i3-hotkey-daemon' in arg or 'i3-hotkey-client' in arg:
-                os.kill(proc.pid, 9)
-                break
+        if proc.name().startswith('i3-hotkey-'):
+            os.kill(proc.pid, 9)
 
 
 async def action_loop():
@@ -393,7 +392,10 @@ async def action_loop():
     while True:
         with open_fifo() as fifo:
             for line in fifo:
-                action_type, action = line.split()
+                try:
+                    action_type, action = line.split()
+                except Exception:
+                    continue
                 print(action_type, action)
                 try:
                     await action_types[action_type].action(action)
