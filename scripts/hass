@@ -85,12 +85,6 @@ async def office_on_cool(_):
         'scene', 'turn_on', entity_id='scene.office_on_cyan')
 
 
-async def office_desk_lamp_toggle(_):
-    hass = HASS(URL, TOKEN)
-    await hass.post_services(
-        'light', 'toggle', entity_id='light.office_desk_lamp')
-
-
 async def office_closet_lights_toggle(_):
     hass = HASS(URL, TOKEN)
     await hass.post_services(
@@ -113,75 +107,6 @@ async def office_studio_monitors_off(_):
     hass = HASS(URL, TOKEN)
     await hass.post_services(
         'switch', 'turn_off', entity_id='switch.office_studio_monitors')
-
-
-async def office_tv_on(_):
-    hass = HASS(URL, TOKEN)
-    await hass.post_services(
-        'media_player', 'turn_on', entity_id='media_player.office_tv')
-
-    # buggy bullshit
-    async def ensure_setup():
-        while True:
-            attributes = [
-                state['attributes']
-                for state in await hass.get_states()
-                if state['entity_id'] == 'media_player.office_tv'
-            ][0]
-
-            futures = []
-            if attributes.get('volume_level') != 0.1:
-                futures.append(hass.post_services(
-                    'media_player', 'volume_set',
-                    entity_id='media_player.office_tv',
-                    volume_level=0.1))
-            elif attributes.get('source') != 'PC':
-                futures.append(hass.post_services(
-                    'media_player', 'select_source',
-                    entity_id='media_player.office_tv',
-                    source='PC'))
-
-            if futures:
-                await asyncio.gather(*futures)
-            else:
-                break
-            await asyncio.sleep(0.1)
-
-    await asyncio.wait_for(ensure_setup(), TIMEOUT)
-
-
-async def office_tv_off(_):
-    hass = HASS(URL, TOKEN)
-    await hass.post_services(
-        'media_player', 'turn_off',
-        entity_id='media_player.office_tv')
-
-
-async def office_tv_mute_toggle(_):
-    hass = HASS(URL, TOKEN)
-    is_muted = [
-        state['attributes']['is_volume_muted']
-        for state in await hass.get_states()
-        if state['entity_id'] == 'media_player.office_tv'
-    ][0]
-    await hass.post_services(
-        'media_player', 'volume_mute',
-        entity_id='media_player.office_tv',
-        is_volume_muted=not is_muted)
-
-
-async def office_tv_volume_up(_):
-    hass = HASS(URL, TOKEN)
-    await hass.post_services(
-        'media_player', 'volume_up',
-        entity_id='media_player.office_tv')
-
-
-async def office_tv_volume_down(_):
-    hass = HASS(URL, TOKEN)
-    await hass.post_services(
-        'media_player', 'volume_down',
-        entity_id='media_player.office_tv')
 
 
 async def get_states(args):
@@ -218,23 +143,6 @@ async def main():
     post_services_parser.add_argument('entity_id')
 
     # specific
-    office_tv_on_parser = subparsers.add_parser('office-tv-on')
-    office_tv_on_parser.set_defaults(func=office_tv_on)
-
-    office_tv_off_parser = subparsers.add_parser('office-tv-off')
-    office_tv_off_parser.set_defaults(func=office_tv_off)
-
-    office_tv_mute_toggle_parser = subparsers.add_parser(
-        'office-tv-mute-toggle')
-    office_tv_mute_toggle_parser.set_defaults(func=office_tv_mute_toggle)
-
-    office_tv_volume_up_parser = subparsers.add_parser('office-tv-volume-up')
-    office_tv_volume_up_parser.set_defaults(func=office_tv_volume_up)
-
-    office_tv_volume_down_parser = subparsers.add_parser(
-        'office-tv-volume-down')
-    office_tv_volume_down_parser.set_defaults(func=office_tv_volume_down)
-
     office_studio_monitors_on_parser = subparsers.add_parser(
         'office-studio-monitors-on')
     office_studio_monitors_on_parser.set_defaults(
@@ -249,11 +157,6 @@ async def main():
         'office-closet-lights')
     office_closet_lights_on_parser.set_defaults(
         func=office_closet_lights_toggle)
-
-    office_desk_lamp_on_parser = subparsers.add_parser(
-        'office-desk-lamp')
-    office_desk_lamp_on_parser.set_defaults(
-        func=office_desk_lamp_toggle)
 
     office_fan_light_toggle_parser = subparsers.add_parser(
         'office-fan-light')

@@ -4,15 +4,52 @@ import contextlib
 import logging
 import os
 import pathlib
-import subprocess
 import sys
 import time
 
+import dbus
 import mpd  # python-mpd2
 
 _LOGGER = logging.getLogger('mpd-notifier')
 
 _ALBUMART_PATH = '/tmp/mpd-notifier_image'
+
+_PROCESS_NAME = 'mpd-notifier'
+
+
+class DBusNotifier:
+    BUS_NAME = 'org.freedesktop.Notifications'
+    OBJECT_PATH = '/org/freedesktop/Notifications'
+
+    def __init__(self):
+        self.interface = dbus.Interface(
+            dbus.SessionBus().get_object(self.BUS_NAME,
+                                         self.OBJECT_PATH),
+            self.BUS_NAME)
+
+    def notify(self,
+               /,
+               app_name='',
+               replaces_id=None,
+               app_icon='',
+               summary='',
+               body='',
+               actions=None,
+               hints=None,
+               expire_timeout=-1):
+
+        replaces_id = replaces_id or 0
+        actions = actions or []
+        hints = hints or {}
+
+        return self.interface.Notify(
+            app_name, replaces_id, app_icon, summary, body, actions, hints,
+            expire_timeout)
+
+
+def set_process_name(value):
+    path = pathlib.Path(f'/proc/{os.getpid()}/comm')
+    path.write_text(value)
 
 
 @contextlib.contextmanager
@@ -49,64 +86,68 @@ def tmp_art_path():
         yield _ALBUMART_PATH + '_b'
 
 
-def _run(client):
-    art_path_iterator = tmp_art_path()
-    while True:
-        status = client.status()
-        client.idle()
-        new_status = client.status()
+class MPDNotifier:
+    def __init__(self, dbus_notifier):
+        self.dbus = dbus_notifier
+        self.dbus_replaces_id = None
 
-        if new_status['state'] == 'stop':
-            if status['state'] == 'play':
-                _dunstify('[stopped]')
-            continue
+    def run(self, client):
+        art_path_iterator = tmp_art_path()
+        while True:
+            status = client.status()
+            client.idle()
+            new_status = client.status()
 
-        if status.get('songid') == new_status.get('songid'):
-            if status['state'] == new_status['state']:
-                if new_status['time'].split(':')[0] != '0':
-                    continue
+            if new_status['state'] == 'stop':
+                if status['state'] == 'play':
+                    self.notify('[stopped]')
+                continue
 
-        current = client.currentsong()
-        if not current:
-            continue
+            if status.get('songid') == new_status.get('songid'):
+                if status['state'] == new_status['state']:
+                    if new_status['time'].split(':')[0] != '0':
+                        continue
 
-        # TODO cache this
-        try:
-            albumart = client.albumart(current['file'])
-        except Exception as e:
-            print(e, file=sys.stderr)
-            break
-        if albumart:
-            art_path = next(art_path_iterator)
-            with open(art_path, 'wb') as f:
-                f.write(albumart['binary'])
-        else:
-            art_path = None
+            current = client.currentsong()
+            if not current:
+                continue
 
-        if new_status['state'] == 'pause':
-            _dunstify(
-                '[paused]',
-                icon=art_path)
-        else:
-            _dunstify(
-                '<b>{}</b>\n{}'.format(
-                    current['title'],
-                    current['artist']),
-                icon=art_path)
+            # TODO cache this
+            try:
+                albumart = client.albumart(current['file'])
+            except Exception as e:
+                print(e, file=sys.stderr)
+                break
+            if albumart:
+                art_path = next(art_path_iterator)
+                with open(art_path, 'wb') as f:
+                    f.write(albumart['binary'])
+            else:
+                art_path = None
 
+            if new_status['state'] == 'pause':
+                self.notify(
+                    '[paused]',
+                    icon=art_path)
+            else:
+                self.notify(
+                    '<b>{}</b>\n{}'.format(
+                        current['title'],
+                        current['artist']),
+                    icon=art_path)
 
-def _dunstify(text, icon=None):
-    args = [
-        'dunstify',
-        'mpd',
-        text,
-        '--hints=int:transient:1',
-        '--hints=string:x-dunst-stack-tag:mpd-notifier',
-        '--appname', 'mpd-notifier',
-    ]
-    if icon:
-        args.extend(['--icon', str(icon)])
-    subprocess.run(args, check=True)
+    def notify(self, body, icon=None):
+        hints = {
+            'x-dunst-stack-tag': 'mpd-notifier',
+            'transient': 1,
+            'urgency': 1,
+        }
+        self.dbus_replaces_id = self.dbus.notify(
+            app_name='mpd-notifier',
+            app_icon=icon,
+            body=body,
+            hints=hints,
+            replaces_id=self.dbus_replaces_id)
 
 
 def main():
@@ -114,6 +155,8 @@ def main():
     parser.add_argument('--host')
     parser.add_argument('--port', type=int, default=6600)
     args = parser.parse_args()
+
+    set_process_name(_PROCESS_NAME)
 
     mpd_host = args.host
     if mpd_host is None:
@@ -127,11 +170,13 @@ def main():
 
     logging.basicConfig(level=logging.INFO, format='%(message)s')
 
+    dbus_notifier = DBusNotifier()
+    mpd_notifier = MPDNotifier(dbus_notifier)
     while True:
         with _mpd_client(mpd_host, args.port) as client:
             client.timeout = 5
             try:
-                _run(client)
+                mpd_notifier.run(client)
             except mpd.ConnectionError:
                 pass
 
