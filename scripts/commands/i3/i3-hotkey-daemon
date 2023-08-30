@@ -6,7 +6,7 @@ import os
 import pathlib
 import re
 import subprocess
-import sys
+import traceback
 
 import dbus
 import psutil
@@ -347,10 +347,11 @@ async def action_loop():
             for line in fifo:
                 try:
                     action_type, action = line.split()
-                except Exception:
+                    print(action_type, action)
+                    await action_types[action_type].action(action)
+                except Exception as e:
+                    traceback.print_exception(e)
                     continue
-                print(action_type, action)
-                await action_types[action_type].action(action)
 
 
 def main():
