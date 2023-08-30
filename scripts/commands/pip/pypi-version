@@ -1,0 +1,49 @@
+#!/usr/bin/env python3
+import argparse
+import subprocess
+import sys
+
+import packaging.version
+
+
+def pip_index_versions(package):
+    proc = subprocess.run(
+        ['pip', 'index', 'versions', '--ignore-requires-python', package],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        check=True)
+
+    for line in proc.stdout.decode().splitlines():
+        new_line = line.removeprefix('Available versions: ')
+        if new_line != line:
+            return new_line.split(', ')
+    raise RuntimeError
+
+
+def sort_versions(versions):
+    sorted_versions = []
+    for v in versions:
+        try:
+            sorted_versions.append(packaging.version.parse(v))
+        except packaging.version.InvalidVersion as e:
+            print(e, file=sys.stderr)
+    return sorted(str(v) for v in sorted_versions)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-a', '--all', action='store_true')
+    parser.add_argument('package')
+    args = parser.parse_args()
+
+    versions = pip_index_versions(args.package)
+    versions = sort_versions(versions)
+    if args.all:
+        for v in versions:
+            print(v)
+    else:
+        print(versions[-1])
+
+
+if __name__ == '__main__':
+    main()
