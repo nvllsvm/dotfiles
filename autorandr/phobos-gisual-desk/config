@@ -14,6 +14,7 @@ mode 1920x1080
 pos 0x0
 primary
 rate 144.00
+x-prop-colorspace Default
 x-prop-max_bpc 8
 x-prop-non_desktop 0
 x-prop-scaling_mode None
@@ -26,6 +27,7 @@ crtc 2
 mode 1920x1080
 pos 1920x0
 rate 119.98
+x-prop-colorspace Default
 x-prop-max_bpc 8
 x-prop-non_desktop 0
 x-prop-scaling_mode None
