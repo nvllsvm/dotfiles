@@ -13,10 +13,12 @@ proc = subprocess.run(
 for line in proc.stdout.decode().splitlines():
     new_line = line.removeprefix('Available versions: ')
     if new_line != line:
-        versions = [
-            packaging.version.parse(v)
-            for v in new_line.split(', ')
-        ]
+        versions = []
+        for v in new_line.split(', '):
+            try:
+                versions.append(packaging.version.parse(v))
+            except packaging.version.InvalidVersion as e:
+                print(e, file=sys.stderr)
         break
 
 for version in sorted(versions):
