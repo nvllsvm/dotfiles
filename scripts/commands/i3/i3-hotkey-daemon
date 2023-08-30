@@ -228,6 +228,7 @@ class KeyboardBacklight:
     ACTIONS = {
         'up',
         'down',
+        'off',
     }
 
     MIN_VALUE = 0
@@ -242,6 +243,8 @@ class KeyboardBacklight:
                 brightness = min(self.MAX_VALUE, self.current_brightness() + 1)
             case 'down':
                 brightness = max(self.MIN_VALUE, self.current_brightness() - 1)
+            case 'off':
+                brightness = 0
         self.set_brightness(brightness)
 
     def current_brightness(self):
