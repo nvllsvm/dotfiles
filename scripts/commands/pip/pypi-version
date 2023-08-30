@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 import argparse
 import subprocess
-import sys
-
-import packaging.version
 
 
 def pip_index_versions(package):
@@ -20,29 +17,19 @@ def pip_index_versions(package):
     raise RuntimeError
 
 
-def sort_versions(versions):
-    sorted_versions = []
-    for v in versions:
-        try:
-            sorted_versions.append(packaging.version.parse(v))
-        except packaging.version.InvalidVersion as e:
-            print(e, file=sys.stderr)
-    return sorted(str(v) for v in sorted_versions)
-
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-a', '--all', action='store_true')
     parser.add_argument('package')
     args = parser.parse_args()
 
+    # seems to be sorted newest to oldest
     versions = pip_index_versions(args.package)
-    versions = sort_versions(versions)
     if args.all:
-        for v in versions:
+        for v in reversed(versions):
             print(v)
     else:
-        print(versions[-1])
+        print(versions[0])
 
 
 if __name__ == '__main__':
