@@ -13,6 +13,4 @@ get_mime() {
 }
 fi
 
-for i in "$@"; do
-    printf '%s\t%s\n' "$(get_mime "$i")" "$i"
-done
+get_mime "$1"
