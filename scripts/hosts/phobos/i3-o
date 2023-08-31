@@ -3,7 +3,6 @@ options() {
     cat << EOF
 autorandr-internal
 autorandr-internal-120
-autorandr-gisual-desk
 EOF
 }
 
@@ -14,9 +13,6 @@ case "$OPTION" in
         ;;
     autorandr-internal-120)
         autorandr --force --load phobos-internal-120
-        ;;
-    autorandr-gisual-desk)
-        autorandr --force --load phobos-gisual-desk
         ;;
     *)
         if [ -n "$OPTION" ]; then

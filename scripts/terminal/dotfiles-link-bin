@@ -56,12 +56,10 @@ def main():
     match hostname:
         case 'mars':
             sources.extend([
-                dotfiles_private / 'scripts' / 'gisual',
                 dotfiles / 'scripts' / 'media'
             ])
         case 'phobos':
             sources.extend([
-                dotfiles_private / 'scripts' / 'gisual',
                 dotfiles / 'scripts' / 'media'
             ])
         case 'sol':

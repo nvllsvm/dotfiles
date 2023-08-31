@@ -73,13 +73,7 @@ def main():
         else:
             parser.error('missing git host')
 
-        if host == 'gisual':
-            parts = path.split('/')
-            if parts[0] != 'gisual' or len(parts) < 2:
-                raise RuntimeError('invalid gisual path')
-            repo_path = '/'.join(parts[1:])
-        else:
-            repo_path = path
+        repo_path = path
 
         repo_dir = CODE_ROOT_DIR / host.lower() / repo_path.lower()
 
