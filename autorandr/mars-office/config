@@ -1,6 +1,6 @@
-output DisplayPort-2
-off
 output DisplayPort-0
+off
+output DisplayPort-2
 off
 output HDMI-A-0
 off
@@ -10,6 +10,7 @@ mode 3840x2160
 pos 0x0
 primary
 rate 120.00
+x-prop-colorspace Default
 x-prop-max_bpc 16
 x-prop-non_desktop 0
 x-prop-scaling_mode None
