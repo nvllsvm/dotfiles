@@ -31,7 +31,7 @@ class DBusNotifier:
                /,
                app_name='',
                replaces_id=None,
-               app_icon='',
+               app_icon=None,
                summary='',
                body='',
                actions=None,
@@ -41,6 +41,7 @@ class DBusNotifier:
         replaces_id = replaces_id or 0
         actions = actions or []
         hints = hints or {}
+        app_icon = app_icon or ''
 
         return self.interface.Notify(
             app_name, replaces_id, app_icon, summary, body, actions, hints,
