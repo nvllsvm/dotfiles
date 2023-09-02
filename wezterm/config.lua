@@ -6,6 +6,7 @@ config.enable_scroll_bar = false
 config.enable_tab_bar = false
 config.check_for_updates = false
 config.window_close_confirmation = 'NeverPrompt'
+config.force_reverse_video_cursor = true
 config.font = wezterm.font('monospace', { })
 config.font_size = 12
 config.window_padding = {

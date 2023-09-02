@@ -214,7 +214,6 @@ local wezterm = require 'wezterm'
 
 config.font = wezterm.font('${FONT_NAME}', { })
 config.font_size = ${FONT_SIZE}
-
 return config
 EOF
 
