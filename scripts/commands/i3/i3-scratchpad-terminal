@@ -37,34 +37,28 @@ def main():
     parser.add_argument('args', nargs='+')
     args = parser.parse_args()
 
-    title = args.title or args.args[0]
+    window_class = f'i3-scratchpad-{args.title or args.args[0]}'
 
     conn = i3ipc.Connection()
 
     found = False
-    for item in conn.get_tree().find_instanced('i3-scratchpad'):
-        if item.window_title == title:
-            found = True
-            show_scratchpad(conn, item)
-        else:
-            # hide other scratchpad windows
-            if item.ipc_data['output'] != '__i3':
-                item.command('scratchpad show')
+    for item in conn.get_tree().find_instanced(window_class):
+        found = True
+        show_scratchpad(conn, item)
     if not found:
         command = [
             'exec',
             '--no-startup-id',
             'terminal',
-            '--class', 'i3-scratchpad',
-            '--title', title,
+            '--class', window_class,
             *args.args,
         ]
         conn.command(' '.join(command))
         for attempt in range(1, 10):
-            for item in conn.get_tree().find_instanced('i3-scratchpad'):
-                if item.window_title == title:
-                    show_scratchpad(conn, item)
-                    return
+            for item in conn.get_tree().find_instanced(window_class):
+                print('here')
+                show_scratchpad(conn, item)
+                return
             time.sleep(0.5)
 
 

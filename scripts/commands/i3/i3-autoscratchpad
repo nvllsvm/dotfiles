@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 import i3ipc
 
-INSTANCE = 'i3-scratchpad'
+INSTANCE = 'i3-scratchpad-'
 
 
 def on_window_focus(self, e):
-    if e.container.window_instance != INSTANCE:
+    if not e.container.window_instance.startswith(INSTANCE):
         CONN.command(f'[instance={INSTANCE}] move scratchpad')
 
 
