@@ -207,8 +207,18 @@ if command -v xrandr > /dev/null; then
     xrandr --dpi "$DPI" || true
 fi
 
-alacritty-config-reload
+mkdir -p ~/.config/wezterm
+cat > ~/.config/wezterm/wezterm.lua << EOF
+local config = require 'config'
+local wezterm = require 'wezterm'
 
+config.font = wezterm.font('${FONT_NAME}', { })
+config.font_size = ${FONT_SIZE}
+
+return config
+EOF
+
+alacritty-config-reload
 mkdir -p ~/.config/alacritty
 cat > ~/.config/alacritty/alacritty.yml << EOF
 env:
