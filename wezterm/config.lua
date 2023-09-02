@@ -15,4 +15,7 @@ config.window_padding = {
   bottom = 0,
 }
 
+-- 120 fps is choppy at 120hz
+config.max_fps = 255
+
 return config
