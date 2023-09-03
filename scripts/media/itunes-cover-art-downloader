@@ -16,6 +16,8 @@ BASE_URL = yarl.URL('https://a5.mzstatic.com/us/r1000/0/')
 
 CLIENT = httpx.AsyncClient()
 
+DEFAULT_LIMIT = 50
+
 
 async def get_itunes_art(*terms, country='us', entity='album', limit=None):
     query = {
@@ -99,12 +101,13 @@ async def convert_to_png(data):
 
 async def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--limit', type=int, default=DEFAULT_LIMIT)
     parser.add_argument('terms', nargs='+')
     args = parser.parse_args()
 
     executor = async_executor.AsyncExecutor()
     task_names = {}
-    for result in await get_itunes_art(*args.terms):
+    for result in await get_itunes_art(*args.terms, limit=args.limit):
         name = '{} - {}'.format(
             result['artistName'],
             result['collectionName'])
