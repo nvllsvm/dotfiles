@@ -54,19 +54,10 @@ class Sony:
     def _checksum(parts):
         return sum(parts) % 256
 
-    def standby_command_on(self):
-        self._cmd(self.CONTROL_REQUEST, 0x00, 0x01, 0x02, 0x01)
-
     def power_on(self):
         self._cmd(self.CONTROL_REQUEST, 0x00, 0x00, 0x02, 0x01)
 
     def power_off(self):
-        # must always issue the standby command before powering off to
-        # allow serial control to continue working
-        try:
-            self.standby_command_on()
-        except Exception:
-            pass
         self._cmd(self.CONTROL_REQUEST, 0x00, 0x00, 0x02, 0x00)
 
     def is_powered_on(self):
