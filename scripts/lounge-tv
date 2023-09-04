@@ -63,12 +63,15 @@ class Sony:
     def power_off(self):
         # must always issue the standby command before powering off to
         # allow serial control to continue working
-        self.standby_command_on()
+        try:
+            self.standby_command_on()
+        except Exception:
+            pass
         self._cmd(self.CONTROL_REQUEST, 0x00, 0x00, 0x02, 0x00)
 
     def is_powered_on(self):
         value = self._cmd(self.QUERY_REQUEST, 0x00, 0x00, 0xff, 0xff)
-        return bool(value)
+        return bool(ord(value))
 
     def volume_up(self):
         return self._cmd(self.CONTROL_REQUEST, 0x00, 0x05, 0x03, 0x00, 0x00)
