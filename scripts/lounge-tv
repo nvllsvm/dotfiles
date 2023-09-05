@@ -105,7 +105,7 @@ class Sony:
             self.VOLUME_CONTROL_FUNCTION,
             0x03,  # length
             0x00,  # relative volume
-            0x00,  # volume down
+            0x01,  # volume down
         )
 
     def mute_toggle(self):
