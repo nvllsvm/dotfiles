@@ -82,7 +82,7 @@ def _command_status():
                 state = '❌'
         containers.append([state, item['Service'], item['Status']])
     containers = sorted(containers, key=lambda x: x[1])
-    print(tabulate.tabulate(containers))
+    print(tabulate.tabulate(containers, tablefmt='plain'))
 
 
 COMMANDS = {
