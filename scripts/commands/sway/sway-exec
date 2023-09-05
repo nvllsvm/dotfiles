@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+"""
+sway exec wrapper which simplifies quoting
+"""
+import argparse
+import base64
+import os
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--decode', action='store_true')
+    parser.add_argument('exec_arg', nargs='+')
+    args = parser.parse_args()
+
+    if args.decode:
+        exec_args = [
+            base64.b64decode(arg).decode()
+            for arg in args.exec_arg
+        ]
+        os.execlp(exec_args[0], *exec_args)
+    else:
+        exec_args = [
+            base64.b64encode(arg.encode()).decode()
+            for arg in args.exec_arg
+        ]
+        os.execlp('swaymsg', 'swaymsg', '-q', '-t', 'command', 'exec', '--',
+                  'sway-exec', '--decode', '--', *exec_args)
+
+
+if __name__ == '__main__':
+    main()
