@@ -8,8 +8,6 @@ DEV = '/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_B001CPKZ-if00-port0'
 
 
 class Sony:
-    command_interval = 0.5  # Sony recommends 0.5, but 0.15 works reliably
-
     CONTROL_REQUEST = 0x8c
     QUERY_REQUEST = 0x83
 
