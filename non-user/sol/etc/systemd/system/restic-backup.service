@@ -1,6 +1,0 @@
-[Unit]
-Description=Run restic-backup
-
-[Service]
-SyslogIdentifier=restic-backup
-ExecStart=/home/ar/.dotfiles/private/scripts/terminal/restic-backup
