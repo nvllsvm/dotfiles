@@ -21,6 +21,10 @@ EXTENSIONS = {
 SUBTITLE_EXTENSIONS = {
     '.ass',
     '.srt',
+
+    # both need to be present at the same time?
+    '.itx',
+    '.sub',
 }
 
 LOGGER = logging.getLogger('convert-to-mkv')
@@ -59,7 +63,11 @@ def all_files(root):
 
 
 def mkvmerge(dest, *sources, delete_parts=True):
-    LOGGER.info('converting %s (parts %s)', dest, sources)
+    LOGGER.info(
+        'converting %s (parts %s)', dest,
+        [str(p)
+         for p in sorted(sources)
+         if p != dest])
     with TempPath(dir=dest.parent, prefix='.convert-to-mkv_',
                   suffix=dest.suffix + '.tmp') as tmp:
         subprocess.run(
