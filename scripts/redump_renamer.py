@@ -17,6 +17,11 @@ import zipfile
 import httpx
 
 SUFFIXES = ('.bin', '.iso', '.mdf')
+IGNORE_ENDSWITH = (
+    ' (Track 0).bin',
+    ' (Track 1)(-LBA).bin',
+    ' (Track AA).bin',
+)
 
 NAME = 'redump-renamer'
 
@@ -134,6 +139,7 @@ def find_dump_hashes(root):
         path
         for path in iterator
         if path.is_file() and path.suffix in SUFFIXES
+        and not path.name.endswith(IGNORE_ENDSWITH)
     ]
 
     if len(paths) > 1:
