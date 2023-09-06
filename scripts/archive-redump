@@ -1,0 +1,115 @@
+#!/usr/bin/env python3
+import argparse
+import asyncio
+import pathlib
+
+
+INFO_SUFFIXES = (
+    '.txt',
+    ' (Track 0).bin',
+    ' (Track AA).bin',
+    ' (Track 1)(-LBA).bin',
+)
+
+DUMP_SUFFIXES = (
+    '.bin',
+    '.cue',
+    '.iso',
+)
+
+DELETE_SUFFIXES = (
+    '.img',
+    '.scm',
+)
+
+
+async def extract(*path, rm=False, force=False, parent=None):
+    args = ['extract']
+    if rm:
+        args.append('--rm')
+    if force:
+        args.append('--force')
+    if parent:
+        args.extend(['-p', parent])
+    args.extend(['--', *path])
+    proc = await asyncio.create_subprocess_exec(*args)
+    await proc.communicate()
+    if proc.returncode:
+        raise RuntimeError(f'extract exit {proc.returncode}')
+
+
+async def archive(*path, num_procs=1, rm=False):
+    args = ['archive']
+    if num_procs != 1:
+        args.extend(['-n', str(num_procs)])
+    if rm:
+        args.append('--rm')
+    args.extend(['--', *path])
+    proc = await asyncio.create_subprocess_exec(*args)
+    await proc.communicate()
+    if proc.returncode:
+        raise RuntimeError(f'extract exit {proc.returncode}')
+
+
+async def process_path(path, dump_name):
+    info_name = ' - '.join([v for v in ['info', dump_name] if v])
+    info_dest = path / info_name
+    dump_dest = path / 'dump'
+
+    dump_paths = []
+    info_paths = []
+    archive_paths = []
+    delete_paths = []
+
+    for path in path.iterdir():
+        if path.is_dir():
+            raise NotImplementedError('child dir detected')
+
+        name = path.name
+        if name.endswith('.zip'):
+            archive_paths.append(path)
+        elif name.endswith(INFO_SUFFIXES):
+            info_paths.append(path)
+        elif name.endswith(DUMP_SUFFIXES):
+            dump_paths.append(path)
+        elif name.endswith(DELETE_SUFFIXES):
+            delete_paths.append(path)
+        else:
+            raise NotImplementedError(path)
+
+    if not dump_paths:
+        raise RuntimeError('no dump found')
+    if len(archive_paths) > 1:
+        raise RuntimeError('multiple archives found')
+
+    dump_dest.mkdir()
+    info_dest.mkdir()
+
+    for path in dump_paths:
+        path.rename(dump_dest / path.name)
+
+    for path in info_paths:
+        path.rename(info_dest / path.name)
+
+    for path in delete_paths:
+        path.unlink()
+
+    for path in archive_paths:
+        await extract(path, rm=True, force=True, parent=info_dest)
+
+    await archive(dump_dest, info_dest, rm=True, num_procs=0)
+
+
+async def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-n', '--dump-name')
+    parser.add_argument('path', type=pathlib.Path, nargs='+')
+    args = parser.parse_args()
+
+    for path in args.path:
+        await process_path(path, args.dump_name)
+
+
+
+if __name__ == '__main__':
+    asyncio.run(main())
