@@ -28,8 +28,8 @@ update_non_user() {
     if [ -d "$backup_root" ]; then
         for source_file in $(find "$backup_root" -type f); do
             target=${source_file#$backup_root}
-            if test -f "$target" || [ "$tag" != 'common' ]; then
-                if ! [ -f "$target" ] || ! sudo diff "$source_file" "$target" > /dev/null 2>&1 ; then
+            if sudo test -f "$target" || [ "$tag" != 'common' ]; then
+                if ! sudo test -f "$target" || ! sudo diff "$source_file" "$target" > /dev/null 2>&1 ; then
                     echo Syncing "$target"
                     sudo mkdir -p "$(dirname "$target")"
                     sudo cp "$source_file" "$target"
