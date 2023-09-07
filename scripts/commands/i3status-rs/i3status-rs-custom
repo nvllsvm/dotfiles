@@ -24,7 +24,6 @@ if has_battery():
 [[block]]
 block = "battery"
 missing_format = ""
-device = "hidpp_battery_3"
 """
 
 config += """
