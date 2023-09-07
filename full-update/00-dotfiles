@@ -22,7 +22,6 @@ MAGENTA='\033[1;35m'
 RESET='\033[0m'
 
 update_non_user() {
-    set -x
     dotfiles_root="$1"
     tag="$2"
     backup_root="$dotfiles_root/non-user/$tag"
@@ -30,7 +29,7 @@ update_non_user() {
         for source_file in $(find "$backup_root" -type f); do
             target=${source_file#$backup_root}
             if test -f "$target" || [ "$tag" != 'common' ]; then
-                if ! sudo diff "$source_file" "$target" > /dev/null 2>&1 ; then
+                if ! [ -f "$target" ] || ! sudo diff "$source_file" "$target" > /dev/null 2>&1 ; then
                     echo Syncing "$target"
                     sudo mkdir -p "$(dirname "$target")"
                     sudo cp "$source_file" "$target"
@@ -40,7 +39,6 @@ update_non_user() {
             fi
         done
     fi
-    set +x
 }
 
 update_repo() {
