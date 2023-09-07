@@ -22,6 +22,7 @@ MAGENTA='\033[1;35m'
 RESET='\033[0m'
 
 update_non_user() {
+    set -x
     dotfiles_root="$1"
     tag="$2"
     backup_root="$dotfiles_root/non-user/$tag"
@@ -39,6 +40,7 @@ update_non_user() {
             fi
         done
     fi
+    set +x
 }
 
 update_repo() {
