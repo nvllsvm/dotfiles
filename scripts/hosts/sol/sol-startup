@@ -25,6 +25,8 @@ systemctl --user enable --now gog-update.timer
 systemctl --user enable --now harmonize-library.timer
 systemctl --user enable --now mbsync.timer
 systemctl --user enable --now sol-fix-permissions.timer
+systemctl --user enable --now sol-sync-camera1.timer
+systemctl --user enable --now sol-sync-camera2.timer
 systemctl --user enable --now sol-update-check.timer
 systemctl --user enable --now sol-update-remotes.timer
 systemctl --user enable --now wasabi-sync.timer

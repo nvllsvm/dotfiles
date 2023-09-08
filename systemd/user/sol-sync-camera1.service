@@ -1,0 +1,6 @@
+[Unit]
+Description=Run sol-sync-camera1
+
+[Service]
+ExecStart=zsh -lc sync-camera1.nullsum.lan
+SyslogIdentifier=sol-sync-camera1
