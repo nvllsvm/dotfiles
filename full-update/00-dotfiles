@@ -61,6 +61,10 @@ update_repo() {
     fi
 }
 
+if ! command -v dotfiles-link-bin || ! command -v git-auto-update > /dev/null; then
+    "${DOTFILES}/scripts/terminal/dotfiles-link-bin"
+fi
+
 update_repo "DOTFILES" "$DOTFILES"
 
 for d in $(env | grep ^DOTFILES_ | sort); do
