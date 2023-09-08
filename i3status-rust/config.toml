@@ -8,7 +8,6 @@ icons = "awesome4"
 [[block]]
 block = "battery"
 missing_format = ""
-device = "hidpp_battery_3"
 
 [[block]]
 block = "sound"
