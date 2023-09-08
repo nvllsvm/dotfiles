@@ -13,6 +13,7 @@ show_help() {
     cat << EOF
 usage: full-update [script ...]
 
+    --no-exit   don't exit when one script encounters an error
     --help      show help and exit
 EOF
 }
