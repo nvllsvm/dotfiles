@@ -61,7 +61,7 @@ update_repo() {
     fi
 }
 
-if ! command -v dotfiles-link-bin || ! command -v git-auto-update > /dev/null; then
+if ! command -v dotfiles-link-bin > /dev/null || ! command -v git-auto-update > /dev/null; then
     "${DOTFILES}/scripts/terminal/dotfiles-link-bin"
 fi
 
