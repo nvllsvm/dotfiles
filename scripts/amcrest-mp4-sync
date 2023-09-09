@@ -183,6 +183,7 @@ async def main():
     parser.add_argument('--port', type=int, default=80)
     parser.add_argument('--host', required=True)
     parser.add_argument('--dest', type=pathlib.Path, required=True)
+    parser.add_argument('--format', action='store_true')
     args = parser.parse_args()
 
     dest = args.dest
@@ -202,8 +203,9 @@ async def main():
         while downloaded_new_file:
             downloaded_new_file = await _download_new(camera, dest)
 
-        print('Formatting storage')
-        await camera.format_storage_device(storage_pointer)
+        if args.format:
+            print('Formatting storage')
+            await camera.format_storage_device(storage_pointer)
 
 
 if __name__ == '__main__':
