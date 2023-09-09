@@ -1,5 +1,4 @@
-*
-!/library/.mpdignore
-!/mpd.conf
-!/playlists
-!/.gitignore
+/library/*/
+/mpd.db
+/mpd.log
+/mpd.state
