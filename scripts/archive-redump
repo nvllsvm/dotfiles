@@ -7,8 +7,10 @@ import pathlib
 INFO_SUFFIXES = (
     '.txt',
     ' (Track 0).bin',
+    ' (Track 00).bin',
     ' (Track AA).bin',
     ' (Track 1)(-LBA).bin',
+    ' (Track 01)(-LBA).bin',
 )
 
 DUMP_SUFFIXES = (

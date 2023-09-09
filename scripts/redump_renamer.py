@@ -19,7 +19,9 @@ import httpx
 SUFFIXES = ('.bin', '.iso', '.mdf')
 IGNORE_ENDSWITH = (
     ' (Track 0).bin',
+    ' (Track 00).bin',
     ' (Track 1)(-LBA).bin',
+    ' (Track 01)(-LBA).bin',
     ' (Track AA).bin',
 )
 
