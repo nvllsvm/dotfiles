@@ -1,5 +1,4 @@
-/library/*
+/*
 !/library/.mpdignore
-/mpd.db
-/mpd.log
-/mpd.state
+!/mpd.conf
+!/playlists
