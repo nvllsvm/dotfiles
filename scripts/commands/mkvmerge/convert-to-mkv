@@ -63,11 +63,7 @@ def all_files(root):
 
 
 def mkvmerge(dest, *sources, delete_parts=True):
-    LOGGER.info(
-        'converting %s (parts %s)', dest,
-        [str(p)
-         for p in sorted(sources)
-         if p != dest])
+    LOGGER.info('converting %s', dest)
     with TempPath(dir=dest.parent, prefix='.convert-to-mkv_',
                   suffix=dest.suffix + '.tmp') as tmp:
         subprocess.run(
@@ -89,9 +85,7 @@ def main():
     parser.add_argument('path', nargs='+', type=pathlib.Path)
     args = parser.parse_args()
 
-    logging.basicConfig(
-        format='%(levelname)-8s %(message)s',
-        level=logging.INFO)
+    logging.basicConfig(format='%(message)s', level=logging.INFO)
 
     paths = set()
     for path in args.path:
