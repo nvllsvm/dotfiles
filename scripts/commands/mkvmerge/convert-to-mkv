@@ -6,7 +6,7 @@ import pathlib
 import subprocess
 import tempfile
 
-EXTENSIONS = {
+VIDEO_EXTENSIONS = {
     '.avi',
     '.flv',
     '.m4v',
@@ -102,7 +102,7 @@ def main():
             paths.update(all_files(path))
 
     for path in sorted(paths):
-        if path.suffix.lower() in ('.mkv', *EXTENSIONS):
+        if path.suffix.lower() in ('.mkv', *VIDEO_EXTENSIONS):
             dest = path.with_suffix('.mkv')
 
             # cannot use path.stem in glob as glob characters may be in path
