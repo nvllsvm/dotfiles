@@ -1,9 +1,8 @@
 set hidden
 map <c-n> :set relativenumber!
-set previewer ~/preview
+set previewer preview
 map i $preview "$f" | less -R
 map r $lf-renamer
-set cleaner ~/cleaner
 
 # working dir - blue
 # selected file - white
