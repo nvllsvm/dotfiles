@@ -12,13 +12,18 @@ import yarl
 
 class Amcrest:
     PAGE_SIZE = 100
+    MEDIA_TYPES = {
+        'dav',
+        'jpg',
+        'mp4',
+    }
 
     def __init__(self, host, port, username, password, /, scheme='http'):
         self._http = httpx.AsyncClient(
             auth=httpx.DigestAuth(username, password))
         self._url = yarl.URL(f'{scheme}://{host}:{port}')
 
-    async def all_files(self):
+    async def all_files(self, media_type=None):
         factory_id = await self._factory_create()
 
         # start the search
@@ -28,6 +33,7 @@ class Amcrest:
             'action': 'findFile',
             'object': factory_id,
             'condition.Channel': '1',
+            'type': media_type,
         })
         # yarl breaks on the space in strftime
         url = '{}&condition.StartTime={}&condition.EndTime={}'.format(
@@ -156,14 +162,12 @@ def safe_write(path, data):
                 pass
 
 
-async def _download_new(camera, dest):
+async def _download_new(camera, dest, media_type):
     existing_files = all_files(dest)
     existing_names = {p.name for p in existing_files}
 
     downloaded_new_file = False
-    for remote_path in await camera.all_files():
-        if not remote_path.endswith('.mp4'):
-            continue
+    for remote_path in await camera.all_files(media_type=media_type):
         local_name = remote_path.removeprefix('/mnt/sd/').replace('/', '_')
         if local_name in existing_names:
             continue
@@ -183,7 +187,8 @@ async def main():
     parser.add_argument('--port', type=int, default=80)
     parser.add_argument('--host', required=True)
     parser.add_argument('--dest', type=pathlib.Path, required=True)
-    parser.add_argument('--format', action='store_true')
+    parser.add_argument('--type', choices=Amcrest.MEDIA_TYPES)
+    parser.add_argument('--format-storage', action='store_true')
     args = parser.parse_args()
 
     dest = args.dest
@@ -197,11 +202,13 @@ async def main():
     storage_id = list(devices.keys())[0]
     storage_pointer = devices[storage_id]['Pointer']
 
-    downloaded_new_file = await _download_new(camera, dest)
+    downloaded_new_file = await _download_new(
+        camera, dest, media_type=args.type)
 
     if downloaded_new_file:
         while downloaded_new_file:
-            downloaded_new_file = await _download_new(camera, dest)
+            downloaded_new_file = await _download_new(
+                camera, dest, media_type=args.type)
 
         if args.format:
             print('Formatting storage')
