@@ -2,5 +2,5 @@
 Description=Run sol-sync-camera3
 
 [Service]
-ExecStart=zsh -lc sync-camera3.nullsum.lan --media-type mp4 --format-storage
+ExecStart=zsh -lc sync-camera3.nullsum.lan --format-storage
 SyslogIdentifier=sol-sync-camera3
