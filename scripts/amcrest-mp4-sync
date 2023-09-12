@@ -33,7 +33,7 @@ class Amcrest:
             'action': 'findFile',
             'object': factory_id,
             'condition.Channel': '1',
-            'type': media_type,
+            'condition.Types': media_type,
         })
         # yarl breaks on the space in strftime
         url = '{}&condition.StartTime={}&condition.EndTime={}'.format(
