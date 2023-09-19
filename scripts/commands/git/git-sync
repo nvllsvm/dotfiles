@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 import argparse
 import pathlib
+import shutil
 import subprocess
-import sys
 import urllib.parse
 
 CODE_ROOT_DIR = pathlib.Path('~/src').expanduser()
+CACHE_PATH = pathlib.Path('~/.cache/gs').expanduser()
 
 
 class Git:
@@ -34,56 +35,88 @@ def _find_git_repos(root):
                     stack.append(path)
 
 
+def parse_repo(repo):
+    repo = repo.lower()
+    parsed = urllib.parse.urlparse(repo)
+    path = parsed.path.strip('/')
+    if parsed.scheme in ('http', 'https'):
+        # TODO: parse .ssh/config for HostName
+        if parsed.netloc in ('www.github.com', 'github.com'):
+            host = 'github'
+            parts = path.split('/')
+            if len(parts) < 2:
+                raise RuntimeError('invalid github url')
+            path = '/'.join(parts[0:2])
+        elif parsed.netloc in ('www.gitlab.com', 'gitlab.com'):
+            host = 'gitlab'
+            parts = path.split('/')
+            if len(parts) < 2:
+                raise RuntimeError('invalid gitlab url')
+            path = '/'.join(parts[0:])
+        elif parsed.netloc == 'aur.archlinux.org':
+            host = 'aur'
+            parts = path.split('/')
+            if parts[0] == 'packages':
+                path = parts[1]
+        else:
+            raise NotImplementedError(f'unhandled netloc: {parsed.netloc}')
+    elif parsed.scheme:
+        host = parsed.scheme
+    else:
+        raise ValueError('missing git host')
+
+    repo_path = path
+    repo_dir = CODE_ROOT_DIR / host.lower() / repo_path.lower()
+    return repo_dir, host, path
+
+
 def main():
     parser = argparse.ArgumentParser('git-sync')
-    parser.add_argument('--show-dir', action='store_true')
+    parser.add_argument('--prune', action='store_true')
+    parser.add_argument('--show-cache', action='store_true')
+    parser.add_argument('--rm', action='store_true')
     parser.add_argument('repo', nargs='?')
     args = parser.parse_args()
+
+    CACHE_PATH.touch()
+
+    cache = CACHE_PATH.read_text().splitlines()
+    if args.prune:
+        new_cache = []
+        for repo in cache:
+            repo_dir, _, _ = parse_repo(repo)
+            if repo_dir.is_dir():
+                new_cache.append(repo)
+        parser.exit()
+
+    if args.show_cache:
+        print('\n'.join(cache))
+        parser.exit()
 
     if args.repo is None:
         for repo_dir in _find_git_repos(pathlib.Path().absolute()):
             print(repo_dir)
             Git.fetch(repo_dir)
     else:
-        parsed = urllib.parse.urlparse(args.repo)
-        path = parsed.path.strip('/')
-        if parsed.scheme in ('http', 'https'):
-            # TODO: parse .ssh/config for HostName
-            if parsed.netloc in ('www.github.com', 'github.com'):
-                host = 'github'
-                parts = path.split('/')
-                if len(parts) < 2:
-                    raise RuntimeError('invalid github url')
-                path = '/'.join(parts[0:2])
-            elif parsed.netloc in ('www.gitlab.com', 'gitlab.com'):
-                host = 'gitlab'
-                parts = path.split('/')
-                if len(parts) < 2:
-                    raise RuntimeError('invalid gitlab url')
-                path = '/'.join(parts[0:])
-            elif parsed.netloc == 'aur.archlinux.org':
-                host = 'aur'
-                parts = path.split('/')
-                if parts[0] == 'packages':
-                    path = parts[1]
-            else:
-                raise NotImplementedError(f'unhandled netloc: {parsed.netloc}')
-        elif parsed.scheme:
-            host = parsed.scheme
+        repo = args.repo.lower()
+        repo_dir, host, path = parse_repo(repo)
+        if args.rm:
+            if repo_dir.exists():
+                shutil.rmtree(repo_dir)
+                parser.exit()
+            if repo in cache:
+                cache.remove(repo)
+                CACHE_PATH.write_text('\n'.join(cache))
         else:
-            parser.error('missing git host')
+            if not repo_dir.exists():
+                repo = f'{host}:{path}'
+                Git.clone(repo, repo_dir)
 
-        repo_path = path
-
-        repo_dir = CODE_ROOT_DIR / host.lower() / repo_path.lower()
-
-        if args.show_dir:
+            if repo in cache:
+                cache.remove(repo)
+            cache.append(repo)
+            CACHE_PATH.write_text('\n'.join(cache))
             print(repo_dir)
-            sys.exit()
-
-        if not repo_dir.exists():
-            repo = f'{host}:{path}'
-            Git.clone(repo, repo_dir)
 
 
 if __name__ == '__main__':

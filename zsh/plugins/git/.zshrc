@@ -1,9 +1,14 @@
 if command -v git > /dev/null; then
     gs() {
-        touch ~/.cache/gs
+        case "$1" in
+            -*)
+                git-sync "$@"
+                return $?
+                ;;
+        esac
         case $# in
             0)
-                target="$(fzf --exact --no-sort < ~/.cache/gs)"
+                target="$(git-sync --show-cache | fzf --exact --no-sort)"
                 if [ -z "$target" ]; then
                     return 130
                 fi
@@ -17,14 +22,16 @@ if command -v git > /dev/null; then
         esac
 
         if ! [ -t 1 ]; then
-            git sync --show-dir "$target"
+            git-sync --show-dir "$target"
             return
         fi
 
-        if git sync "$target"; then
-            print -s "gs $target"
-            echo "$target" | awk '!x[$0]++' - ~/.cache/gs | tr '[:upper:]' '[:lower:]' | sponge ~/.cache/gs
-            cd "$(git sync --show-dir "$target")"
+        local repo_dir
+        repo_dir="$(git-sync "$target")"
+        if [ -z "$repo_dir" ]; then
+            return 130
+        else
+            cd "$repo_dir"
         fi
     }
 fi
