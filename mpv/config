@@ -1,6 +1,7 @@
 sid=no
 sub-scale=0.7
 tone-mapping=reinhard
+force-window=immediate
 
 [deinterlace]
 profile-cond=p["video-frame-info/interlaced"]
