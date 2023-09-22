@@ -2,6 +2,7 @@
 import argparse
 import pathlib
 import subprocess
+import sys
 
 
 AUTORANDR_ROOT = pathlib.Path('~/.config/autorandr').expanduser()
@@ -28,7 +29,8 @@ def current_autorandr_profile():
     proc = subprocess.run(['autorandr', '--current'],
                           stdout=subprocess.PIPE,
                           check=True)
-    return proc.stdout.decode().splitlines()[0]
+    if lines := proc.stdout.decode().splitlines():
+        return lines[0]
 
 
 def set_wallpaper_color(color):
@@ -52,27 +54,34 @@ def main():
     args = parser.parse_args()
 
     profile = current_autorandr_profile()
-    profile_wallpaper = AUTORANDR_ROOT / profile / 'wallpaper'
+    if profile := current_autorandr_profile():
+        wallpaper = AUTORANDR_ROOT / profile / 'wallpaper'
+    else:
+        print('warning: no autorandr profile detected', file=sys.stderr)
+        wallpaper = None
 
     if args.none:
-        if profile_wallpaper.exists():
-            profile_wallpaper.unlink()
+        if wallpaper and wallpaper.exists():
+            wallpaper.unlink()
 
     if args.path:
+        wallpaper = wallpaper or args.path
         path = args.path.absolute()
         if not path.is_file():
             raise argparse.ArgumentError('does not exist')
-        profile_wallpaper.unlink(missing_ok=True)
-        print(profile_wallpaper)
-        profile_wallpaper.symlink_to(path)
+        if profile:
+            wallpaper.unlink(missing_ok=True)
+            print(wallpaper)
+            wallpaper.symlink_to(path)
 
-    if profile_wallpaper.exists():
-        set_wallpaper_image(profile_wallpaper)
+    if wallpaper and wallpaper.exists():
+        set_wallpaper_image(wallpaper)
     else:
         colors = base16_theme()
         set_wallpaper_color(colors['background'])
 
-        profile_wallpaper.unlink(missing_ok=True)
+        if profile:
+            wallpaper.unlink(missing_ok=True)
 
 
 if __name__ == '__main__':

@@ -10,6 +10,7 @@ mode 1920x1200
 pos 0x0
 primary
 rate 120.00
+x-prop-colorspace Default
 x-prop-max_bpc 16
 x-prop-non_desktop 0
 x-prop-scaling_mode None
