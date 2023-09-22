@@ -6,7 +6,8 @@ if [ "$(id -u)" != '0' ]; then
 fi
 
 ISO="$1"
-BOOT=/boot
+#BOOT=/boot
+BOOT=/mnt/tmp1
 ROOT_DEV="$(findmnt -o SOURCE -n "$BOOT")"
 ROOT_UUID="$(lsblk -dno UUID "$ROOT_DEV")"
 
