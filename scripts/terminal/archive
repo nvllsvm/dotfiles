@@ -1436,6 +1436,51 @@ class gzip:
         return [path]
 
 
+class cpio:
+    @staticmethod
+    @functools.cache
+    def check():
+        if not shutil.which('cpio'):
+            raise KeyError
+
+    @staticmethod
+    async def contents(path):
+        proc = await asyncio.create_subprocess_exec(
+            'cpio',
+            '--list',
+            '--no-absolute-filenames',
+            '--quiet',  # suppress last line containing block count
+            '--file', path,
+            stdout=asyncio.subprocess.PIPE)
+        stdout, _ = await proc.communicate()
+        if proc.returncode:
+            raise ProcessError(proc.returncode)
+        return stdout.splitlines()
+
+    @staticmethod
+    async def extract(path, dest, paths=None, password=None, overwrite=False):
+        if paths:
+            raise NotImplementedError
+        if overwrite:
+            raise NotImplementedError
+        if path == dest:
+            raise RuntimeError
+        proc = await asyncio.create_subprocess_exec(
+            'cpio',
+            '--extract',
+            '--directory', dest,
+            '--make-directories',
+            '--no-absolute-filenames',
+            '--file', path)
+        await proc.wait()
+        if proc.returncode:
+            raise ProcessError(proc.returncode)
+
+    @staticmethod
+    async def volumes(path, password=''):
+        return [path]
+
+
 class pbzip2:
     @staticmethod
     @functools.cache
@@ -1828,6 +1873,14 @@ async def _get_class(path):
                 return gnu_tar
             else:
                 return zstd
+        # cpio (new ASCII (SVR4))
+        # cpio (CRC)
+        # cpio (standard ASCII)
+        elif \
+                start.startswith(b'070701') or \
+                start.startswith(b'070702') or \
+                start.startswith(b'070707'):
+            return cpio
         # exe
         elif start.startswith(b'MZ'):
             # TODO: add additional innoextract validation
