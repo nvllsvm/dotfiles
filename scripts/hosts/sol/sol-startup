@@ -13,6 +13,9 @@ sudo systemctl start zpool-check-health-storage.service
 
 sudo zpool status -v
 
+echo Mounting CCTV storage ...
+sudo mount /dev/disk/by-uuid/e02387d5-c96e-4896-ab3a-86e4741be77e /storage/CCTV/
+
 echo Starting NFS binds ...
 sudo mount --bind ~ar /srv/nfs4/ar
 sudo mount --bind /storage /srv/nfs4/storage

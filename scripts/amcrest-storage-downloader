@@ -171,6 +171,9 @@ async def _download_new(camera, dest, media_type):
     found_files = False
     for remote_path in await camera.all_files():
         found_files = True
+        if remote_path.endswith('_'):
+            continue
+
         # TODO pass media type in URL query param
         if media_type is not None and not remote_path.endswith(media_type):
             continue
