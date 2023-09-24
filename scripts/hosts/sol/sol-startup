@@ -14,7 +14,8 @@ sudo systemctl start zpool-check-health-storage.service
 sudo zpool status -v
 
 echo Mounting CCTV storage ...
-sudo mount /dev/disk/by-uuid/e02387d5-c96e-4896-ab3a-86e4741be77e /storage/CCTV/
+sudo mkdir -p /mnt/frigate
+sudo mount /dev/disk/by-uuid/e02387d5-c96e-4896-ab3a-86e4741be77e /mnt/frigate
 
 echo Starting NFS binds ...
 sudo mount --bind ~ar /srv/nfs4/ar
@@ -28,8 +29,6 @@ systemctl --user enable --now gog-update.timer
 systemctl --user enable --now harmonize-library.timer
 systemctl --user enable --now mbsync.timer
 systemctl --user enable --now sol-fix-permissions.timer
-systemctl --user enable --now sol-sync-camera1.timer
-systemctl --user enable --now sol-sync-camera2.timer
 systemctl --user enable --now sol-update-check.timer
 systemctl --user enable --now sol-update-remotes.timer
 systemctl --user enable --now wasabi-sync.timer
