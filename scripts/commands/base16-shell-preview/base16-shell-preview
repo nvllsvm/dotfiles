@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+tmux set -g allow-passthrough on
+"$(which -a "${0##*/}" | grep -m 1 -v "^$0$")" "$@"
+tmux set -g allow-passthrough off
