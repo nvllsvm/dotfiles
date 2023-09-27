@@ -1,17 +1,34 @@
 #!/usr/bin/env python3
+import time
+import traceback
+
 import i3ipc
 
 INSTANCE = 'i3-scratchpad-'
 
 
-def on_window_focus(self, e):
-    if not e.container.window_instance.startswith(INSTANCE):
-        CONN.command(f'[instance={INSTANCE}] move scratchpad')
+def run():
+    conn = i3ipc.Connection()
+
+    def on_window_focus(_, e):
+        if not e.container.window_instance.startswith(INSTANCE):
+            conn.command(f'[instance={INSTANCE}] move scratchpad')
+
+    try:
+        conn.on('window::focus', on_window_focus)
+        conn.main()
+    finally:
+        conn.main_quit()
 
 
-CONN = i3ipc.Connection()
-try:
-    CONN.on('window::focus', on_window_focus)
-    CONN.main()
-finally:
-    CONN.main_quit()
+def main():
+    while True:
+        try:
+            run()
+        except Exception as e:
+            traceback.print_exception(e)
+            time.sleep(1)
+
+
+if __name__ == '__main__':
+    main()
