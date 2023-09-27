@@ -8,6 +8,8 @@ INSTANCE = 'i3-scratchpad-'
 
 
 def run(conn):
+    conn = i3ipc.Connection()
+
     def on_window_focus(_, e):
         window_instance = e.container.window_instance
         if window_instance and window_instance.startswith(INSTANCE):
@@ -22,11 +24,6 @@ def run(conn):
 
 def main():
     while True:
-        try:
-            conn = i3ipc.Connection()
-        except FileNotFoundError:
-            return
-
         try:
             run(conn)
         except Exception as e:
