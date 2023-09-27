@@ -12,6 +12,7 @@ import time
 import dbus
 import mpd  # python-mpd2
 import PIL.Image  # pillow
+import psutil
 
 _LOGGER = logging.getLogger('mpd-notifier')
 
@@ -24,6 +25,16 @@ def sha256sum(data):
     hasher = hashlib.sha256()
     hasher.update(data)
     return hasher.hexdigest()
+
+
+def cleanup_lingering_predecessors():
+    pid = os.getpid()
+    pathlib.Path(f'/proc/{pid}/comm').write_text('mpd-notifier\n')
+    for proc in psutil.process_iter(['pid', 'name']):
+        if proc.pid == pid:
+            continue
+        if proc.name().startswith('mpd-notifier'):
+            os.kill(proc.pid, 9)
 
 
 class DBusNotifier:
@@ -155,6 +166,8 @@ def main():
     parser.add_argument('--host')
     parser.add_argument('--port', type=int, default=6600)
     args = parser.parse_args()
+
+    cleanup_lingering_predecessors()
 
     # TODO consider cache pruning
     _CACHE_PATH.mkdir(exist_ok=True, parents=True)
