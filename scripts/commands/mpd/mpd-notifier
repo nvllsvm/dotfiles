@@ -186,9 +186,14 @@ def main():
 
     logging.basicConfig(level=logging.INFO, format='%(message)s')
 
-    dbus_notifier = DBusNotifier()
-    mpd_notifier = MPDNotifier(dbus_notifier)
     while True:
+        try:
+            dbus_notifier = DBusNotifier()
+        except dbus.exceptions.DBusException:
+            time.sleep(1)
+            continue
+
+        mpd_notifier = MPDNotifier(dbus_notifier)
         with _mpd_client(mpd_host, args.port) as client:
             client.timeout = 5
             try:
