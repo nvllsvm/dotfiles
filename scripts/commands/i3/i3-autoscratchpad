@@ -7,9 +7,7 @@ import i3ipc
 INSTANCE = 'i3-scratchpad-'
 
 
-def run():
-    conn = i3ipc.Connection()
-
+def run(conn):
     def on_window_focus(_, e):
         if not e.container.window_instance.startswith(INSTANCE):
             conn.command(f'[instance={INSTANCE}] move scratchpad')
@@ -24,7 +22,12 @@ def run():
 def main():
     while True:
         try:
-            run()
+            conn = i3ipc.Connection()
+        except FileNotFoundError:
+            return
+
+        try:
+            run(conn)
         except Exception as e:
             traceback.print_exception(e)
             time.sleep(1)

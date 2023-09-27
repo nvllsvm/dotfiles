@@ -11,4 +11,5 @@ set -a
 eval "$(/usr/lib/systemd/user-environment-generators/30-systemd-environment-d-generator)"
 set +a
 
-exec i3
+export I3SOCK=~/.config/i3/i3-ipc.sock
+exec systemd-cat i3
