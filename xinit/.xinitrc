@@ -11,5 +11,7 @@ set -a
 eval "$(/usr/lib/systemd/user-environment-generators/30-systemd-environment-d-generator)"
 set +a
 
+# ensure consistent value in tmux for X restarts
 export I3SOCK=~/.config/i3/i3-ipc.sock
+
 exec systemd-cat i3

@@ -9,7 +9,8 @@ INSTANCE = 'i3-scratchpad-'
 
 def run(conn):
     def on_window_focus(_, e):
-        if not e.container.window_instance.startswith(INSTANCE):
+        window_instance = e.container.window_instance
+        if window_instance and window_instance.startswith(INSTANCE):
             conn.command(f'[instance={INSTANCE}] move scratchpad')
 
     try:
