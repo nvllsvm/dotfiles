@@ -2,7 +2,7 @@
 Description=i3-hotkey-daemon
 
 [Service]
-ExecStart=zsh -lc 'i3-hotkey-daemon --loop'
+ExecStart=zsh -lc 'exec i3-hotkey-daemon --loop'
 SyslogIdentifier=i3-hotkey-daemon
 Restart=on-failure
 RestartSec=5s

@@ -19,7 +19,7 @@ fi
 case "$HOST" in
     mars|phobos)
         if [ -z "$(pidof Xorg)" ]; then
-            exec systemd-cat startx
+            exec systemd-cat -t startx startx
         fi
         ;;
 esac

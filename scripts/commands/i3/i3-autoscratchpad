@@ -5,7 +5,7 @@ INSTANCE = 'i3-scratchpad-'
 
 
 def main():
-    conn = i3ipc.Connection()
+    conn = i3ipc.Connection(auto_reconnect=True)
 
     def on_window_focus(_, e):
         window_instance = e.container.window_instance
