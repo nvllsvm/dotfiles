@@ -215,8 +215,6 @@ class xinput:
             raise RuntimeError
 
 
-
-
 def round_to_nearest(value, nearest):
     return int(value / nearest) * nearest
 
@@ -324,28 +322,24 @@ def open_fifo():
 
 
 def cleanup_lingering_predecessors():
-    pid = os.getpid()
-    pathlib.Path(f'/proc/{pid}/comm').write_text('i3-hotkey-daemon\n')
     for proc in psutil.process_iter(['pid', 'name']):
-        if proc.pid == pid:
-            continue
-        if proc.name().startswith('i3-hotkey-'):
+        if proc.name().startswith('i3-hotkey-client'):
             os.kill(proc.pid, 9)
 
 
 async def action_loop():
     cleanup_lingering_predecessors()
 
-    dbus_notifier = DBusNotifier()
-    action_types = {
-        'display-backlight': DisplayBacklight(dbus_notifier),
-        'keyboard-backlight': KeyboardBacklight(),
-        'touchpad': Touchpad(dbus_notifier),
-        'volume-input': VolumeInput(dbus_notifier),
-        'volume-output': VolumeOutput(dbus_notifier),
-    }
-
     while True:
+        dbus_notifier = DBusNotifier()
+        action_types = {
+            'display-backlight': DisplayBacklight(dbus_notifier),
+            'keyboard-backlight': KeyboardBacklight(),
+            'touchpad': Touchpad(dbus_notifier),
+            'volume-input': VolumeInput(dbus_notifier),
+            'volume-output': VolumeOutput(dbus_notifier),
+        }
+
         with open_fifo() as fifo:
             for line in fifo:
                 try:

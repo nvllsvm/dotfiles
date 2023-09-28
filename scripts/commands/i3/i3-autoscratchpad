@@ -1,26 +1,10 @@
 #!/usr/bin/env python3
-import os
-import pathlib
-import time
-import traceback
-
 import i3ipc
-import psutil
 
 INSTANCE = 'i3-scratchpad-'
 
 
-def cleanup_lingering_predecessors():
-    pid = os.getpid()
-    pathlib.Path(f'/proc/{pid}/comm').write_text('i3-hotkey-daemon\n')
-    for proc in psutil.process_iter(['pid', 'name']):
-        if proc.pid == pid:
-            continue
-        if proc.name().startswith('i3-hotkey-'):
-            os.kill(proc.pid, 9)
-
-
-def run():
+def main():
     conn = i3ipc.Connection()
 
     def on_window_focus(_, e):
@@ -33,17 +17,6 @@ def run():
         conn.main()
     finally:
         conn.main_quit()
-
-
-def main():
-    cleanup_lingering_predecessors()
-
-    while True:
-        try:
-            run()
-        except Exception as e:
-            traceback.print_exception(e)
-            time.sleep(1)
 
 
 if __name__ == '__main__':

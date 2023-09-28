@@ -1,0 +1,8 @@
+[Unit]
+Description=i3-autoscratchpad
+
+[Service]
+ExecStart=zsh -lc i3-autoscratchpad
+SyslogIdentifier=i3-autoscratchpad
+Restart=on-failure
+RestartSec=5s
