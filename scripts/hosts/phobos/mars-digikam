@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-exec ssh -X mars digikam
+exec ssh -X -Y mars digikam
