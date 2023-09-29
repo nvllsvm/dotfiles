@@ -11,18 +11,26 @@ on
 on-cool
 studio-monitors-on
 studio-monitors-off
-sound-tv
+sound-monitor
 sound-schiit-fulla
+sound-umc404hd
+sound-vr
 EOF
 }
 
 OPTION="$(options | rofi -dmenu -p '' -i)"
 case "$OPTION" in
-    sound-tv)
+    sound-monitor)
         pactl-set-only --profile 'Navi 21/23 HDMI/DP Audio Controller' 'Digital Stereo (HDMI 3) Output'
         ;;
     sound-schiit-fulla)
         pactl-set-only --profile "I'm Fulla Schiit" 'Pro Audio'
+        ;;
+    sound-umc404hd)
+        pactl-set-only --profile 'UMC404HD 192k' 'Pro Audio'
+        ;;
+    sound-vr)
+        pactl-set-only --profile 'USB Audio Device' 'Pro Audio'
         ;;
     *)
         if [ -n "$OPTION" ]; then
