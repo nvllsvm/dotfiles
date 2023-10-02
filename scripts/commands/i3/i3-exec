@@ -8,8 +8,9 @@ import os
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--decode', action='store_true')
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--i3-exec-decode', action='store_true',
+                        help=argparse.SUPPRESS)
     parser.add_argument('exec_arg', nargs='+')
     args = parser.parse_args()
 
@@ -25,7 +26,7 @@ def main():
             for arg in args.exec_arg
         ]
         os.execlp('i3-msg', 'i3-msg', '-q', '-t', 'command', 'exec', '--',
-                  'i3-exec', '--decode', '--', *exec_args)
+                  'i3-exec', '--i3-exec-decode', '--', *exec_args)
 
 
 if __name__ == '__main__':
