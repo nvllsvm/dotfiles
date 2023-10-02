@@ -11,19 +11,20 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--i3-exec-decode', action='store_true',
                         help=argparse.SUPPRESS)
-    parser.add_argument('exec_arg', nargs='+')
+    parser.add_argument('cmd')
+    parser.add_argument('arg', nargs='*')
     args = parser.parse_args()
 
     if args.i3_exec_decode:
         exec_args = [
             base64.b64decode(arg).decode()
-            for arg in args.exec_arg
+            for arg in [args.cmd, *args.arg]
         ]
         os.execlp(exec_args[0], *exec_args)
     else:
         exec_args = [
             base64.b64encode(arg.encode()).decode()
-            for arg in args.exec_arg
+            for arg in [args.cmd, *args.arg]
         ]
         os.execlp('i3-msg', 'i3-msg', '-q', '-t', 'command', 'exec', '--',
                   'i3-exec', '--i3-exec-decode', '--', *exec_args)
