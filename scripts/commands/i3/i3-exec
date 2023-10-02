@@ -14,7 +14,7 @@ def main():
     parser.add_argument('exec_arg', nargs='+')
     args = parser.parse_args()
 
-    if args.decode:
+    if args.i3_exec_decode:
         exec_args = [
             base64.b64decode(arg).decode()
             for arg in args.exec_arg
