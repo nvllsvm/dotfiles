@@ -11,8 +11,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--i3-exec-decode', action='store_true',
                         help=argparse.SUPPRESS)
-    parser.add_argument('cmd')
-    parser.add_argument('arg', nargs='*')
+    parser.add_argument('exec_arg', nargs='+')
     args = parser.parse_args()
 
     if args.i3_exec_decode:
