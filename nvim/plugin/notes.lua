@@ -1,7 +1,5 @@
 notes_dir = os.getenv("NOTES_DIR") or "~/notes"
-function Journal()
+function notes_journal()
     vim.cmd("e " .. notes_dir .. "/journal/" .. os.date("%Y-%m-%d") .. ".md")
 end
-vim.cmd([[
-command Journal lua Journal()
-]])
+vim.api.nvim_create_user_command('Journal', 'lua notes_journal()', {})

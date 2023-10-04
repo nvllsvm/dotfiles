@@ -6,6 +6,4 @@ augroup JSON
     endfunction
 
     command JSON call _JSONify()
-
-    au BufNewFile,BufRead *.avsc set filetype=json
 augroup END
