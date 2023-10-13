@@ -117,7 +117,7 @@ class MPDNotifier:
                     albumart = client.albumart(track_filename)
                 except Exception as e:
                     print(e, file=sys.stderr)
-                    break
+                    albumart = None
                 if albumart:
                     im = PIL.Image.open(io.BytesIO(albumart['binary']))
                     im.thumbnail((256, 256))
@@ -128,13 +128,13 @@ class MPDNotifier:
             if new_status['state'] == 'pause':
                 self.notify(
                     '[paused]',
-                    icon=str(art_path))
+                    icon=str(art_path) if art_path else None)
             else:
                 self.notify(
                     '<b>{}</b>\n{}'.format(
                         current['title'],
-                        current['artist']),
-                    icon=str(art_path))
+                        current.get('artist', '')),
+                    icon=str(art_path) if art_path else None)
 
     def notify(self, body, icon=None):
         hints = {
