@@ -1,6 +1,0 @@
-#!/usr/bin/env sh
-if ! command -v desktop-launcher > /dev/null; then
-    exit
-fi
-
-desktop-launcher --update
