@@ -54,8 +54,8 @@ def main():
     carrier = args.carrier or determine_carrier(tracking_id)
 
     url = CARRIERS[carrier] + tracking_id
-    Clipboard.copy(url.encode())
     print(url)
+    Clipboard.copy(url.encode())
 
 
 if __name__ == '__main__':
