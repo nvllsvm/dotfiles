@@ -821,7 +821,7 @@ class udisksctl:
     @classmethod
     async def contents(cls, path):
         with cls._loop_context(path) as device:
-            with cls._mount_context(device) as mount_path:
+            with cls._udisksctl_mount_context(device) as mount_path:
                 return sorted(
                     bytes(path.relative_to(mount_path))
                     for path in cls._child_paths(mount_path)
@@ -836,7 +836,7 @@ class udisksctl:
             raise NotImplementedError
 
         with cls._loop_context(path) as device:
-            with cls._mount_context(device) as mount_path:
+            with cls._udisksctl_mount_context(device) as mount_path:
                 mount_path = pathlib.Path(mount_path)
                 shutil.copytree(mount_path, dest, dirs_exist_ok=True)
 
@@ -858,11 +858,15 @@ class udisksctl:
             stdout=subprocess.PIPE,
             check=True)
         output = proc.stdout.decode().strip()
+
+        backing_file = None
+        mount_point = None
         for line in output.splitlines():
             if line.startswith('    MountPoints:'):
                 mount_point = line.split(maxsplit=1)[1]
             elif line.startswith('    BackingFile:'):
                 backing_file = line.split(maxsplit=1)[1]
+
         return {
             'backing_file': backing_file,
             'mount_point': mount_point,
@@ -895,7 +899,7 @@ class udisksctl:
 
     @staticmethod
     @contextlib.contextmanager
-    def _mount_context(device):
+    def _udisksctl_mount_context(device):
         proc = subprocess.run(
             ['udisksctl', 'mount', '--no-user-interaction',
              '--options', 'ro',
@@ -906,6 +910,13 @@ class udisksctl:
         if proc.returncode:
             mount_info = udisksctl._loop_info(device)
             path = mount_info['mount_point']
+
+            if path is None:
+                # udisksctl doesn't recognize some floppy images as mountable
+                # ex. goodolddays_000846_commander_keen_goodbye_galaxy
+                with udisksctl._mount_context(device) as path:
+                    yield path
+                return
         else:
             output = proc.stdout.decode().strip()
             start = f'Mounted {device} at '
@@ -922,6 +933,21 @@ class udisksctl:
                  '--block-device', device],
                 stdout=subprocess.DEVNULL,
                 check=True)
+
+    @staticmethod
+    @contextlib.contextmanager
+    def _mount_context(device):
+        with tempfile.TemporaryDirectory() as tmp:
+            try:
+                subprocess.run(
+                    ['mount', '-o', 'loop,ro', device, tmp],
+                    check=True)
+                yield tmp
+            finally:
+                subprocess.run(
+                    ['umount', tmp],
+                    check=True)
+
 
     @staticmethod
     def _child_paths(root):
