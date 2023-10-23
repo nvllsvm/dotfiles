@@ -23,6 +23,7 @@ def files_to_mtime(root):
 def run_lgogdownloader():
     subprocess.run(
         ['podman', 'run',
+         '--pull', 'always',
          '--rm',
          '-e', 'HOME',
          '-v', f'{GOG_DIR}:/downloads',
