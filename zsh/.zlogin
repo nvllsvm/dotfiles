@@ -1,11 +1,3 @@
-if [ "$HOST" = 'termux' ]; then
-    if [ "$HOME" != '/home' ]; then
-        exec termux-chroot
-    else
-        cd "$HOME"
-    fi
-fi
-
 if [ -t 0 ] && [ -n "$SSH_TTY" ] && [ -z "$TMUX" ] && command -v tmux-attach &> /dev/null; then
     if [ "$HOST" = 'termux' ]; then
         # exec is broken in termux
