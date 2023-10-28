@@ -937,6 +937,8 @@ class udisksctl:
     @staticmethod
     @contextlib.contextmanager
     def _mount_context(device):
+        if os.getuid() != 0:
+            raise RuntimeError('must extracted as root')
         with tempfile.TemporaryDirectory() as tmp:
             try:
                 subprocess.run(
@@ -947,7 +949,6 @@ class udisksctl:
                 subprocess.run(
                     ['umount', tmp],
                     check=True)
-
 
     @staticmethod
     def _child_paths(root):
