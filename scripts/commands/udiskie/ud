@@ -146,7 +146,7 @@ def main():
         if item['is_filesystem'] == 'True':
             key = '\t'.join([
                 'mount' if item['is_mounted'] == 'False' else 'unmount',
-                item['ui_label']
+                item['ui_label'] + ' ' + (item['mount_path'] or ''),
             ])
         elif item['is_loop'] == 'True' and item['is_toplevel'] == 'True':
             key = '\t'.join(['detach', item['ui_label']])
