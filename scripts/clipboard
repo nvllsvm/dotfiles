@@ -18,6 +18,22 @@ case "$1" in
         fi
 esac
 
+clipboard_copyq() {
+    if command -v copyq > /dev/null; then
+        case "$MODE" in
+            copy)
+                copyq copy -
+                ;;
+            paste)
+                copyq clipboard
+                ;;
+        esac
+    else
+        return 1
+    fi
+}
+
+
 clipboard_wayland() {
     if [ -n "$WAYLAND_DISPLAY" ]; then
         case "$MODE" in
@@ -42,38 +58,6 @@ clipboard_xorg() {
                 ;;
             paste)
                 xclip -selection c -o
-                ;;
-        esac
-    else
-        return 1
-    fi
-}
-
-
-clipboard_macos() {
-    if command -v pbcopy > /dev/null; then
-        case "$MODE" in
-            copy)
-                pbcopy
-                ;;
-            paste)
-                pbpaste
-                ;;
-        esac
-    else
-        return 1
-    fi
-}
-
-
-clipboard_tmux_ssh() {
-    if [ -n "$SSH_TTY" ] && command -v tmux > /dev/null; then
-        case "$MODE" in
-            copy)
-                tmux load-buffer -
-                ;;
-            paste)
-                tmux save-buffer -
                 ;;
         esac
     else
@@ -113,10 +97,9 @@ clipboard_termux() {
     fi
 }
 
-clipboard_wayland \
-    || clipboard_xorg \
-    || clipboard_macos \
+clipboard_copyq \
     || clipboard_termux \
-    || clipboard_tmux_ssh \
     || clipboard_tmux \
+    || clipboard_wayland \
+    || clipboard_xorg \
     || (echo error: no suitable clipboard command detected >&2; exit 1)
