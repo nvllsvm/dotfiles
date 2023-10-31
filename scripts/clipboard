@@ -113,10 +113,10 @@ clipboard_termux() {
     fi
 }
 
-clipboard_tmux_ssh \
-    || clipboard_wayland \
+clipboard_wayland \
     || clipboard_xorg \
     || clipboard_macos \
     || clipboard_termux \
+    || clipboard_tmux_ssh \
     || clipboard_tmux \
     || (echo error: no suitable clipboard command detected >&2; exit 1)
