@@ -1,0 +1,19 @@
+#!/usr/bin/env sh
+set -e
+SOURCE='/media/PSVITA' 
+TARGET='/storage/Backup/PlayStation Vita/ux0_microsd'
+if [ "$(sha256sum "${SOURCE}/id.dat" | awk '{print $1}')" != '661ae9b39e0fe52bacbbb3a11dcbca5d9df2c35bbae24a338f542cca2fd968ed' ]; then
+    echo "error: missing ${SOURCE}/id.dat" >&2
+    exit 1
+fi
+rsync -av --delete --progress \
+    --exclude 'addcont/PCSA*/' \
+    --exclude 'addcont/PCSE*/' \
+    --exclude 'app/PCSA*/' \
+    --exclude 'app/PCSE*/' \
+    --exclude 'patch/PCSA*/' \
+    --exclude 'patch/PCSE*/' \
+    --exclude 'pspemu/iso/' \
+    --exclude 'pspemu/PSP/GAME/' \
+    --exclude 'roms/' \
+    "${SOURCE}/" "${TARGET}"
