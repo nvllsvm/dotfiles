@@ -33,7 +33,9 @@ class ffmpeg:
         proc = await asyncio.create_subprocess_exec(
             'ffmpeg', '-i', source,
             '-vf', f'mpdecimate,setpts=N/{round(avg_frame_rate, 3)}/TB',
-            target)
+            target,
+            stdout=asyncio.subprocess.DEVNULL,
+            stderr=asyncio.subprocess.DEVNULL)
         await proc.communicate()
         if proc.returncode != 0:
             raise cls.ProcessError
@@ -65,7 +67,7 @@ async def _process_path(path):
 async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-n', metavar='NUM', dest='num_procs',
-                        type=int, default=None,
+                        type=int, default=1,
                         help='number of parallel jobs (default: %(default)s)')
     parser.add_argument('path', type=pathlib.Path, nargs='+')
     args = parser.parse_args()
@@ -75,7 +77,7 @@ async def main():
         executor.submit(_process_path, path)
 
     async for result in executor:
-        await result.result()
+        result.result()
 
 
 if __name__ == '__main__':
