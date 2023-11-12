@@ -1,0 +1,4 @@
+#compdef i3-exec
+_arguments : \
+    --help \
+    '*::command arguments:_normal'
