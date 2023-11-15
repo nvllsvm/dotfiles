@@ -510,9 +510,11 @@ def _num_procs(value):
 
 
 class SizeDiffPrinter:
-    def __init__(self):
+    def __init__(self, num_items):
         self._before_total = 0
         self._after_total = 0
+        self._num_items = num_items
+        self._num_printed = 0
         self._printed = False
 
     @staticmethod
@@ -533,16 +535,17 @@ class SizeDiffPrinter:
         return f'{num:.1f}{unit}'
 
     def print(self, before, after, name):
-        self._printed = True
+        self._num_printed += 1
         self._before_total += before
         self._after_total += after
         diff = self.format_diff(before, after)
 
         s = f'{diff:>6}%' if diff else 7 * '-'
-        print(f'{s}  {name}')
+        num_printed = str(self._num_printed).rjust(len(str(self._num_items)))
+        print(f'({num_printed}/{self._num_items})\t{s}\t{name}')
 
     def print_total(self):
-        if self._printed:
+        if self._num_printed:
             if diff := self.format_diff(self._before_total, self._after_total):
                 fmt = self.sizeof_fmt(self._before_total - self._after_total)
                 print(f'Total: {diff}% ({fmt})')
@@ -593,7 +596,7 @@ def archive_main():
             executor.submit(process, source, args.format, args.rm, args.fast,
                             parent=args.parent)
 
-        size_diff_printer = SizeDiffPrinter()
+        size_diff_printer = SizeDiffPrinter(num_items=len(executor))
         async for future in executor:
             try:
                 dest, before, after = future.result()
