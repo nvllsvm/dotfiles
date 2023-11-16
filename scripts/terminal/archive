@@ -1200,6 +1200,76 @@ class unrar:
         ]
 
 
+class bchunk:
+    @staticmethod
+    @functools.cache
+    def check():
+        if not shutil.which('bchunk'):
+            raise KeyError
+
+    @classmethod
+    async def contents(cls, path):
+        if path.suffix != '.cue':
+            raise NotImplementedError('must end with .cue')
+        volumes = await cls.volumes(path)
+        if len(volumes) != 2:
+            raise NotImplementedError('too many files')
+        # 01 is the track number
+        name = cls._content_name(path) + '01'
+        return [f'{name}.iso'.encode()]
+
+    @staticmethod
+    def _content_name(cue_path):
+        name = pathlib.Path(cue_path).name.removesuffix('.cue')
+        if not name:
+            raise RuntimeError
+        return name
+
+    @classmethod
+    async def extract(cls, path, dest, paths=None, password=None,
+                      overwrite=False):
+        if paths:
+            raise NotImplementedError
+        if overwrite:
+            raise NotImplementedError
+        if password is not None:
+            raise NotImplementedError
+
+        if isinstance(path, bytes):
+            path = path.decode()
+        path = pathlib.Path(path)
+
+        volumes = await cls.volumes(path)
+        name = cls._content_name(path)
+        proc = await asyncio.create_subprocess_exec(
+            'bchunk', '-w', volumes[1], volumes[0], dest / name,
+            stdout=asyncio.subprocess.DEVNULL)
+        await proc.communicate()
+        if proc.returncode:
+            raise ProcessError(proc.returncode)
+
+    @staticmethod
+    async def volumes(path, password=None):
+        if password is not None:
+            raise NotImplementedError
+        files = []
+        for line in path.read_text().splitlines():
+            line = line.strip()
+            if line.startswith('FILE '):
+                file_path = line\
+                    .split(maxsplit=1)[1]\
+                    .rsplit(maxsplit=1)[0]\
+                    .removeprefix('"')\
+                    .removesuffix('"')
+                file_path = path.parent / pathlib.Path(file_path)
+                if not file_path.is_file():
+                    raise ValueError('file(s) specified in cue does not exist')
+                files.append(file_path)
+        if len(files) == 0:
+            raise NotImplementedError
+        return [path, *files]
+
+
 class unace:
     # note: unace command seems to expect file to end with `.ace`
 
@@ -1943,6 +2013,13 @@ async def _get_class(path):
             return xorriso
 
     if suffixes := [suffix.lower() for suffix in path.suffixes]:
+        if suffixes[-1] == '.cue':
+            await bchunk.contents(path)
+            try:
+                await bchunk.contents(path)
+                return bchunk
+            except Exception:
+                pass
         if suffixes[-1] == '.rvz':
             return dolphin_tool
         if suffixes[-1] == '.nsz':
