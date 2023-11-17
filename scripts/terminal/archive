@@ -510,9 +510,11 @@ def _num_procs(value):
 
 
 class SizeDiffPrinter:
-    def __init__(self):
+    def __init__(self, num_items):
         self._before_total = 0
         self._after_total = 0
+        self._num_items = num_items
+        self._num_printed = 0
         self._printed = False
 
     @staticmethod
@@ -533,16 +535,17 @@ class SizeDiffPrinter:
         return f'{num:.1f}{unit}'
 
     def print(self, before, after, name):
-        self._printed = True
+        self._num_printed += 1
         self._before_total += before
         self._after_total += after
         diff = self.format_diff(before, after)
 
         s = f'{diff:>6}%' if diff else 7 * '-'
-        print(f'{s}  {name}')
+        num_printed = str(self._num_printed).rjust(len(str(self._num_items)))
+        print(f'({num_printed}/{self._num_items})\t{s}\t{name}')
 
     def print_total(self):
-        if self._printed:
+        if self._num_printed:
             if diff := self.format_diff(self._before_total, self._after_total):
                 fmt = self.sizeof_fmt(self._before_total - self._after_total)
                 print(f'Total: {diff}% ({fmt})')
@@ -593,7 +596,7 @@ def archive_main():
             executor.submit(process, source, args.format, args.rm, args.fast,
                             parent=args.parent)
 
-        size_diff_printer = SizeDiffPrinter()
+        size_diff_printer = SizeDiffPrinter(num_items=len(executor))
         async for future in executor:
             try:
                 dest, before, after = future.result()
@@ -1195,6 +1198,76 @@ class unrar:
             for line in stdout.decode().splitlines()
             if line.startswith('Archive: ')
         ]
+
+
+class bchunk:
+    @staticmethod
+    @functools.cache
+    def check():
+        if not shutil.which('bchunk'):
+            raise KeyError
+
+    @classmethod
+    async def contents(cls, path):
+        if path.suffix != '.cue':
+            raise NotImplementedError('must end with .cue')
+        volumes = await cls.volumes(path)
+        if len(volumes) != 2:
+            raise NotImplementedError('too many files')
+        # 01 is the track number
+        name = cls._content_name(path) + '01'
+        return [f'{name}.iso'.encode()]
+
+    @staticmethod
+    def _content_name(cue_path):
+        name = pathlib.Path(cue_path).name.removesuffix('.cue')
+        if not name:
+            raise RuntimeError
+        return name
+
+    @classmethod
+    async def extract(cls, path, dest, paths=None, password=None,
+                      overwrite=False):
+        if paths:
+            raise NotImplementedError
+        if overwrite:
+            raise NotImplementedError
+        if password is not None:
+            raise NotImplementedError
+
+        if isinstance(path, bytes):
+            path = path.decode()
+        path = pathlib.Path(path)
+
+        volumes = await cls.volumes(path)
+        name = cls._content_name(path)
+        proc = await asyncio.create_subprocess_exec(
+            'bchunk', '-w', volumes[1], volumes[0], dest / name,
+            stdout=asyncio.subprocess.DEVNULL)
+        await proc.communicate()
+        if proc.returncode:
+            raise ProcessError(proc.returncode)
+
+    @staticmethod
+    async def volumes(path, password=None):
+        if password is not None:
+            raise NotImplementedError
+        files = []
+        for line in path.read_text().splitlines():
+            line = line.strip()
+            if line.startswith('FILE '):
+                file_path = line\
+                    .split(maxsplit=1)[1]\
+                    .rsplit(maxsplit=1)[0]\
+                    .removeprefix('"')\
+                    .removesuffix('"')
+                file_path = path.parent / pathlib.Path(file_path)
+                if not file_path.is_file():
+                    raise ValueError('file(s) specified in cue does not exist')
+                files.append(file_path)
+        if len(files) == 0:
+            raise NotImplementedError
+        return [path, *files]
 
 
 class unace:
@@ -1940,6 +2013,13 @@ async def _get_class(path):
             return xorriso
 
     if suffixes := [suffix.lower() for suffix in path.suffixes]:
+        if suffixes[-1] == '.cue':
+            await bchunk.contents(path)
+            try:
+                await bchunk.contents(path)
+                return bchunk
+            except Exception:
+                pass
         if suffixes[-1] == '.rvz':
             return dolphin_tool
         if suffixes[-1] == '.nsz':
