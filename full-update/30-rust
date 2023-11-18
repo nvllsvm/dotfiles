@@ -39,7 +39,7 @@ if ! command -v rustup > /dev/null; then
     TEMP_FILE="$(mktemp)"
     curl https://sh.rustup.rs > "${TEMP_FILE}"
     chmod +x "${TEMP_FILE}"
-    "${TEMP_FILE}" -y --profile complete --no-modify-path
+    RUSTUP_INIT_SKIP_PATH_CHECK=yes "${TEMP_FILE}" -y --profile complete --no-modify-path
 else
     rustup update
 fi
