@@ -31,7 +31,15 @@ if [ -z "$FORCE" ] && ! command -v rustup > /dev/null; then
 fi
 
 if ! command -v rustup > /dev/null; then
-    curl https://sh.rustup.rs | sh
+    cleanup() {
+        rm -f "${TEMP_FILE}"
+    }
+
+    trap cleanup EXIT
+    TEMP_FILE="$(mktemp)"
+    curl https://sh.rustup.rs > "${TEMP_FILE}"
+    chmod +x "${TEMP_FILE}"
+    "${TEMP_FILE}" -y --profile complete --no-modify-path
 else
     rustup update
 fi
