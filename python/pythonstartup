@@ -41,6 +41,7 @@ import os
 import pathlib
 import pickle
 import pkgutil
+import plistlib
 import pprint
 import pwd
 import random
