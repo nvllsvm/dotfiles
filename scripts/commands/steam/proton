@@ -41,6 +41,9 @@ class CasefoldUnsupported(Exception):
 
 def case_insensitivty(path):
     # enable case-insensitivity (ext4)
+    #
+    # WARNING: overlayfs cannot be used on a filesystem with casefold enabled
+    # https://bugzilla.kernel.org/show_bug.cgi?id=216471
     proc = subprocess.run(
         ['chattr', '+F', str(path)],
         stderr=subprocess.PIPE)
