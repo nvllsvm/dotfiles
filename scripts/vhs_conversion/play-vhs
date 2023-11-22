@@ -5,14 +5,14 @@ DEST="$(date -I)_$(date +%s)".mkv
 
 ALSA_DEVICE_NUM="$(arecord -l | grep 'Cx231xxAudio' | grep '^card ' | tr ':' ' ' | awk '{print $2}')"
 if [ -z "$ALSA_DEVICE_NUM" ]; then
-    echo 'error: cannot detected alsa device' >&2
+    echo 'error: cannot detect alsa device' >&2
     exit 1
 fi
 ALSA_DEVICE="hw:${ALSA_DEVICE_NUM}"
 
 VIDEO_DEVICE="$(v4l2-ctl --list-devices | grep -A 3 '^Hauppauge USB Live 2' | grep '/dev/video' | awk '{print $1}')"
 if [ -z "$VIDEO_DEVICE" ]; then
-    echo 'error: cannot detected video device' >&2
+    echo 'error: cannot detect video device' >&2
     exit 1
 fi
 
