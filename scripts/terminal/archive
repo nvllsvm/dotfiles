@@ -632,7 +632,7 @@ class nsz:
             raise NotImplementedError
         if overwrite:
             raise NotImplementedError
-        target = dest / path.with_suffix('.nsp')
+        target = (dest / path.name).with_suffix('.nsp')
         if target.exists():
             raise RuntimeError
         with tempfile.TemporaryDirectory(
