@@ -22,7 +22,7 @@ clipboard_copyq() {
     if command -v copyq > /dev/null; then
         case "$MODE" in
             copy)
-                copyq copy -
+                copyq copy - > /dev/null
                 ;;
             paste)
                 copyq clipboard
