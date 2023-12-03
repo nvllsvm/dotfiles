@@ -16,6 +16,7 @@ class Clipboard:
         subprocess.run(
             ['cbcopy'],
             input=data,
+            stdout=subprocess.DEVNULL,
             check=True)
 
     @staticmethod
