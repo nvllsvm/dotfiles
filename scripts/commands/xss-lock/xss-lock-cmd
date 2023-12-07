@@ -1,7 +1,9 @@
 #!/usr/bin/env sh
 if ! pidof i3lock; then
-    pkill -x onboard
-    onboard &
+    if command -v onboard; then
+        pkill -x onboard
+        onboard &
+    fi
     i3lock -n -c 8c8cb8
     pkill -x onboard
     killall -USR1 i3status i3status-rs
