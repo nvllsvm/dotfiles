@@ -4,11 +4,11 @@ DOTFILES_DIR=~/.dotfiles/public
 if ! [ -d "${DOTFILES_DIR}" ]; then
     git clone https://github.com/nvllsvm/dotfiles "${DOTFILES_DIR}"
 fi
-git -c "${DOTFILES_DIR}" pull 
+git -C "${DOTFILES_DIR}" pull 
 
 RRUNLOCK_DIR=~/.local/share/SteamDeck-RefreshRateUnlocker
 if ! [ -d "${RRUNLOCK_DIR}" ]; then
     git clone https://github.com/ryanrudolfoba/SteamDeck-RefreshRateUnlocker "${RRUNLOCK_DIR}"
 fi
-git -c "${RRUNLOCK_DIR}" checkout c68fdfb6d93baef30c34e832306c8d2af76adb83
+git -C "${RRUNLOCK_DIR}" checkout c68fdfb6d93baef30c34e832306c8d2af76adb83
 
