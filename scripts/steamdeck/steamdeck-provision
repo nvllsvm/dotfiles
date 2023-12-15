@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-set -e
+set -ex
 DOTFILES_DIR=~/.dotfiles/public
 if ! [ -d "${DOTFILES_DIR}" ]; then
     git clone https://github.com/nvllsvm/dotfiles "${DOTFILES_DIR}"
