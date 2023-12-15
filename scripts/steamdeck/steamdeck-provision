@@ -7,7 +7,7 @@ fi
 
 RRUNLOCK_DIR=~/.local/share/SteamDeck-RefreshRateUnlocker
 if ! [ -d "${RRUNLOCK_DIR}" ]; then
-    git clone https://github.com/ryanrudolfoba/SteamDeck-RefreshRateUnlocker
+    git clone https://github.com/ryanrudolfoba/SteamDeck-RefreshRateUnlocker "${RRUNLOCK_DIR}"
 fi
 cd "${RRUNLOCK_DIR}"
 git checkout c68fdfb6d93baef30c34e832306c8d2af76adb83
