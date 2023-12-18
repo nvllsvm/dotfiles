@@ -1,6 +1,7 @@
 [Default Applications]
 application/epub+zip=com.github.johnfactotum.Foliate.desktop
 application/pdf=org.kde.okular.desktop
+application/vnd.adobe.flash.movie=ruffle.desktop
 application/vnd.comicbook+zip=org.nomacs.ImageLounge.desktop
 application/vnd.jgraph.mxfile=draw.io.desktop
 application/x-bittorrent=torrent.desktop
