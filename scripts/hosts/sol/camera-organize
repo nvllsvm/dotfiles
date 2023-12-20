@@ -17,12 +17,14 @@ VIDEO_DIR = 'Videos'
 PHOTO_EXT = set([
     '.cr3',
     '.jpg',
+    '.jpeg',
     '.png'
 ])
 
 VIDEO_EXT = set([
     '.mkv',
-    '.mp4'
+    '.mp4',
+    '.mov',
 ])
 
 
@@ -118,7 +120,7 @@ async def parse_date(path):
         print(
             f'error: parse error "{path}" {e.args}', file=sys.stderr
         )
-        sys.exit(1)
+        raise
     return dt
 
 
@@ -143,14 +145,19 @@ async def process_file(path, target_root, dry_run):
     else:
         raise KeyError(f'unhandled suffix in {path}')
 
-    dt = await parse_date(path)
-
-    target_path = target_path.joinpath(
-        str(dt.year),
-        str(dt.month).zfill(2),
-        str(dt.day).zfill(2),
-        path.name
-    )
+    try:
+        dt = await parse_date(path)
+        target_path = target_path.joinpath(
+            str(dt.year),
+            str(dt.month).zfill(2),
+            str(dt.day).zfill(2),
+            path.name
+        )
+    except Exception:
+        target_path = target_path.joinpath(
+            'unknown',
+            path.name
+        )
 
     if target_path.exists():
         raise RuntimeError(f'path exists: {path} {target_path}')
