@@ -45,7 +45,7 @@ def main():
     parser.add_argument('--hold', action='store_true')
     parser.add_argument('--class', dest='window_class')
     parser.add_argument('--terminal', choices=_TERMINALS,
-                        default='wezterm')
+                        default='alacritty')
     parser.add_argument('args', nargs='*')
     args = parser.parse_args()
 
