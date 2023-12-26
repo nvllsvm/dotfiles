@@ -23,6 +23,9 @@ cmd nopreview &{{
     lf -remote "send $id set ratios 1"
     lf -remote "send $id map <tab> showpreview"
 }}
+cmd gui &{{
+    dolphin "$PWD"
+}}
 map <tab> nopreview
 set autoquit
 
