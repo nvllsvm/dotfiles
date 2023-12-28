@@ -219,18 +219,21 @@ EOF
 
 alacritty-config-reload
 mkdir -p ~/.config/alacritty
-cat > ~/.config/alacritty/alacritty.yml << EOF
-env:
-    TERM: screen-256color
-font:
-  normal:
-    family: ${FONT_NAME}
-  size: ${FONT_SIZE}
-colors:
-  primary:
-    background: '0x${BASE16_BACKGROUND}'
-mouse:
-    hide_when_typing: true
+cat > ~/.config/alacritty/alacritty.toml << EOF
+[colors.primary]
+background = "0x${BASE16_BACKGROUND}"
+
+[env]
+TERM = "screen-256color"
+
+[font]
+size = ${FONT_SIZE}
+
+[font.normal]
+family = "${FONT_NAME}"
+
+[mouse]
+hide_when_typing = true
 EOF
 
 # let it fail
