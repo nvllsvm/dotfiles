@@ -1,10 +1,14 @@
 #!/usr/bin/env sh
+xset +dpms
+xset dpms 0 0 10
 if ! pidof i3lock; then
     if command -v onboard; then
-        pkill -x onboard
+        pkiill -x onboard
         onboard &
     fi
+
     i3lock -n -c 000000
     pkill -x onboard
+    xset -dpms
     killall -USR1 i3status i3status-rs
 fi
