@@ -3,7 +3,7 @@ xset +dpms
 xset dpms 0 0 10
 if ! pidof i3lock; then
     if command -v onboard; then
-        pkiill -x onboard
+        pkill -x onboard
         onboard &
     fi
 
