@@ -111,12 +111,12 @@ def main():
                 and results[name]['size'] == stat.st_size \
                 and not args.force:
             continue
-        pending_paths.append((name, path))
+        pending_paths.append((path, name, stat))
 
     if not args.no_progress:
         pending_paths = tqdm.tqdm(pending_paths)
 
-    for name, path in pending_paths:
+    for path, name, stat in pending_paths:
         hashes = multi_hash(path)
         data = {
             'mtime': stat.st_mtime,
