@@ -89,11 +89,11 @@ def main():
     args = parser.parse_args()
 
     results = {}
-    ingnore_paths = set()
+    ignore_paths = set()
     output_path = None
     if args.output is not None:
         output_path = args.output
-        ingnore_paths.add(output_path)
+        ignore_paths.add(output_path)
         if output_path.exists():
             results = json.loads(output_path.read_text())
 
@@ -101,7 +101,7 @@ def main():
 
     pending_paths = []
     for path in all_files(args.path):
-        if path in ingnore_paths:
+        if path in ignore_paths:
             continue
         name = str(path.relative_to(args.path))
         found.add(name)
