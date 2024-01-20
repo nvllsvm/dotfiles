@@ -7,6 +7,8 @@ import subprocess
 import tempfile
 import zlib
 
+import tqdm
+
 
 def all_files(root):
     stack = [pathlib.Path(root)]
@@ -58,6 +60,7 @@ def safe_write(path, data):
 def extract(source, target):
     subprocess.run(
         ['extract',
+         '--quiet',
          '-p', target,
          '--',
          source],
@@ -67,6 +70,7 @@ def extract(source, target):
 def file_hash_recorder(path):
     proc = subprocess.run(
         ['file-hash-recorder',
+         '--no-progress',
          '--archive-contents',
          '--',
          path],
@@ -77,6 +81,7 @@ def file_hash_recorder(path):
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--no-progress', action='store_true')
     parser.add_argument('-f', '--force', action='store_true')
     parser.add_argument('-o', '--output', type=pathlib.Path)
     parser.add_argument('--archive-contents', action='store_true')
@@ -93,7 +98,12 @@ def main():
             results = json.loads(output_path.read_text())
 
     found = set()
-    for path in all_files(args.path):
+
+    path_iter = all_files(args.path)
+    if not args.no_progress:
+        path_iter = tqdm.tqdm(path_iter)
+
+    for path in path_iter:
         if path in ingnore_paths:
             continue
         name = str(path.relative_to(args.path))
