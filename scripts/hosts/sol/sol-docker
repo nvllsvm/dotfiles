@@ -33,45 +33,19 @@ def docker_compose(*args, exec=False, **kwargs):
             ['docker', 'compose', *args], env=env, **kwargs)
 
 
-def restart_hass():
-    containers = [
-        'home-assistant',
-        'rtl_433_mqtt',
-        'zigbee2mqtt',
-        'zwavejs2mqtt',
-    ]
-    docker_compose('kill', *[c for c in containers if c in KILLABLE])
-    docker_compose('rm', '-fs', *containers)
-    docker_compose('up', '-d', '--no-recreate', *containers, check=True)
-
-
-def restart_nginx():
-    docker_compose('kill', 'nginx')
-    docker_compose('up', '-d', '--no-recreate', 'nginx')
-
-
-def _command_restart_hass():
-    restart_hass()
-    restart_nginx()
-
-
 def _command_restart():
     docker_compose('kill', *KILLABLE)
     docker_compose('rm', '-fs')
     docker_compose('up', '-d', check=True)
 
 
-def _command_startup():
-    docker_compose('down', '--remove-orphans')
-    docker_compose('up', '-d', check=True)
-    restart_hass()
-    restart_nginx()
-
-
 def _command_status():
     proc = docker_compose('ps', '--all', '--format=json',
                           stdout=subprocess.PIPE)
-    data = json.loads(proc.stdout)
+    data = [
+        json.loads(line)
+        for line in proc.stdout.splitlines()
+    ]
 
     containers = []
     for item in data:
@@ -86,10 +60,7 @@ def _command_status():
 
 
 COMMANDS = {
-    'restart-hass': _command_restart_hass,
-    'restart-nginx': restart_nginx,
     'restart': _command_restart,
-    'startup': _command_startup,
     'status': _command_status,
 }
 
