@@ -42,7 +42,7 @@ require("packer").startup({
             config = function()
                 require("nvim-treesitter.configs").setup({
                     ensure_installed = { "lua", "rust" },
-                    highlight = { -- Be sure to enable highlights if you haven't!
+                    highlight = {
                         enable = true,
                     },
                 })
