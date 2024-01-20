@@ -99,11 +99,8 @@ def main():
 
     found = set()
 
-    path_iter = all_files(args.path)
-    if not args.no_progress:
-        path_iter = tqdm.tqdm(path_iter)
-
-    for path in path_iter:
+    pending_paths = []
+    for path in all_files(args.path):
         if path in ingnore_paths:
             continue
         name = str(path.relative_to(args.path))
@@ -114,6 +111,12 @@ def main():
                 and results[name]['size'] == stat.st_size \
                 and not args.force:
             continue
+        pending_paths.append((name, path))
+
+    if not args.no_progress:
+        pending_paths = tqdm.tqdm(pending_paths)
+
+    for name, path in pending_paths:
         hashes = multi_hash(path)
         data = {
             'mtime': stat.st_mtime,
