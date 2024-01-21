@@ -13,6 +13,7 @@ INFO_SUFFIXES = (
     '.c2',
     '.ccd',
     '.dat',
+    '.json',
     '.sub',
     '.toc',
     '.txt',
