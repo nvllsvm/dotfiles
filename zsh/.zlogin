@@ -16,11 +16,9 @@ if [ -f ~/.usesway ] && [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]; then
     exec sway
 fi
 
-exec systemd-cat -t startplasma-wayland
 case "$HOST" in
     mars|phobos)
         if [ -z "$(pidof Xorg)" ]; then
-            exec systemd-cat -t startplasma-wayland
             exec systemd-cat -t startx startx
         fi
         ;;

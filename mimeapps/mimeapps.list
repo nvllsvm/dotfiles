@@ -52,4 +52,3 @@ x-scheme-handler/https=web-browser-dotfiles.desktop
 x-scheme-handler/magnet=torrent.desktop
 x-scheme-handler/sgnl=signal-desktop.desktop
 x-scheme-handler/unknown=web-browser-dotfiles.desktop
-x-scheme-handler/slack=slack.desktop
