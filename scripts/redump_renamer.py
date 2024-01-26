@@ -137,23 +137,40 @@ class Redump:
 def find_dump_hashes(root):
     iterator = root.iterdir() if root.is_dir() else [root]
 
-    paths = [
+    files = [
         path
         for path in iterator
-        if path.is_file() and path.suffix in SUFFIXES
+        if path.is_file()
+    ]
+    hash_cache = None
+    if len(files) == 1 and files[0].name == 'dump.tar.zst':
+        hash_cache = FILE_HASH_RECORDER[str(files[0])]['archive_contents']
+        files = [
+            pathlib.Path(p)
+            for p in hash_cache
+            if '/' not in p
+        ]
+
+    paths = [
+        path
+        for path in files
+        if path.name.endswith(SUFFIXES)
         and not path.name.endswith(IGNORE_ENDSWITH)
     ]
 
     if len(paths) > 1:
-        iso_paths = [path for path in paths if path.suffix == '.iso']
+        iso_paths = [path for path in paths if path.name.endswith('.iso')]
         if len(iso_paths) == 1:
             paths = iso_paths
         else:
             for path in paths:
-                if path.suffix != '.bin':
+                if not path.name.endswith('.bin'):
                     raise RuntimeError('unexpected files')
 
-    hashes = {path: sha1sum(path) for path in sorted(paths)}
+    if hash_cache:
+        hashes = {path: hash_cache[str(path)]['sha1'] for path in sorted(paths)}
+    else:
+        hashes = {path: sha1sum(path) for path in sorted(paths)}
     LOGGER.debug('sha1 hashes %s', hashes)
     return hashes
 
@@ -218,11 +235,6 @@ async def main():
         parser.exit()
 
     if args.hashes:
-        subprocess.run(
-            ['file-hash-recorder',
-             '--output', args.hashes,
-             args.hashes.parent],
-            check=True)
         FILE_HASH_RECORDER.update(json.loads(args.hashes.read_text()))
 
     for path in args.path:
