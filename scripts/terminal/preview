@@ -65,6 +65,7 @@ else
         video/*)
             ffprobe -hide_banner -- "$1" 2>&1
             ;;
+        application/pdf|\
         image/gif|\
         image/x-canon-cr2|\
         image/x-canon-cr3)
