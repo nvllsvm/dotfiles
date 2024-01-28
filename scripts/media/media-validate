@@ -7,6 +7,7 @@ import re
 import sys
 
 import async_executor
+import tqdm.asyncio
 
 
 LOGGER = logging.getLogger('media-validate')
@@ -182,7 +183,7 @@ async def async_main(args):
     for path in paths:
         executor.submit(validate, path)
 
-    async for result in executor:
+    async for result in tqdm.asyncio.tqdm(executor):
         if result.result() is False:
             has_error = True
 
