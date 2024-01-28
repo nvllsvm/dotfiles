@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
+import argparse
 import pathlib
 import subprocess
+import sys
 
 CACHE_DIR = pathlib.Path('~/.cache/lgogdownloader').expanduser()
 CONFIG_DIR = pathlib.Path('~/.dotfiles/private/lgogdownloader').expanduser()
 GOG_DIR = pathlib.Path('/storage/Games/PC/GOG.com')
-IMAGE = 'docker.io/nvllsvm/lgogdownloader'
+IMAGE = 'ghcr.io/nvllsvm/lgogdownloader'
 
 
 def files_to_mtime(root):
@@ -20,20 +22,35 @@ def files_to_mtime(root):
     return files
 
 
-def run_lgogdownloader():
-    subprocess.run(
-        ['podman', 'run',
-         '--pull', 'always',
-         '--rm',
-         '-e', 'HOME',
-         '-v', f'{GOG_DIR}:/downloads',
-         '-v', f'{CACHE_DIR}:/cache',
-         '-v', f'{CONFIG_DIR}:/config',
-         IMAGE],
-        check=True)
+def run_lgogdownloader(*, pull=True, shell=False):
+    args = [
+        'podman', 'run',
+        '--rm',
+        '-e', 'HOME',
+        '-v', f'{GOG_DIR}:/downloads',
+        '-v', f'{CACHE_DIR}:/cache',
+        '-v', f'{CONFIG_DIR}:/config',
+    ]
+    if pull:
+        args.append('--pull=always')
+    if shell:
+        args.append('-it')
+    args.append(IMAGE)
+    if shell:
+        args.extend(['--', 'sh', '-l'])
+
+    subprocess.run(args, check=True)
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--shell', action='store_true')
+    args = parser.parse_args()
+
+    if args.shell:
+        run_lgogdownloader(shell=True)
+        sys.exit()
+
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
     before = files_to_mtime(GOG_DIR)
