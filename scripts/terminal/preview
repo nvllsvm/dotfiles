@@ -23,7 +23,6 @@ else
         mimetype="$(file --brief --mime-type "$1")"
     fi
     case "$mimetype" in
-        application/epub+zip|\
         application/gzip|\
         application/x-rpm|\
         application/java-archive|\
@@ -65,11 +64,14 @@ else
         video/*)
             ffprobe -hide_banner -- "$1" 2>&1
             ;;
-        application/pdf|\
+        application/epub+zip)
+            epubmeta -- "$1"
+            ;;
+        application/pdf|)
         image/gif|\
         image/x-canon-cr2|\
         image/x-canon-cr3)
-            exiftool "$1"
+            exiftool -- "$1"
             ;;
         image/*)
             exiv2 "$1" || true
