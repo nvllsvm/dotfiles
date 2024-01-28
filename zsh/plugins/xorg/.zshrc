@@ -1,4 +1,4 @@
 if [ -f /tmp/.X0-lock ]; then
-    export XAUTHORITY=~/.Xauthority
-    export DISPLAY=':0'
+    export XAUTHORITY="${XAUTHORITY:-${HOME}/.Xauthority}"
+    export DISPLAY="${DISPLAY:-:0}"
 fi
