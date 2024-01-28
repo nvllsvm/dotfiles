@@ -1,9 +1,3 @@
-#nvidia dGPU
-ACTION=="add", SUBSYSTEM=="pci", TEST=="power/control", ATTR{vendor}=="0x10de", ATTR{power/control}="auto"
-
-#ssd
-ACTION=="add", SUBSYSTEM=="pci", DRIVER=="nvme", TEST=="power/control", ATTR{power/control}="auto"
-
 # keyboard backlight permissions
 ACTION=="add", SUBSYSTEM=="leds", KERNEL=="asus::kbd_backlight", ATTR{brightness}="0", GROUP="video", MODE="0664"
 
