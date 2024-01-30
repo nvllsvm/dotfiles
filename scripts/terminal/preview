@@ -67,7 +67,7 @@ else
         application/epub+zip)
             epubmeta -- "$1"
             ;;
-        application/pdf|)
+        application/pdf|\
         image/gif|\
         image/x-canon-cr2|\
         image/x-canon-cr3)
