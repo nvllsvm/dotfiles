@@ -32,7 +32,7 @@ def process(path):
     )
 
     for sub in subs:
-        number = sub['properties']['number']
+        selector = 'track:={}'.format(sub['properties']['uid'])
         if sub['properties']['language'] in ('eng', 'und'):
             continue
         if sub['properties']['default_track'] \
@@ -40,7 +40,7 @@ def process(path):
             print('Unsetting default & forced flags', path)
             subprocess.run(
                 ['mkvpropedit',
-                 '--edit', f'track:{number}',
+                 '--edit', selector,
                  '--set', 'flag-default=false',
                  '--set', 'flag-forced=false',
                  str(path)],
