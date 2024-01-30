@@ -9,6 +9,7 @@ import subprocess
 import sys
 import tempfile
 
+import tqdm
 
 DEFAULT_LANGUAGES = {'eng', 'und'}
 
@@ -151,7 +152,7 @@ def main():
     files = []
     if args.input.is_dir():
         files.extend([
-            path.relative_to(args.input)
+            path.absolute()
             for path in mkv_files(args.input)
         ])
     else:
@@ -170,11 +171,12 @@ def main():
         if 'und' in valid_languages:
             valid_languages.add(None)
 
-        for path in files:
-            print(path)
+        input_path = args.input.absolute()
+        for path in tqdm.tqdm(files):
             mkv = MKVFile(path)
             invalid_languages = mkv.languages - valid_languages
-            target = args.output / path.name
+            target = args.output / path.relative_to(input_path)
+            target.parent.mkdir(parents=True, exist_ok=True)
             audio = mkv.matching_audio_tracks(invalid_languages)
             subtitle = mkv.matching_subtitle_tracks(invalid_languages)
 
