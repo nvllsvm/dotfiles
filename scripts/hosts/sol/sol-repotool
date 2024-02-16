@@ -16,6 +16,7 @@ fi
 repotool_update() {
     sudo pacsync "$DATABASE" > /dev/null
 
+    mkdir -p ~/.cache/aurutils/sync
     cd ~/.cache/aurutils/sync || exit 1
 
     aur sync --no-view --no-confirm --database="$DATABASE" --no-ver --upgrades
