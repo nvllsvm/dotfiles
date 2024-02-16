@@ -86,19 +86,20 @@ class Redump:
         LOGGER.info('Updating .dat files')
         systems_dict = {}
         systems = [
-            'dc',   # dreamcast
-            'gc',   # gamecube
-            'mac',  # macintosh
-            'mcd',  # SEGA Mega CD
-            'palm', # palm os
-            'pc',   # PC
-            'ps2',  # playstation 2
-            'ps3',  # playstation 3
-            'psp',  # playstation portable
-            'psx',  # playstation
-            'ss',   # SEGA Saturn
-            'wii',  # wii
-            'xbox', # xbox
+            'dc',       # dreamcast
+            'gc',       # gamecube
+            'mac',      # macintosh
+            'mcd',      # SEGA Mega CD
+            'palm',     # palm os
+            'pc',       # PC
+            'ps2',      # playstation 2
+            'ps3',      # playstation 3
+            'psp',      # playstation portable
+            'psx',      # playstation
+            'ss',       # SEGA Saturn
+            'wii',      # wii
+            'xbox',     # xbox
+            'xbox360',  # xbox 360
         ]
         client = httpx.AsyncClient()
         for system in systems:
