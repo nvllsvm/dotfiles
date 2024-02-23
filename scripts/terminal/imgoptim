@@ -157,6 +157,12 @@ _MIME_OPTIMIZATIONS = {
     'image/png': optimize_png,
 }
 
+_TYPE_TO_MIME = {
+    'jpeg': 'image/jpeg',
+    'png': 'image/png',
+    'gif': 'image/gif',
+}
+
 
 def determine_mime(path):
     # roughly 2.5x faster than using libmagic
@@ -248,9 +254,9 @@ async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-s', '--strip', action='store_true')
     parser.add_argument(
-        '--mime', action='append', default=[],
-        choices=['image/gif', 'image/jpeg', 'image/png'],
-        help='mimetypes to process. may be specified more than once.')
+        '-t', '--type', dest='types', action='append', default=[],
+        choices=_TYPE_TO_MIME,
+        help='filetypes to process. may be specified more than once.')
     parser.add_argument('-n', metavar='NUM', dest='num_procs',
                         type=_num_procs, default=None,
                         help='number of parallel jobs (default: %(default)s)')
@@ -264,6 +270,8 @@ async def main():
         else:
             files.update(all_files(path))
 
+    mimetypes = set(_TYPE_TO_MIME[t] for t in (args.types or _TYPE_TO_MIME))
+
     executor = async_executor.AsyncExecutor(args.num_procs)
     for f in sorted(files):
         try:
@@ -272,7 +280,7 @@ async def main():
             # broken symlink can cause this
             continue
 
-        if args.mime and mimetype not in args.mime:
+        if mimetype not in mimetypes:
             continue
 
         if func := _MIME_OPTIMIZATIONS.get(mimetype):
