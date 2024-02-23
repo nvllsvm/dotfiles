@@ -74,6 +74,7 @@ else
             exiftool -- "$1"
             ;;
         image/*)
+            #chafa -f sixel -s "$2x$3" --animate off --polite on "$1"
             exiv2 "$1" || true
             ;;
         application/octet-stream)

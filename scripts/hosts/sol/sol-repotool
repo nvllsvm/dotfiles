@@ -139,6 +139,10 @@ case "$1" in
         shift
         repotool_list
         ;;
+    sync)
+        shift
+        sync_nullsum
+        ;;
     --help)
         usage
         exit

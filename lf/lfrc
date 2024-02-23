@@ -1,6 +1,7 @@
 set hidden
 map <c-n> :set relativenumber!
 set previewer preview
+set sixel
 map i $preview "$f" | less -R
 map r $lf-renamer
 
