@@ -1,0 +1,200 @@
+#!/usr/bin/env python3
+import argparse
+import asyncio
+import datetime
+import pathlib
+import shutil
+import string
+import sys
+
+import async_executor
+import tqdm.asyncio
+
+DEFAULT_TARGET = pathlib.Path('/storage/Personal Creations')
+PHOTO_DIR = 'Photos'
+VIDEO_DIR = 'Videos'
+
+PHOTO_EXT = set([
+    '.cr3',
+    '.jpg',
+    '.jpeg',
+    '.png'
+])
+
+VIDEO_EXT = set([
+    '.mkv',
+    '.mp4',
+    '.mov',
+])
+
+
+class exiv2:
+
+    @classmethod
+    async def get_image_datetime(cls, path):
+        keys = [
+            'Exif.Image.DateTime',
+            'Exif.Photo.DateTimeOriginal',
+        ]
+        for key in keys:
+            proc = await asyncio.create_subprocess_exec(
+                'exiv2', '--key', key, '--', path,
+                stderr=asyncio.subprocess.PIPE,
+                stdout=asyncio.subprocess.PIPE)
+            stdout, stderr = await proc.communicate()
+
+            if proc.returncode == 0:
+                _, _, _, value = stdout.decode().split(maxsplit=3)
+                value = value.strip()
+                if value != '(0)':
+                    dt = datetime.datetime.strptime(value, '%Y:%m:%d %H:%M:%S')
+                    return dt
+
+
+class ffprobe:
+
+    @classmethod
+    async def get_image_datetime(cls, path):
+        proc = await asyncio.create_subprocess_exec(
+            'ffprobe', '--', path,
+            stderr=asyncio.subprocess.PIPE,
+            stdout=asyncio.subprocess.PIPE)
+        stdout, stderr = await proc.communicate()
+
+        if proc.returncode != 0:
+            raise SubprocessError
+        match = [
+            line
+            for line in stderr.decode().splitlines()
+            if line.startswith('    creation_time   : ')
+        ]
+        if match:
+            value = match[0].split(':', maxsplit=1)[-1].strip()\
+                .removesuffix('Z')
+            return datetime.datetime.fromisoformat(value)
+
+
+class SubprocessError(Exception):
+    """Raised when an error occurs in a subprocess"""
+
+
+async def parse_date(path):
+    try:
+        dt = await exiv2.get_image_datetime(path)
+        if dt:
+            return dt
+    except Exception as e:
+        print('exiv2 error', e)
+        pass
+
+    try:
+        dt = await ffprobe.get_image_datetime(path)
+        if dt:
+            return dt
+    except Exception as e:
+        print('ffprobe error', e)
+        pass
+
+    try:
+        name = path.name
+        if name.startswith(('DOC', 'IMG', 'VID')) and name[3] in ('-', '_'):
+            dt = datetime.datetime(
+                int(name[4:8]),
+                int(name[8:10]),
+                int(name[10:12])
+            )
+        elif not set(name[:10]) - set(string.digits):
+            dt = datetime.datetime.utcfromtimestamp(int(name[:10]))
+        else:
+            raise ValueError('unknown date format')
+
+        lower_bound = datetime.timedelta(weeks=52 * 5)
+        upper_bound = datetime.timedelta(days=1)
+
+        now = datetime.datetime.utcnow()
+        if dt > (now + upper_bound):
+            raise ValueError('date in the future')
+        elif dt < (now - lower_bound):
+            raise ValueError('date too old')
+    except Exception as e:
+        print(
+            f'error: parse error "{path}" {e.args}', file=sys.stderr
+        )
+        raise
+    return dt
+
+
+def all_files(root):
+    files = []
+    stack = [root]
+    while stack:
+        for path in stack.pop().iterdir():
+            if path.is_file():
+                files.append(path)
+            elif path.is_dir():
+                stack.append(path)
+    return sorted(files)
+
+
+async def process_file(path, target_root, dry_run):
+    suffix = path.suffix.lower()
+    if suffix in PHOTO_EXT:
+        target_path = target_root.joinpath(PHOTO_DIR)
+    elif suffix in VIDEO_EXT:
+        target_path = target_root.joinpath(VIDEO_DIR)
+    else:
+        raise KeyError(f'unhandled suffix in {path}')
+
+    try:
+        dt = await parse_date(path)
+        target_path = target_path.joinpath(
+            str(dt.year),
+            str(dt.month).zfill(2),
+            str(dt.day).zfill(2),
+            path.name
+        )
+    except Exception:
+        target_path = target_path.joinpath(
+            'unknown',
+            path.name
+        )
+
+    if target_path.exists():
+        raise RuntimeError(f'path exists: {path} {target_path}')
+    if not dry_run:
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(path, target_path)
+
+
+async def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--target',
+        metavar='PATH',
+        type=pathlib.Path,
+        default=DEFAULT_TARGET,
+        help='target directory (default: %(default)s)')
+    parser.add_argument('-d', '--dry-run', action='store_true')
+    parser.add_argument('path', type=pathlib.Path, nargs='+')
+    args = parser.parse_args()
+
+    paths = set()
+    for path in args.path:
+        if path.is_file():
+            paths.add(path)
+        else:
+            paths.update(all_files(path))
+
+    executor = async_executor.AsyncExecutor()
+    for path in paths:
+        executor.submit(process_file, path, args.target, args.dry_run)
+
+    async for task in tqdm.asyncio.tqdm(executor):
+        try:
+            task.result()
+        except Exception as e:
+            print('error:', str(e), file=sys.stderr)
+
+
+if __name__ == '__main__':
+    asyncio.run(main())
