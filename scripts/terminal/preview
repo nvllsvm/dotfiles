@@ -39,6 +39,7 @@ else
         application/x-dosexec|\
         application/x-iso9660-image|\
         application/x-ms-dos-executable|\
+        application/x-pak|\
         application/x-rar|\
         application/x-raw-disk-image|\
         application/x-tar|\
