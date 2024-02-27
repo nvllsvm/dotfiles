@@ -2,6 +2,7 @@
 options() {
     cat << EOF
 closet-lights
+desk-lamp
 fan-light
 fan-max
 fan-off

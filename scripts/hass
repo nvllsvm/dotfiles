@@ -97,6 +97,12 @@ async def office_fan_light_toggle(_):
         'light', 'toggle', entity_id='light.fan_office_light')
 
 
+async def office_desk_lamp_toggle(_):
+    hass = HASS(URL, TOKEN)
+    await hass.post_services(
+        'light', 'toggle', entity_id='light.office_desk_lamp')
+
+
 async def office_studio_monitors_on(_):
     hass = HASS(URL, TOKEN)
     await hass.post_services(
@@ -162,6 +168,11 @@ async def main():
         'office-fan-light')
     office_fan_light_toggle_parser.set_defaults(
         func=office_fan_light_toggle)
+
+    office_desk_lamp_toggle_parser = subparsers.add_parser(
+        'office-desk-lamp')
+    office_desk_lamp_toggle_parser.set_defaults(
+        func=office_desk_lamp_toggle)
 
     office_at_monitor_desk_parser = subparsers.add_parser(
         'office-at-monitor-desk')
