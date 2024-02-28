@@ -4,6 +4,7 @@ if ! command -v k9s > /dev/null; then
 fi
 
 eval "$(base16-export)}"
+mkdir -p ~/.config/k9s
 cat > ~/.config/k9s/skin.yml << EOF
 k9s:
   body:
