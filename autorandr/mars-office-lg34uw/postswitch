@@ -1,4 +1,0 @@
-#!/usr/bin/env sh
-set-desktop-themes --dpi 96
-pactl-set-only \
-    --profile 'UMC404HD 192k' 'Pro Audio'
