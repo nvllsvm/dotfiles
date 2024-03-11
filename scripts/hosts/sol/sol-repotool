@@ -1,153 +1,252 @@
-#!/usr/bin/env bash
-set -e
-
-if [ -n "$DEBUG" ]; then
-    set -x
-fi
-
-DATABASE=sol
-DATABASE_DIR="/var/cache/pacman/$DATABASE"
-DATABASE_FILE="$DATABASE_DIR/$DATABASE.db.tar"
-
-if ! [ -f "$DATABASE_FILE" ]; then
-    repo-add "$DATABASE_FILE"
-fi
-
-repotool_update() {
-    sudo pacsync "$DATABASE" > /dev/null
-
-    mkdir -p ~/.cache/aurutils/sync
-    cd ~/.cache/aurutils/sync || exit 1
-
-    aur sync --no-view --no-confirm --database="$DATABASE" --no-ver --upgrades
-
-    pkgs=$(aur repo --database="$DATABASE" --list | cut -f1)
-    aur sync "$pkgs" --no-ver-argv --no-build --no-view
-    for pkg in $pkgs; do
-        echo "Checking ${pkg}"
-        escaped_pkg="$(printf '%s' "$pkg" | sed 's/\+/\\+/g')"
-        repo_ver="$(aur repo --database "$DATABASE" --list | grep -P "^$escaped_pkg\t")"
-        current_ver="$(aur srcver "$pkg" || true)"
-        if [ -z "$current_ver" ]; then
-            repotool_add "$pkg"
-        fi
-
-        ood="$(printf '%s' "$repo_ver" | aur vercmp -p <(printf '%s' "$current_ver"))"
-        if [ -n "$ood" ]; then
-            repotool_add "$pkg"
-        fi
-    done
-
-    sudo pacsync "$DATABASE" > /dev/null
-    paccache --remove --keep 1 --cachedir "$DATABASE_DIR"
-}
-
-repotool_add() {
-    sudo pacsync "$DATABASE" > /dev/null
-    for i in "${@}"; do
-        if [ -f "$i" ]; then
-            sudo cp "$i" "$DATABASE_DIR"
-            repo-add "$DATABASE_FILE" "$i"
-        else
-            packages_and_deps="$packages_and_deps $i $(echo "$i" | aur depends 2>/dev/null | cut -f2 | sort | comm -12 - <(aur pkglist | sort))"
-        fi
-    done
-    if [ -n "$packages_and_deps" ]; then
-        aur sync --no-view --no-confirm --no-ver --database="$DATABASE" -- ${packages_and_deps} || true
-    fi
-    sudo pacsync "$DATABASE" > /dev/null
-    for i in "${@}"; do
-        if ! [ -f "$i" ]; then
-            pacman -Si "sol/$i" >&2 || true
-        fi
-    done
-}
-
-repotool_remove() {
-    repo-remove "$DATABASE_FILE" "${@}"
-    for pkg in "${@}"; do
-        rm -rf "$DATABASE_DIR"/"$pkg"*.pkg.*
-    done
-    sudo pacsync "$DATABASE" > /dev/null
-}
-
-repotool_prune() {
-    python << EOF
+#!/usr/bin/env python3
+import argparse
+import dataclasses
 import pathlib
-import subprocess
 import shutil
+import subprocess
 
-DATABASE = '${DATABASE}'
 
-def get_packages():
-    proc = subprocess.run(
-        ['aur', 'repo', f'--database={DATABASE}', '--list'],
-        stdout=subprocess.PIPE,
-        check=True)
-    return [
-        line.split()[0]
-        for line in proc.stdout.decode().splitlines()
-    ]
+DATABASE = 'sol'
+DATABASE_DIR = pathlib.Path('/var/cache/pacman') / DATABASE
+DATABASE_FILE = DATABASE_DIR / f'{DATABASE}.db.tar'
 
-packages = get_packages()
+AURUTILS_DIR = pathlib.Path('~/.cache/aurutils/sync').expanduser()
 
-for path in pathlib.Path('~/.cache/aurutils/sync').expanduser().iterdir():
-    if path.name not in packages:
-        print('Clearing cache for', path.name)
-        shutil.rmtree(path)
-EOF
+
+@dataclasses.dataclass
+class Package:
+    name: str
+    version: str
+
+
+class Database:
+    def __init__(self, name):
+        self.name = name
+        self.db_dir = DATABASE_DIR
+        self.db_file = DATABASE_FILE
+        self.aurutils_dir = AURUTILS_DIR
+
+        if self.db_file.is_file():
+            subprocess.run(
+                ['repo-add', self.db_file],
+                check=True)
+
+    def packages(self):
+        proc = subprocess.run(
+            ['aur', 'repo', '--database', self.name, '--list'],
+            stdout=subprocess.PIPE,
+            check=True)
+
+        packages = []
+        for line in proc.stdout.decode().splitlines():
+            name, version = line.split()
+            packages.append(Package(name=name, version=version))
+        return packages
+
+    def prune(self):
+        packages = {
+            package.name
+            for package in self.packages()
+        }
+        for path in AURUTILS_DIR.iterdir():
+            if path.name not in packages:
+                print('Clearing cache for', path.name)
+                shutil.rmtree(path)
+
+    def sync(self):
+        subprocess.run(
+            ['rsync', '-avz', '--progress', '--delete-after',
+             '/var/cache/pacman/sol/',
+             'nullsum.net:~/srv/http/repo/arch/x86_64'],
+            check=True)
+
+    def remove(self, *packages):
+        subprocess.run(
+            ['repo-remove', self.db_file, *packages],
+            check=True)
+        for package in packages:
+            paths = (self.db_dir).glob(f'{package}*.pkg.*')
+            for path in paths:
+                path.unlink()
+        self._pacsync()
+        self.sync()
+
+    def add(self, *packages):
+        self._pacsync()
+
+        packages_and_deps = set()
+        for package in packages:
+            maybe_path = pathlib.Path(package)
+            if maybe_path.is_file():
+                subprocess.run(
+                    ['sudo', 'cp', maybe_path, self.db_dir],
+                    check=True)
+                subprocess.run(
+                    ['repo-add', self.db_file, maybe_path],
+                    check=True)
+            else:
+                proc = subprocess.run(
+                    ['aur', 'depends', '--', package],
+                    stdout=subprocess.PIPE,
+                    check=True)
+                for line in proc.stdout.decode().splitlines():
+                    _, name = line.split()
+                    packages_and_deps.add(name)
+
+        if packages_and_deps:
+            subprocess.run(
+                ['aur', 'sync', '--no-view', '--no-confirm', '--no-ver',
+                 f'--database={self.name}', '--', *packages_and_deps],
+            )
+        self._pacsync()
+        self.sync()
+
+    def update(self):
+        self._pacsync()
+        self.aurutils_dir.mkdir(exist_ok=True, parents=True)
+
+        subprocess.run(
+            ['aur', 'sync',
+             '--no-view', '--no-confirm', f'--database={self.name}',
+             '--no-ver', '--upgrades'],
+            cwd=self.aurutils_dir,
+            check=True)
+        self._pacsync()
+        self._paccache()
+        self.sync()
+        return
+
+        packages = self.packages()
+        package_names = [
+            package.name
+            for package in packages
+        ]
+
+        #subprocess.run(
+        #    ['aur', 'sync', *package_names,
+        #     '--no-ver-argv', '--no-build', '--no-view'],
+        #    cwd=self.aurutils_dir,
+        #    check=True)
+
+        for package in packages:
+            print('Checking', package.name)
+
+            repo_ver = package.version
+            proc = subprocess.run(
+                ['aur', 'srcver', package.name],
+                stdout=subprocess.PIPE,
+                cwd=self.aurutils_dir)
+            output = proc.stdout.decode()
+            if not output:
+                continue
+                raise NotImplementedError
+
+            current_ver = output.split()[-1]
+            if current_ver == repo_ver:
+                continue
+            print(repo_ver, current_ver)
+
+        """
+        cd ~/.cache/aurutils/sync || exit 1
+
+        for pkg in $package_names; do
+            echo "Checking ${pkg}"
+            escaped_pkg="$(printf '%s' "$pkg" | sed 's/\+/\\+/g')"
+            repo_ver="$(aur repo --database "$DATABASE" --list | grep -P "^$escaped_pkg\t")"
+            current_ver="$(aur srcver "$pkg" || true)"
+            if [ -z "$current_ver" ]; then
+                repotool_add "$pkg"
+            fi
+
+            ood="$(printf '%s' "$repo_ver" | aur vercmp -p <(printf '%s' "$current_ver"))"
+            if [ -n "$ood" ]; then
+                repotool_add "$pkg"
+            fi
+        done
+        """
+
+    def _paccache(self):
+        subprocess.run(
+            ['paccache', '--remove', '--keep', '1',
+             '--cachedir', self.db_dir],
+            check=True)
+
+    def _pacsync(self):
+        subprocess.run(
+            ['sudo', 'pacsync', self.name],
+            stderr=subprocess.DEVNULL,
+            check=True)
+
+
+def db_list():
+    database = Database(DATABASE)
+    for package in database.packages():
+        print(package.name)
+
+
+def db_prune():
+    database = Database(DATABASE)
+    database.prune()
+
+
+def db_sync():
+    database = Database(DATABASE)
+    database.sync()
+
+
+def db_remove(packages):
+    database = Database(DATABASE)
+    database.remove(*packages)
+
+
+def db_add(packages):
+    database = Database(DATABASE)
+    database.add(*packages)
+
+
+def db_update():
+    database = Database(DATABASE)
+    database.update()
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(dest='command', metavar='COMMAND', required=True)
+
+    update_parser = subparsers.add_parser('update')
+
+    add_parser = subparsers.add_parser('add')
+    add_parser.add_argument('package', nargs='+')
+
+    remove_parser = subparsers.add_parser('remove')
+    remove_parser.add_argument('package', nargs='+')
+
+    prune_parser = subparsers.add_parser('prune')
+    list_parser = subparsers.add_parser('list')
+    sync_parser = subparsers.add_parser('sync')
+    args = parser.parse_args()
+
+    match args.command:
+        case 'prune':
+            db_prune()
+        case 'update':
+            db_update()
+        case 'add':
+            db_add(args.package)
+        case 'remove':
+            db_remove(args.package)
+        case 'list':
+            db_list()
+        case 'sync':
+            db_sync()
+        case _:
+            raise ValueError
+
+
+if __name__ == '__main__':
+    main()
+"""
+repotool_update() {
 }
 
-repotool_list() {
-    aur repo --database="$DATABASE" --list | cut -f1
-}
-
-sync_nullsum() {
-    rsync -av --progress --delete-after /var/cache/pacman/sol/ nullsum.net:~/srv/http/repo/arch/x86_64
-}
-
-usage() {
-    cat << EOF
-usage: sol-repotool (add|list|prune|remove|update)
-EOF
-}
-
-case "$1" in
-    update)
-        shift
-        repotool_update "$@"
-        sync_nullsum
-        exit
-        ;;
-    add)
-        shift
-        repotool_add "$@"
-        sync_nullsum
-        exit
-        ;;
-    remove)
-        shift
-        repotool_remove "$@"
-        sync_nullsum
-        exit
-        ;;
-    prune)
-        shift
-        repotool_prune
-        ;;
-    list)
-        shift
-        repotool_list
-        ;;
-    sync)
-        shift
-        sync_nullsum
-        ;;
-    --help)
-        usage
-        exit
-        ;;
-    *)
-        usage >&2
-        exit 1
-esac
+"""
