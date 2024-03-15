@@ -3,6 +3,7 @@ import argparse
 import json
 import os
 import pathlib
+import shutil
 import subprocess
 import sys
 
@@ -16,6 +17,9 @@ LINK_ROOT = pathlib.Path('~/.local/bin').expanduser()
 
 def installed_versions():
     versions = {}
+
+    if wine_bin := shutil.which('wine'):
+        versions['wine'] = [wine_bin, 'wine']
 
     if SYSTEM_PROTON.is_file():
         versions['system'] = [SYSTEM_PROTON, 'run', 'run']
@@ -152,6 +156,7 @@ def main():
         'STEAM_COMPAT_CLIENT_INSTALL_PATH': str(STEAM_ROOT),
         'STEAM_COMPAT_DATA_PATH': str(PREFIX_ROOT / args.prefix),
         'WINEARCH': args.winearch,
+        'WINEPREFIX': str(prefix / 'pfx'),
     })
     os.execl(*proton_bin, *cmd)
 
