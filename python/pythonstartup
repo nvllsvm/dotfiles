@@ -18,6 +18,7 @@ import email.mime
 import email.mime.multipart
 import email.mime.text
 import enum
+import errno
 import fnmatch
 import getpass
 import glob
