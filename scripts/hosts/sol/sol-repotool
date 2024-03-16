@@ -62,12 +62,12 @@ class Database:
 
     def remove(self, *packages):
         subprocess.run(
-            ['repo-remove', self.db_file, *packages],
-            check=True)
+            ['repo-remove', self.db_file, *packages])
         for package in packages:
             paths = (self.db_dir).glob(f'{package}*.pkg.*')
             for path in paths:
                 path.unlink()
+            shutil.rmtree(self.aurutils_dir / package)
         self._pacsync()
         self.sync()
 
