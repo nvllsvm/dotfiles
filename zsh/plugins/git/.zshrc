@@ -8,7 +8,7 @@ if command -v git > /dev/null; then
         esac
         case $# in
             0)
-                target="$(git-sync --show-cache | fzf --exact --no-sort)"
+                target="$(git-sync --show-cache | fzf --tac --exact --no-sort)"
                 if [ -z "$target" ]; then
                     return 130
                 fi

@@ -72,7 +72,6 @@ def parse_repo(repo):
 
 def main():
     parser = argparse.ArgumentParser('git-sync')
-    parser.add_argument('--prune', action='store_true')
     parser.add_argument('--show-cache', action='store_true')
     parser.add_argument('--rm', action='store_true')
     parser.add_argument('repo', nargs='?')
@@ -80,20 +79,17 @@ def main():
 
     CACHE_PATH.touch()
 
-    cache = CACHE_PATH.read_text().splitlines()
-    if args.prune:
-        new_cache = []
-        for repo in cache:
-            repo_dir, _, _ = parse_repo(repo)
-            if repo_dir.is_dir():
-                new_cache.append(repo)
-        parser.exit()
+    cache = []
+    cache_modified = False
+    for repo in CACHE_PATH.read_text().splitlines():
+        repo_dir, _, _ = parse_repo(repo)
+        if repo_dir.is_dir():
+            cache_modified = True
+            cache.append(repo)
 
     if args.show_cache:
         print('\n'.join(cache))
-        parser.exit()
-
-    if args.repo is None:
+    elif args.repo is None:
         for repo_dir in _find_git_repos(pathlib.Path().absolute()):
             print(repo_dir)
             Git.fetch(repo_dir)
@@ -105,18 +101,21 @@ def main():
                 shutil.rmtree(repo_dir)
                 parser.exit()
             if repo in cache:
+                cache_modified = True
                 cache.remove(repo)
-                CACHE_PATH.write_text('\n'.join(cache))
         else:
             if not repo_dir.exists():
                 repo = f'{host}:{path}'
                 Git.clone(repo, repo_dir)
 
+            cache_modified = True
             if repo in cache:
                 cache.remove(repo)
             cache.append(repo)
-            CACHE_PATH.write_text('\n'.join(cache))
             print(repo_dir)
+
+    if cache_modified:
+        CACHE_PATH.write_text('\n'.join(cache))
 
 
 if __name__ == '__main__':
