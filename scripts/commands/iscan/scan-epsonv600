@@ -12,11 +12,12 @@ FORMAT_SUFFIXES = {
     'jpeg': '.jpg',
     'png': '.png',
     'tiff': '.tif',
+    'pnm': '.pnm',
 }
 
 # less than 400 rounded to 400
 # 2400 is rounded to 1600
-SUPPORTED_DPI = {400, 800, 1600}
+SUPPORTED_DPI = {400, 800, 1200, 1600}
 
 
 def scan(output, output_format, dpi):
@@ -29,8 +30,8 @@ def scan(output, output_format, dpi):
              '--device', DEVICE,
              '--scan-area', 'Maximum',
              '--resolution', str(dpi),
-             '--x-resolution', str(dpi),
-             '--y-resolution', str(dpi),
+             '--x-resolution', str(dpi) + 'dpi',
+             '--y-resolution', str(dpi) + 'dpi',
              '--progress',
              '--output', str(tmp)],
             check=True)
