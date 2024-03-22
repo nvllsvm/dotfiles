@@ -32,3 +32,6 @@ set autoquit
 
 # disable tagging
 map t
+
+# disable find
+map f
