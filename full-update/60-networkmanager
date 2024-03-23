@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+set -e
+
+if ! command -v > /dev/null; then
+    exit
+fi
+
+for f in $DOTFILES/non-user/common/etc/NetworkManager/dispatcher.d/*; do
+    TARGET="/etc/NetworkManager/dispatcher.d/$(basename "$f")"
+    echo "$TARGET"
+    if [ -f "$TARGET" ] && [ "$(stat -c '%U:%G' "$TARGET")" = 'root:root' ]; then
+        echo 'FAIL' "$TARGET"
+    fi
+done
