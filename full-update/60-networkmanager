@@ -5,10 +5,14 @@ if ! command -v > /dev/null; then
     exit
 fi
 
-for f in $DOTFILES/non-user/common/etc/NetworkManager/dispatcher.d/*; do
-    TARGET="/etc/NetworkManager/dispatcher.d/$(basename "$f")"
-    echo "$TARGET"
-    if [ -f "$TARGET" ] && [ "$(stat -c '%U:%G' "$TARGET")" = 'root:root' ]; then
-        echo 'FAIL' "$TARGET"
+for source_file in $DOTFILES/networkmanager/dispatcher.d/*; do
+    target_file="/etc/NetworkManager/dispatcher.d/$(basename "$source_file")"
+    if ! test -f "$target_file" || ! diff "$source_file" "$target_file" > /dev/null 2>&1 ; then
+        echo Syncing "$target_file"
+        sudo mkdir -p "$(dirname "$target_file")"
+        sudo cp "$source_file" "$target_file"
+    fi
+    if [ "$(stat -c '%U:%G' "$target_file")" != 'root:root' ]; then
+        sudo chown root:root "$target_file"
     fi
 done
