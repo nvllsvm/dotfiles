@@ -1,0 +1,21 @@
+#!/bin/sh
+
+[ -z "$CONNECTION_UUID" ] && exit 0
+INTERFACE="$1"
+ACTION="$2"
+
+case $ACTION in
+up | dhcp4-change | dhcp6-change)
+	[ -n "$DHCP4_NTP_SERVERS" ] || exit 0
+	mkdir -p /etc/systemd/timesyncd.conf.d
+	cat <<-THE_END >"/etc/systemd/timesyncd.conf.d/${CONNECTION_UUID}.conf"
+		[Time]
+		NTP=$DHCP4_NTP_SERVERS
+	THE_END
+	systemctl restart systemd-timesyncd.service
+	;;
+down)
+	rm -f "/etc/systemd/timesyncd.conf.d/${CONNECTION_UUID}.conf"
+	systemctl restart systemd-timesyncd.service
+	;;
+esac
