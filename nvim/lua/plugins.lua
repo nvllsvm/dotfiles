@@ -44,6 +44,11 @@ require("packer").startup({
                     ensure_installed = { "lua", "rust" },
                     highlight = {
                         enable = true,
+                        disable = { 
+                            -- broken in Arch neovim-0.9.5-4
+                            -- last working in neovim-0.9.5-2
+                            'markdown',
+                        },
                     },
                 })
             end,
