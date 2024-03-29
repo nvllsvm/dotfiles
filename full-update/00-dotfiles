@@ -21,6 +21,12 @@ done
 MAGENTA='\033[1;35m'
 RESET='\033[0m'
 
+HOSTNAME="$(hostname)"
+if [ -z "$HOSTNAME" ]; then
+    echo 'error: hostname not installed' >&2
+    exit 1
+fi
+
 update_non_user() {
     dotfiles_root="$1"
     tag="$2"
@@ -52,7 +58,7 @@ update_repo() {
         printf "%bUpdating non-user files %s (%s)...%b\n" "$MAGENTA" "$1" "$dotfiles_root" "$RESET"
         if command -v sudo > /dev/null; then
             update_non_user "$dotfiles_root" common
-            update_non_user "$dotfiles_root" "$(hostname)"
+            update_non_user "$dotfiles_root" "$HOSTNAME"
 
             if command -v pacman > /dev/null; then
                 update_non_user "$dotfiles_root" _archlinux
