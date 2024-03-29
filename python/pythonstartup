@@ -17,6 +17,7 @@ import email.message
 import email.mime
 import email.mime.multipart
 import email.mime.text
+import email.utils
 import enum
 import errno
 import fnmatch
