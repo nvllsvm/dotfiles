@@ -102,6 +102,10 @@ class VueScanDownloader:
         'Czech': 'https://www.hamrick.com/files/ocr_cs.bin',
         'Danish': 'https://www.hamrick.com/files/ocr_da.bin',
         'Dutch': 'https://www.hamrick.com/files/ocr_nl.bin',
+
+        # this is included in vuescan itself. archive anyway
+        'English': 'https://www.hamrick.com/files/ocr_en.bin',
+
         'Finnish': 'https://www.hamrick.com/files/ocr_fi.bin',
         'French': 'https://www.hamrick.com/files/ocr_fr.bin',
         'German': 'https://www.hamrick.com/files/ocr_de.bin',
