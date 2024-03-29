@@ -28,7 +28,7 @@ class Database:
 
         if self.db_file.is_file():
             subprocess.run(
-                ['repo-add', self.db_file],
+                ['repo-add', '--verify', '--sign', self.db_file],
                 check=True)
 
     def packages(self):
@@ -52,6 +52,9 @@ class Database:
             if path.name not in packages:
                 print('Clearing cache for', path.name)
                 shutil.rmtree(path)
+        self._pacsync()
+        self._paccache()
+        self.sync()
 
     def sync(self):
         subprocess.run(
@@ -65,7 +68,7 @@ class Database:
             # run per-package to avoid one package's error
             # from stopping removal of the others
             subprocess.run(
-                ['repo-remove', self.db_file, package])
+                ['repo-remove', '--verify', '--sign', self.db_file, package])
 
             paths = (self.db_dir).glob(f'{package}*.pkg.*')
             for path in paths:
@@ -76,6 +79,13 @@ class Database:
                 pass
         self._pacsync()
         self.sync()
+
+    @staticmethod
+    def _sign(path):
+        sig = f'{path}.sig'
+        subprocess.run(
+            ['gpg', '--output', sig, '--sign', path],
+            check=True)
 
     def add(self, *packages):
         self._pacsync()
@@ -88,8 +98,9 @@ class Database:
                     ['sudo', 'cp', maybe_path, self.db_dir],
                     check=True)
                 subprocess.run(
-                    ['repo-add', self.db_file, maybe_path],
+                    ['repo-add', '--verify', '--sign', self.db_file, maybe_path],
                     check=True)
+                self._sign(self.db_dir / maybe_path.name)
             else:
                 proc = subprocess.run(
                     ['aur', 'depends', '--', package],
