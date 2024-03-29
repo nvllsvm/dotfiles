@@ -8,6 +8,7 @@ the latest version to use with a year-based subscription license.
 import argparse
 import asyncio
 import contextvars
+import email.utils
 import logging
 import pathlib
 import string
@@ -93,6 +94,41 @@ class VueScanDownloader:
             'https://www.hamrick.com/files/vuex6498.tgz',
         ],
     }
+    OCR_LINKS = {
+        'Bulgarian': 'https://www.hamrick.com/files/ocr_bg.bin',
+        'Catalan': 'https://www.hamrick.com/files/ocr_ca.bin',
+        'Chinese (Simplified)': 'https://www.hamrick.com/files/ocr_zh.bin',
+        'Chinese (Traditional)': 'https://www.hamrick.com/files/ocr_tw.bin',
+        'Czech': 'https://www.hamrick.com/files/ocr_cs.bin',
+        'Danish': 'https://www.hamrick.com/files/ocr_da.bin',
+        'Dutch': 'https://www.hamrick.com/files/ocr_nl.bin',
+        'Finnish': 'https://www.hamrick.com/files/ocr_fi.bin',
+        'French': 'https://www.hamrick.com/files/ocr_fr.bin',
+        'German': 'https://www.hamrick.com/files/ocr_de.bin',
+        'Greek': 'https://www.hamrick.com/files/ocr_el.bin',
+        'Hungarian': 'https://www.hamrick.com/files/ocr_hu.bin',
+        'Indonesian': 'https://www.hamrick.com/files/ocr_id.bin',
+        'Italian': 'https://www.hamrick.com/files/ocr_it.bin',
+        'Japanese': 'https://www.hamrick.com/files/ocr_ja.bin',
+        'Korean': 'https://www.hamrick.com/files/ocr_ko.bin',
+        'Latvian': 'https://www.hamrick.com/files/ocr_lv.bin',
+        'Lithuanian': 'https://www.hamrick.com/files/ocr_lt.bin',
+        'Norwegian': 'https://www.hamrick.com/files/ocr_no.bin',
+        'Polish': 'https://www.hamrick.com/files/ocr_pl.bin',
+        'Portuguese': 'https://www.hamrick.com/files/ocr_pt.bin',
+        'Romanian': 'https://www.hamrick.com/files/ocr_ro.bin',
+        'Russian': 'https://www.hamrick.com/files/ocr_ru.bin',
+        'Serbian': 'https://www.hamrick.com/files/ocr_sr.bin',
+        'Slovak': 'https://www.hamrick.com/files/ocr_sk.bin',
+        'Slovenian': 'https://www.hamrick.com/files/ocr_sl.bin',
+        'Spanish': 'https://www.hamrick.com/files/ocr_es.bin',
+        'Swedish': 'https://www.hamrick.com/files/ocr_sv.bin',
+        'Tagalog': 'https://www.hamrick.com/files/ocr_tl.bin',
+        'Thai': 'https://www.hamrick.com/files/ocr_th.bin',
+        'Turkish': 'https://www.hamrick.com/files/ocr_tr.bin',
+        'Ukrainian': 'https://www.hamrick.com/files/ocr_uk.bin',
+        'Vietnamese': 'https://www.hamrick.com/files/ocr_vi.bin',
+    }
 
     def __init__(self, path, max_concurrent=None):
         self.path = path
@@ -124,6 +160,11 @@ class VueScanDownloader:
         async for task in executor:
             task.result()
 
+        for language, url in self.OCR_LINKS.items():
+            executor.submit(self._download_ocr, url, language)
+        async for task in executor:
+            task.result()
+
     async def _download(self, url, version, architecture):
         log_context('architecture', architecture)
         log_context('url', url)
@@ -146,6 +187,29 @@ class VueScanDownloader:
             assert dest.suffix in self._VALID_SUFFIX
             assert dest.stem.endswith(f'-{version}')
 
+            if dest.is_file():
+                LOGGER.info('Already downloaded')
+                return
+
+            dest.parent.mkdir(exist_ok=True, parents=True)
+            safe_write(dest, await response.aread())
+            LOGGER.info('Download complete')
+
+    async def _download_ocr(self, url, language):
+        LOGGER.info('Downloading OCR')
+        parent_path = self.path / 'OCR' / language
+        async with self.client.stream('GET', url, follow_redirects=True) as response:
+            try:
+                response.raise_for_status()
+            except Exception as e:
+                LOGGER.exception(e)
+                raise
+
+            last_modified = email.utils\
+                .parsedate_to_datetime(response.headers['Last-Modified'])\
+                .isoformat()
+
+            dest = parent_path / last_modified / url.split('/')[-1]
             if dest.is_file():
                 LOGGER.info('Already downloaded')
                 return
