@@ -158,14 +158,9 @@ class VueScanDownloader:
             for url in urls:
                 executor.submit(self._download, url, latest_version,
                                 architecture)
-        if not executor:
-            print('Nothing to do: already downloaded')
-            return
-        async for task in executor:
-            task.result()
-
         for language, url in self.OCR_LINKS.items():
             executor.submit(self._download_ocr, url, language)
+
         async for task in executor:
             task.result()
 
@@ -200,6 +195,9 @@ class VueScanDownloader:
             LOGGER.info('Download complete')
 
     async def _download_ocr(self, url, language):
+        log_context('language', language)
+        log_context('url', url)
+
         LOGGER.info('Downloading OCR')
         parent_path = self.path / 'OCR' / language
         async with self.client.stream('GET', url, follow_redirects=True) as response:
