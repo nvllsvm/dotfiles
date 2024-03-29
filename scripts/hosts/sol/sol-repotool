@@ -31,6 +31,20 @@ class Database:
                 ['repo-add', '--verify', '--sign', self.db_file],
                 check=True)
 
+    def sign_database(self):
+        paths = [
+            self.db_dir / f'{self.name}.db.tar',
+            self.db_dir / f'{self.name}.db',
+            self.db_dir / f'{self.name}.files.tar',
+            self.db_dir / f'{self.name}.files',
+        ]
+        for path in paths:
+            dest = path.with_name(path.name + '.sig')
+            subprocess.run(
+                ['gpg', '--yes', '--detach-sign', '--use-agent', '--no-armor',
+                 '--output', dest, path],
+                check=True)
+
     def packages(self):
         proc = subprocess.run(
             ['aur', 'repo', '--database', self.name, '--list'],
@@ -226,6 +240,12 @@ def db_update():
     database.update()
 
 
+def db_sign():
+    database = Database(DATABASE)
+    database.sign_database()
+    database.sync()
+
+
 def main():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest='command', metavar='COMMAND', required=True)
@@ -241,6 +261,7 @@ def main():
     prune_parser = subparsers.add_parser('prune')
     list_parser = subparsers.add_parser('list')
     sync_parser = subparsers.add_parser('sync')
+    sign_parser = subparsers.add_parser('sign')
     args = parser.parse_args()
 
     match args.command:
@@ -254,6 +275,8 @@ def main():
             db_remove(args.package)
         case 'list':
             db_list()
+        case 'sign':
+            db_sign()
         case 'sync':
             db_sync()
         case _:
