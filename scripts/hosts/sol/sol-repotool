@@ -28,7 +28,7 @@ class Database:
 
         if self.db_file.is_file():
             subprocess.run(
-                ['repo-add', '--verify', '--sign', self.db_file],
+                ['repo-add', '--sign', self.db_file],
                 check=True)
 
     def sign_database(self):
@@ -82,7 +82,7 @@ class Database:
             # run per-package to avoid one package's error
             # from stopping removal of the others
             subprocess.run(
-                ['repo-remove', '--verify', '--sign', self.db_file, package])
+                ['repo-remove', '--sign', self.db_file, package])
 
             paths = (self.db_dir).glob(f'{package}*.pkg.*')
             for path in paths:
@@ -112,7 +112,7 @@ class Database:
                     ['sudo', 'cp', maybe_path, self.db_dir],
                     check=True)
                 subprocess.run(
-                    ['repo-add', '--verify', '--sign', self.db_file, maybe_path],
+                    ['repo-add', '--sign', self.db_file, maybe_path],
                     check=True)
                 self._sign(self.db_dir / maybe_path.name)
             else:
