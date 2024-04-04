@@ -7,10 +7,6 @@ import subprocess
 
 
 DATABASE = 'sol'
-DATABASE_DIR = pathlib.Path('/var/cache/pacman') / DATABASE
-DATABASE_FILE = DATABASE_DIR / f'{DATABASE}.db.tar'
-
-AURUTILS_DIR = pathlib.Path('~/.cache/aurutils/sync').expanduser()
 
 
 @dataclasses.dataclass
@@ -20,24 +16,36 @@ class Package:
 
 
 class Database:
-    def __init__(self, name):
+    def __init__(self, name, /,
+                 aurutils_cache=None,
+                 directory=None,
+                 ):
         self.name = name
-        self.db_dir = DATABASE_DIR
-        self.db_file = DATABASE_FILE
-        self.aurutils_dir = AURUTILS_DIR
 
-        if self.db_file.is_file():
-            subprocess.run(
-                ['repo-add', '--sign', self.db_file],
-                check=True)
+        self.directory = \
+            pathlib.Path(directory) \
+            if directory is not None \
+            else pathlib.Path('/var/cache/pacman') / name
 
-    def sign_database(self):
-        paths = [
-            self.db_dir / f'{self.name}.db.tar',
-            self.db_dir / f'{self.name}.db',
-            self.db_dir / f'{self.name}.files.tar',
-            self.db_dir / f'{self.name}.files',
-        ]
+        self.aurutils_cache = \
+            pathlib.Path(aurutils_cache) \
+            if aurutils_cache is not None \
+            else pathlib.Path('~/.cache/aurutils/sync').expanduser()
+
+        self.db_tar = self.directory / f'{self.name}.db.tar'
+        self.db_tar_link = self.directory / f'{self.name}.db'
+        self.files_tar = self.directory / f'{self.name}.files.tar'
+        self.db_files_link = self.directory / f'{self.name}.files'
+
+        #if self.db_tar.is_file():
+        #    subprocess.run(
+        #        ['repo-add', '--sign', self.db_tar],
+        #        check=True)
+
+    def _sign_database(self):
+        tar_link = self.directory / f'{self.name}.db'
+        files_link = self.directory / f'{self.name}.files'
+
         for path in paths:
             dest = path.with_name(path.name + '.sig')
             subprocess.run(
@@ -62,7 +70,7 @@ class Database:
             package.name
             for package in self.packages()
         }
-        for path in AURUTILS_DIR.iterdir():
+        for path in self.aurutils_cache.iterdir():
             if path.name not in packages:
                 print('Clearing cache for', path.name)
                 shutil.rmtree(path)
@@ -82,13 +90,13 @@ class Database:
             # run per-package to avoid one package's error
             # from stopping removal of the others
             subprocess.run(
-                ['repo-remove', '--sign', self.db_file, package])
+                ['repo-remove', '--sign', self.db_tar, package])
 
-            paths = (self.db_dir).glob(f'{package}*.pkg.*')
+            paths = (self.directory).glob(f'{package}*.pkg.*')
             for path in paths:
                 path.unlink()
             try:
-                shutil.rmtree(self.aurutils_dir / package)
+                shutil.rmtree(self.aurutils_cache / package)
             except FileNotFoundError:
                 pass
         self._pacsync()
@@ -109,12 +117,12 @@ class Database:
             maybe_path = pathlib.Path(package)
             if maybe_path.is_file():
                 subprocess.run(
-                    ['sudo', 'cp', maybe_path, self.db_dir],
+                    ['sudo', 'cp', maybe_path, self.directory],
                     check=True)
                 subprocess.run(
-                    ['repo-add', '--sign', self.db_file, maybe_path],
+                    ['repo-add', '--sign', self.db_tar, maybe_path],
                     check=True)
-                self._sign(self.db_dir / maybe_path.name)
+                self._sign(self.directory / maybe_path.name)
             else:
                 proc = subprocess.run(
                     ['aur', 'depends', '--', package],
@@ -134,13 +142,13 @@ class Database:
 
     def update(self):
         self._pacsync()
-        self.aurutils_dir.mkdir(exist_ok=True, parents=True)
+        self.aurutils_cache.mkdir(exist_ok=True, parents=True)
 
         subprocess.run(
             ['aur', 'sync',
              '--no-view', '--no-confirm', f'--database={self.name}',
              '--no-ver', '--upgrades'],
-            cwd=self.aurutils_dir,
+            cwd=self.aurutils_cache,
             check=True)
         self._pacsync()
         self._paccache()
@@ -199,7 +207,7 @@ class Database:
     def _paccache(self):
         subprocess.run(
             ['paccache', '--remove', '--keep', '1',
-             '--cachedir', self.db_dir],
+             '--cachedir', self.directory],
             check=True)
 
     def _pacsync(self):
