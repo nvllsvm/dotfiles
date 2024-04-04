@@ -122,7 +122,7 @@ class Database:
                     ['sudo', 'cp', maybe_path, self.directory],
                     check=True)
                 subprocess.run(
-                    ['repo-add', '--sign', self.db_tar, maybe_path],
+                    ['repo-add', self.db_tar, maybe_path],
                     check=True)
                 self._sign(self.directory / maybe_path.name)
             else:
