@@ -104,9 +104,11 @@ class Database:
 
     @staticmethod
     def _sign(path):
-        sig = f'{path}.sig'
+        path = pathlib.Path(path)
+        dest = path.with_name(path.name + '.sig')
         subprocess.run(
-            ['gpg', '--output', sig, '--sign', path],
+            ['gpg', '--yes', '--detach-sign', '--use-agent', '--no-armor',
+             '--output', dest, path],
             check=True)
 
     def add(self, *packages):
@@ -248,9 +250,14 @@ def db_update():
     database.update()
 
 
-def db_sign():
+def db_sign(all=False):
     database = Database(DATABASE)
-    database.sign_database()
+    if all:
+        for path in database.directory.iterdir():
+            if not path.name.endswith('.pkg.tar.zst'):
+                continue
+            database._sign(path)
+    #database._sign_database()
     database.sync()
 
 
@@ -270,6 +277,7 @@ def main():
     list_parser = subparsers.add_parser('list')
     sync_parser = subparsers.add_parser('sync')
     sign_parser = subparsers.add_parser('sign')
+    sign_parser.add_argument('--all', action='store_true')
     args = parser.parse_args()
 
     match args.command:
@@ -284,7 +292,7 @@ def main():
         case 'list':
             db_list()
         case 'sign':
-            db_sign()
+            db_sign(all=args.all)
         case 'sync':
             db_sync()
         case _:
