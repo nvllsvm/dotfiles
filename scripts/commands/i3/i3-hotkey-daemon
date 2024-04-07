@@ -176,7 +176,16 @@ class xinput:
         stdout, _ = await proc.communicate()
         if proc.returncode:
             raise RuntimeError
-        return stdout.decode().splitlines()
+
+        ids = []
+        # fix for tilde prefixing last line output (ex. `~ 15`)
+        for part in stdout.decode().split():
+            try:
+                part = int(part)
+            except ValueError:
+                continue
+            ids.append(str(part))
+        return ids
 
     @classmethod
     async def list_props(cls, ids=None):
