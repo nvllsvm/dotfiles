@@ -8,9 +8,11 @@ the latest version to use with a year-based subscription license.
 import argparse
 import asyncio
 import contextvars
+import datetime
 import email.utils
 import logging
 import pathlib
+import re
 import string
 import tempfile
 
@@ -65,8 +67,11 @@ class VueScanDownloader:
         '.rpm',
         '.tgz',
     }
+    RELEASE_NOTES_URL = \
+        'https://www.hamrick.com/vuescan-versions/{version}.html'
+
     VERSION_SERIES = '9.8.'
-    DOWNLOAD_LINKS = {
+    DOWNLOAD_URLS = {
         'ARM 32-bit': [
             'https://www.hamrick.com/files/vuea3298.deb',
             'https://www.hamrick.com/files/vuea3298.rpm',
@@ -94,7 +99,7 @@ class VueScanDownloader:
             'https://www.hamrick.com/files/vuex6498.tgz',
         ],
     }
-    OCR_LINKS = {
+    OCR_URLS = {
         'Bulgarian': 'https://www.hamrick.com/files/ocr_bg.bin',
         'Catalan': 'https://www.hamrick.com/files/ocr_ca.bin',
         'Chinese (Simplified)': 'https://www.hamrick.com/files/ocr_zh.bin',
@@ -146,25 +151,62 @@ class VueScanDownloader:
         response.raise_for_status()
         return response.text.strip()
 
-    async def download_all(self):
-        latest_version = await self.get_latest_version()
-        LOGGER.info('Latest version: %s', latest_version)
-        if not latest_version.startswith(self.VERSION_SERIES):
-            raise NotImplementedError(f'unsupported version: {latest_version}')
+    async def download_all(self, version=None):
+        if version is None:
+            version = await self.get_latest_version()
+            LOGGER.info('Latest version: %s', version)
+        if not version.startswith(self.VERSION_SERIES):
+            raise NotImplementedError(f'unsupported version: {version}')
 
         executor = async_executor.AsyncExecutor(
             max_concurrent=self.max_concurrent)
-        for architecture, urls in self.DOWNLOAD_LINKS.items():
+        executor.submit(self._download_release_notes, version)
+        for architecture, urls in self.DOWNLOAD_URLS.items():
             for url in urls:
-                executor.submit(self._download, url, latest_version,
-                                architecture)
-        for language, url in self.OCR_LINKS.items():
+                executor.submit(
+                    self._download_application, url, version,
+                    architecture)
+        for language, url in self.OCR_URLS.items():
             executor.submit(self._download_ocr, url, language)
 
         async for task in executor:
             task.result()
 
-    async def _download(self, url, version, architecture):
+    def _release_notes_path(self, version):
+        return self.path / f'VueScan {version}' / 'release_notes.html'
+
+    async def _download_release_notes(self, version):
+        url = self.RELEASE_NOTES_URL.format(version=version)
+        log_context('url', url)
+        log_context('version', version)
+        LOGGER.info('Downloading release notes')
+
+        dest = self._release_notes_path(version)
+        if dest.is_file():
+            LOGGER.info('Already downloaded')
+            return
+        async with self.client.stream('GET', url, follow_redirects=True) as response:
+            try:
+                response.raise_for_status()
+            except Exception as e:
+                LOGGER.exception(e)
+                raise
+            data = await response.aread()
+            data = data.decode()
+
+            assert f'VueScan Version {version} Release Notes' in data
+
+            dest.parent.mkdir(exist_ok=True, parents=True)
+            safe_write(dest, data)
+
+    def _parse_release_date(self, version):
+        data = self._release_notes_path(version)
+        results = re.findall('Released on <time>(?P<date>.*)</time>', data)
+        assert len(results) == 1
+        date = datetime.datetime.strptime(results[0], '%d %B %Y').date()
+        return date
+
+    async def _download_application(self, url, version, architecture):
         log_context('architecture', architecture)
         log_context('url', url)
 
@@ -242,7 +284,7 @@ async def main():
     parser.add_argument('--max-concurrent', type=int, default=2,
                         help='(default: %(default)s)')
     parser.add_argument('--dest', type=pathlib.Path,
-                        default=pathlib.Path('/storage/Software/Vuescan/'),
+                        default=pathlib.Path('/storage/Software/VueScan/'),
                         help='(default: %(default)s)')
     parser.add_argument('--verbose', action='store_true')
     args = parser.parse_args()
