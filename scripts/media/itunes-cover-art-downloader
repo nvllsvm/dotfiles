@@ -16,8 +16,7 @@ BASE_URL = yarl.URL('https://a5.mzstatic.com/us/r1000/0/')
 
 CLIENT = httpx.AsyncClient()
 
-# maximum number i've personally seen work
-DEFAULT_LIMIT = 57
+DEFAULT_LIMIT = 200
 
 # does the stdlib define this anywhere?
 PATH_LENGTH_MAX = 255
