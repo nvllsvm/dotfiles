@@ -181,8 +181,9 @@ class VueScanDownloader:
         log_context('version', version)
         LOGGER.info('Downloading release notes')
 
-        dest = self._release_notes_path(version)
-        if dest.is_file():
+        release_date_dest = self.path / f'VueScan {version}' / 'release_date.txt'
+        html_dest = self._release_notes_path(version)
+        if release_date_dest.is_file() and html_dest.is_file():
             LOGGER.info('Already downloaded')
             return
         async with self.client.stream('GET', url, follow_redirects=True) as response:
@@ -192,16 +193,22 @@ class VueScanDownloader:
                 LOGGER.exception(e)
                 raise
             data = await response.aread()
-            data = data.decode()
 
-            assert f'VueScan Version {version} Release Notes' in data
+        data = data.decode()
 
-            dest.parent.mkdir(exist_ok=True, parents=True)
-            safe_write(dest, data)
+        assert f'VueScan Version {version} Release Notes' in data
 
-    def _parse_release_date(self, version):
-        data = self._release_notes_path(version)
-        results = re.findall('Released on <time>(?P<date>.*)</time>', data)
+        html_dest.parent.mkdir(exist_ok=True, parents=True)
+        safe_write(html_dest, data)
+
+        release_date = self._parse_release_date(data)
+        safe_write(release_date_dest, f'{release_date.isoformat()}\n')
+
+    @staticmethod
+    def _parse_release_date(release_notes_html):
+        results = re.findall(
+            'Released on <time>(?P<date>.*)</time>',
+            release_notes_html)
         assert len(results) == 1
         date = datetime.datetime.strptime(results[0], '%d %B %Y').date()
         return date
