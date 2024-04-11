@@ -17,8 +17,3 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______, _______, _______,                   _______, _______, _______,          _______, KC_HOME, _______, KC_PGDN, KC_END
     )
 };
-
-const uint16_t PROGMEM fn_actions[] = {
-    [0] = ACTION_DEFAULT_LAYER_SET(0),
-    [1] = ACTION_LAYER_MOMENTARY(1),
-};

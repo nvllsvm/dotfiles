@@ -1,6 +1,9 @@
+BOOTMAGIC_ENABLE = no
+MOUSEKEY_ENABLE = no
+EXTRAKEY_ENABLE = yes
+CONSOLE_ENABLE = no
+COMMAND_ENABLE = no
+NKRO_ENABLE = yes
 BACKLIGHT_ENABLE = no
 RGBLIGHT_ENABLE = no
-
-# mouse not used in layout.
-# prevents mouse device from being exposed to host
-MOUSEKEY_ENABLE = no
+AUDIO_ENABLE = no
