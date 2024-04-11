@@ -46,6 +46,8 @@ def main():
         return
 
     enable_unit('fstrim.timer', now=True)
+    enable_unit('systemd-timesyncd.service', now=True)
+    enable_unit('logrotate.timer', now=True)
 
 
 if __name__ == '__main__':
