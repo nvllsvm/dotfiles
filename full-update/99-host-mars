@@ -4,5 +4,6 @@ if [ "$(hostname)" != 'mars' ]; then
     exit
 fi
 
+systemctl --system enable fstrim.timer
 systemctl --user enable mpd
 systemctl --user enable syncthing
