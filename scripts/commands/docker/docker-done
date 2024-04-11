@@ -10,11 +10,13 @@ remove all containers, networks, and volumes
 
     --help          show help and exit
     --system        also prune images and build cache
+    --volumes       prune anonymous volumes
 EOF
 }
 
 
 PRUNE_SYSTEM=''
+PRUNE_VOLUMES=''
 while true; do
     case "$1" in
         --help)
@@ -23,6 +25,15 @@ while true; do
             ;;
         --system)
             PRUNE_SYSTEM=1
+            shift
+            ;;
+        --volumes)
+            PRUNE_VOLUMES=1
+            shift
+            ;;
+        --all)
+            PRUNE_SYSTEM=1
+            PRUNE_VOUMES=1
             shift
             ;;
         *)
