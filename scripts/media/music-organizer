@@ -38,6 +38,10 @@ MIME_SUFFIXES = {
     'audio/mpeg': [
         '.mp3',
     ],
+    'audio/ogg': [
+        '.ogg',
+        '.opus',
+    ],
     'image/gif': [
         '.gif',
     ],
