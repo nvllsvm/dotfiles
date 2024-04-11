@@ -25,7 +25,7 @@ def is_unit_enabled(name, user=False):
 def enable_unit(name, now=False, user=False):
     if is_unit_enabled(name, user=user):
         return
-    print(f'Enabling unit {name} (user={user})')
+    print(f'Enabling unit {name} (user={user}) (now={now})')
     args = []
     if not user:
         args.append('sudo')
