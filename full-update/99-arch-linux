@@ -45,7 +45,7 @@ def main():
     if not pathlib.Path('/etc/arch-release').exists():
         return
 
-    enable_unit('fstrim.timer')
+    enable_unit('fstrim.timer', now=True)
 
 
 if __name__ == '__main__':
