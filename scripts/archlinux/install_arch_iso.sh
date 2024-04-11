@@ -1,13 +1,12 @@
 #!/usr/bin/env sh
-set -eu
+set -eux
 if [ "$(id -u)" != '0' ]; then
     echo 'error: must run as root' >&2
     exit 1
 fi
 
 ISO="$1"
-#BOOT=/boot
-BOOT=/mnt/tmp1
+BOOT=/boot
 ROOT_DEV="$(findmnt -o SOURCE -n "$BOOT")"
 ROOT_UUID="$(lsblk -dno UUID "$ROOT_DEV")"
 
