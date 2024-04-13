@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import subprocess
+import os
 import sys
 
 import i3ipc
@@ -24,13 +24,7 @@ def find_firefox_windows(is_private):
 
 
 def firefox(args):
-    subprocess.run(
-        args,
-        # needed to fix firefox starting, but never displaying when opening
-        # a link from an electron app.
-        # what the fuck?!
-        stdout=subprocess.DEVNULL,
-    )
+    os.execvp(args[0], args)
 
 
 conn = i3ipc.Connection()
