@@ -1,5 +1,6 @@
-RGB_MATRIX_EFFECT(solid_reduced_dim)
 RGB_MATRIX_EFFECT(solid_reduced_off)
+RGB_MATRIX_EFFECT(solid_reduced_dim3x)
+RGB_MATRIX_EFFECT(solid_reduced_dim2x)
 
 #ifdef RGB_MATRIX_CUSTOM_EFFECT_IMPLS
 
@@ -102,14 +103,18 @@ bool solid_reduced_enabled[] = {
 };
 
 
-bool solid_reduced_dim(effect_params_t* params) {
+bool solid_reduced(effect_params_t* params, uint8_t dim_factor) {
     RGB_MATRIX_USE_LIMITS(led_min, led_max);
     RGB rgb = rgb_matrix_hsv_to_rgb(rgb_matrix_config.hsv);
     uint8_t r = rgb.r;
     uint8_t g = rgb.g;
     uint8_t b = rgb.b;
     uint8_t v = rgb_matrix_config.hsv.v;
-    rgb_matrix_config.hsv.v = v / 3;
+    if (dim_factor == 0) {
+        rgb_matrix_config.hsv.v = 0;
+    } else {
+        rgb_matrix_config.hsv.v = v / dim_factor;
+    }
     rgb = rgb_matrix_hsv_to_rgb(rgb_matrix_config.hsv);
     uint8_t r_dim = rgb.r;
     uint8_t g_dim = rgb.g;
@@ -126,18 +131,16 @@ bool solid_reduced_dim(effect_params_t* params) {
     return rgb_matrix_check_finished_leds(led_max);
 }
 
+bool solid_reduced_dim3x(effect_params_t* params) {
+    return solid_reduced(params, 3);
+}
+
+bool solid_reduced_dim2x(effect_params_t* params) {
+    return solid_reduced(params, 2);
+}
+
 bool solid_reduced_off(effect_params_t* params) {
-    RGB_MATRIX_USE_LIMITS(led_min, led_max);
-    RGB rgb = rgb_matrix_hsv_to_rgb(rgb_matrix_config.hsv);
-    for (uint8_t i = led_min; i < led_max; i++) {
-        RGB_MATRIX_TEST_LED_FLAGS();
-        if (solid_reduced_enabled[i]) {
-            rgb_matrix_set_color(i, rgb.r, rgb.g, rgb.b);
-        } else {
-            rgb_matrix_set_color(i, 0, 0, 0);
-        }
-    }
-    return rgb_matrix_check_finished_leds(led_max);
+    return solid_reduced(params, 0);
 }
 
 #endif // RGB_MATRIX_CUSTOM_EFFECT_IMPLS
