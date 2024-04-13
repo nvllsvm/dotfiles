@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+# Bluetooth firmware breaks BT+WIFI MT7961 adapters
+# Issue confirmed on 6.8.6, 6.9rc3
+FW='/usr/lib/firmware/mediatek/BT_RAM_CODE_MT7961_1_2_hdr.bin.zst'
+if [ -e "$FW" ]; then
+    sudo rm -f "$FW"
+fi
