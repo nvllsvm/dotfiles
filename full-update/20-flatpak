@@ -3,5 +3,6 @@ if ! command -v flatpak > /dev/null; then
     exit
 fi
 
+flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 flatpak update --user --assumeyes
 flatpak uninstall --unused --user --assumeyes
