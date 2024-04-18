@@ -8,6 +8,7 @@ import stat
 import string
 import subprocess
 import tempfile
+import unicodedata
 
 import chardet
 import magic  # package: python-magic
@@ -172,12 +173,12 @@ def check_metadata(path, metadata):
 def fix_metadata(path, metadata):
     for tag, values in metadata.items():
         new_values = sorted({
-            ' '.join(v for v in value.split() if v)
+            unicodedata.normalize('NFC', ' '.join(v for v in value.split() if v))
             for value in values
         })
         if new_values != sorted(values):
             metadata[tag] = new_values
-            LOGGER.info(f'Fixing whitespace in "{tag}": "{path}"')
+            LOGGER.info(f'Fixing whitespace/unicode normalization in "{tag}": "{path}"')
             metadata.save()
 
 
