@@ -22,7 +22,6 @@ sudo mount --bind /storage /srv/nfs4/storage
 sudo systemctl restart nfs-server.service
 
 echo Starting systemd units ...
-systemctl --user enable --now download-latest-vuescan-version.timer
 systemctl --user enable --now git-repo-backup.timer
 systemctl --user enable --now gog-update.timer
 systemctl --user enable --now harmonize-library.timer
