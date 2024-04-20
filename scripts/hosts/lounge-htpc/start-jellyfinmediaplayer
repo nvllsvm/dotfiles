@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+SCALING_FACTOR=3
+CURSOR_SIZE=96
+DPI=192
+gsettings set org.gnome.desktop.interface color-scheme prefer-dark
+
+# changing org.gnome.desktop.interface cursor-size after xrdb steps
+# fucks up i3's scaling...
+gsettings set org.gnome.desktop.interface cursor-size "$CURSOR_SIZE"
+gsettings set org.gnome.desktop.interface scaling-factor "$SCALING_FACTOR"
+
+# Xft/DPI: needed for Qt5 applications
+gsettings set org.gnome.settings-daemon.plugins.xsettings overrides \
+    "{'Gdk/WindowScalingFactor': <$SCALING_FACTOR>, 'Gtk/CursorThemeSize': <$CURSOR_SIZE>, 'Xft/DPI': <$((${DPI}*1024))>}"
+
+pactl set-sink-volume @DEFAULT_SINK@ 100%
+
+exec jellyfinmediaplayer --scale-factor=1.5
