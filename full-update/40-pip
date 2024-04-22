@@ -11,6 +11,10 @@ pip() {
     python -m pip "$@"
 }
 
+if ! [ -d ~/.local/share/pythonuser ]; then
+    exit
+fi
+
 if [ "$(realpath ~/.config/pip)" != "${DOTFILES}/pip" ]; then
     mkdir -p ~/.config
     rm -rf ~/.config/pip

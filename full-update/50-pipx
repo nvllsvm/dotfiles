@@ -5,6 +5,8 @@ if ! command -v pip > /dev/null; then
 fi
 
 if ! command -v pipx > /dev/null; then
+    exit
+
     cleanup() {
         rm -f "${TEMP_FILE}"
     }
