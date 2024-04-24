@@ -1,17 +1,23 @@
+# by default, w starts a shell as a child of lf.
+# unbind it as zsh's cd integration should be preferred.
+map w
+
+# disable tagging
+map t
+
+# disable find
+map f
+
 set hidden
 map <c-n> :set relativenumber!
 set previewer preview
-set sixel
 map i $preview "$f" | less -R
 map r $lf-renamer
+map f &lf-guifilemanager
 
 # working dir - blue
 # selected file - white
 set promptfmt "\033[34;1m%w/\033[0m\033[1m%f\033[0m"
-
-# by default, w starts a shell as a child of lf.
-# unbind it as zsh's cd integration should be preferred.
-map w
 
 # preview toggle
 cmd showpreview &{{
@@ -24,14 +30,5 @@ cmd nopreview &{{
     lf -remote "send $id set ratios 1"
     lf -remote "send $id map <tab> showpreview"
 }}
-cmd gui &{{
-    dolphin "$PWD"
-}}
 map <tab> nopreview
 set autoquit
-
-# disable tagging
-map t
-
-# disable find
-map f
