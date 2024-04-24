@@ -11,7 +11,7 @@ update_server() {
     cd - > /dev/null
 }
 
-cd ~/src/certs-nullsum.net
+cd ~/src/github/nvllsvm/certs-nullsum.net
 ./renew.sh
 
 update_server ~/src/github/nvllsvm/nullsum.net
