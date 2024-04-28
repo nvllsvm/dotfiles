@@ -157,6 +157,7 @@ class Database:
         self.sync()
         return
 
+        r"""
         packages = self.packages()
         package_names = [
             package.name
@@ -187,7 +188,6 @@ class Database:
                 continue
             print(repo_ver, current_ver)
 
-        """
         cd ~/.cache/aurutils/sync || exit 1
 
         for pkg in $package_names; do
