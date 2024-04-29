@@ -27,9 +27,9 @@ EOF
 fi
 
 #yes | termux-setup-storage
-ln -sfT ~/storage/shared/syncthing/default/notes ~/notes
-ln -sfT ~/storage/shared/syncthing ~/syncthing
-ln -sfT ~/storage/shared/Download ~/download
+ln -sfT /storage/emulated/0/Syncthing/default/notes ~/notes
+ln -sfT /storage/emulated/0/Syncthing ~/syncthing
+ln -sfT /storage/emulated/0/Download ~/download
 
 yes | pkg upgrade
 yes | apt autoremove
