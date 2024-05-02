@@ -25,7 +25,7 @@ fi
 
 case "$HOST" in
     mars|phobos)
-        if [ -z "$(pidof Xorg)" ]; then
+        if [ -z "$(pidof Xorg)" ] && [ -z "$(pidof sway)" ]; then
             exec systemd-cat -t startx startx
         fi
         ;;
