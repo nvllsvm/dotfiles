@@ -1,6 +1,10 @@
 set $mod Mod4
 set $gap_size 0px
 set $border_size 4
+set $bar_padding_top 0px
+set $bar_padding_bottom 0px
+set $bar_padding_left 0px
+set $bar_padding_right 0px
 
 set $color_bg #000000
 set $color_fg #e0e0e0

@@ -55,14 +55,8 @@ def main():
         window_class=args.window_class,
     )
 
-    if 'I3SOCK' in os.environ:
-        # remove as it can be stale.
-        # maybe check for running process?
-        os.environ.pop('I3SOCK')
-
-    # TODO add support for sway
     print(command)
-    subprocess.run(['i3-msg', '--', 'exec', '--no-startup-id', *command])
+    subprocess.run(['i3-exec', '--', *command])
 
 
 if __name__ == '__main__':
