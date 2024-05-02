@@ -244,9 +244,21 @@ if command -v i3 > /dev/null; then
     export FONT_NAME
     export FONT_SIZE
     i3-build-config
+
+    if pidof i3 > /dev/null; then
+        i3 restart > /dev/null 2>&1 || true
+    fi
 fi
-if pidof i3 > /dev/null; then
-    i3 restart > /dev/null 2>&1 || true
+
+if command -v sway > /dev/null; then
+    export BORDER_WIDTH
+    export FONT_NAME
+    export FONT_SIZE
+    sway-build-config
+
+    if pidof sway > /dev/null; then
+        swaymsg reload > /dev/null 2>&1 || true
+    fi
 fi
 
 if command -v dunst > /dev/null; then

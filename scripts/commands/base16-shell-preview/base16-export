@@ -31,7 +31,7 @@ ATTRIBUTE_MAP = {
 }
 
 
-def base16_export(path):
+def base16_export(path, uppercase=False):
     attributes = {}
     for line in path.read_text().split('\n'):
         line = line.strip()
@@ -45,13 +45,14 @@ def base16_export(path):
             color = color.replace(char, '')
 
         color = attributes.get(color, color)
-        attributes[attribute] = color
+        attributes[attribute] = color.upper() if uppercase else color.lower()
     return attributes
 
 
 def main():
     parser = argparse.ArgumentParser('base16-export')
     default = '~/.base16_theme'
+    parser.add_argument('--uppercase', action='store_true')
     parser.add_argument(
         '--theme',
         metavar='FILE',
@@ -60,7 +61,7 @@ def main():
         help=f'(default: {default})'
     )
     args = parser.parse_args()
-    attributes = base16_export(args.theme)
+    attributes = base16_export(args.theme, uppercase=args.uppercase)
     print(
         '\n'.join(
             f"export BASE16_{ATTRIBUTE_MAP[attribute]}='{color}'"
