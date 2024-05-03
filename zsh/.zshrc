@@ -67,12 +67,12 @@ prompt_user='%F{green}%n%f'
 prompt_separator='%F{black}.%f'
 prompt_current_dir='%F{cyan}%~%f'
 if [ -n "$SSH_TTY" ] && [ -z "$TMUX" ]; then
-    prompt_host='%F{$vi_mode_color}%m%f '
+    prompt_host='%m '
 else
     prompt_host=''
 fi
 
-PROMPT='$prompt_host%F{$vi_mode_color}\$%f '
+PROMPT='%F{$vi_mode_color}$prompt_host\$%f '
 RPROMPT="$prompt_current_dir"
 
 # hide when start typing
