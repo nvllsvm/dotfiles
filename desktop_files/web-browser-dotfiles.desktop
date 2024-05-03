@@ -1,6 +1,0 @@
-[Desktop Entry]
-Name=Web Browser
-Comment=Web Browser
-Type=Application
-Exec=web-browser %U
-Icon=/usr/share/icons/hicolor/48x48/apps/firefox.png
