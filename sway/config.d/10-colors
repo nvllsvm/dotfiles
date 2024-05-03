@@ -1,0 +1,25 @@
+set $color_00 #000000
+set $color_01 #fb0120
+set $color_02 #a1c659
+set $color_03 #fda331
+set $color_04 #6fb3d2
+set $color_05 #d381c3
+set $color_06 #76c7b7
+set $color_07 #e0e0e0
+set $color_08 #b0b0b0
+set $color_09 #fb0120
+set $color_10 #a1c659
+set $color_11 #fda331
+set $color_12 #6fb3d2
+set $color_13 #d381c3
+set $color_14 #76c7b7
+set $color_15 #ffffff
+set $color_16 #fc6d24
+set $color_17 #be643c
+set $color_18 #303030
+set $color_19 #505050
+set $color_20 #d0d0d0
+set $color_21 #f5f5f5
+
+set $color_fg #e0e0e0
+set $color_bg #000000
