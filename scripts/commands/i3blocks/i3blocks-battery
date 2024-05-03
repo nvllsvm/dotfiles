@@ -1,3 +1,0 @@
-#!/usr/bin/env sh
-. /sys/class/power_supply/BAT*/uevent
-printf '%s %s%%\n' "$POWER_SUPPLY_STATUS" "$POWER_SUPPLY_CAPACITY"

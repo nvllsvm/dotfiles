@@ -18,18 +18,12 @@ LARGE=
 MEDIUM_LARGE=
 DPI=96
 HASARGS=
-BORDER_WIDTH=
 
 while [ $# -gt 0 ]; do
     HASARGS=1
     case "$1" in
         --dpi)
             DPI="$2"
-            shift
-            shift
-            ;;
-        --border)
-            BORDER_WIDTH="$2"
             shift
             shift
             ;;
@@ -57,57 +51,33 @@ else
     FONT_NAME='monospace'
 
     if [ "$DPI" -le 138 ]; then
-        BORDER_WIDTH=${BORDER_WIDTH:-4}
         CURSOR_SIZE=16
-        DUNST_MAX_ICON_SIZE=64
-        DUNST_FRAME_WIDTH=${BORDER_WIDTH:-4}
         SCALING_FACTOR=1
 
         if [ -n "$LARGE" ]; then
-            DUNST_WIDTH=300
-            DUNST_OFFSET=0x29
             FONT_SIZE=14
         elif [ -n "$MEDIUM_LARGE" ]; then
-            DUNST_WIDTH=400
-            DUNST_OFFSET=0x25
             FONT_SIZE=12
         else
-            DUNST_WIDTH=300
-            DUNST_OFFSET=0x21
             FONT_SIZE=9
         fi
     else
-        BORDER_WIDTH=${BORDER_WIDTH:-4}
         CURSOR_SIZE=48
-        DUNST_FRAME_WIDTH=${BORDER_WIDTH:-4}
-        DUNST_MAX_ICON_SIZE=128
         SCALING_FACTOR=2
 
         if [ -n "$LARGE" ]; then
-            DUNST_WIDTH=800
-            # with DPI 192
-            DUNST_OFFSET=0x28
             FONT_SIZE=14
         elif [ -n "$MEDIUM_LARGE" ]; then
-            DUNST_WIDTH=800
-            DUNST_OFFSET=0x56
             FONT_SIZE=12
         else
-            DUNST_WIDTH=800
-            DUNST_OFFSET=0x44
             FONT_SIZE=10
         fi
     fi
 
     # save settings
     cat > "$CURRENT_THEME" << EOF
-BORDER_WIDTH="$BORDER_WIDTH"
 CURSOR_SIZE="$CURSOR_SIZE"
 DPI="$DPI"
-DUNST_WIDTH="$DUNST_WIDTH"
-DUNST_FRAME_WIDTH="$DUNST_FRAME_WIDTH"
-DUNST_OFFSET="$DUNST_OFFSET"
-DUNST_MAX_ICON_SIZE="$DUNST_MAX_ICON_SIZE"
 FONT_NAME="$FONT_NAME"
 FONT_SIZE="$FONT_SIZE"
 SCALING_FACTOR="$SCALING_FACTOR"
@@ -170,53 +140,6 @@ Xcursor.size: ${CURSOR_SIZE}
 EOF
 fi
 
-rm -rf ~/.config/rofi
-mkdir -p ~/.config/rofi
-cat > ~/.config/rofi/config.rasi << EOF
-configuration {
-    dpi: ${DPI};
-    font: "${FONT_NAME} ${FONT_SIZE}";
-}
-
-window {
-    border: ${BORDER_WIDTH};
-    width: 50em;
-}
-
-listview {
-    scrollbar: false;
-}
-
-entry {
-    placeholder: "";
-}
-
-* {
-    background:                     #${BASE16_BACKGROUND};
-    border-color:                   #${BASE16_COLOR19};
-    foreground:                     #${BASE16_FOREGROUND};
-    lightbg:                        var(background);
-    selected-normal-background:     var(border-color);
-    selected-normal-foreground:     var(foreground);
-    separatorcolor:                 var(background);
-}
-EOF
-
-# fails in sway
-if command -v xrandr > /dev/null; then
-    xrandr --dpi "$DPI" || true
-fi
-
-mkdir -p ~/.config/wezterm
-cat > ~/.config/wezterm/wezterm.lua << EOF
-local config = require 'config'
-local wezterm = require 'wezterm'
-
-config.font = wezterm.font('${FONT_NAME}', { })
-config.font_size = ${FONT_SIZE}
-return config
-EOF
-
 alacritty-config-reload
 mkdir -p ~/.config/alacritty
 cat > ~/.config/alacritty/alacritty.toml << EOF
@@ -235,80 +158,3 @@ family = "${FONT_NAME}"
 [mouse]
 hide_when_typing = true
 EOF
-
-# let it fail
-set-wallpaper || true
-
-if command -v i3 > /dev/null; then
-    export BORDER_WIDTH
-    export FONT_NAME
-    export FONT_SIZE
-    i3-build-config
-
-    if pidof i3 > /dev/null; then
-        i3 restart > /dev/null 2>&1 || true
-    fi
-fi
-
-if command -v sway > /dev/null; then
-    export BORDER_WIDTH
-    export FONT_NAME
-    export FONT_SIZE
-    sway-build-config
-
-    if pidof sway > /dev/null; then
-        swaymsg reload > /dev/null 2>&1 || true
-    fi
-fi
-
-if command -v dunst > /dev/null; then
-    pkill -9 dunst || true
-
-    FONT_NAME="${FONT_NAME}" \
-    FONT_SIZE="${FONT_SIZE}" \
-    FRAME_WIDTH="${DUNST_FRAME_WIDTH}" \
-    MAX_ICON_SIZE="${MAX_ICON_SIZE}" \
-    WIDTH="${DUNST_WIDTH}" \
-    OFFSET="${DUNST_OFFSET}" \
-        dunst-build-config
-
-    dunst -config /tmp/dunstrc 2>&1 &
-fi
-
-if [ -d ~/.config/sway ]; then
-    cat > ~/.config/sway/config.d/10-colors << EOF
-set \$color_00 #${BASE16_COLOR0}
-set \$color_01 #${BASE16_COLOR1}
-set \$color_02 #${BASE16_COLOR2}
-set \$color_03 #${BASE16_COLOR3}
-set \$color_04 #${BASE16_COLOR4}
-set \$color_05 #${BASE16_COLOR5}
-set \$color_06 #${BASE16_COLOR6}
-set \$color_07 #${BASE16_COLOR7}
-set \$color_08 #${BASE16_COLOR8}
-set \$color_09 #${BASE16_COLOR9}
-set \$color_10 #${BASE16_COLOR10}
-set \$color_11 #${BASE16_COLOR11}
-set \$color_12 #${BASE16_COLOR12}
-set \$color_13 #${BASE16_COLOR13}
-set \$color_14 #${BASE16_COLOR14}
-set \$color_15 #${BASE16_COLOR15}
-set \$color_16 #${BASE16_COLOR16}
-set \$color_17 #${BASE16_COLOR17}
-set \$color_18 #${BASE16_COLOR18}
-set \$color_19 #${BASE16_COLOR19}
-set \$color_20 #${BASE16_COLOR20}
-set \$color_21 #${BASE16_COLOR21}
-
-set \$color_fg #${BASE16_FOREGROUND}
-set \$color_bg #${BASE16_BACKGROUND}
-EOF
-
-    cat > ~/.config/sway/config.d/10-font << EOF
-font pango:${FONT_NAME} ${FONT_SIZE}
-EOF
-fi
-
-if pidof sway > /dev/null; then
-    swaymsg reload
-fi

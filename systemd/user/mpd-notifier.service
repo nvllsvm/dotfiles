@@ -1,8 +1,0 @@
-[Unit]
-Description=mpd-notifier
-
-[Service]
-ExecStart=zsh -lc 'exec mpd-notifier'
-SyslogIdentifier=mpd-notifier
-Restart=on-failure
-RestartSec=5s

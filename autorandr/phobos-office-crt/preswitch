@@ -1,2 +1,0 @@
-#!/usr/bin/env sh
-xrandr-custom-resolution HDMI-A-0 1024 768 85

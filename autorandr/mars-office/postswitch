@@ -1,7 +1,0 @@
-#!/usr/bin/env sh
-set-desktop-themes --dpi 96 --medium-large
-
-pactl-set-only \
-    --profile 'UMC404HD 192k' 'Direct UMC404HD 192k'
-
-i3-move-ws
