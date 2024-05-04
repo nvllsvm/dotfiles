@@ -67,7 +67,7 @@ prompt_user='%F{green}%n%f'
 prompt_separator='%F{black}.%f'
 prompt_current_dir='%F{cyan}%~%f'
 if [ -n "$SSH_TTY" ] && [ -z "$TMUX" ]; then
-    prompt_host='%m '
+    prompt_host='%m'
 else
     prompt_host=''
 fi
