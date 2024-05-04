@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -e
 
-if command -v kwin_wrapper > /dev/null; then
+if command -v kwin_wayland > /dev/null; then
     if [ "$(realpath ~/.local/share/kwin)" != "${DOTFILES}/kwin" ]; then
         echo "Linking configuration ..."
         rm -rf ~/.local/share/kwin
