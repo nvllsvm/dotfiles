@@ -38,19 +38,6 @@ yay -Syu --noconfirm --devel
 log 'Removing bullshit gcr-prompter 🖕'
 sudo rm -f /usr/lib/gcr-prompter
 
-log 'Fixing the bullshit combination of libappindicator and electron 🖕'
-# https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1910521
-sudo touch \
-       /usr/lib/electron/libappindicator3.so \
-       /usr/lib/electron/libappindicator3.so.1 \
-       /usr/lib/element/libappindicator3.so \
-       /usr/lib/element/libappindicator3.so.1 \
-       /usr/lib/signal-desktop/libappindicator3.so \
-       /usr/lib/signal-desktop/libappindicator3.so.1 \
-       /usr/lib/slack/libappindicator3.so \
-       /usr/lib/slack/libappindicator3.so.1 \
-    2> /dev/null || true
-
 if command -v pkgfile > /dev/null; then
     log 'Updating file cache'
     sudo pkgfile --update > /dev/null
