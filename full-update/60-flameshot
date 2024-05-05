@@ -1,9 +1,0 @@
-#!/usr/bin/env sh
-if ! command -v flameshot > /dev/null; then
-    exit
-fi
-
-if [ "$(realpath ~/.config/flameshot)" != "${DOTFILES}/flameshot" ]; then
-    rm -rf ~/.config/flameshot
-    ln -sT "${DOTFILES}/flameshot" ~/.config/flameshot
-fi

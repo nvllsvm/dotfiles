@@ -1,11 +1,9 @@
 #!/usr/bin/env sh
 set -eu
 if ! command -v zsh > /dev/null; then
-    rm -rf ~/.zlogin
     rm -rf ~/.zshenv
     rm -rf ~/.zshrc
 else
-    ln -sfT "${DOTFILES}/zsh/.zlogin" ~/.zlogin
     ln -sfT "${DOTFILES}/zsh/.zshenv" ~/.zshenv
     ln -sfT "${DOTFILES}/zsh/.zshrc" ~/.zshrc
 

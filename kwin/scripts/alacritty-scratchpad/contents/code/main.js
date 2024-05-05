@@ -1,7 +1,3 @@
-/*
-# vim:tabstop=4:shiftwidth=4:noexpandtab
-*/
-
 function isAlacritty(client) {
     return client && !client.deleted && client.normalWindow && client.resourceClass.toString() === "tmux-scratchpad";
 }
@@ -25,9 +21,9 @@ function activate(client) {
 
 function setupClient(client) {
     client.activeChanged.connect(function() {
-		if (!isNormal && !client.active) {
-			hide(client);
-		}
+        if (!isNormal && !client.active) {
+            hide(client);
+        }
     });
 
     client.onAllDesktops = true;
@@ -35,7 +31,6 @@ function setupClient(client) {
     client.skipSwitcher = true;
     client.skipPager = true;
     client.keepAbove = true;
-    // client.setMaximize(true, true);
     client.fullScreen = false;
 }
 
@@ -45,7 +40,7 @@ let isNormal = false;
 
 
 function show_normal(client) {
-	isNormal = true;
+    isNormal = true;
 
     client.onAllDesktops = false;
     client.skipTaskbar = false;
@@ -61,9 +56,8 @@ function show_normal(client) {
 }
 
 function show(client) {
-	isNormal = false;
+    isNormal = false;
 
-    //Object.keys(client).forEach((prop)=> print(prop));
     client.onAllDesktops = true;
     client.skipTaskbar = true;
     client.skipSwitcher = true;
@@ -102,10 +96,10 @@ function hide(client) {
 function toggleAlacritty() {
     let alacritty = findAlacritty();
     if ( alacritty ) {
-		if ( isNormal ) {
+        if ( isNormal ) {
             show(alacritty);
             activate(alacritty);
-		} else if ( isVisible(alacritty) ) {
+        } else if ( isVisible(alacritty) ) {
             if ( isActive(alacritty) ) {
                 hide(alacritty);
             } else {
@@ -121,9 +115,9 @@ function toggleAlacritty() {
 function showNormal() {
     let alacritty = findAlacritty();
     if ( alacritty ) {
-		show_normal(alacritty);
-		activate(alacritty);
-	}
+        show_normal(alacritty);
+        activate(alacritty);
+    }
 }
 
 function setupAlacritty(client) {
@@ -144,4 +138,3 @@ function init() {
 }
 
 init();
-
