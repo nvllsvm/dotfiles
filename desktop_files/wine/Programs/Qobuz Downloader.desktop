@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Qobuz Downloader
+Exec=env WINEPREFIX="/home/ar/.wine" wine C:\\\\users\\\\ar\\\\AppData\\\\Roaming\\\\Microsoft\\\\Windows\\\\Start\\ Menu\\\\Programs\\\\Qobuz\\ Downloader.lnk
+Type=Application
+StartupNotify=true
+Path=/home/ar/.wine/dosdevices/c:/users/ar/AppData/Local/Qobuz downloader
+Icon=5015_qobuz_downloader.0
+StartupWMClass=qobuz_downloader.exe
