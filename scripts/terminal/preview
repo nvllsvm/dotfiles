@@ -16,7 +16,7 @@ else
     if command -v xdg-mime > /dev/null; then
         # allows for overrides in ~/.local/share/mime/packages to work
         # on headless system.
-        export XDG_CURRENT_DESKTOP="${XDG_CURRENT_DESKTOP:=i3}"
+        export XDG_CURRENT_DESKTOP="${XDG_CURRENT_DESKTOP:=kde}"
 
         mimetype="$(xdg-mime query filetype "$1")"
     else

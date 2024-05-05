@@ -1,3 +1,0 @@
-#!/usr/bin/env sh
-set -e
-sudo sh -c 'efibootmgr -n 0001 && systemctl reboot'

@@ -1,0 +1,11 @@
+[env]
+TERM = "screen-256color"
+
+[font]
+size = 12
+
+[font.normal]
+family = "monospace"
+
+[mouse]
+hide_when_typing = true

@@ -1,9 +1,0 @@
-#!/usr/bin/env sh
-exec docker run \
-    --shm-size=4g \
-    -e PBF_PATH=/storage/north-america.osm.pbf \
-    -v ~/.cache/north-america-20221017.osm.pbf:/storage/north-america.osm.pbf \
-    -v ~/.cache/nominatim/flatnode:/nominatim/flatnode \
-    -v ~/.cache/nominatim/postgresql:/var/lib/postgresql/14/main \
-    -p 8080:8080 \
-    docker.io/mediagis/nominatim:4.1 /app/start.sh

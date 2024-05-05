@@ -3,7 +3,7 @@ if command -v xdg-mime > /dev/null; then
 get_mime() {
     # allows for overrides in ~/.local/share/mime/packages to work
     # on headless system.
-    export XDG_CURRENT_DESKTOP="${XDG_CURRENT_DESKTOP:=i3}"
+    export XDG_CURRENT_DESKTOP="${XDG_CURRENT_DESKTOP:=kde}"
 
     xdg-mime query filetype "$1"
 }

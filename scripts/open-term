@@ -1,7 +1,0 @@
-#!/usr/bin/env sh
-TARGET="$(basename "$0")"
-if [ "$(hostname)" = "$TARGET" ]; then
-    exec terminal tmux-attach
-else
-    exec terminal ssh "$TARGET"
-fi

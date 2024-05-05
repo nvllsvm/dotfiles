@@ -1,4 +1,0 @@
-#!/usr/bin/env zsh
-if command -v set-desktop-themes &> /dev/null; then
-    exec set-desktop-themes
-fi
