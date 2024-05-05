@@ -3,4 +3,5 @@ Name=torrent
 Comment=torrent
 Type=Application
 MimeType=application/x-bittorrent;x-scheme-handler/magnet;
+Icon=org.equeim.Tremotesf
 Exec=torrent %U

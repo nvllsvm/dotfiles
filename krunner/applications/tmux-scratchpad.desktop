@@ -2,4 +2,5 @@
 Name=tmux-scratchpad
 Comment=Alacritty & tmux-attach
 Type=Application
+Icon=Alacritty
 Exec=alacritty --title tmux-scratchpad --class tmux-scratchpad --command zsh -ic 'tmux-attach'

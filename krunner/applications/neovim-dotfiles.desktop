@@ -2,4 +2,5 @@
 Name=Neovim (Alacritty)
 Comment=Neovim
 Type=Application
+Icon=nvim
 Exec=alacritty --command zsh -ic "nvim %u"
