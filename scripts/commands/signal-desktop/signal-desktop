@@ -1,2 +1,0 @@
-#!/usr/bin/env sh
-exec "$(which -a "${0##*/}" | grep -m 1 -v "^$0$")" --use-tray-icon "$@"

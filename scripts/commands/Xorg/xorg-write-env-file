@@ -1,6 +1,0 @@
-#!/usr/bin/env sh
-USER="$(whoami)"
-cat > /tmp/xorg_${USER}.env << EOF
-export XAUTHORITY="${HOME}/.Xauthority"
-export DISPLAY="$(ps e -u "${USER}" | sed -rn 's/.* DISPLAY=(:[0-9]*).*/\1/p' | head -n 1)"
-EOF

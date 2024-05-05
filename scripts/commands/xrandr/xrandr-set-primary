@@ -1,8 +1,0 @@
-#!/usr/bin/env sh
-
-current_primary="$(xrandr | grep ' connected' | grep primary)"
-
-if [ -z "$current_primary" ]; then
-    output="$(xrandr | grep ' connected' | awk '{print $1}' | head -n 1)"
-    xrandr --output $output --primary
-fi

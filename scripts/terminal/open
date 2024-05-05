@@ -3,10 +3,6 @@ set -e
 if command -v termux-open > /dev/null; then
     nohup termux-open "$@" > /dev/null 2>&1 &
 elif command -v xdg-open > /dev/null; then
-    if pidof Xorg > /dev/null && [ -z "$XAUTHORITY" ]; then
-        export XAUTHORITY=~/.Xauthority
-        export DISPLAY="$(ps e -u "$(whoami)" | sed -rn 's/.* DISPLAY=(:[0-9]*).*/\1/p' | head -n 1)"
-    fi
     nohup xdg-open "$@" > /dev/null 2>&1 &
 else
     bin="$(which -a "${0##*/}" | grep -m 1 -v "^$0$")"

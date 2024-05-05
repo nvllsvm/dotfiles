@@ -5,4 +5,3 @@ ChallengeResponseAuthentication no
 UsePAM yes
 PrintMotd no # pam does that
 Subsystem	sftp	/usr/lib/ssh/sftp-server
-X11Forwarding yes

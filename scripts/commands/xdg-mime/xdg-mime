@@ -1,5 +1,0 @@
-#!/usr/bin/env sh
-if [ "$XDG_CURRENT_DESKTOP" = 'i3' ]; then
-    export XDG_CURRENT_DESKTOP='GNOME'
-fi
-exec "$(which -a "${0##*/}" | grep -m 1 -v "^$0$")" "$@"
