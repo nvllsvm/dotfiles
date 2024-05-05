@@ -19,7 +19,13 @@ sound-vr
 EOF
 }
 
-OPTION="$(options | rofi -dmenu -p '' -i)"
+fzf_menu() {
+    fzf --black --prompt= --no-info --exact --no-sort --no-extended -i --layout=reverse
+}
+
+
+OPTION="$(options | fzf_menu)"
+echo "$OPTION"
 case "$OPTION" in
     sound-monitor)
         pactl-set-only --profile 'Navi 21/23 HDMI/DP Audio Controller' 'Digital Stereo (HDMI 3) Output'
