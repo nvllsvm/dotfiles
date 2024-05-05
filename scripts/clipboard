@@ -18,22 +18,6 @@ case "$1" in
         fi
 esac
 
-clipboard_copyq() {
-    if command -v copyq > /dev/null; then
-        case "$MODE" in
-            copy)
-                copyq copy - > /dev/null
-                ;;
-            paste)
-                copyq clipboard
-                ;;
-        esac
-    else
-        return 1
-    fi
-}
-
-
 clipboard_wayland() {
     if [ -n "$WAYLAND_DISPLAY" ]; then
         case "$MODE" in
@@ -42,22 +26,6 @@ clipboard_wayland() {
                 ;;
             paste)
                 wl-paste
-                ;;
-        esac
-    else
-        return 1
-    fi
-}
-
-
-clipboard_xorg() {
-    if [ -n "$XAUTHORITY" ]; then
-        case "$MODE" in
-            copy)
-                xclip -selection c
-                ;;
-            paste)
-                xclip -selection c -o
                 ;;
         esac
     else
@@ -97,9 +65,7 @@ clipboard_termux() {
     fi
 }
 
-clipboard_copyq \
-    || clipboard_termux \
-    || clipboard_xorg \
+clipboard_termux \
     || clipboard_wayland \
     || clipboard_tmux \
     || (echo error: no suitable clipboard command detected >&2; exit 1)
