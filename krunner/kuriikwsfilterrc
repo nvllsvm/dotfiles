@@ -2,5 +2,5 @@
 DefaultWebShortcut=google
 EnableWebShortcuts=true
 KeywordDelimiter=:
-PreferredWebShortcuts=ebay,snahp,reddit,arch,youtube,aliexpress,translate,rutracker,github,giphy,aur,discogs,target,wiki,googleimages,redump,maps,1337x,duckduckgo,libgen,pypi,python,archive.org,google,getcomics,amazon
+PreferredWebShortcuts=translate,wiki,ebay,maps,google,libgen,python,getcomics,rutracker,github,1337x,target,archive.org,snahp,googleimages,giphy,duckduckgo,reddit,discogs,redump,pypi,arch,aur,amazon,youtube,aliexpress
 UsePreferredWebShortcutsOnly=true
