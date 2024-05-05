@@ -1,0 +1,7 @@
+[Desktop Entry]
+Charset=
+Hidden=false
+Keys=googleimages,gi
+Name=Google Images
+Query=https://google.com/search?tbm=isch&q=\\{@}&tbs=imgo:1
+Type=Service

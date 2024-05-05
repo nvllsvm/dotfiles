@@ -1,0 +1,7 @@
+[Desktop Entry]
+Charset=
+Hidden=false
+Keys=archlinuxaur,aur
+Name=Arch Linux AUR
+Query=https://aur.archlinux.org/packages/?SB=v&SO=d&K=\\{@}
+Type=Service

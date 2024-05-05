@@ -1,0 +1,7 @@
+[Desktop Entry]
+Charset=
+Hidden=false
+Keys=github,gh
+Name=GitHub
+Query=http://github.com/search?q=\\{@}&type=Everything&repo=&langOverride=&start_value=1
+Type=Service

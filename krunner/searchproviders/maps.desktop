@@ -1,0 +1,7 @@
+[Desktop Entry]
+Charset=
+Hidden=false
+Keys=googlemaps,maps
+Name=Google Maps
+Query=https://www.google.com/maps/search/\\{@}
+Type=Service

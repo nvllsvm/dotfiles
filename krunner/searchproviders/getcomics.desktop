@@ -1,0 +1,7 @@
+[Desktop Entry]
+Charset=
+Hidden=false
+Keys=getcomics
+Name=GetComics
+Query=https://getcomics.info/?s=\\{@}
+Type=Service

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Charset=
+Hidden=false
+Keys=redump
+Name=redump.org
+Query=http://redump.org/discs/quicksearch/\\{@}
+Type=Service

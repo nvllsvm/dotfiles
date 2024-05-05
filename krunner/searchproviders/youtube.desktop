@@ -1,0 +1,7 @@
+[Desktop Entry]
+Charset=
+Hidden=false
+Keys=youtube,yt
+Name=YouTube
+Query=https://www.youtube.com/results?search_query=\\{@}
+Type=Service

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Charset=
+Hidden=false
+Keys=googletranslate,translate
+Name=Google Translate
+Query=https://translate.google.com/?sl=auto&tl=en&text=\\{@}
+Type=Service

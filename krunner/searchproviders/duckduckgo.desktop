@@ -1,0 +1,7 @@
+[Desktop Entry]
+Charset=
+Hidden=false
+Keys=duckduckgo,ddg
+Name=DuckDuckGo
+Query=https://duckduckgo.com/?q=\\{@}
+Type=Service

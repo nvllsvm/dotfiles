@@ -1,0 +1,7 @@
+[Desktop Entry]
+Charset=
+Hidden=false
+Keys=discogs
+Name=Discogs
+Query=https://www.discogs.com/seach?q=\\{@}
+Type=Service

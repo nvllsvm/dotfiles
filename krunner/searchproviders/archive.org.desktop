@@ -1,0 +1,7 @@
+[Desktop Entry]
+Charset=
+Hidden=false
+Keys=internetarchive,ia
+Name=Internet Archive
+Query=https://archive.org/search?query=\\{@}
+Type=Service

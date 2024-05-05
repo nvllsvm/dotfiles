@@ -1,0 +1,7 @@
+[Desktop Entry]
+Charset=
+Hidden=false
+Keys=amazon
+Name=Amazon
+Query=https://www.amazon.com/s?k=\\{@}
+Type=Service

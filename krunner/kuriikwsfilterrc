@@ -1,0 +1,6 @@
+[General]
+DefaultWebShortcut=google
+EnableWebShortcuts=true
+KeywordDelimiter=:
+PreferredWebShortcuts=ebay,snahp,reddit,arch,youtube,aliexpress,translate,rutracker,github,giphy,aur,discogs,target,wiki,googleimages,redump,maps,1337x,duckduckgo,libgen,pypi,python,archive.org,google,getcomics,amazon
+UsePreferredWebShortcutsOnly=true

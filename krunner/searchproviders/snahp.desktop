@@ -1,0 +1,7 @@
+[Desktop Entry]
+Charset=
+Hidden=false
+Keys=snahp
+Name=Snahp
+Query=https://fora.snahp.eu/search.php?sf=titleonly&keywords=\\{@}
+Type=Service

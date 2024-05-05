@@ -1,0 +1,7 @@
+[Desktop Entry]
+Charset=
+Hidden=false
+Keys=libgen
+Name=Library Genesis
+Query=http://libgen.is/search.php?req=\\{@}
+Type=Service

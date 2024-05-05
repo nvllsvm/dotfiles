@@ -1,0 +1,7 @@
+[Desktop Entry]
+Charset=
+Hidden=false
+Keys=target
+Name=Target
+Query=https://www.target.com/s?searchTerm=\\{@}
+Type=Service

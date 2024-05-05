@@ -1,0 +1,7 @@
+[Desktop Entry]
+Charset=
+Hidden=false
+Keys=rutracker
+Name=RuTracker.org
+Query=https://rutracker.org/forum/tracker.php?nm=\\{@}
+Type=Service

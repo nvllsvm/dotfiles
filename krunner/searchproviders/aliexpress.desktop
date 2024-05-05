@@ -1,0 +1,7 @@
+[Desktop Entry]
+Charset=
+Hidden=false
+Keys=aliexpress
+Name=AliExpress
+Query=https://www.aliexpress.com/w/wholesale-\\{@}.html
+Type=Service
