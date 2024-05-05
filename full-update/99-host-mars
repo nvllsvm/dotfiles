@@ -45,7 +45,6 @@ def main():
     if socket.gethostname() != 'mars':
         return
 
-    enable_unit('mpd', user=True)
     enable_unit('syncthing', user=True)
 
 

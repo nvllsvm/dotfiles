@@ -4,5 +4,4 @@ if [ "$(hostname)" != 'mars' ]; then
     exit
 fi
 
-systemctl --user enable mpd
 systemctl --user enable syncthing
