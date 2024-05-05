@@ -1,0 +1,7 @@
+*
+!/.gitignore
+!/neovim-dotfiles.desktop
+!/ssh-mars.desktop
+!/ssh-sol.desktop
+!/tmux-scratchpad.desktop
+!/torrent.desktop

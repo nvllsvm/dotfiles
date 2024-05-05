@@ -1,0 +1,5 @@
+[Desktop Entry]
+Name=ssh-sol
+Comment=ssh sol
+Type=Application
+Exec=alacritty --title ssh-sol --class ssh-sol --command zsh -ic 'ssh -t sol tmux-attach'

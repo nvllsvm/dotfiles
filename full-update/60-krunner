@@ -3,14 +3,19 @@ set -e
 
 if command -v krunner > /dev/null; then
     if [ "$(realpath ~/.local/share/kf6/searchproviders/)" != "${DOTFILES}/krunner/searchproviders" ]; then
-        echo "Linking configuration ..."
+        echo "Linking searchproviders ..."
         rm -rf ~/.local/share/kf6/searchproviders
         mkdir -p ~/.local/share/kf6
         ln -sT "${DOTFILES}/krunner/searchproviders" ~/.local/share/kf6/searchproviders
     fi
     if [ "$(realpath ~/.config/kuriikwsfilterrc)" != "${DOTFILES}/krunner/kuriikwsfilterrc" ]; then
-        echo "Linking configuration ..."
+        echo "Linking kuriikwsfilterrc ..."
         rm -rf ~/.config/kuriikwsfilterrc
         ln -sT "${DOTFILES}/krunner/kuriikwsfilterrc" ~/.config/kuriikwsfilterrc
+    fi
+    if [ "$(realpath ~/.local/share/applications)" != "${DOTFILES}/krunner/applications" ]; then
+        echo "Linking applications ..."
+        rm -rf ~/.local/share/applications
+        ln -sT "${DOTFILES}/krunner/applications" ~/.local/share/applications
     fi
 fi

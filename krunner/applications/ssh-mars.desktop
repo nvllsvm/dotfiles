@@ -1,0 +1,5 @@
+[Desktop Entry]
+Name=ssh-mars
+Comment=ssh mars
+Type=Application
+Exec=alacritty --title ssh-mars --class ssh-mars --command zsh -ic 'ssh -t mars tmux-attach'

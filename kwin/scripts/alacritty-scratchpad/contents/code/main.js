@@ -3,15 +3,11 @@
 */
 
 function isAlacritty(client) {
-    return client && !client.deleted && client.normalWindow && client.resourceName.toString() === "alacritty";
+    return client && !client.deleted && client.normalWindow && client.resourceClass.toString() === "tmux-scratchpad";
 }
 
 function findAlacritty() {
     let clients = workspace.windowList();
-    print('WORKSPACE WIDTH');
-    print(workspace.workspaceWidth);
-    print('WORKSPACE HEIGHT');
-    print(workspace.workspaceHeight);
     return clients.find(client => isAlacritty(client)) || null;
 }
 
@@ -28,9 +24,8 @@ function activate(client) {
 }
 
 function setupClient(client) {
-    print("setupClient");
     client.activeChanged.connect(function() {
-		if (!client.active) {
+		if (!isNormal && !client.active) {
 			hide(client);
 		}
     });
@@ -42,30 +37,41 @@ function setupClient(client) {
     client.keepAbove = true;
     // client.setMaximize(true, true);
     client.fullScreen = false;
-    printClient(client);
-}
-
-function printClient(client) {
-    print("resourceName=" + client.resourceName.toString() +
-        ";normalWindow=" + client.normalWindow +
-        ";onAllDesktops=" + client.onAllDesktops +
-        ";skipTaskbar=" + client.skipTaskbar +
-        ";skipSwitcher=" + client.skipSwitcher +
-        ";skipPager=" + client.skipPager +
-        ";keepAbove=" + client.keepAbove +
-        ";fullScreen=" + client.fullScreen +
-        "");
 }
 
 const maxAspect = 1.6;
 const scaleFactor = 0.8;
+let isNormal = false;
 
 
-function show(client) {
-    //Object.keys(client).forEach((prop)=> print(prop));
+function show_normal(client) {
+	isNormal = true;
+
+    client.onAllDesktops = false;
+    client.skipTaskbar = false;
+    client.skipSwitcher = false;
+    client.skipPager = false;
+    client.keepAbove = false;
+    client.fullScreen = false;
+
     client.minimized = false;
     client.fullScreen = false;
     client.keepAbove = false;
+    client.noBorder = false;
+}
+
+function show(client) {
+	isNormal = false;
+
+    //Object.keys(client).forEach((prop)=> print(prop));
+    client.onAllDesktops = true;
+    client.skipTaskbar = true;
+    client.skipSwitcher = true;
+    client.skipPager = true;
+
+    client.minimized = false;
+    client.fullScreen = false;
+    client.keepAbove = true;
     client.noBorder = true;
 
     let wsWidth = workspace.workspaceWidth;
@@ -96,7 +102,10 @@ function hide(client) {
 function toggleAlacritty() {
     let alacritty = findAlacritty();
     if ( alacritty ) {
-        if ( isVisible(alacritty) ) {
+		if ( isNormal ) {
+            show(alacritty);
+            activate(alacritty);
+		} else if ( isVisible(alacritty) ) {
             if ( isActive(alacritty) ) {
                 hide(alacritty);
             } else {
@@ -109,10 +118,17 @@ function toggleAlacritty() {
     }
 }
 
+function showNormal() {
+    let alacritty = findAlacritty();
+    if ( alacritty ) {
+		show_normal(alacritty);
+		activate(alacritty);
+	}
+}
+
 function setupAlacritty(client) {
     if ( isAlacritty(client) ) {
         setupClient(client);
-        printClient(client);
     }
 }
 
@@ -123,7 +139,8 @@ function init() {
     }
 
     workspace.windowAdded.connect(setupAlacritty);
-    registerShortcut("Alacritty Toggle", "Toggle Alacritty open/closed.", "Meta+Enter", toggleAlacritty);
+    registerShortcut("Scratchpad Toggle", "Toggle scratchpad.", "Meta+Return", toggleAlacritty);
+    registerShortcut("Show Window", "Show scratchpad as a normal window.", "Shift+Meta+Return", showNormal);
 }
 
 init();
