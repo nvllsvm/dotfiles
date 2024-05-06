@@ -3,4 +3,5 @@ Name=JDownloader (sol)
 Comment=
 Type=Application
 Icon=jdownloader
+StartupNotify=false
 Exec=jdownloader --open
