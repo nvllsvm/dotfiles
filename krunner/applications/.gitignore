@@ -1,5 +1,6 @@
 *
 !/.gitignore
+!/jdownloader-sol.desktop
 !/neovim-dotfiles.desktop
 !/ssh-mars.desktop
 !/ssh-sol.desktop

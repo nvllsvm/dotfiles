@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=JDownloader (sol)
+Comment=
+Type=Application
+Icon=jdownloader
+Exec=jdownloader --open
