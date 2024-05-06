@@ -1,7 +1,7 @@
 [Desktop Entry]
 Charset=
 Hidden=false
-Keys=archlinuxwiki,archwiki
+Keys=archwiki
 Name=Arch Linux Wiki
 Query=https://wiki.archlinux.org/index.php?search=\\{@}
 Type=Service
