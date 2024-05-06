@@ -18,4 +18,9 @@ if command -v krunner > /dev/null; then
         rm -rf ~/.local/share/applications
         ln -sT "${DOTFILES}/krunner/applications" ~/.local/share/applications
     fi
+    if [ "$(realpath ~/.local/share/icons)" != "${DOTFILES}/krunner/icons" ]; then
+        echo "Linking icons ..."
+        rm -rf ~/.local/share/icons
+        ln -sT "${DOTFILES}/krunner/icons" ~/.local/share/icons
+    fi
 fi
