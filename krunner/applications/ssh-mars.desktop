@@ -2,5 +2,5 @@
 Name=ssh-mars
 Comment=ssh mars
 Type=Application
-Icon=Alacritty
-Exec=alacritty --title ssh-mars --class ssh-mars --command zsh -ic 'ssh -t mars tmux-attach'
+Icon=foot
+Exec=foot --title ssh-mars --app-id ssh-mars -- zsh -ic 'ssh -t mars tmux-attach'
