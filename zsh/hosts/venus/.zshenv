@@ -1,1 +1,0 @@
-. ~/.dotfiles/private/zsh/.zshenv

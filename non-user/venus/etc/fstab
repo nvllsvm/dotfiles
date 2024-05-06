@@ -1,5 +1,0 @@
-UUID=ef5b6a23-7439-449d-ba5a-08b085ed88d9         	ext4      	rw,relatime	0 1
-UUID=4716-7FF0      	/boot     	vfat      	rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro	0 2
-/swapfile none swap defaults 0 0
-
-#//sol.nullsum.net/public                        /sol            cifs            _netdev,noauto,x-systemd.automount,username=venus,password= 0 0
