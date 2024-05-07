@@ -1,0 +1,5 @@
+[Desktop Entry]
+Name=hass-office-closet-lights
+Type=Application
+StartupNotify=false
+Exec=hass office-closet-lights

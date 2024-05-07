@@ -6,4 +6,5 @@
 !/ssh-sol.desktop
 !/tmux-scratchpad.desktop
 !/torrent.desktop
-!/hass/*.desktop
+!/home-assistant/
+!/home-assistant/*

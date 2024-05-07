@@ -1,0 +1,5 @@
+[Desktop Entry]
+Name=hass-office-dark
+Type=Application
+StartupNotify=false
+Exec=hass office-dark

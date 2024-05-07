@@ -1,0 +1,5 @@
+[Desktop Entry]
+Name=hass-office-desk-lamp
+Type=Application
+StartupNotify=false
+Exec=hass office-desk-lamp

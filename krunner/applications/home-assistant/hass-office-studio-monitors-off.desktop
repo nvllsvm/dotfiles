@@ -1,0 +1,5 @@
+[Desktop Entry]
+Name=hass-office-studio-monitors-off
+Type=Application
+StartupNotify=false
+Exec=hass office-studio-monitors-off
