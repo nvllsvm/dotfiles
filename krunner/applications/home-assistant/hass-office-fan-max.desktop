@@ -2,4 +2,5 @@
 Name=hass-office-fan-max
 Type=Application
 StartupNotify=false
+Icon=fan-plus
 Exec=hass office-fan-max

@@ -2,4 +2,5 @@
 Name=hass-office-closet-lights
 Type=Application
 StartupNotify=false
+Icon=wardrobe
 Exec=hass office-closet-lights
