@@ -1,9 +1,0 @@
-#!/usr/bin/env sh
-set -e
-CONTEXT_DIR="$(mktemp -p '' -d busybox.XXXXXX)"
-cleanup() {
-    rm -rf "$CONTEXT_DIR"
-}
-trap cleanup EXIT;
-busybox --install -s "$CONTEXT_DIR"
-PATH="${CONTEXT_DIR}:${PATH}" "$CONTEXT_DIR"/sh
