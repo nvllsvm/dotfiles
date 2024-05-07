@@ -2,4 +2,5 @@
 Name=hass-office-on
 Type=Application
 StartupNotify=false
+Icon=hass-lightbulb
 Exec=hass office-on
