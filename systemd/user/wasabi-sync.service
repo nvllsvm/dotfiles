@@ -1,6 +1,0 @@
-[Unit]
-Description=Run wasabi-sync
-
-[Service]
-ExecStart=zsh -lc wasabi-sync
-SyslogIdentifier=wasabi-sync

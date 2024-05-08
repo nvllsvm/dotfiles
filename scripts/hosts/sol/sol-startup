@@ -29,7 +29,6 @@ systemctl --user enable --now mbsync.timer
 systemctl --user enable --now sol-fix-permissions.timer
 systemctl --user enable --now sol-update-check.timer
 systemctl --user enable --now sol-update-remotes.timer
-systemctl --user enable --now wasabi-sync.timer
 
 echo Starting podman ...
 podman system migrate || true

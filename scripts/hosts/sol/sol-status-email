@@ -25,7 +25,6 @@ USER_UNITS = {
     'sol-update-check.service',
     'sol-update-remotes.service',
     'vdirsyncer.service',
-    'wasabi-sync.service',
 }
 
 

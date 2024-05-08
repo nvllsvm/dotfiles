@@ -43,7 +43,7 @@ def all_files(root):
     return sorted(files)
 
 
-async def optimize_jpeg(source, dest, strip=False):
+async def optimize_jpeg(source, dest, fast=False, strip=False):
     args = [
         'jpegoptim', '--quiet', '--all-progressive',
         '--force', '--stdout',
@@ -73,10 +73,12 @@ async def optimize_jpeg(source, dest, strip=False):
             await exiv2.set_orientation(dest, orientation)
 
 
-async def optimize_png(source, dest, strip=False):
-    args = [
-        'oxipng', '--quiet', '--zopfli', '--opt', 'max', '--out', dest,
-    ]
+async def optimize_png(source, dest, fast=False, strip=False):
+    args = ['oxipng', '--quiet', '--out', dest]
+    if fast:
+        args.append('--fast')
+    else:
+        args.extend(['--zopfli', '--opt', 'max'])
 
     if strip:
         args.extend(['--strip', 'safe'])
@@ -88,7 +90,7 @@ async def optimize_png(source, dest, strip=False):
         raise SubprocessError
 
 
-async def optimize_gif(source, dest, strip=False):
+async def optimize_gif(source, dest, fast=False, strip=False):
     args = [
         'gifsicle', '--output=-', '--same-loopcount', '--same-delay',
         '--no-warnings', '--optimize=3', '--output', dest,
@@ -104,7 +106,7 @@ async def optimize_gif(source, dest, strip=False):
         raise SubprocessError
 
 
-async def optimize_tiff(source, dest, strip=False):
+async def optimize_tiff(source, dest, fast=False, strip=False):
     # some metadata is stripped?
     if not strip:
         raise RuntimeError('TIFF requires strip')
@@ -213,12 +215,12 @@ def _sigint_handler(*_):
     sys.exit(130)
 
 
-async def _process(func, path, strip):
+async def _process(func, path, fast, strip):
     before = path.stat().st_size
 
     with TempPath(dir=path.parent, prefix='.imgoptim_',
                   suffix=path.name + '.tmp') as temp_path:
-        await func(path, temp_path, strip=strip)
+        await func(path, temp_path, fast=fast, strip=strip)
 
         after = temp_path.stat().st_size
         if after < before:
@@ -290,6 +292,7 @@ async def main():
         '-t', '--type', dest='types', action='append', default=[],
         choices=_TYPE_TO_MIME,
         help='filetypes to process. may be specified more than once.')
+    parser.add_argument('--fast', action='store_true')
     parser.add_argument('-n', metavar='NUM', dest='num_procs',
                         type=_num_procs, default=None,
                         help='number of parallel jobs (default: %(default)s)')
@@ -317,7 +320,7 @@ async def main():
             continue
 
         if func := _MIME_OPTIMIZATIONS.get(mimetype):
-            executor.submit(_process, func, f, args.strip)
+            executor.submit(_process, func, f, fast=args.fast, strip=args.strip)
 
     size_diff_printer = SizeDiffPrinter(num_items=len(executor))
     async for result in executor:
