@@ -1,0 +1,2 @@
+#!/bin/sh
+exec ssh -t mars tmux-attach
