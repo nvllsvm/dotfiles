@@ -1,11 +1,8 @@
 *
 !/.gitignore
+!/dotfiles-localhost
 !/jdownloader-sol.desktop
-!/neovim-dotfiles.desktop
 !/maliit-breeze.desktop
-!/ssh-mars.desktop
-!/ssh-sol.desktop
+!/neovim-dotfiles.desktop
 !/tmux-scratchpad.desktop
 !/torrent.desktop
-!/home-assistant/
-!/home-assistant/*

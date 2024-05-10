@@ -23,4 +23,10 @@ if command -v krunner > /dev/null; then
         rm -rf ~/.local/share/icons
         ln -sT "${DOTFILES}/krunner/icons" ~/.local/share/icons
     fi
+    HOSTNAME="$(hostname)"
+    if [ -n "$HOSTNAME" ] && [ -d "${DOTFILES}/krunner/applications_host/${HOSTNAME}/" ]; then
+        rsync -av -q --delete "${DOTFILES}/krunner/applications_host/${HOSTNAME}/" ~/.local/share/applications/dotfiles-localhost/
+    else
+        rm -rf ~/.local/share/applications/dotfiles-localhost
+    fi
 fi
