@@ -1,6 +1,6 @@
 [Desktop Entry]
-Name=ssh-sol
-Comment=ssh sol
+Name=tmux-sol
+Comment=tmux sol
 Type=Application
 Icon=foot
-Exec=foot --title ssh-sol --app-id ssh-sol -- zsh -ic 'ssh -t sol tmux-attach'
+Exec=foot --title tmux-sol --app-id tmux-sol -- zsh -ic 'ssh -t sol tmux-attach'

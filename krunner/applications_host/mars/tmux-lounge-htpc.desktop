@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=tmux-lounge-htpc
+Comment=tmux lounge-htpc
+Type=Application
+Icon=foot
+Exec=foot --title tmux-lounge-htpc --app-id tmux-lounge-htpc -- zsh -ic 'ssh -t lounge-htpc tmux-attach'
