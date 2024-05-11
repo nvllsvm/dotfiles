@@ -3,10 +3,15 @@ set -eu
 if ! command -v zsh > /dev/null; then
     rm -rf ~/.zshenv
     rm -rf ~/.zshrc
+    rm -rf ~/.zlogin
 else
     ln -sfT "${DOTFILES}/zsh/.zshenv" ~/.zshenv
     ln -sfT "${DOTFILES}/zsh/.zshrc" ~/.zshrc
 
+    HOSTNAME="$(hostname)"
+    if [ -n "$HOSTNAME" ] && [ -f "${DOTFILES}/zsh/hosts/${HOSTNAME}/.zlogin" ]; then
+        ln -sfT "${DOTFILES}/zsh/hosts/${HOSTNAME}/.zlogin" ~/.zlogin
+    fi
     rm -f ~/.zcompdump
     zsh -ic 'echo -n'
 fi
