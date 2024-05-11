@@ -29,4 +29,5 @@ if command -v krunner > /dev/null; then
     else
         rm -rf ~/.local/share/applications/dotfiles-localhost
     fi
+    update-desktop-database
 fi
