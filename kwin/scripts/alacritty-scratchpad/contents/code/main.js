@@ -25,13 +25,6 @@ function setupClient(client) {
             hide(client);
         }
     });
-
-    client.onAllDesktops = true;
-    client.skipTaskbar = true;
-    client.skipSwitcher = true;
-    client.skipPager = true;
-    client.keepAbove = true;
-    client.fullScreen = false;
 }
 
 const maxAspect = 1.6;
@@ -130,6 +123,7 @@ function init() {
     let alacritty = findAlacritty();
     if ( alacritty ) {
         setupClient(alacritty);
+        show(alacritty);
     }
 
     workspace.windowAdded.connect(setupAlacritty);
