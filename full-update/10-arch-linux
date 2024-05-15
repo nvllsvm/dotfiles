@@ -35,9 +35,6 @@ fi
 log 'Updating packages'
 yay -Syu --noconfirm --devel
 
-log 'Removing bullshit gcr-prompter 🖕'
-sudo rm -f /usr/lib/gcr-prompter
-
 if command -v pkgfile > /dev/null; then
     log 'Updating file cache'
     sudo pkgfile --update > /dev/null
