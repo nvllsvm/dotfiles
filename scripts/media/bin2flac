@@ -27,7 +27,7 @@ def TempPath(**kwargs):
 
 
 def bin_to_flac(source, target):
-    with TempPath(dir=source.parent) as tmp:
+    with TempPath(dir=source.parent, prefix='.bin2flac_') as tmp:
         subprocess.run(
             ['flac',
              '--force',

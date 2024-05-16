@@ -3,4 +3,4 @@ Name=tmux (sol)
 Comment=tmux sol
 Type=Application
 Icon=foot
-Exec=foot --title tmux-sol --app-id tmux-sol -- zsh -ic 'ssh -t sol tmux-attach'
+Exec=foot --title tmux-sol --app-id tmux-sol -- zsh -lic 'ssh -t sol tmux-attach'
