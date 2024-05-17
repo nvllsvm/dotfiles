@@ -1,0 +1,5 @@
+#!/bin/sh
+# https://gitlab.freedesktop.org/drm/amd/-/issues/1500#note_825883
+CARD=card1
+echo manual > /sys/class/drm/${CARD}/device/power_dpm_force_performance_level
+echo 1 > /sys/class/drm/${CARD}/device/pp_power_profile_mode

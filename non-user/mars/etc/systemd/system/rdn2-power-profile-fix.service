@@ -1,0 +1,9 @@
+[Unit]
+Description=Fix performance of RDNA2 cards
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/rdna2-power-profile-fix
+
+[Install]
+WantedBy=multi-user.target
