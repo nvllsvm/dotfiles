@@ -9,7 +9,6 @@ import logging
 import pathlib
 import pickle
 import re
-import subprocess
 import tempfile
 import xml.etree.ElementTree
 import zipfile
