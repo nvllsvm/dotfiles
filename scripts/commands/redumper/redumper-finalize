@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+set -e
+name=''
+for f in *.log; do
+    name="${f%.log}"
+    break
+done
+if [ -z "$name" ]; then
+    echo 'error: cannot determine image name' >&2
+    exit 1
+fi
+redumper protection --image-name "$name"
+redumper split --image-name "$name"
+redumper hash --image-name "$name"
+redumper info --image-name "$name"
+redumper skeleton --image-name "$name"
