@@ -1,1 +1,2 @@
+ar ALL=(ALL) ALL
 ar ALL=(ALL) NOPASSWD: /usr/bin/redumper   
