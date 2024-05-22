@@ -35,7 +35,7 @@ def _parser_default_optical_device():
     pattern = re.compile(r'^sr\d+$')
     devices = []
     for path in pathlib.Path('/dev/').iterdir():
-        if not path.name.startswith('tty'):
+        if not path.name.startswith('sr'):
             continue
         if pattern.match(path.name):
             devices.append(path)
@@ -48,7 +48,10 @@ class Redumper:
         proc = await asyncio.create_subprocess_exec(
             'redumper', 'protection',
             '--image-name', image_name,
-            cwd=cwd)
+            cwd=cwd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
         await proc.communicate()
         if proc.returncode != 0:
             raise RuntimeError
@@ -57,7 +60,10 @@ class Redumper:
         proc = await asyncio.create_subprocess_exec(
             'redumper', 'split',
             '--image-name', image_name,
-            cwd=cwd)
+            cwd=cwd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
         await proc.communicate()
         if proc.returncode != 0:
             raise RuntimeError
@@ -66,7 +72,10 @@ class Redumper:
         proc = await asyncio.create_subprocess_exec(
             'redumper', 'hash',
             '--image-name', image_name,
-            cwd=cwd)
+            cwd=cwd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
         await proc.communicate()
         if proc.returncode != 0:
             raise RuntimeError
@@ -75,7 +84,10 @@ class Redumper:
         proc = await asyncio.create_subprocess_exec(
             'redumper', 'info',
             '--image-name', image_name,
-            cwd=cwd)
+            cwd=cwd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
         await proc.communicate()
         if proc.returncode != 0:
             raise RuntimeError
@@ -84,7 +96,10 @@ class Redumper:
         proc = await asyncio.create_subprocess_exec(
             'redumper', 'skeleton',
             '--image-name', image_name,
-            cwd=cwd)
+            cwd=cwd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
         await proc.communicate()
         if proc.returncode != 0:
             raise RuntimeError
@@ -93,19 +108,25 @@ class Redumper:
 async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--device', default=_parser_default_optical_device)
-    parser.add_argument('path', type=_parser_path)
+    parser.add_argument('path', type=_parser_path, nargs='+')
     args = parser.parse_args()
 
     redumper = Redumper()
 
-    image_name = args.path.stem
-    cwd = args.path.parent
+    for path in args.path:
+        try:
+            image_name = path.stem
+            cwd = path.parent
 
-    await redumper.protection(cwd=cwd, image_name=image_name)
-    await redumper.split(cwd=cwd, image_name=image_name)
-    await redumper.hash(cwd=cwd, image_name=image_name)
-    await redumper.info(cwd=cwd, image_name=image_name)
-    await redumper.skeleton(cwd=cwd, image_name=image_name)
+            await redumper.protection(cwd=cwd, image_name=image_name)
+            await redumper.split(cwd=cwd, image_name=image_name)
+            await redumper.hash(cwd=cwd, image_name=image_name)
+            await redumper.info(cwd=cwd, image_name=image_name)
+            await redumper.skeleton(cwd=cwd, image_name=image_name)
+        except Exception:
+            print(f'⚠️ ERROR: {path}')
+        else:
+            print(f'✅ Success: {path}')
 
 
 if __name__ == '__main__':
