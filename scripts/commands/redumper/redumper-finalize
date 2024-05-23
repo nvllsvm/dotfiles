@@ -4,6 +4,7 @@ import asyncio
 import pathlib
 import re
 
+
 def _parser_path(value):
     path = pathlib.Path(value).absolute()
     if not path.exists():
@@ -43,85 +44,11 @@ def _parser_default_optical_device():
         return devices[0]
 
 
-class Redumper:
-    @staticmethod
-    def get_profile(log_path):
-        for line in log_path.read_text().splitlines():
-            if line.startswith('current profile: '):
-                return line.removeprefix('current profile: ').strip()
-        raise RuntimeError('cannot determine dump profile')
-
-    async def protection(self, cwd, image_name):
-        proc = await asyncio.create_subprocess_exec(
-            'redumper', 'protection',
-            '--image-name', image_name,
-            cwd=cwd,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-        await proc.communicate()
-        if proc.returncode != 0:
-            raise RuntimeError
-
-    async def split(self, cwd, image_name):
-        proc = await asyncio.create_subprocess_exec(
-            'redumper', 'split',
-            '--image-name', image_name,
-            cwd=cwd,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-        await proc.communicate()
-        if proc.returncode != 0:
-            raise RuntimeError
-
-    async def hash(self, cwd, image_name):
-        proc = await asyncio.create_subprocess_exec(
-            'redumper', 'hash',
-            '--image-name', image_name,
-            cwd=cwd,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-        await proc.communicate()
-        if proc.returncode != 0:
-            raise RuntimeError
-
-    async def info(self, cwd, image_name):
-        proc = await asyncio.create_subprocess_exec(
-            'redumper', 'info',
-            '--image-name', image_name,
-            cwd=cwd,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-        await proc.communicate()
-        if proc.returncode != 0:
-            raise RuntimeError
-
-    async def skeleton(self, cwd, image_name):
-        proc = await asyncio.create_subprocess_exec(
-            'redumper', 'skeleton',
-            '--image-name', image_name,
-            cwd=cwd,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-        await proc.communicate()
-        if proc.returncode != 0:
-            raise RuntimeError
-
-    async def dvdkey(self, cwd, image_name):
-        proc = await asyncio.create_subprocess_exec(
-            'redumper', 'dvdkey',
-            '--image-name', image_name,
-            cwd=cwd,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-        await proc.communicate()
-        if proc.returncode != 0:
-            raise RuntimeError
+def get_dump_profile(log_path):
+    for line in log_path.read_text().splitlines():
+        if line.startswith('current profile: '):
+            return line.removeprefix('current profile: ').strip()
+    raise RuntimeError('cannot determine dump profile')
 
 
 async def main():
@@ -130,27 +57,38 @@ async def main():
     parser.add_argument('path', type=_parser_path, nargs='+')
     args = parser.parse_args()
 
-    redumper = Redumper()
-
     for path in args.path:
         try:
             image_name = path.stem
             cwd = path.parent
 
-            profile = redumper.get_profile(path)
+            profile = get_dump_profile(path)
 
             match profile:
                 case 'CD-ROM':
-                    await redumper.protection(cwd=cwd, image_name=image_name)
-                    await redumper.split(cwd=cwd, image_name=image_name)
-                    await redumper.hash(cwd=cwd, image_name=image_name)
-                    await redumper.info(cwd=cwd, image_name=image_name)
-                    await redumper.skeleton(cwd=cwd, image_name=image_name)
+                    proc = await asyncio.create_subprocess_exec(
+                        'redumper',
+                        'protection', 'split', 'hash', 'info', 'skeleton',
+                        '--image-name', image_name,
+                        cwd=cwd,
+                        stdout=asyncio.subprocess.PIPE,
+                        stderr=asyncio.subprocess.PIPE,
+                    )
+                    await proc.communicate()
+                    if proc.returncode != 0:
+                        raise RuntimeError
                 case 'DVD-ROM':
-                    await redumper.dvdkey(cwd=cwd, image_name=image_name)
-                    await redumper.hash(cwd=cwd, image_name=image_name)
-                    await redumper.info(cwd=cwd, image_name=image_name)
-                    await redumper.skeleton(cwd=cwd, image_name=image_name)
+                    proc = await asyncio.create_subprocess_exec(
+                        'redumper',
+                        'dvdkey', 'hash', 'info', 'skeleton',
+                        '--image-name', image_name,
+                        cwd=cwd,
+                        stdout=asyncio.subprocess.PIPE,
+                        stderr=asyncio.subprocess.PIPE,
+                    )
+                    await proc.communicate()
+                    if proc.returncode != 0:
+                        raise RuntimeError
                 case _:
                     raise RuntimeError(f'profile not implemented: {profile}')
         except Exception:
