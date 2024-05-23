@@ -80,7 +80,7 @@ async def main():
                 case 'DVD-ROM':
                     proc = await asyncio.create_subprocess_exec(
                         'redumper',
-                        'dvdkey', 'hash', 'info', 'skeleton',
+                        'hash', 'info', 'skeleton',
                         '--image-name', image_name,
                         cwd=cwd,
                         stdout=asyncio.subprocess.PIPE,
