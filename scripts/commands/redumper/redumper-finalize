@@ -4,6 +4,8 @@ import asyncio
 import pathlib
 import re
 
+import async_executor
+
 
 def _parser_path(value):
     path = pathlib.Path(value).absolute()
@@ -51,46 +53,58 @@ def get_dump_profile(log_path):
     raise RuntimeError('cannot determine dump profile')
 
 
+async def process_path(path):
+    image_name = path.stem
+    cwd = path.parent
+
+    profile = get_dump_profile(path)
+
+    match profile:
+        case 'CD-ROM':
+            proc = await asyncio.create_subprocess_exec(
+                'redumper',
+                'protection', 'split', 'hash', 'info', 'skeleton',
+                '--image-name', image_name,
+                cwd=cwd,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+            await proc.communicate()
+            if proc.returncode != 0:
+                raise RuntimeError
+        case 'DVD-ROM':
+            proc = await asyncio.create_subprocess_exec(
+                'redumper',
+                'hash', 'info', 'skeleton',
+                '--image-name', image_name,
+                cwd=cwd,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+            await proc.communicate()
+            if proc.returncode != 0:
+                raise RuntimeError
+        case _:
+            raise RuntimeError(f'profile not implemented: {profile}')
+
+
 async def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('-n', dest='num_procs', type=int, default=1)
     parser.add_argument('--device', default=_parser_default_optical_device)
     parser.add_argument('path', type=_parser_path, nargs='+')
     args = parser.parse_args()
 
+    executor = async_executor.AsyncExecutor(args.num_procs)
+    tasks = {}
     for path in args.path:
+        task = executor.submit(process_path, path)
+        tasks[task] = path
+
+    async for task in executor:
+        path = tasks[task]
         try:
-            image_name = path.stem
-            cwd = path.parent
-
-            profile = get_dump_profile(path)
-
-            match profile:
-                case 'CD-ROM':
-                    proc = await asyncio.create_subprocess_exec(
-                        'redumper',
-                        'protection', 'split', 'hash', 'info', 'skeleton',
-                        '--image-name', image_name,
-                        cwd=cwd,
-                        stdout=asyncio.subprocess.PIPE,
-                        stderr=asyncio.subprocess.PIPE,
-                    )
-                    await proc.communicate()
-                    if proc.returncode != 0:
-                        raise RuntimeError
-                case 'DVD-ROM':
-                    proc = await asyncio.create_subprocess_exec(
-                        'redumper',
-                        'hash', 'info', 'skeleton',
-                        '--image-name', image_name,
-                        cwd=cwd,
-                        stdout=asyncio.subprocess.PIPE,
-                        stderr=asyncio.subprocess.PIPE,
-                    )
-                    await proc.communicate()
-                    if proc.returncode != 0:
-                        raise RuntimeError
-                case _:
-                    raise RuntimeError(f'profile not implemented: {profile}')
+            task.result()
         except Exception:
             print(f'⚠️ ERROR: {path}')
         else:
