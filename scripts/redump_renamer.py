@@ -202,7 +202,6 @@ async def get_name(path, redump):
     try:
         system, name = redump.hashes[tuple(arg_hashes.values())]
     except KeyError:
-        LOGGER.warning('No redump match found')
         return None, path.name
     return system, name
 
@@ -239,7 +238,6 @@ async def main():
 
     for path in args.path:
         log_context('path', path)
-        LOGGER.info('PROCESSING')
         if path.is_file():
             if path.suffix == '.iso':
                 suffix = '.iso'
@@ -257,6 +255,13 @@ async def main():
             suffix = ''
             system, name = await get_name(path, redump)
 
+        file_paths = [
+            p
+            for p in path.iterdir()
+            if p.is_file()
+        ]
+        if not file_paths:
+            continue
         if name and system:
             target = path.with_name(f'redump_{system} {name}{suffix}')
 
