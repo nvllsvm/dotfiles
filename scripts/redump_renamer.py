@@ -56,7 +56,7 @@ def setup_logging(name, level=logging.INFO):
     logger = logging.getLogger()
     logger.setLevel(level)
 
-    fmt = _LogFormatter('%(levelname)-8s %(message)s')
+    fmt = _LogFormatter('%(message)s')
 
     sh = logging.StreamHandler()
     sh.setLevel(level)
@@ -266,18 +266,18 @@ async def main():
             target = path.with_name(f'redump_{system} {name}{suffix}')
 
             if path == target:
-                LOGGER.info('✅ VALIDATED')
+                LOGGER.info('✅ validated')
                 continue
 
             if not args.no_rename:
-                LOGGER.info('ℹ️  RENAMING %s', target)
+                LOGGER.info('ℹ️ RENAMING %s', target)
                 if target.exists():
                     raise RuntimeError(f'target exists {target}')
                 path.rename(target)
             else:
-                LOGGER.info('ℹ️  REDUMP ID CORRECT, BUT NAME DIFFERS %s', target)
+                LOGGER.info('ℹ️ REDUMP ID CORRECT, BUT NAME DIFFERS %s', target)
         else:
-            LOGGER.error('⚠️  ERROR: unknown')
+            LOGGER.error('⚠️ no match')
             if not path.name.startswith('unknown '):
                 target = path.with_name(f'unknown {path.name}')
                 while target.exists():
