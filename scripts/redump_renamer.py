@@ -56,7 +56,7 @@ def setup_logging(name, level=logging.INFO):
     logger = logging.getLogger()
     logger.setLevel(level)
 
-    fmt = _LogFormatter('%(levelname)-8s %(name)s %(message)s')
+    fmt = _LogFormatter('%(levelname)-8s %(message)s')
 
     sh = logging.StreamHandler()
     sh.setLevel(level)
@@ -277,7 +277,7 @@ async def main():
             else:
                 LOGGER.info('ℹ️  REDUMP ID CORRECT, BUT NAME DIFFERS %s', target)
         else:
-            LOGGER.error('⚠  ERROR: unknown')
+            LOGGER.error('⚠️  ERROR: unknown')
             if not path.name.startswith('unknown '):
                 target = path.with_name(f'unknown {path.name}')
                 while target.exists():
