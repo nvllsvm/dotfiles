@@ -92,12 +92,42 @@ async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-n', dest='num_procs', type=int, default=1)
     parser.add_argument('--device', default=_parser_default_optical_device)
-    parser.add_argument('path', type=_parser_path, nargs='+')
+    parser.add_argument('path', type=pathlib.Path, nargs='+')
     args = parser.parse_args()
+
+    paths = set()
+    for path in args.path:
+        if not path.is_dir():
+            raise ValueError('path must be directory')
+        stack = [path]
+        while stack:
+            log_paths = []
+            scram_paths = []
+            needs_finalization = True
+            parent = stack.pop()
+            for p in parent.iterdir():
+                if p.is_dir():
+                    stack.append(p)
+                else:
+                    match p.suffix:
+                        case '.log':
+                            log_paths.append(p)
+                        case '.scram':
+                            scram_paths.append(p)
+                        case '.bin':
+                            needs_finalization = False
+                        case '.iso':
+                            needs_finalization = False
+                        case '.hash':
+                            needs_finalization = False
+                        case '.skeleton':
+                            needs_finalization = False
+            if needs_finalization and (len(log_paths) == len(scram_paths) == 1):
+                paths.add(log_paths[0])
 
     executor = async_executor.AsyncExecutor(args.num_procs)
     tasks = {}
-    for path in args.path:
+    for path in paths:
         task = executor.submit(process_path, path)
         tasks[task] = path
 
