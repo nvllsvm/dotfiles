@@ -22,6 +22,7 @@ IGNORE_ENDSWITH = (
     ' (Track 1)(-LBA).bin',
     ' (Track 01)(-LBA).bin',
     ' (Track AA).bin',
+    ' (Track A).bin',
 )
 
 NAME = 'redump-renamer'
