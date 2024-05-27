@@ -53,6 +53,14 @@ class Database:
                  '--output', dest, path],
                 check=True)
 
+    def cleanup(self):
+        for path in self.aurutils_cache.iterdir():
+            for subpath in ('src', 'pkg'):
+                try:
+                    shutil.rmtree(path / subpath)
+                except FileNotFoundError:
+                    pass
+
     def packages(self):
         proc = subprocess.run(
             ['aur', 'repo', '--database', self.name, '--list'],
@@ -143,6 +151,7 @@ class Database:
         self.sync()
 
     def update(self):
+        self.cleanup()
         self._pacsync()
         self.aurutils_cache.mkdir(exist_ok=True, parents=True)
 
