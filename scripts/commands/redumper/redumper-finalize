@@ -2,48 +2,8 @@
 import argparse
 import asyncio
 import pathlib
-import re
 
 import async_executor
-
-
-def _parser_path(value):
-    path = pathlib.Path(value).absolute()
-    if not path.exists():
-        raise ValueError('path not found')
-
-    if path.is_file():
-        if path.suffix() == '.log':
-            return path
-        else:
-            raise ValueError('file paths must point to the dump log')
-    elif path.is_dir():
-        log_files = [
-            p
-            for p in path.iterdir()
-            if p.suffix == ('.log')
-        ]
-        match len(log_files):
-            case 0:
-                raise ValueError('directory does not contain dump log')
-            case 1:
-                return log_files[0]
-            case 2:
-                raise ValueError('multiple log files found')
-    else:
-        raise RuntimeError
-
-
-def _parser_default_optical_device():
-    pattern = re.compile(r'^sr\d+$')
-    devices = []
-    for path in pathlib.Path('/dev/').iterdir():
-        if not path.name.startswith('sr'):
-            continue
-        if pattern.match(path.name):
-            devices.append(path)
-    if len(devices) == 1:
-        return devices[0]
 
 
 def get_dump_profile(log_path):
@@ -59,39 +19,37 @@ async def process_path(path):
 
     profile = get_dump_profile(path)
 
-    match profile:
-        case 'CD-ROM':
-            proc = await asyncio.create_subprocess_exec(
-                'redumper',
-                'protection', 'split', 'hash', 'info', 'skeleton',
-                '--image-name', image_name,
-                cwd=cwd,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-            )
-            await proc.communicate()
-            if proc.returncode != 0:
-                raise RuntimeError
-        case 'DVD-ROM':
-            proc = await asyncio.create_subprocess_exec(
-                'redumper',
-                'hash', 'info', 'skeleton',
-                '--image-name', image_name,
-                cwd=cwd,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-            )
-            await proc.communicate()
-            if proc.returncode != 0:
-                raise RuntimeError
-        case _:
-            raise RuntimeError(f'profile not implemented: {profile}')
+    if profile.startswith('CD-'):
+        proc = await asyncio.create_subprocess_exec(
+            'redumper',
+            'protection', 'split', 'hash', 'info', 'skeleton',
+            '--image-name', image_name,
+            cwd=cwd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        await proc.communicate()
+        if proc.returncode != 0:
+            raise RuntimeError
+    elif profile.startswith(('DVD-', 'BD-', 'HD ')):
+        proc = await asyncio.create_subprocess_exec(
+            'redumper',
+            'hash', 'info', 'skeleton',
+            '--image-name', image_name,
+            cwd=cwd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        await proc.communicate()
+        if proc.returncode != 0:
+            raise RuntimeError
+    else:
+        raise RuntimeError(f'profile not implemented: {profile}')
 
 
 async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-n', dest='num_procs', type=int, default=1)
-    parser.add_argument('--device', default=_parser_default_optical_device)
     parser.add_argument('path', type=pathlib.Path, nargs='+')
     args = parser.parse_args()
 
