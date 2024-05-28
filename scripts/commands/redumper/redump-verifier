@@ -212,7 +212,7 @@ REDUMP_ID_PATH_PATTERN = re.compile(r'^redump_(?P<redump_id>\d+) ')
 
 def all_directories(root):
     stack = [root]
-    dirs = []
+    dirs = [root]
     while stack:
         for path in stack.pop().iterdir():
             if path.is_dir():
