@@ -96,7 +96,7 @@ async def convert_to_png(data):
     # use imagemagick instead of Pillow as Pillow's TIFF support doesn't
     # work without special compile flags
     proc = await asyncio.create_subprocess_exec(
-        'convert', '-', 'png:-',
+        'magick', '-', 'png:-',
         stdin=asyncio.subprocess.PIPE,
         stdout=asyncio.subprocess.PIPE,
     )

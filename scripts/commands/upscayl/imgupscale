@@ -89,7 +89,7 @@ async def convert_to_jpg(path, quality):
 
     for p in paths:
         proc = await asyncio.create_subprocess_exec(
-            'convert',
+            'magick',
             p,
             '-quality', f'{quality}%',
             p.with_suffix('.jpg')
