@@ -1,46 +1,98 @@
-#!/usr/bin/env sh
-set -e
+#!/usr/bin/env python3
+import argparse
+import asyncio
+import re
+import shutil
+import sys
 
-usage() {
-    cat << EOF
-usage: dl [OPTIONS] url [url ...]
 
-optional arguments:
-    --help      show help and exit
-    --insecure  disable certificate validation
-EOF
-}
+async def clipboard_contents():
+    proc = await asyncio.create_subprocess_exec(
+            'cbpaste',
+            stdout=asyncio.subprocess.PIPE)
+    stdout, _ = await proc.communicate()
+    if proc.returncode:
+        raise RuntimeError(f'cbpaste: returncode {proc.returncode}')
+    return stdout
 
-DL_INSECURE=
-while [ $# -ge 1 ]; do
-    case "$1" in
-        --help)
-            usage
-            exit
-            ;;
-        --insecure)
-            DL_INSECURE=1
-            shift
-            ;;
-        -*)
-            echo 'error: unrecognized argument' >&2
-            exit 1
-            ;;
-        *)
-            break
-    esac
-done
 
-dl_aria2c() {
-    aria2c \
-        --max-connection-per-server=16 \
-        --max-concurrent-downloads=20 \
-        --split=20 \
-        --follow-torrent=false \
-        "$@"
-}
+def urlextract(data):
+    pattern = re.compile(r'http[s]?://[^ \\\'"]*')
+    return list(pattern.findall(data))
 
-download() {
+
+def prepare_urls(raw_urls, urls=None, add_prefix=False, insecure=True):
+    if urls is None:
+        urls = []
+    prefix = 'http://' if insecure else 'https://'
+    for url in raw_urls:
+        url = url.strip()
+        if not url.lower().startswith(('http://', 'https://')):
+            if not add_prefix:
+                continue
+            url = prefix + url
+        if url and url not in urls:
+            urls.append(url)
+    return urls
+
+
+async def download(url, insecure=False):
+    if shutil.which('aria2c'):
+        proc = await asyncio.create_subprocess_exec(
+            'aria2c',
+            '--max-connection-per-server=16',
+            '--max-concurrent-downloads=20',
+            '--split=20',
+            '--follow-torrent=false',
+            '--', url)
+        await proc.communicate()
+        if proc.returncode:
+            raise RuntimeError(f'aria2c: returncode {proc.returncode}')
+    elif shutil.which('curl'):
+        args = ['curl']
+        if insecure:
+            args.append('--insecure')
+        args.extend(['-L', '-O'])
+        proc = await asyncio.create_subprocess_exec(*args)
+        await proc.communicate()
+        if proc.returncode:
+            raise RuntimeError(f'curl: returncode {proc.returncode}')
+    else:
+        raise RuntimeError('aria2c and/or curl must be installed')
+
+
+async def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--insecure', action='store_true')
+    parser.add_argument('url', nargs='*')
+    args = parser.parse_args()
+
+    urls = prepare_urls(
+        args.url,
+        add_prefix=True,
+    )
+    if not sys.stdin.isatty():
+        prepare_urls(
+            sys.stdin.read().splitlines(),
+            add_prefix=False,
+            urls=urls,
+        )
+    if not urls:
+        cb = await clipboard_contents()
+        prepare_urls(
+            cb.decode().splitlines(),
+            add_prefix=False,
+            urls=urls,
+        )
+
+    for url in urls:
+        print(url)
+        await download(url, insecure=args.insecure)
+
+
+if __name__ == '__main__':
+    asyncio.run(main())
+"""
     case "$1" in
         http://www.youtube.com*|\
         http://youtube.com*|\
@@ -52,30 +104,4 @@ download() {
                 --add-metadata \
                 --merge-output-format=mkv "$1"
             ;;
-        *)
-            if command -v aria2c > /dev/null; then
-                if [ -n "$DL_INSECURE" ]; then
-                    dl_aria2c --check-certificate=false "$@"
-                else
-                    dl_aria2c "$@"
-                fi
-            elif command -v curl > /dev/null; then
-                if [ -n "$DL_INSECURE" ]; then
-                    curl --insecure -L -O "$@"
-                else
-                    curl -L -O "$@"
-                fi
-            fi
-    esac
-}
-if [ $# -eq 0 ]; then
-    if [ -t 0 ]; then
-        download "$(cbpaste 2> /dev/null)"
-    else
-        download "$(urlextract)"
-    fi
-else
-    for link in "$@"; do
-        download "$link"
-    done
-fi
+"""
