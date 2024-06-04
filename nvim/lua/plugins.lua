@@ -14,8 +14,7 @@ require("packer").startup({
     function(use)
         use("wbthomason/packer.nvim")
 
-        use("Vimjas/vim-python-pep8-indent")
-        use("base16-project/base16-vim")
+        use("tinted-theming/base16-vim")
         use("hrsh7th/cmp-buffer")
         use("hrsh7th/cmp-cmdline")
         use("hrsh7th/cmp-nvim-lsp")
@@ -23,9 +22,6 @@ require("packer").startup({
         use("hrsh7th/nvim-cmp")
         use("neomake/neomake")
         use("neovim/nvim-lspconfig")
-
-        use("voldikss/vim-floaterm")
-        use("ptzz/lf.vim")
 
         use("plasticboy/vim-markdown")
         use("dhruvasagar/vim-table-mode")
