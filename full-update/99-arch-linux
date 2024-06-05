@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
+import asyncio
 import pathlib
-import subprocess
 
 
-def is_unit_enabled(name, user=False):
-    proc = subprocess.run(
-        ['systemctl',
-         '--user' if user else '--system',
-         'show',
-         '--property=UnitFileState',
-         '--',
-         name],
-        stdout=subprocess.PIPE,
-        check=True)
-    match proc.stdout.decode().strip():
+async def is_unit_enabled(name, user=False):
+    proc = await asyncio.create_subprocess_exec(
+        'systemctl',
+        '--user' if user else '--system',
+        'show',
+        '--property=UnitFileState',
+        '--',
+        name,
+        stdout=asyncio.subprocess.PIPE,
+    )
+    if proc.returncode:
+        raise RuntimeError(f'exit {proc.returncode}')
+    stdout, _ = await proc.communicate()
+    match stdout.decode().strip():
         case 'UnitFileState=enabled':
             return True
         case 'UnitFileState=disabled':
@@ -22,8 +25,8 @@ def is_unit_enabled(name, user=False):
             raise RuntimeError
 
 
-def enable_unit(name, now=False, user=False):
-    if is_unit_enabled(name, user=user):
+async def enable_unit(name, now=False, user=False):
+    if await is_unit_enabled(name, user=user):
         return
     print(f'Enabling unit {name} (user={user}) (now={now})')
     args = []
@@ -38,17 +41,20 @@ def enable_unit(name, now=False, user=False):
     if now:
         args.append('--now')
     args.extend(['--', name])
-    subprocess.run(args, check=True)
+    proc = await asyncio.create_subprocess_exec(*args)
+    await proc.communicate()
+    if proc.returncode:
+        raise RuntimeError(f'exit {proc.returncode}')
 
 
-def main():
+async def main():
     if not pathlib.Path('/etc/arch-release').exists():
         return
 
-    enable_unit('fstrim.timer', now=True)
-    enable_unit('systemd-timesyncd.service', now=True)
-    enable_unit('logrotate.timer', now=True)
+    await enable_unit('fstrim.timer', now=True)
+    await enable_unit('systemd-timesyncd.service', now=True)
+    await enable_unit('logrotate.timer', now=True)
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())
