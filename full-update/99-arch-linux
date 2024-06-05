@@ -105,6 +105,12 @@ EXPECTED_OPT_DEPENDS = {
         'art-rawconverter-ctlscripts': True,
         'lcms2-ff': False,
     },
+    'digikam': {
+        'darktable': True,
+        'hugin': True,
+        'qt6-imageformats': True,
+        'rawtherapee': False,
+    },
     'dolphin': {
         'ffmpegthumbs': True,
         'kde-cli-tools': True,
@@ -131,6 +137,11 @@ EXPECTED_OPT_DEPENDS = {
         'luajit': True,
         'qoi-headers': True,
         'zlib': True,
+    },
+    'gwenview': {
+        'kamera': False,
+        'kimageformats': True,
+        'qt6-imageformats': True,
     },
     'krita': {
         'kimageformats5': True,
