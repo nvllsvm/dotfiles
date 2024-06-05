@@ -75,9 +75,10 @@ async def main():
     parser.add_argument(
         '--name',
         default=datetime.datetime.now().strftime('dump_%Y%m%d_%H%M%S'))
-    parser.add_argument('--image-format', default='ibm.1440')
+    parser.add_argument('--image-format', default='ibm.scan')
     parser.add_argument('--image-suffix', default='img')
     parser.add_argument('--convert', action='store_true')
+    parser.add_argument('--no-convert', action='store_true')
     args = parser.parse_args()
 
     raw_path = pathlib.Path(f'{args.name}.scp')
@@ -123,21 +124,22 @@ async def main():
             hash_value = hashes[hash_type]
             loglines.append(f'{hash_type}: {hash_value}')
 
-    loglines.append('')
-    loglines.append('CONVERT')
-    cmd_args, stdout, stderr = await Greaseweazle.convert(
-        raw_path, image_path, image_format=args.image_format)
-    loglines.append(f'cmd args: {cmd_args}')
-    loglines.extend([f'stdout: {line}' for line in stdout.splitlines()])
-    loglines.extend([f'stderr: {line}' for line in stderr.splitlines()])
+    if not args.no_convert:
+        loglines.append('')
+        loglines.append('CONVERT')
+        cmd_args, stdout, stderr = await Greaseweazle.convert(
+            raw_path, image_path, image_format=args.image_format)
+        loglines.append(f'cmd args: {cmd_args}')
+        loglines.extend([f'stdout: {line}' for line in stdout.splitlines()])
+        loglines.extend([f'stderr: {line}' for line in stderr.splitlines()])
 
-    loglines.append('')
-    loglines.append('IMAGE HASHES')
-    loglines.append(f'path: {image_path}')
-    hashes = multi_hash(image_path)
-    for hash_type in sorted(hashes):
-        hash_value = hashes[hash_type]
-        loglines.append(f'{hash_type}: {hash_value}')
+        loglines.append('')
+        loglines.append('IMAGE HASHES')
+        loglines.append(f'path: {image_path}')
+        hashes = multi_hash(image_path)
+        for hash_type in sorted(hashes):
+            hash_value = hashes[hash_type]
+            loglines.append(f'{hash_type}: {hash_value}')
 
     loglines.append('')
     loglines.append(
