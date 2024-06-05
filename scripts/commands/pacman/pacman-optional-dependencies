@@ -2,7 +2,6 @@
 import asyncio
 import dataclasses
 import argparse
-from collections.abc import AsyncIterable
 
 
 @dataclasses.dataclass
@@ -70,7 +69,7 @@ async def main():
 
     all_opt_depends = {}
     opt_depends_by_parent = await pacman_query_opt_depends(args.package)
-    for parent, opt_depends in opt_depends_by_parent.items():
+    for opt_depends in opt_depends_by_parent.values():
         for dep in opt_depends:
             if args.installed and not dep.installed:
                 continue
@@ -82,7 +81,8 @@ async def main():
     for name in sorted(all_opt_depends):
         print(name)
         if not args.quiet:
-            for dep in sorted(all_opt_depends[name], key=lambda x: x.parent_name):
+            for dep in sorted(all_opt_depends[name],
+                              key=lambda x: x.parent_name):
                 print(f'    {dep.parent_name}: {dep.description}')
 
 
