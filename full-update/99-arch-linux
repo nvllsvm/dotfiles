@@ -1,6 +1,93 @@
 #!/usr/bin/env python3
 import asyncio
+import dataclasses
 import pathlib
+import sys
+
+
+# bool True == package is installed
+EXPECTED_OPT_DEPENDS = {
+    'dolphin': {
+        'ffmpegthumbs': True,
+        'kde-cli-tools': True,
+        'kdegraphics-thumbnailers': True,
+        'kio-admin': True,
+        'konsole': False,
+        'purpose': True,
+    },
+    'yt-dlp': {
+        'aria2': True,
+        'atomicparsley': True,
+        'ffmpeg': True,
+        'phantomjs': False,
+        'python-brotli': True,
+        'python-brotlicffi': True,
+        'python-mutagen': True,
+        'python-pycryptodome': True,
+        'python-pycryptodomex': True,
+        'python-pyxattr': True,
+        'python-secretstorage': True,
+        'python-websockets': True,
+        'python-xattr': True,
+        'rtmpdump': True,
+    },
+}
+
+
+@dataclasses.dataclass
+class OptionalDependency:
+    parent_name: str
+    name: str
+    description: str
+    installed: bool
+
+
+async def pacman_query_opt_depends(packages):
+    proc = await asyncio.create_subprocess_exec(
+            'pacman', '-Qi', '--', *set(packages),
+            stdout=asyncio.subprocess.PIPE)
+    stdout, _ = await proc.communicate()
+
+    opt_depends = {}
+
+    inside_optdepends = False
+    parent_package = None
+    for line in stdout.decode().splitlines():
+        if line.startswith('Name            : '):
+            parent_package = line.split(':', maxsplit=1)[1].strip()
+
+        if line.startswith('Optional Deps   : '):
+            inside_optdepends = True
+            parts = line.split(':', maxsplit=2)
+            match len(parts):
+                case 2:
+                    if parts[1].strip() == 'None':
+                        # no opt depends
+                        continue
+                case 3:
+                    package_name = parts[1]
+                    description = parts[2]
+        elif inside_optdepends and line.startswith('                  '):
+            package_name, description = line.split(':', maxsplit=1)
+        else:
+            inside_optdepends = False
+            package_name = None
+
+        if package_name is not None:
+            package_name = package_name.strip()
+            installed = False
+            if description.strip().endswith(' [installed]'):
+                description = description.removesuffix(' [installed]')
+                installed = True
+            optdep = OptionalDependency(
+                parent_name=parent_package.strip(),
+                name=package_name.strip(),
+                description=description.strip(),
+                installed=installed,
+            )
+            opt_depends.setdefault(parent_package, [])
+            opt_depends[parent_package].append(optdep)
+    return opt_depends
 
 
 async def is_unit_enabled(name, user=False):
@@ -47,6 +134,19 @@ async def enable_unit(name, now=False, user=False):
         raise RuntimeError(f'exit {proc.returncode}')
 
 
+async def install_packages(packages, asdeps=False):
+    args = [
+        'yay',
+        '-S',
+        '--noconfirm',
+    ]
+    if asdeps:
+        args.append('--asdeps')
+    args.extend(['--', *packages])
+    proc = await asyncio.create_subprocess_exec(*args)
+    await proc.communicate()
+
+
 async def main():
     if not pathlib.Path('/etc/arch-release').exists():
         return
@@ -54,6 +154,19 @@ async def main():
     await enable_unit('fstrim.timer', now=True)
     await enable_unit('systemd-timesyncd.service', now=True)
     await enable_unit('logrotate.timer', now=True)
+
+    opt_deps_by_parent = await pacman_query_opt_depends(
+            EXPECTED_OPT_DEPENDS.keys())
+    missing = set()
+    for parent, opt_deps in opt_deps_by_parent.items():
+        for opt_dep in opt_deps:
+            if opt_dep.installed != EXPECTED_OPT_DEPENDS[parent][opt_dep.name]:
+                if opt_dep.installed:
+                    print(f'warning: unexpected optdep installed for {parent} - {opt_dep.name}: {opt_dep.description}', file=sys.stderr)
+                else:
+                    missing.add(opt_dep.name)
+    if missing:
+        await install_packages(missing, asdeps=True)
 
 
 if __name__ == '__main__':
