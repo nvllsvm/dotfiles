@@ -9,23 +9,102 @@ EXPECTED_PACKAGES = {
     '7-zip',
     'advancecomp',
     'aria2',
+    'bat',
+    'bchunk',
+    'binmerge',
+    'cabextract',
+    'cuetools',
+    'curlie',
     'dash',
+    'direnv',
+    'dosfstools',
+    'e2fsprogs',
+    'epub-tools-bin',
+    'fd',
+    'flake8',
     'foot-terminfo',
     'fzf',
+    'gifsicle',
+    'git',
+    'hugo',
+    'hyperfine',
+    'iftop',
+    'innoextract',
+    'iperf3',
+    'jpegoptim',
+    'jq',
+    'ledger',
+    'less',
     'lf',
+    'mac',
+    'moreutils',
+    'mp3val',
+    'mprime-bin',
+    'ms-sys',
     'neovim',
+    'noto-fonts',
+    'noto-fonts-cjk',
+    'noto-fonts-emoji',
+    'noto-fonts-extra',
+    'nsz',
+    'ntfs-3g',
+    'openssh',
+    'opus-tools',
+    'oxipng',
+    'pandoc-cli',
+    'pbzip2',
+    'perl-image-exiftool',
+    'pigz',
+    'pixz',
+    'pwgen',
+    'pyright',
     'python',
+    'python-async-executor',
+    'python-httpx',
+    'python-magic',
+    'python-mutagen',
+    'python-numpy',
+    'python-psutil',
+    'python-pytorch-rocm',
+    'python-yarl',
+    'rdfind',
+    'reflector',
+    'ripgrep',
     'rsync',
+    'rust-analyzer',
+    'shellcheck',
+    'shntool',
+    'speedtest-cli',
+    'sshfs',
+    'sshuttle',
     'tmux',
+    'tmux-xpanes',
+    'transmission-cli',
+    'tree-sitter-cli',
+    'ttf-dejavu-emojiless',
+    'typescript-language-server',
+    'unace',
+    'unrar',
+    'unshield',
+    'unzip',
+    'vim',
+    'vorbis-tools',
     'wl-clipboard',
     'xsel',
     'yt-dlp',
+    'zip',
     'zsh',
 }
 
 
 # bool True == package is installed
 EXPECTED_OPT_DEPENDS = {
+    'art-rawconverter': {
+        'perl-image-exiftool': True,
+        'art-rawconverter-imageio': True,
+        'art-rawconverter-ctlscripts': True,
+        'lcms2-ff': False,
+    },
     'dolphin': {
         'ffmpegthumbs': True,
         'kde-cli-tools': True,
@@ -39,6 +118,15 @@ EXPECTED_OPT_DEPENDS = {
         'xclip': False,
         'xsel': False,
         'wl-clipboard': False,
+    },
+    'okular': {
+        'ebook-tools': True,
+        'kdegraphics-mobipocket': True,
+        'unarchiver': False,
+        'unrar': True,
+    },
+    'udiskie': {
+        'libappindicator-gtk3': True,
     },
     'yt-dlp': {
         'aria2': True,
@@ -236,10 +324,10 @@ async def ensure_packages():
         if name not in packages:
             missing.add(name)
         elif not packages[name].explicitly_installed:
-            print('here', name)
             missing.add(name)
 
     if missing:
+        print('Installing missing packages ...')
         await install_packages(missing, asexplicit=True)
 
 
@@ -262,6 +350,7 @@ async def ensure_opt_depends():
                 else:
                     missing.add(opt_dep.name)
     if missing:
+        print('Installing missing opt depends ...')
         await install_packages(missing, asdeps=True)
 
 
