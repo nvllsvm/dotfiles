@@ -38,7 +38,22 @@ async def pacman_query_opt_depends(packages):
                     package_name = parts[1]
                     description = parts[2]
         elif inside_optdepends and line.startswith('                  '):
-            package_name, description = line.split(':', maxsplit=1)
+            parts = line.split(':', maxsplit=1)
+            match len(parts):
+                case 1:
+                    parts = parts[0].strip().split(maxsplit=1)
+                    match len(parts):
+                        case 1:
+                            package_name = parts[0]
+                            description = ''
+                        case 2:
+                            package_name = parts[0]
+                            description = parts[1]
+                        case _:
+                            raise RuntimeError
+                case 2:
+                    package_name = parts[0]
+                    description = parts[1]
         else:
             inside_optdepends = False
             package_name = None

@@ -229,6 +229,44 @@ EXPECTED_OPT_DEPENDS = {
     'udiskie': {
         'libappindicator-gtk3': True,
     },
+    'wine': {
+        'alsa-plugins': True,
+        'cups': True,
+        'dosbox': False,
+        'gnutls': True,
+        'gst-plugins-bad': True,
+        'gst-plugins-base': True,
+        'gst-plugins-base-libs': True,
+        'gst-plugins-good': True,
+        'gst-plugins-ugly': True,
+        'lib32-alsa-lib': True,
+        'lib32-alsa-plugins': True,
+        'lib32-gnutls': True,
+        'lib32-gst-plugins-base': True,
+        'lib32-gst-plugins-base-libs': True,
+        'lib32-gst-plugins-good': True,
+        'lib32-libcups': True,
+        'lib32-libpulse': True,
+        'lib32-libxcomposite': True,
+        'lib32-libxinerama': True,
+        'lib32-opencl-icd-loader': True,
+        'lib32-pcsclite': True,
+        'lib32-sdl2': True,
+        'lib32-v4l-utils': True,
+        'libgphoto2': True,
+        'libpulse': True,
+        'libxcomposite': True,
+        'libxinerama': True,
+        'opencl-icd-loader': True,
+        'pcsclite': True,
+        'samba': True,
+        'sane': True,
+        'sdl2': True,
+        'unixodbc': True,
+        'v4l-utils': True,
+        'wine-gecko': True,
+        'wine-mono': True,
+    },
     'yt-dlp': {
         'aria2': True,
         'atomicparsley': True,
@@ -336,7 +374,22 @@ async def pacman_query_opt_depends(packages):
                     package_name = parts[1]
                     description = parts[2]
         elif inside_optdepends and line.startswith('                  '):
-            package_name, description = line.split(':', maxsplit=1)
+            parts = line.split(':', maxsplit=1)
+            match len(parts):
+                case 1:
+                    parts = parts[0].strip().split(maxsplit=1)
+                    match len(parts):
+                        case 1:
+                            package_name = parts[0]
+                            description = ''
+                        case 2:
+                            package_name = parts[0]
+                            description = parts[1]
+                        case _:
+                            raise RuntimeError
+                case 2:
+                    package_name = parts[0]
+                    description = parts[1]
         else:
             inside_optdepends = False
             package_name = None
@@ -344,8 +397,8 @@ async def pacman_query_opt_depends(packages):
         if package_name is not None:
             package_name = package_name.strip()
             installed = False
-            if description.strip().endswith(' [installed]'):
-                description = description.removesuffix(' [installed]')
+            if description.strip().endswith('[installed]'):
+                description = description.removesuffix('[installed]')
                 installed = True
             optdep = OptionalDependency(
                 parent_name=parent_package.strip(),
@@ -468,7 +521,6 @@ async def main():
 
     await ensure_packages()
     await ensure_opt_depends()
-
 
 
 if __name__ == '__main__':
