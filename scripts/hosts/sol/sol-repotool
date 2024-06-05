@@ -55,9 +55,13 @@ class Database:
 
     def cleanup(self):
         for path in self.aurutils_cache.iterdir():
-            for subpath in ('src', 'pkg'):
+            for subpath in (path / 'src', path / 'pkg'):
+                if not subpath.exists():
+                    continue
+                subprocess.run(
+                    ['chmod', '-R', '777', '--', subpath], check=True)
                 try:
-                    shutil.rmtree(path / subpath)
+                    shutil.rmtree(subpath)
                 except FileNotFoundError:
                     pass
 
