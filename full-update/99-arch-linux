@@ -5,6 +5,24 @@ import pathlib
 import sys
 
 
+EXPECTED_PACKAGES = {
+    '7-zip',
+    'advancecomp',
+    'aria2',
+    'dash',
+    'foot-terminfo',
+    'fzf',
+    'lf',
+    'neovim',
+    'rsync',
+    'tmux',
+    'wl-clipboard',
+    'xsel',
+    'yt-dlp',
+    'zsh',
+}
+
+
 # bool True == package is installed
 EXPECTED_OPT_DEPENDS = {
     'dolphin': {
@@ -14,6 +32,12 @@ EXPECTED_OPT_DEPENDS = {
         'kio-admin': True,
         'konsole': False,
         'purpose': True,
+    },
+    'neovim': {
+        'python-pynvim': False,
+        'xclip': False,
+        'xsel': False,
+        'wl-clipboard': False,
     },
     'yt-dlp': {
         'aria2': True,

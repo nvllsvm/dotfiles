@@ -23,6 +23,8 @@ require("packer").startup({
         use("neomake/neomake")
         use("neovim/nvim-lspconfig")
 
+        use("Vimjas/vim-python-pep8-indent")
+
         use("plasticboy/vim-markdown")
         use("dhruvasagar/vim-table-mode")
 
