@@ -212,6 +212,17 @@ EXPECTED_OPT_DEPENDS = {
         'unarchiver': False,
         'unrar': True,
     },
+    'proton-ge-custom-bin': {
+        'kdialog': True,
+        'lib32-vulkan-icd-loader': True,
+        'python-kivy': True,
+        'steam': True,
+        'vulkan-driver': True,
+        'wine': True,
+        'winetricks': True,
+        'xboxdrv': True,
+        'zenity': True,
+    },
     'steam': {
         'steam-native-runtime': True,
     },
