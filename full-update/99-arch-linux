@@ -166,7 +166,13 @@ async def main():
     missing = set()
     for parent, opt_deps in opt_deps_by_parent.items():
         for opt_dep in opt_deps:
-            if opt_dep.installed != EXPECTED_OPT_DEPENDS[parent][opt_dep.name]:
+            try:
+                expected_installed = EXPECTED_OPT_DEPENDS[parent][opt_dep.name]
+            except KeyError:
+                print(f'warning: undefined opt dep for {parent} - {opt_dep.name}',
+                      file=sys.stderr)
+                continue
+            if opt_dep.installed != expected_installed:
                 if opt_dep.installed:
                     print(f'warning: unexpected optdep installed for {parent} - {opt_dep.name}: {opt_dep.description}', file=sys.stderr)
                 else:
