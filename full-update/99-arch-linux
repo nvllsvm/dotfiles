@@ -2,6 +2,7 @@
 import asyncio
 import dataclasses
 import pathlib
+import socket
 import sys
 
 
@@ -20,12 +21,14 @@ EXPECTED_PACKAGES = {
     'dosfstools',
     'e2fsprogs',
     'epub-tools-bin',
+    'exfatprogs',
     'fd',
     'flake8',
     'foot-terminfo',
     'fzf',
     'gifsicle',
     'git',
+    'htop',
     'hugo',
     'hyperfine',
     'iftop',
@@ -42,10 +45,6 @@ EXPECTED_PACKAGES = {
     'mprime-bin',
     'ms-sys',
     'neovim',
-    'noto-fonts',
-    'noto-fonts-cjk',
-    'noto-fonts-emoji',
-    'noto-fonts-extra',
     'nsz',
     'ntfs-3g',
     'openssh',
@@ -77,11 +76,11 @@ EXPECTED_PACKAGES = {
     'speedtest-cli',
     'sshfs',
     'sshuttle',
+    'syncthing',
     'tmux',
     'tmux-xpanes',
     'transmission-cli',
     'tree-sitter-cli',
-    'ttf-dejavu-emojiless',
     'typescript-language-server',
     'unace',
     'unrar',
@@ -94,6 +93,54 @@ EXPECTED_PACKAGES = {
     'yt-dlp',
     'zip',
     'zsh',
+}
+
+EXPECTED_PACKAGES_DESKTOP = {
+    'alacritty',
+    'art-rawconverter',
+    'audacity',
+    'base16-shell-preview',
+    'bitwig-studio',
+    'chromium',
+    'discord',
+    'docker-compose',
+    'dolphin',
+    'element-desktop',
+    'firefox',
+    'foliate',
+    'foot',
+    'gamescope',
+    'gifski',
+    'gimp-devel',
+    'gparted',
+    'gwenview',
+    'inkscape',
+    'jellyfin-media-player',
+    'kdeconnect',
+    'kid3-qt',
+    'krita',
+    'mangohud',
+    'mkvtoolnix-gui',
+    'noto-fonts',
+    'noto-fonts-cjk',
+    'noto-fonts-emoji',
+    'noto-fonts-extra',
+    'obs-studio',
+    'okular',
+    'piavpn-bin',
+    'podman',
+    'proton-ge-custom-bin',
+    'signal-desktop',
+    'slack-desktop',
+    'spectacle',
+    'steam',
+    'strawberry',
+    'tremotesf',
+    'ttf-dejavu-emojiless',
+    'upscayl-bin',
+    'virt-manager',
+    'wine',
+    'xboxdrv',
 }
 
 
@@ -164,6 +211,9 @@ EXPECTED_OPT_DEPENDS = {
         'kdegraphics-mobipocket': True,
         'unarchiver': False,
         'unrar': True,
+    },
+    'steam': {
+        'steam-native-runtime': True,
     },
     'udiskie': {
         'libappindicator-gtk3': True,
@@ -358,9 +408,12 @@ async def install_packages(packages, asdeps=False, asexplicit=False):
 
 
 async def ensure_packages():
-    packages = await pacman_query_installed(EXPECTED_PACKAGES)
+    expected_packages = set(EXPECTED_PACKAGES)
+    if socket.gethostname() in ('mars', 'phobos'):
+        expected_packages.update(EXPECTED_PACKAGES_DESKTOP)
+    packages = await pacman_query_installed(expected_packages)
     missing = set()
-    for name in EXPECTED_PACKAGES:
+    for name in expected_packages:
         if name not in packages:
             missing.add(name)
         elif not packages[name].explicitly_installed:
