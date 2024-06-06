@@ -843,9 +843,12 @@ class dolphin_tool_rvz:
         cls._check_is_rvz(path)
         if paths:
             raise NotImplementedError
-        if overwrite:
-            raise NotImplementedError
         target = dest / path.with_suffix('.gcm').name
+        if target.is_file():
+            if overwrite:
+                target.unlink()
+            else:
+                raise RuntimeError('target already exists')
         proc = await asyncio.create_subprocess_exec(
             'dolphin-tool', 'convert',
             '--format=iso',
