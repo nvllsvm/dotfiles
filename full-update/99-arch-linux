@@ -4,6 +4,9 @@ import pathlib
 import socket
 import subprocess
 
+if not pathlib.Path('/etc/arch-release').is_file():
+    exit()
+
 try:
     import pyalpm
 except ImportError:
