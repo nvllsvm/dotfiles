@@ -368,12 +368,16 @@ async def ensure_packages():
 
 async def ensure_opt_depends():
     provided_packages = set()
+    installed_packages = set()
     for package in all_packages():
+        installed_packages.add(package.name)
         provided_packages.add(package.name)
         provided_packages.update(package.provides)
 
     missing = set()
-    for expected_optdepends in EXPECTED_OPT_DEPENDS.values():
+    for package, expected_optdepends in EXPECTED_OPT_DEPENDS.items():
+        if package not in installed_packages:
+            continue
         for optdep in expected_optdepends:
             if optdep not in provided_packages:
                 missing.add(optdep)
