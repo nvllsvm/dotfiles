@@ -773,7 +773,60 @@ class cli_7zip:
         return volumes
 
 
-class dolphin_tool:
+class dolphin_tool_gcm:
+    @staticmethod
+    @functools.cache
+    def check():
+        if not shutil.which('dolphin-tool'):
+            raise KeyError
+
+    @staticmethod
+    async def contents(path):
+        proc = await asyncio.create_subprocess_exec(
+            'dolphin-tool', 'extract',
+            '--list',
+            '--input', path,
+            stdout=asyncio.subprocess.PIPE)
+        stdout, _ = await proc.communicate()
+        if proc.returncode:
+            raise ProcessError(proc.returncode)
+        return [
+            line.split(maxsplit=3)[-1]
+            for line in stdout.splitlines()
+        ]
+
+    @staticmethod
+    async def extract(path, dest, paths=None, password=None, overwrite=False):
+        if paths:
+            raise NotImplementedError
+        args = [
+            'dolphin-tool', 'extract',
+            '--quiet',
+            '--input', path,
+            '--output', dest,
+        ]
+        args.append(path)
+        proc = await asyncio.create_subprocess_exec(
+            *args,
+            stdin=asyncio.subprocess.DEVNULL,
+            stderr=asyncio.subprocess.DEVNULL, # quiet fails to suppress successful extraction
+            stdout=asyncio.subprocess.PIPE)
+        await proc.communicate()
+        if proc.returncode:
+            raise ProcessError(proc.returncode)
+
+    @classmethod
+    async def volumes(cls, path, password=''):
+        cls._check_is_gcm(path)
+        return [path]
+
+    @staticmethod
+    def _check_is_gcm(path):
+        if path.suffix.lower() != '.gcm':
+            raise ValueError('does not end with .gcm')
+
+
+class dolphin_tool_rvz:
     @staticmethod
     @functools.cache
     def check():
@@ -783,7 +836,7 @@ class dolphin_tool:
     @classmethod
     async def contents(cls, path):
         cls._check_is_rvz(path)
-        return [path.with_suffix('.iso').name.encode()]
+        return [path.with_suffix('.gcm').name.encode()]
 
     @classmethod
     async def extract(cls, path, dest, paths=None, password=None, overwrite=False):
@@ -792,7 +845,7 @@ class dolphin_tool:
             raise NotImplementedError
         if overwrite:
             raise NotImplementedError
-        target = dest / path.with_suffix('.iso').name
+        target = dest / path.with_suffix('.gcm').name
         proc = await asyncio.create_subprocess_exec(
             'dolphin-tool', 'convert',
             '--format=iso',
@@ -2021,7 +2074,9 @@ async def _get_class(path):
             except Exception:
                 pass
         if suffixes[-1] == '.rvz':
-            return dolphin_tool
+            return dolphin_tool_rvz
+        if suffixes[-1] == '.gcm':
+            return dolphin_tool_gcm
         if suffixes[-1] == '.nsz':
             return nsz
         # ffs - brotli doesn't have a file signature
