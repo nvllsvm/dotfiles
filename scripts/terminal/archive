@@ -809,8 +809,8 @@ class dolphin_tool_gcm:
         proc = await asyncio.create_subprocess_exec(
             *args,
             stdin=asyncio.subprocess.DEVNULL,
-            stderr=asyncio.subprocess.DEVNULL, # quiet fails to suppress successful extraction
-            stdout=asyncio.subprocess.PIPE)
+            stdout=asyncio.subprocess.DEVNULL,
+        )
         await proc.communicate()
         if proc.returncode:
             raise ProcessError(proc.returncode)
