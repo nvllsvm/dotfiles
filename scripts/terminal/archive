@@ -792,7 +792,7 @@ class dolphin_tool:
             raise NotImplementedError
         if overwrite:
             raise NotImplementedError
-        target = dest / path.with_suffix('').name
+        target = dest / path.with_suffix('.iso').name
         proc = await asyncio.create_subprocess_exec(
             'dolphin-tool', 'convert',
             '--format=iso',
