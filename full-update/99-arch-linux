@@ -61,6 +61,7 @@ EXPECTED_PACKAGES = {
     'pigz',
     'pixz',
     'pwgen',
+    'pyalpm',
     'pyright',
     'python',
     'python-async-executor',
