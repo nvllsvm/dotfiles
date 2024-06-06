@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 import asyncio
-import dataclasses
 import pathlib
 import socket
-import sys
+import subprocess
+
+try:
+    import pyalpm
+except ImportError:
+    subprocess.run(['yay', '-S', '--noconfirm', 'pyalpm'], check=True)
+    import pyalpm
 
 
 EXPECTED_PACKAGES = {
@@ -147,268 +152,130 @@ EXPECTED_PACKAGES_DESKTOP = {
 # bool True == package is installed
 EXPECTED_OPT_DEPENDS = {
     'art-rawconverter': {
-        'perl-image-exiftool': True,
-        'art-rawconverter-imageio': True,
-        'art-rawconverter-ctlscripts': True,
-        'lcms2-ff': False,
+        'perl-image-exiftool',
+        'art-rawconverter-imageio',
+        'art-rawconverter-ctlscripts',
     },
     'digikam': {
-        'darktable': True,
-        'hugin': True,
-        'qt6-imageformats': True,
-        'rawtherapee': False,
+        'darktable',
+        'hugin',
+        'qt6-imageformats',
     },
     'dolphin': {
-        'ffmpegthumbs': True,
-        'kde-cli-tools': True,
-        'kdegraphics-thumbnailers': True,
-        'kio-admin': True,
-        'konsole': False,
-        'purpose': True,
+        'ffmpegthumbs',
+        'kde-cli-tools',
+        'kdegraphics-thumbnailers',
+        'kio-admin',
+        'purpose',
     },
     'gimp-devel': {
-        'aalib': True,
-        'alsa-lib': True,
-        'cfitsio': True,
-        'curl': True,
-        'ghostscript': True,
-        'gjs': True,
-        'gutenprint': False,
-        'iso-codes': True,
-        'libheif': True,
-        'libjxl': True,
-        'libmng': True,
-        'libwebp': True,
-        'libxpm': True,
-        'lua51-lgi': True,
-        'luajit': True,
-        'qoi-headers': True,
-        'zlib': True,
+        'aalib',
+        'alsa-lib',
+        'cfitsio',
+        'curl',
+        'ghostscript',
+        'gjs',
+        'iso-codes',
+        'libheif',
+        'libjxl',
+        'libmng',
+        'libwebp',
+        'libxpm',
+        'lua51-lgi',
+        'luajit',
+        'qoi-headers',
+        'zlib',
     },
     'gwenview': {
-        'kamera': False,
-        'kimageformats': True,
-        'qt6-imageformats': True,
+        'kimageformats',
+        'qt6-imageformats',
     },
     'krita': {
-        'kimageformats5': True,
-        'krita-plugin-gmic': True,
-        'kseexpr': True,
-        'libheif': True,
-        'libjxl': True,
-        'libmypaint': True,
-        'poppler-qt5': True,
-        'python-pyqt5': True,
-    },
-    'neovim': {
-        'python-pynvim': False,
-        'xclip': False,
-        'xsel': False,
-        'wl-clipboard': False,
+        'kimageformats5',
+        'krita-plugin-gmic',
+        'kseexpr',
+        'libheif',
+        'libjxl',
+        'libmypaint',
+        'poppler-qt5',
+        'python-pyqt5',
     },
     'okular': {
-        'ebook-tools': True,
-        'kdegraphics-mobipocket': True,
-        'unarchiver': False,
-        'unrar': True,
+        'ebook-tools',
+        'kdegraphics-mobipocket',
+        'unrar',
     },
     'proton-ge-custom-bin': {
-        'kdialog': True,
-        'lib32-vulkan-icd-loader': True,
-        'python-kivy': True,
-        'steam': True,
-        'vulkan-driver': True,
-        'wine': True,
-        'winetricks': True,
-        'xboxdrv': True,
-        'zenity': True,
+        'kdialog',
+        'lib32-vulkan-icd-loader',
+        'python-kivy',
+        'steam',
+        'vulkan-driver',
+        'wine',
+        'winetricks',
+        'xboxdrv',
+        'zenity',
     },
     'steam': {
-        'steam-native-runtime': True,
+        'steam-native-runtime',
     },
     'udiskie': {
-        'libappindicator-gtk3': True,
+        'libappindicator-gtk3',
     },
     'wine': {
-        'alsa-plugins': True,
-        'cups': True,
-        'dosbox': False,
-        'gnutls': True,
-        'gst-plugins-bad': True,
-        'gst-plugins-base': True,
-        'gst-plugins-base-libs': True,
-        'gst-plugins-good': True,
-        'gst-plugins-ugly': True,
-        'lib32-alsa-lib': True,
-        'lib32-alsa-plugins': True,
-        'lib32-gnutls': True,
-        'lib32-gst-plugins-base': True,
-        'lib32-gst-plugins-base-libs': True,
-        'lib32-gst-plugins-good': True,
-        'lib32-libcups': True,
-        'lib32-libpulse': True,
-        'lib32-libxcomposite': True,
-        'lib32-libxinerama': True,
-        'lib32-opencl-icd-loader': True,
-        'lib32-pcsclite': True,
-        'lib32-sdl2': True,
-        'lib32-v4l-utils': True,
-        'libgphoto2': True,
-        'libpulse': True,
-        'libxcomposite': True,
-        'libxinerama': True,
-        'opencl-icd-loader': True,
-        'pcsclite': True,
-        'samba': True,
-        'sane': True,
-        'sdl2': True,
-        'unixodbc': True,
-        'v4l-utils': True,
-        'wine-gecko': True,
-        'wine-mono': True,
+        'alsa-plugins',
+        'cups',
+        'dosbox',
+        'gnutls',
+        'gst-plugins-bad',
+        'gst-plugins-base',
+        'gst-plugins-base-libs',
+        'gst-plugins-good',
+        'gst-plugins-ugly',
+        'lib32-alsa-lib',
+        'lib32-alsa-plugins',
+        'lib32-gnutls',
+        'lib32-gst-plugins-base',
+        'lib32-gst-plugins-base-libs',
+        'lib32-gst-plugins-good',
+        'lib32-libcups',
+        'lib32-libpulse',
+        'lib32-libxcomposite',
+        'lib32-libxinerama',
+        'lib32-opencl-icd-loader',
+        'lib32-pcsclite',
+        'lib32-sdl2',
+        'lib32-v4l-utils',
+        'libgphoto2',
+        'libpulse',
+        'libxcomposite',
+        'libxinerama',
+        'opencl-icd-loader',
+        'pcsclite',
+        'samba',
+        'sane',
+        'sdl2',
+        'unixodbc',
+        'v4l-utils',
+        'wine-gecko',
+        'wine-mono',
     },
     'yt-dlp': {
-        'aria2': True,
-        'atomicparsley': True,
-        'ffmpeg': True,
-        'phantomjs': False,
-        'python-brotli': True,
-        'python-brotlicffi': True,
-        'python-mutagen': True,
-        'python-pycryptodome': True,
-        'python-pycryptodomex': True,
-        'python-pyxattr': True,
-        'python-secretstorage': True,
-        'python-websockets': True,
-        'python-xattr': True,
-        'rtmpdump': True,
+        'aria2',
+        'atomicparsley',
+        'ffmpeg',
+        'python-brotli',
+        'python-brotlicffi',
+        'python-mutagen',
+        'python-pycryptodome',
+        'python-pycryptodomex',
+        'python-pyxattr',
+        'python-secretstorage',
+        'python-websockets',
+        'python-xattr',
+        'rtmpdump',
     },
 }
-
-
-@dataclasses.dataclass
-class Package:
-    name: str
-    explicitly_installed: bool
-
-
-@dataclasses.dataclass
-class OptionalDependency:
-    parent_name: str
-    name: str
-    description: str
-    installed: bool
-
-
-async def pacman_query_installed(packages):
-    proc = await asyncio.create_subprocess_exec(
-            'pacman', '-Qi', '--', *set(packages),
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-    )
-    stdout, stderr = await proc.communicate()
-    for line in stderr.decode().splitlines():
-        if line.startswith("error: package '") and line.endswith("' was not found"):
-            continue
-        print(line, file=sys.stderr)
-
-    found_packages = {}
-
-    name = None
-    explicitly_installed = False
-    for line in stdout.decode().splitlines():
-        if line.startswith('Install Reason  :'):
-            _, part = line.split(':', maxsplit=1)
-            match part.strip():
-                case 'Explicitly installed':
-                    explicitly_installed = True
-                case 'Installed as a dependency for another package':
-                    explicitly_installed = False
-                case _:
-                    raise RuntimeError()
-        if line.startswith('Name            : '):
-            if name is not None:
-                found_packages[name] = Package(
-                    name=name,
-                    explicitly_installed=explicitly_installed,
-                )
-            name = line.split(':', maxsplit=1)[1].strip()
-
-    if name is not None:
-        found_packages[name] = Package(
-            name=name,
-            explicitly_installed=explicitly_installed,
-        )
-    return found_packages
-
-
-async def pacman_query_opt_depends(packages):
-    proc = await asyncio.create_subprocess_exec(
-            'pacman', '-Qi', '--', *set(packages),
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-    )
-    stdout, stderr = await proc.communicate()
-    for line in stderr.decode().splitlines():
-        if line.startswith("error: package '") and line.endswith("' was not found"):
-            continue
-        print(line, file=sys.stderr)
-
-    opt_depends = {}
-
-    inside_optdepends = False
-    parent_package = None
-    for line in stdout.decode().splitlines():
-        if line.startswith('Name            : '):
-            parent_package = line.split(':', maxsplit=1)[1].strip()
-
-        if line.startswith('Optional Deps   : '):
-            inside_optdepends = True
-            parts = line.split(':', maxsplit=2)
-            match len(parts):
-                case 2:
-                    if parts[1].strip() == 'None':
-                        # no opt depends
-                        continue
-                case 3:
-                    package_name = parts[1]
-                    description = parts[2]
-        elif inside_optdepends and line.startswith('                  '):
-            parts = line.split(':', maxsplit=1)
-            match len(parts):
-                case 1:
-                    parts = parts[0].strip().split(maxsplit=1)
-                    match len(parts):
-                        case 1:
-                            package_name = parts[0]
-                            description = ''
-                        case 2:
-                            package_name = parts[0]
-                            description = parts[1]
-                        case _:
-                            raise RuntimeError
-                case 2:
-                    package_name = parts[0]
-                    description = parts[1]
-        else:
-            inside_optdepends = False
-            package_name = None
-
-        if package_name is not None:
-            package_name = package_name.strip()
-            installed = False
-            if description.strip().endswith('[installed]'):
-                description = description.removesuffix('[installed]')
-                installed = True
-            optdep = OptionalDependency(
-                parent_name=parent_package.strip(),
-                name=package_name.strip(),
-                description=description.strip(),
-                installed=installed,
-            )
-            opt_depends.setdefault(parent_package, [])
-            opt_depends[parent_package].append(optdep)
-    return opt_depends
 
 
 async def is_unit_enabled(name, user=False):
@@ -471,16 +338,26 @@ async def install_packages(packages, asdeps=False, asexplicit=False):
     await proc.communicate()
 
 
+def all_packages():
+    handle = pyalpm.Handle('.', '/var/lib/pacman')
+    localdb = handle.get_localdb()
+    return localdb.pkgcache
+
+
 async def ensure_packages():
     expected_packages = set(EXPECTED_PACKAGES)
     if socket.gethostname() in ('mars', 'phobos'):
         expected_packages.update(EXPECTED_PACKAGES_DESKTOP)
-    packages = await pacman_query_installed(expected_packages)
+    installed_packages = {
+        package.name: package
+        for package in all_packages()
+    }
+
     missing = set()
     for name in expected_packages:
-        if name not in packages:
+        if name not in installed_packages:
             missing.add(name)
-        elif not packages[name].explicitly_installed:
+        elif installed_packages[name].reason != pyalpm.PKG_REASON_EXPLICIT:
             missing.add(name)
 
     if missing:
@@ -489,23 +366,17 @@ async def ensure_packages():
 
 
 async def ensure_opt_depends():
-    opt_deps_by_parent = await pacman_query_opt_depends(
-            EXPECTED_OPT_DEPENDS.keys())
+    provided_packages = set()
+    for package in all_packages():
+        provided_packages.add(package.name)
+        provided_packages.update(package.provides)
+
     missing = set()
-    for parent, opt_deps in opt_deps_by_parent.items():
-        for opt_dep in opt_deps:
-            try:
-                expected_installed = EXPECTED_OPT_DEPENDS[parent][opt_dep.name]
-            except KeyError:
-                print(f'warning: undefined opt dep for {parent} - {opt_dep.name}',
-                      file=sys.stderr)
-                continue
-            if opt_dep.installed != expected_installed:
-                if opt_dep.installed:
-                    if opt_dep.name not in EXPECTED_PACKAGES:
-                        print(f'warning: unexpected optdep installed for {parent} - {opt_dep.name}: {opt_dep.description}', file=sys.stderr)
-                else:
-                    missing.add(opt_dep.name)
+    for expected_optdepends in EXPECTED_OPT_DEPENDS.values():
+        for optdep in expected_optdepends:
+            if optdep not in provided_packages:
+                missing.add(optdep)
+
     if missing:
         print('Installing missing opt depends ...')
         await install_packages(missing, asdeps=True)
