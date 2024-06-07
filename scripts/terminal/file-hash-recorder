@@ -154,7 +154,6 @@ def main():
                 json.dumps(results, indent=2, sort_keys=True),
             )
         if args.show_dupes:
-            print('here')
             by_sha256 = {}
             for path, info in results.items():
                 by_sha256.setdefault(info['sha256'], [])
