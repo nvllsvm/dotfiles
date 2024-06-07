@@ -265,7 +265,7 @@ async def main():
         has_iso = False
 
         if path.is_file():
-            if path.suffix == '.iso':
+            if path.suffix in ('.iso', '.rawiso'):
                 suffix = '.iso'
                 system, name = await get_name(path, redump)
                 file_paths.append(path)
@@ -286,7 +286,7 @@ async def main():
             for p in path.iterdir():
                 if p.is_file():
                     match p.suffix.lower():
-                        case '.iso':
+                        case '.iso' | '.rawiso':
                             has_iso = True
                         case '.bin':
                             has_bin = True
