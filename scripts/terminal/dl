@@ -61,9 +61,24 @@ async def download(url, insecure=False):
         raise RuntimeError('aria2c and/or curl must be installed')
 
 
+async def download_ytdlp(url):
+    proc = await asyncio.create_subprocess_exec(
+        'yt-dlp',
+        '--output', '%(upload_date)s %(title)s [%(id)s]',
+        '--embed-subs',
+        '--add-metadata',
+        '--merge-output-format=mkv',
+        '--', url,
+    )
+    await proc.communicate()
+    if proc.returncode:
+        raise RuntimeError(f'yt-dlp: returncode {proc.returncode}')
+
+
 async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--insecure', action='store_true')
+    parser.add_argument('--yt', action='store_true')
     parser.add_argument('url', nargs='*')
     args = parser.parse_args()
 
@@ -87,21 +102,11 @@ async def main():
 
     for url in urls:
         print(url)
-        await download(url, insecure=args.insecure)
+        if args.yt:
+            await download_ytdlp(url)
+        else:
+            await download(url, insecure=args.insecure)
 
 
 if __name__ == '__main__':
     asyncio.run(main())
-"""
-    case "$1" in
-        http://www.youtube.com*|\
-        http://youtube.com*|\
-        https://www.youtube.com*|\
-        https://youtube.com*)
-            yt-dlp \
-                --output '%(upload_date)s %(title)s [%(id)s]' \
-                --embed-subs \
-                --add-metadata \
-                --merge-output-format=mkv "$1"
-            ;;
-"""
