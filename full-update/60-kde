@@ -42,7 +42,7 @@ def delete(path):
 
 
 def is_linked(source, target):
-    return source.exists() and source.readlink() == target
+    return source.is_symlink() and source.readlink() == target
 
 
 def symlink(source, target):
