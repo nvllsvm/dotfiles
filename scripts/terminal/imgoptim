@@ -106,6 +106,20 @@ async def optimize_gif(source, dest, fast=False, strip=False):
         raise SubprocessError
 
 
+async def optimize_svg(source, dest, fast=False, strip=False):
+    args = [
+        'svgo',
+        '--quiet',
+        '--multipass',
+        '--input', source,
+        '--output', dest,
+    ]
+    proc = await asyncio.create_subprocess_exec(*args)
+    await proc.wait()
+    if proc.returncode != 0:
+        raise SubprocessError
+
+
 async def optimize_tiff(source, dest, fast=False, strip=False):
     # some metadata is stripped?
     if not strip:
@@ -175,6 +189,7 @@ _MIME_OPTIMIZATIONS = {
     'image/gif': optimize_gif,
     'image/jpeg': optimize_jpeg,
     'image/png': optimize_png,
+    'image/svg+xml': optimize_svg,
     'image/tiff': optimize_tiff,
 }
 
@@ -182,6 +197,7 @@ _TYPE_TO_MIME = {
     'gif': 'image/gif',
     'jpeg': 'image/jpeg',
     'png': 'image/png',
+    'svg': 'image/svg+xml',
     'tiff': 'image/tiff',
 }
 
@@ -208,6 +224,8 @@ def determine_mime(path):
         elif start[0:4] == b'\x4d\x4d\x00\x2a':
             # big endian
             return 'image/tiff'
+        elif start[0:5] == b'<svg ':
+            return 'image/svg+xml'
 
 
 
