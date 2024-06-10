@@ -16,8 +16,6 @@ DOTFILES = pathlib.Path(os.environ['DOTFILES'])
 
 
 LINKS = {
-    CONFIG / 'autostart' / 'org.kde.kdeconnect.daemon.desktop':
-        DOTFILES / 'kde' / 'autostart' / 'org.kde.kdeconnect.daemon.desktop',
     CONFIG / 'kdesurc':
         DOTFILES / 'kde' / 'kdesurc',
     CONFIG / 'kuriikwsfilterrc':
@@ -35,6 +33,10 @@ LINKS = {
         DOTFILES / 'kde' / 'color-schemes',
 }
 
+COPIES = {
+    CONFIG / 'autostart' / 'org.kde.kdeconnect.daemon.desktop':
+        DOTFILES / 'kde' / 'autostart' / 'org.kde.kdeconnect.daemon.desktop',
+}
 
 def delete(path):
     if path.is_symlink() or path.is_file():
@@ -62,6 +64,13 @@ def copy_into_replace_contents(source, target):
         check=True)
 
 
+def copy_replace(source, target):
+    target.parent.mkdir(exist_ok=True, parents=True)
+    subprocess.run(
+        ['rsync', '-avq', source, target],
+        check=True)
+
+
 def main():
     if not shutil.which('plasmashell'):
         exit()
@@ -78,6 +87,9 @@ def main():
             delete(target)
 
     subprocess.run(['update-desktop-database'], check=True)
+
+    for target, source in COPIES.items():
+        copy_replace(source, target)
 
 
 if __name__ == '__main__':
