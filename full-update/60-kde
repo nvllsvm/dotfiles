@@ -16,6 +16,8 @@ DOTFILES = pathlib.Path(os.environ['DOTFILES'])
 
 
 LINKS = {
+    CONFIG / 'autostart' / 'org.kde.kdeconnect.daemon.desktop':
+        DOTFILES / 'kde' / 'autostart' / 'org.kde.kdeconnect.daemon.desktop',
     CONFIG / 'kdesurc':
         DOTFILES / 'kde' / 'kdesurc',
     CONFIG / 'kuriikwsfilterrc':
