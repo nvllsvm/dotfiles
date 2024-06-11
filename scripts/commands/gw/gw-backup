@@ -81,11 +81,13 @@ async def main():
     parser.add_argument('--no-convert', action='store_true')
     args = parser.parse_args()
 
-    raw_path = pathlib.Path(f'{args.name}.scp')
-    image_path = pathlib.Path(f'{args.name}.{args.image_suffix}')
+    parent = pathlib.Path(args.name)
+    parent.mkdir(exist_ok=False, parents=True)
+    raw_path = parent / f'{args.name}.scp'
+    image_path = parent / f'{args.name}.{args.image_suffix}'
 
     loglines = []
-    log_path = pathlib.Path(f'{args.name}.log')
+    log_path = parent / f'{args.name}.log'
     if log_path.exists():
         loglines.extend(log_path.read_text().splitlines())
 
