@@ -37,10 +37,17 @@ process() {
         return
     fi
     printf '%bfull-update - %s - start %s%b\n' "$YELLOW" "$1" "$(date)" "$RESET_COLOR"
+
+    # update dotfiles to ensure full-update/* is up-to-date
+    cmd="$1"/full-update/00-dotfiles
+    if [ -f "$cmd" ]; then
+        run_script "$cmd" --all
+    fi
+
     for cmd in "$1"/full-update/*; do
         case "$cmd" in
             */00-dotfiles)
-                run_script "$cmd" --all
+                # already run
                 ;;
             *)
                 run_script "$cmd"
