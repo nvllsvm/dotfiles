@@ -13,6 +13,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import uuid
 import zipfile
 
 
@@ -1256,23 +1257,34 @@ class unrar:
         ]
 
 
-class bchunk:
+class cuefile:
+    TRACK_TYPE_SUFFIXES = {
+        'AUDIO': '.wav',
+        'MODE1/2352': '.iso',
+    }
+
     @staticmethod
     @functools.cache
     def check():
-        if not shutil.which('bchunk'):
-            raise KeyError
+        for cmd in ('bchunk', 'binmerge'):
+            if not shutil.which(cmd):
+                raise KeyError(f'missing {cmd}')
 
     @classmethod
     async def contents(cls, path):
         if path.suffix != '.cue':
             raise NotImplementedError('must end with .cue')
-        volumes = await cls.volumes(path)
-        if len(volumes) != 2:
-            raise NotImplementedError('too many files')
-        # 01 is the track number
-        name = cls._content_name(path) + '01'
-        return [f'{name}.iso'.encode()]
+        parts = cls._parse_cue(path)
+        name = cls._content_name(path)
+        contents = []
+        for i, (part_path, track_type) in enumerate(parts):
+            suffix = cls.TRACK_TYPE_SUFFIXES[track_type]
+            trackname = name
+            if len(parts) > 1:
+                trackname = f'{trackname}{i+1:02}'
+            trackname += suffix
+            contents.append(trackname.encode())
+        return contents
 
     @staticmethod
     def _content_name(cue_path):
@@ -1295,20 +1307,54 @@ class bchunk:
             path = path.decode()
         path = pathlib.Path(path)
 
+        # TODO check if contents already exist
         volumes = await cls.volumes(path)
+        unique_files = set([
+            filename
+            for filename, _ in cls._parse_cue(path)
+        ])
+        print(len(unique_files))
+        print(volumes)
         name = cls._content_name(path)
-        proc = await asyncio.create_subprocess_exec(
-            'bchunk', '-w', volumes[1], volumes[0], dest / name,
-            stdout=asyncio.subprocess.DEVNULL)
-        await proc.communicate()
-        if proc.returncode:
-            raise ProcessError(proc.returncode)
+        with tempfile.TemporaryDirectory(
+                dir=dest, prefix='.extract_',
+                suffix=dest.name + '.tmp') as tmp:
+            if len(unique_files) > 1:
+                proc = await asyncio.create_subprocess_exec(
+                    'binmerge',
+                    '--outdir', tmp,
+                    path.absolute(), 'merged',
+                )
+                await proc.communicate()
+                if proc.returncode:
+                    raise ProcessError(proc.returncode)
+                source_cue = 'merged.cue'
+                source_bin = 'merged.bin'
+            else:
+                source_cue = volumes[0]
+                source_bin = volumes[1]
+            proc = await asyncio.create_subprocess_exec(
+                'bchunk', '-w', source_bin, source_cue, 'chunk',
+                stdout=asyncio.subprocess.DEVNULL,
+                cwd=tmp,
+            )
+            await proc.communicate()
+            if proc.returncode:
+                raise ProcessError(proc.returncode)
+            results = {}
+            for source in pathlib.Path(tmp).iterdir():
+                if source.name.startswith('chunk'):
+                    target = dest / (name + source.name.removeprefix('chunk'))
+                    if target.exists():
+                        raise RuntimeError
+                    results[source] = target
+            for source, target in results.items():
+                source.rename(target)
 
     @staticmethod
-    async def volumes(path, password=None):
-        if password is not None:
-            raise NotImplementedError
+    def _parse_cue(path):
         files = []
+        current_file = None
         for line in path.read_text().splitlines():
             line = line.strip()
             if line.startswith('FILE '):
@@ -1320,9 +1366,22 @@ class bchunk:
                 file_path = path.parent / pathlib.Path(file_path)
                 if not file_path.is_file():
                     raise ValueError('file(s) specified in cue does not exist')
-                files.append(file_path)
+                current_file = file_path
+            elif current_file and line.startswith('TRACK '):
+                _, _, track_type = line.split()
+                files.append((current_file, track_type))
         if len(files) == 0:
             raise NotImplementedError
+        return files
+
+    @classmethod
+    async def volumes(cls, path, password=None):
+        if password is not None:
+            raise NotImplementedError
+        files = set([
+            filename
+            for filename, _ in cls._parse_cue(path)
+        ])
         return [path, *files]
 
 
@@ -2070,10 +2129,10 @@ async def _get_class(path):
 
     if suffixes := [suffix.lower() for suffix in path.suffixes]:
         if suffixes[-1] == '.cue':
-            await bchunk.contents(path)
+            await cuefile.contents(path)
             try:
-                await bchunk.contents(path)
-                return bchunk
+                await cuefile.contents(path)
+                return cuefile
             except Exception:
                 pass
         if suffixes[-1] == '.rvz':
