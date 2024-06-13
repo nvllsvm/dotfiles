@@ -1,6 +1,0 @@
-[Desktop Entry]
-Name=hass-office-fan-silent
-Type=Application
-StartupNotify=false
-Icon=fan
-Exec=hass office-fan-silent

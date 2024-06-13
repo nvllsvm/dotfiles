@@ -1,6 +1,0 @@
-[Desktop Entry]
-Name=hass-office-fan-light
-Type=Application
-StartupNotify=false
-Icon=wardrobe
-Exec=hass office-fan-light
