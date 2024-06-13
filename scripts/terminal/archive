@@ -1313,8 +1313,6 @@ class cuefile:
             filename
             for filename, _ in cls._parse_cue(path)
         ])
-        print(len(unique_files))
-        print(volumes)
         name = cls._content_name(path)
         with tempfile.TemporaryDirectory(
                 dir=dest, prefix='.extract_',
@@ -1342,12 +1340,20 @@ class cuefile:
             if proc.returncode:
                 raise ProcessError(proc.returncode)
             results = {}
-            for source in pathlib.Path(tmp).iterdir():
-                if source.name.startswith('chunk'):
-                    target = dest / (name + source.name.removeprefix('chunk'))
-                    if target.exists():
-                        raise RuntimeError
-                    results[source] = target
+            chunk_files = list(pathlib.Path(tmp).iterdir())
+            if len(chunk_files) == 1:
+                source = chunk_files[0]
+                target = dest / (name + source.suffix)
+                if target.exists():
+                    raise RuntimeError
+                results[source] = target
+            else:
+                for source in pathlib.Path(tmp).iterdir():
+                    if source.name.startswith('chunk'):
+                        target = dest / (name + source.name.removeprefix('chunk'))
+                        if target.exists():
+                            raise RuntimeError
+                        results[source] = target
             for source, target in results.items():
                 source.rename(target)
 
