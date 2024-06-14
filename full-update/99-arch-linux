@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import asyncio
+import grp
 import pathlib
 import socket
 import subprocess
@@ -295,6 +296,39 @@ EXPECTED_OPT_DEPENDS = {
     },
 }
 
+EXPECTED_GROUPS = {
+    'ar': {
+        'libvirt',
+        'realtime',
+        'storage',
+        'video',
+        'wheel',
+    }
+}
+
+
+async def ensure_users_in_expected_groups():
+    for user, expected_groups in EXPECTED_GROUPS.items():
+        current_groups = {
+            g.gr_name
+            for g in grp.getgrall()
+            if user in g.gr_mem
+        }
+        for group in expected_groups - current_groups:
+            await add_user_to_group(user, group)
+
+
+async def add_user_to_group(user, group):
+    # print prior to command so the sudo password prompt as context
+    print(f'Adding user {user} to group {group}')
+    proc = await asyncio.create_subprocess_exec(
+        'sudo', 'gpasswd', '-a', user, group,
+        stdout=asyncio.subprocess.DEVNULL,
+    )
+    await proc.communicate()
+    if proc.returncode:
+        raise RuntimeError(f'exit {proc.returncode}')
+
 
 async def is_unit_enabled(name, user=False):
     proc = await asyncio.create_subprocess_exec(
@@ -407,6 +441,8 @@ async def ensure_opt_depends():
 async def main():
     if not pathlib.Path('/etc/arch-release').exists():
         return
+
+    await ensure_users_in_expected_groups()
 
     await ensure_packages()
     await ensure_opt_depends()
