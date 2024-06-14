@@ -126,6 +126,7 @@ EXPECTED_PACKAGES_DESKTOP = {
     'gwenview',
     'inkscape',
     'jellyfin-media-player',
+    'kcolorchooser',
     'kdeconnect',
     'kid3-qt',
     'krita',
