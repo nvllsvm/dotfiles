@@ -209,6 +209,15 @@ EXPECTED_OPT_DEPENDS = {
         'udftools',
         'xfsprogs',
     },
+    'libvirt': {
+        'dmidecode',
+        'dnsmasq',
+        'gettext',
+        'iptables-nft',
+        'lvm2',
+        'qemu-desktop',
+        'swtpm',
+    },
     'krita': {
         'kimageformats5',
         'krita-plugin-gmic',
