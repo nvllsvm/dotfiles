@@ -111,7 +111,7 @@ async def parse_date(path):
         lower_bound = datetime.timedelta(weeks=52 * 5)
         upper_bound = datetime.timedelta(days=1)
 
-        now = datetime.datetime.utcnow()
+        now = datetime.datetime.now(datetime.UTC)
         if dt > (now + upper_bound):
             raise ValueError('date in the future')
         elif dt < (now - lower_bound):

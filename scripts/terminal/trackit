@@ -30,9 +30,7 @@ def fzf(options, prompt=''):
 
 
 def now():
-    # fix after grafana csv plugin supports timezone
-    # return datetime.datetime.now(datetime.timezone.utc)
-    return datetime.datetime.utcnow()
+    return datetime.datetime.now(datetime.UTC)
 
 
 def read_csv(path):
