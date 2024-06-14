@@ -33,10 +33,19 @@ LINKS = {
         DOTFILES / 'kde' / 'color-schemes',
 }
 
-COPIES = {
-    CONFIG / 'autostart' / 'org.kde.kdeconnect.daemon.desktop':
-        DOTFILES / 'kde' / 'autostart' / 'org.kde.kdeconnect.daemon.desktop',
-}
+
+match HOSTNAME:
+    case 'mars':
+        LINKS.update({
+            CONFIG / 'autostart':
+                DOTFILES / 'kde' / 'autostart' / 'mars',
+        })
+    case 'phobos':
+        LINKS.update({
+            CONFIG / 'autostart':
+                DOTFILES / 'kde' / 'autostart' / 'phobos',
+        })
+
 
 def delete(path):
     if path.is_symlink() or path.is_file():
@@ -87,9 +96,6 @@ def main():
             delete(target)
 
     subprocess.run(['update-desktop-database'], check=True)
-
-    for target, source in COPIES.items():
-        copy_replace(source, target)
 
 
 if __name__ == '__main__':
