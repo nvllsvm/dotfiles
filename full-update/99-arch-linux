@@ -299,6 +299,7 @@ EXPECTED_OPT_DEPENDS = {
 EXPECTED_GROUPS = {
     'ar': {
         'libvirt',
+        'libvirt-qemu',
         'realtime',
         'storage',
         'video',
