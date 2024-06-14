@@ -102,7 +102,7 @@ async def main():
 
     for url in urls:
         print(url)
-        if args.yt:
+        if url.startswith('https://www.youtube.com') or args.yt:
             await download_ytdlp(url)
         else:
             await download(url, insecure=args.insecure)
