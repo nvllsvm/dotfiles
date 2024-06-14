@@ -23,6 +23,7 @@ import errno
 import fnmatch
 import getpass
 import glob
+import grp
 import gzip
 import hashlib
 import importlib
@@ -189,7 +190,7 @@ def cd(pattern='~'):
     return pathlib.Path.cwd()
 
 
-def pwd():
+def cwd():
     return pathlib.Path.cwd()
 
 
