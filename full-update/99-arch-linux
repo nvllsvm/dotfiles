@@ -196,6 +196,18 @@ EXPECTED_OPT_DEPENDS = {
         'kimageformats',
         'qt6-imageformats',
     },
+    'gparted': {
+        'btrfs-progs',
+        'dosfstools',
+        'exfatprogs',
+        'f2fs-tools',
+        'gpart',
+        'mtools',
+        'ntfs-3g',
+        'polkit',
+        'udftools',
+        'xfsprogs',
+    },
     'krita': {
         'kimageformats5',
         'krita-plugin-gmic',
