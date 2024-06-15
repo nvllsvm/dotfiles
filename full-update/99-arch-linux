@@ -14,6 +14,7 @@ except ImportError:
     subprocess.run(['yay', '-S', '--noconfirm', 'pyalpm'], check=True)
     import pyalpm
 
+HOSTNAME = socket.gethostname()
 
 EXPECTED_PACKAGES = {
     '7-zip',
@@ -316,6 +317,17 @@ EXPECTED_GROUPS = {
     }
 }
 
+EXPECTED_SERVICES = {
+    'fstrim.timer',
+    'logrotate.timer',
+    'systemd-timesyncd.service',
+}
+
+if HOSTNAME in ('mars', 'phobos', 'sol'):
+    EXPECTED_SERVICES.update({
+        'smb.service',
+    })
+
 
 async def ensure_users_in_expected_groups():
     for user, expected_groups in EXPECTED_GROUPS.items():
@@ -408,7 +420,7 @@ def all_packages():
 
 async def ensure_packages():
     expected_packages = set(EXPECTED_PACKAGES)
-    if socket.gethostname() in ('mars', 'phobos'):
+    if HOSTNAME in ('mars', 'phobos'):
         expected_packages.update(EXPECTED_PACKAGES_DESKTOP)
     installed_packages = {
         package.name: package
@@ -457,9 +469,8 @@ async def main():
     await ensure_packages()
     await ensure_opt_depends()
 
-    await enable_unit('fstrim.timer', now=True)
-    await enable_unit('systemd-timesyncd.service', now=True)
-    await enable_unit('logrotate.timer', now=True)
+    for service in EXPECTED_SERVICES:
+        await enable_unit(service, now=True)
 
 
 if __name__ == '__main__':
