@@ -53,6 +53,7 @@ EXPECTED_PACKAGES = {
     'moreutils',
     'mp3val',
     'mprime-bin',
+    'mpv',
     'ms-sys',
     'neovim',
     'nsz',
