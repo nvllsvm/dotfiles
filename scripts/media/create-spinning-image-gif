@@ -36,4 +36,4 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-convert "$SOURCE" -duplicate "$((FRAMES-1))" -distort SRT %[fx:t*360/n] -set delay "$DELAY" -loop 0 "$TARGET"
+magick "$SOURCE" -duplicate "$((FRAMES-1))" -distort SRT %[fx:t*360/n] -set delay "$DELAY" -loop 0 "$TARGET"
