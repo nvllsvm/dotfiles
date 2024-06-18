@@ -912,25 +912,51 @@ class udisksctl:
         return [path]
 
     @staticmethod
-    def _loop_info(device):
+    def _info(block_device=None, object_path=None):
+        args = ['udisksctl', 'info']
+        if block_device is not None:
+            args.extend(['--block-device', block_device])
+        if object_path is not None:
+            args.extend(['--object-path', object_path])
         proc = subprocess.run(
-            ['udisksctl', 'info', '--block-device', device],
+            args,
             stdout=subprocess.PIPE,
             check=True)
         output = proc.stdout.decode().strip()
 
         backing_file = None
         mount_point = None
+        partitions = []
+        prev_is_partitions = False
+        data = None
+        current_section = None
+        current_key = None
         for line in output.splitlines():
-            if line.startswith('    MountPoints:'):
-                mount_point = line.split(maxsplit=1)[1]
-            elif line.startswith('    BackingFile:'):
-                backing_file = line.split(maxsplit=1)[1]
+            if line[0].strip():
+                if data is not None:
+                    raise RuntimeError
+                data = {}
+            if line[2].strip():
+                current_section = line.strip().removesuffix(':')
+                current_key = None
+                if current_section in data:
+                    raise RuntimeError
+                data[current_section] = {}
+            if line[4].strip():
+                current_key, value = line.strip().split(':', maxsplit=1)
+                value = value.strip()
+                if value:
+                    data[current_section].setdefault(current_key, [])
+                    data[current_section][current_key].append(value)
+            else:
+                if not current_key:
+                    raise RuntimeError
+                value = line.strip()
+                if value:
+                    data[current_section].setdefault(current_key, [])
+                    data[current_section][current_key].append(value)
 
-        return {
-            'backing_file': backing_file,
-            'mount_point': mount_point,
-        }
+        return data
 
     @staticmethod
     @contextlib.contextmanager
@@ -960,6 +986,23 @@ class udisksctl:
     @staticmethod
     @contextlib.contextmanager
     def _udisksctl_mount_context(device):
+        info = udisksctl._info(block_device=device)
+        if info.get('org.freedesktop.UDisks2.Filesystem'):
+            raise NotImplementedError
+        else:
+            filesystems = []
+            partitions = info['org.freedesktop.UDisks2.PartitionTable']['Partitions']
+            for part in partitions:
+                if part.startswith('/org/freedesktop/UDisks2/block_devices/'):
+                    bd = '/dev/{}'.format(part.removeprefix('/org/freedesktop/UDisks2/block_devices/'))
+                    part_info = udisksctl._info(block_device=bd)
+                else:
+                    raise NotImplementedError
+                if part_info.get('org.freedesktop.UDisks2.Filesystem'):
+                    filesystems.append(bd)
+            if len(filesystems) != 1:
+                raise NotImplementedError
+            device = filesystems[0]
         proc = subprocess.run(
             ['udisksctl', 'mount', '--no-user-interaction',
              '--options', 'ro',
@@ -968,7 +1011,7 @@ class udisksctl:
             stdout=subprocess.PIPE)
 
         if proc.returncode:
-            mount_info = udisksctl._loop_info(device)
+            mount_info = udisksctl._info(device)
             path = mount_info['mount_point']
 
             if path is None:
