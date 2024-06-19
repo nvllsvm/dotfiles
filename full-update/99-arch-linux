@@ -24,6 +24,7 @@ EXPECTED_PACKAGES = {
     'bchunk',
     'binmerge',
     'cabextract',
+    'cdemu-client',
     'cuetools',
     'curlie',
     'dash',
