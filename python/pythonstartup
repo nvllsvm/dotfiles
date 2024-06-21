@@ -55,6 +55,7 @@ import smtplib
 import socket
 import stat
 import string
+import struct
 import subprocess
 import sys
 import tarfile
