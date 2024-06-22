@@ -313,12 +313,15 @@ EXPECTED_GROUPS = {
     'ar': {
         'libvirt',
         'libvirt-qemu',
-        'realtime',
         'storage',
         'video',
         'wheel',
     }
 }
+
+if HOSTNAME in ('mars', 'phobos'):
+    EXPECTED_GROUPS['ar'].add('realtime')
+
 
 EXPECTED_SERVICES = {
     'fstrim.timer',
