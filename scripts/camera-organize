@@ -14,18 +14,22 @@ DEFAULT_TARGET = pathlib.Path('/storage/Personal Creations')
 PHOTO_DIR = 'Photos'
 VIDEO_DIR = 'Videos'
 
-PHOTO_EXT = set([
+PHOTO_EXT = {
     '.cr3',
     '.jpg',
     '.jpeg',
     '.png'
-])
+}
 
-VIDEO_EXT = set([
+VIDEO_EXT = {
     '.mkv',
     '.mp4',
     '.mov',
-])
+}
+
+IGNORED_SUFFIXES = {
+    '.ctg',
+}
 
 
 class exiv2:
@@ -142,6 +146,8 @@ async def process_file(path, target_root, dry_run):
         target_path = target_root.joinpath(PHOTO_DIR)
     elif suffix in VIDEO_EXT:
         target_path = target_root.joinpath(VIDEO_DIR)
+    elif suffix in IGNORED_SUFFIXES:
+        return
     else:
         raise KeyError(f'unhandled suffix in {path}')
 
@@ -187,6 +193,11 @@ async def main():
 
     executor = async_executor.AsyncExecutor()
     for path in paths:
+        suffix = path.suffix.lower()
+        if suffix in IGNORED_SUFFIXES:
+            continue
+        elif suffix not in PHOTO_EXT and suffix not in VIDEO_EXT:
+            print('warning: unhandled suffix in "{path}"', file=sys.stderr)
         executor.submit(process_file, path, args.target, args.dry_run)
 
     async for task in tqdm.asyncio.tqdm(executor):
