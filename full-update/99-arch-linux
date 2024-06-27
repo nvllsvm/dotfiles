@@ -236,6 +236,14 @@ EXPECTED_OPT_DEPENDS = {
         'xboxdrv',
         'zenity',
     },
+    'python': {
+        'python-setuptools',
+        'python-pip',
+        'python-pipx',
+        'sqlite',
+        'xz',
+        'tk',
+    },
     'steam': {
         'steam-native-runtime',
     },
