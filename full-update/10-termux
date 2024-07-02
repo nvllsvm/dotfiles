@@ -35,3 +35,10 @@ yes | pkg upgrade
 yes | apt autoremove
 
 touch ~/.hushlogin
+
+# TODO make this more intelligent
+mkdir -p ~/.cache
+rm -rf ~/.cache/termux-exec
+git clone https://github.com/termux-play-store/termux-exec ~/.cache/termux-exec
+cd ~/.cache/termux-exec
+make install
