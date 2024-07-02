@@ -316,7 +316,10 @@ EXPECTED_GROUPS = {
 }
 
 if HOSTNAME in ('mars', 'phobos'):
-    EXPECTED_GROUPS['ar'].add('realtime')
+    EXPECTED_GROUPS['ar'].update({
+        'games',  # for proton to automatically set niceness
+        'realtime',
+    })
 
 
 EXPECTED_SERVICES = {
