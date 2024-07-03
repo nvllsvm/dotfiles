@@ -315,6 +315,12 @@ EXPECTED_GROUPS = {
     }
 }
 
+EXPECTED_SERVICES = {
+    'fstrim.timer',
+    'logrotate.timer',
+    'systemd-timesyncd.service',
+}
+
 if HOSTNAME in ('mars', 'phobos'):
     EXPECTED_GROUPS['ar'].update({
         'games',  # for proton to automatically set niceness
@@ -324,14 +330,23 @@ if HOSTNAME in ('mars', 'phobos'):
         'python-pytorch-opt-rocm',
     })
 
+if HOSTNAME == 'mars':
+    EXPECTED_PACKAGES.update({
+        'linux-zen',
+        'linux-zen-headers',
+    })
 
-EXPECTED_SERVICES = {
-    'fstrim.timer',
-    'logrotate.timer',
-    'systemd-timesyncd.service',
-}
+if HOSTNAME == 'phobos':
+    EXPECTED_PACKAGES.update({
+        'linux-flowx13',
+        'linux-flowx13-headers',
+    })
 
 if HOSTNAME in ('mars', 'phobos', 'sol'):
+    EXPECTED_PACKAGES.update({
+        'linux-lts',
+        'linux-lts-headers',
+    })
     EXPECTED_SERVICES.update({
         'smb.service',
     })
