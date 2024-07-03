@@ -78,7 +78,6 @@ EXPECTED_PACKAGES = {
     'python-mutagen',
     'python-numpy',
     'python-psutil',
-    'python-pytorch-rocm',
     'python-yarl',
     'rdfind',
     'reflector',
@@ -318,6 +317,9 @@ if HOSTNAME in ('mars', 'phobos'):
     EXPECTED_GROUPS['ar'].update({
         'games',  # for proton to automatically set niceness
         'realtime',
+    })
+    EXPECTED_PACKAGES.update({
+        'python-pytorch-opt-rocm',
     })
 
 
