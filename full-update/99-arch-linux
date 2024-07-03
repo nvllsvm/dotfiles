@@ -93,7 +93,6 @@ EXPECTED_PACKAGES = {
     'svgo',
     'syncthing',
     'tmux',
-    'tmux-xpanes',
     'transmission-cli',
     'tree-sitter-cli',
     'typescript-language-server',
