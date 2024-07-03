@@ -87,7 +87,7 @@ EXPECTED_PACKAGES = {
     'rust-analyzer',
     'shellcheck',
     'shntool',
-    'speedtest-cli',
+    'speedtest-go',
     'sshfs',
     'sshuttle',
     'svgo',
