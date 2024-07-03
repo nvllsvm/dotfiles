@@ -158,12 +158,14 @@ EXPECTED_PACKAGES_DESKTOP = {
 }
 
 
-# bool True == package is installed
-EXPECTED_OPT_DEPENDS = {
+EXPECTED_PACKAGE_DEPENDENCIES = {
     'art-rawconverter': {
         'perl-image-exiftool',
         'art-rawconverter-imageio',
         'art-rawconverter-ctlscripts',
+    },
+    'cdemu-daemon': {
+        'vhba-module-dkms',
     },
     'digikam': {
         'darktable',
@@ -445,7 +447,7 @@ async def ensure_packages():
         await install_packages(missing, asexplicit=True)
 
 
-async def ensure_opt_depends():
+async def ensure_package_dependencies():
     provided_packages = set()
     installed_packages = set()
     for package in all_packages():
@@ -454,15 +456,15 @@ async def ensure_opt_depends():
         provided_packages.update(package.provides)
 
     missing = set()
-    for package, expected_optdepends in EXPECTED_OPT_DEPENDS.items():
+    for package, expected_deps in EXPECTED_PACKAGE_DEPENDENCIES.items():
         if package not in installed_packages:
             continue
-        for optdep in expected_optdepends:
-            if optdep not in provided_packages:
-                missing.add(optdep)
+        for dep in expected_deps:
+            if dep not in provided_packages:
+                missing.add(dep)
 
     if missing:
-        print('Installing missing opt depends ...')
+        print('Installing missing dependencies ...')
         await install_packages(missing, asdeps=True)
 
 
@@ -473,7 +475,7 @@ async def main():
     await ensure_users_in_expected_groups()
 
     await ensure_packages()
-    await ensure_opt_depends()
+    await ensure_package_dependencies()
 
     for service in EXPECTED_SERVICES:
         await enable_unit(service, now=True)
