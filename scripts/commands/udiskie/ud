@@ -6,6 +6,82 @@ import subprocess
 import sys
 
 
+class cdemu:
+
+    @classmethod
+    def info(cls):
+        status = cls._status()
+        devmap = cls._device_mapping()
+        mounted = []
+        for cdemu_id, path in status.items():
+            if path is not None:
+                info = {
+                    'cdemu_id': cdemu_id,
+                    'device': devmap[cdemu_id],
+                    'ui_label': str(path),
+                }
+                mounted.append(info)
+        return mounted
+
+    @staticmethod
+    def _device_mapping():
+        proc = subprocess.run(
+            ['cdemu', 'device-mapping'],
+            stdout=subprocess.PIPE,
+            check=True)
+        devmap = {}
+        for line in proc.stdout.decode().splitlines()[2:]:
+            parts = line.split(maxsplit=2)
+            cdemu_id = parts[0]
+            device = parts[1]
+            devmap[cdemu_id] = device
+        return devmap
+
+    @staticmethod
+    def _status():
+        proc = subprocess.run(
+            ['cdemu', 'status'],
+            stdout=subprocess.PIPE,
+            check=True)
+        devmap = {}
+        for line in proc.stdout.decode().splitlines()[2:]:
+            parts = line.split(maxsplit=2)
+            cdemu_id = parts[0]
+            match parts[1]:
+                case 'True':
+                    is_loaded = True
+                case 'False':
+                    is_loaded = False
+                case _:
+                    raise ValueError(parts)
+            path = None
+            if is_loaded:
+                path = pathlib.Path(parts[2])
+                assert path.is_file()
+            devmap[cdemu_id] = path
+        return devmap
+
+    @classmethod
+    def load(cls, path):
+        status = cls._status()
+        target_cdemu_id = None
+        for cdemu_id, loaded_path in status.items():
+            if loaded_path is None:
+                target_cdemu_id = cdemu_id
+                break
+        if target_cdemu_id is None:
+            raise NotImplementedError
+        subprocess.run(
+            ['cdemu', 'load', cdemu_id, '--', path],
+            check=True)
+
+    @staticmethod
+    def unload(cdemu_id):
+        subprocess.run(
+            ['cdemu', 'unload', cdemu_id],
+            check=True)
+
+
 class sshfs:
 
     @staticmethod
@@ -138,7 +214,10 @@ def main():
         return
 
     if args.image is not None:
-        udiskie.mount(args.image, options=args.options)
+        if args.image.name.lower().endswith('.cue'):
+            cdemu.load(args.image)
+        else:
+            udiskie.mount(args.image, options=args.options)
         return
 
     items = {}
@@ -156,6 +235,12 @@ def main():
         if key in items:
             raise RuntimeError
         items[key] = ['udiskie', item]
+
+    for item in cdemu.info():
+        print(item)
+        key = '\t'.join(['detach', item['device'] + ' ' + item['ui_label']])
+        items[key] = ['cdemu', item]
+        pass
 
     for item in sshfs.info():
         key = '\t'.join(['unmount', item['mount_point']])
@@ -180,6 +265,9 @@ def main():
     elif item_type == 'sshfs':
         if action == 'unmount':
             sshfs.unmount(item['mount_point'])
+    elif item_type == 'cdemu':
+        if action == 'detach':
+            cdemu.unload(item['cdemu_id'])
 
 
 if __name__ == '__main__':
