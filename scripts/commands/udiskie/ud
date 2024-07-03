@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import asyncio
 import json
 import pathlib
 import subprocess
@@ -9,9 +10,10 @@ import sys
 class cdemu:
 
     @classmethod
-    def info(cls):
-        status = cls._status()
-        devmap = cls._device_mapping()
+    async def info(cls):
+        status, devmap = await asyncio.gather(
+            cls._status(),
+            cls._device_mapping())
         mounted = []
         for cdemu_id, path in status.items():
             if path is not None:
@@ -24,13 +26,15 @@ class cdemu:
         return mounted
 
     @staticmethod
-    def _device_mapping():
-        proc = subprocess.run(
-            ['cdemu', 'device-mapping'],
-            stdout=subprocess.PIPE,
-            check=True)
+    async def _device_mapping():
+        proc = await asyncio.create_subprocess_exec(
+            'cdemu', 'device-mapping',
+            stdout=asyncio.subprocess.PIPE)
+        stdout, _ = await proc.communicate()
+        if proc.returncode:
+            raise RuntimeError
         devmap = {}
-        for line in proc.stdout.decode().splitlines()[2:]:
+        for line in stdout.decode().splitlines()[2:]:
             parts = line.split(maxsplit=2)
             cdemu_id = parts[0]
             device = parts[1]
@@ -38,13 +42,15 @@ class cdemu:
         return devmap
 
     @staticmethod
-    def _status():
-        proc = subprocess.run(
-            ['cdemu', 'status'],
-            stdout=subprocess.PIPE,
-            check=True)
+    async def _status():
+        proc = await asyncio.create_subprocess_exec(
+            'cdemu', 'status',
+            stdout=asyncio.subprocess.PIPE)
+        stdout, _ = await proc.communicate()
+        if proc.returncode:
+            raise RuntimeError
         devmap = {}
-        for line in proc.stdout.decode().splitlines()[2:]:
+        for line in stdout.decode().splitlines()[2:]:
             parts = line.split(maxsplit=2)
             cdemu_id = parts[0]
             match parts[1]:
@@ -62,8 +68,8 @@ class cdemu:
         return devmap
 
     @classmethod
-    def load(cls, path):
-        status = cls._status()
+    async def load(cls, path):
+        status = await cls._status()
         target_cdemu_id = None
         for cdemu_id, loaded_path in status.items():
             if loaded_path is None:
@@ -71,21 +77,25 @@ class cdemu:
                 break
         if target_cdemu_id is None:
             raise NotImplementedError
-        subprocess.run(
-            ['cdemu', 'load', cdemu_id, '--', path],
-            check=True)
+        proc = await asyncio.create_subprocess_exec(
+            'cdemu', 'load', cdemu_id, '--', path)
+        await proc.communicate()
+        if proc.returncode:
+            raise RuntimeError
 
     @staticmethod
-    def unload(cdemu_id):
-        subprocess.run(
-            ['cdemu', 'unload', cdemu_id],
-            check=True)
+    async def unload(cdemu_id):
+        proc = await asyncio.create_subprocess_exec(
+            'cdemu', 'unload', cdemu_id)
+        await proc.communicate()
+        if proc.returncode:
+            raise RuntimeError
 
 
 class sshfs:
 
     @staticmethod
-    def info():
+    async def info():
         mounted = []
         for line in pathlib.Path('/proc/mounts').read_text().splitlines():
             device, mount_point, fs_type, *_ = line.split(maxsplit=4)
@@ -99,16 +109,18 @@ class sshfs:
         return mounted
 
     @staticmethod
-    def unmount(mount_point):
-        subprocess.run(
-            ['fusermount3', '-quz', '--', mount_point],
-            check=True)
+    async def unmount(mount_point):
+        proc = await asyncio.create_subprocess_exec(
+            'fusermount3', '-quz', '--', mount_point)
+        await proc.communicate()
+        if proc.returncode:
+            raise RuntimeError
 
 
 class udiskie:
 
     @staticmethod
-    def info():
+    async def info():
         columns = [
             'autoclear',
             'device_file',
@@ -154,13 +166,15 @@ class udiskie:
             'ui_label',
         ]
         output_arg = '\t'.join('{' + c + '}' for c in columns)
-        proc = subprocess.run(
-            ['udiskie-info', '--all', '--output', output_arg],
-            stdout=subprocess.PIPE,
-            check=True)
+        proc = await asyncio.create_subprocess_exec(
+            'udiskie-info', '--all', '--output', output_arg,
+            stdout=asyncio.subprocess.PIPE)
+        stdout, _ = await proc.communicate()
+        if proc.returncode:
+            raise RuntimeError
 
         items = []
-        for line in proc.stdout.decode().splitlines():
+        for line in stdout.decode().splitlines():
             items.append({
                 key: value
                 for key, value in zip(columns, line.split('\t'))
@@ -168,13 +182,15 @@ class udiskie:
         return items
 
     @staticmethod
-    def unmount(device):
-        subprocess.run(
-            ['udiskie-umount', device],
-            check=True)
+    async def unmount(device):
+        proc = await asyncio.create_subprocess_exec(
+            'udiskie-umount', device)
+        await proc.communicate
+        if proc.returncode:
+            raise RuntimeError
 
     @staticmethod
-    def mount(device, options='', recursive=False):
+    async def mount(device, options='', recursive=False):
         args = []
         if options:
             args.extend(['--options', options])
@@ -182,9 +198,11 @@ class udiskie:
             args.append('--recursive')
         else:
             args.append('--no-recursive')
-        subprocess.run(
-            ['udiskie-mount', *args, device],
-            check=True)
+        proc = await asyncio.create_subprocess_exec(
+            'udiskie-umount', *args, device)
+        await proc.communicate
+        if proc.returncode:
+            raise RuntimeError
 
 
 def fzf(data):
@@ -202,7 +220,7 @@ def fzf(data):
     return result
 
 
-def main():
+async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('image', type=pathlib.Path, nargs='?')
     parser.add_argument('--json', action='store_true')
@@ -210,18 +228,23 @@ def main():
     args = parser.parse_args()
 
     if args.json:
-        print(json.dumps(udiskie.info(), indent=2, sort_keys=True))
+        print(json.dumps(await udiskie.info(), indent=2, sort_keys=True))
         return
 
     if args.image is not None:
         if args.image.name.lower().endswith('.cue'):
-            cdemu.load(args.image)
+            await cdemu.load(args.image)
         else:
-            udiskie.mount(args.image, options=args.options)
+            await udiskie.mount(args.image, options=args.options)
         return
 
     items = {}
-    for item in udiskie.info():
+    udiskie_info, cdemu_info, sshfs_info = await asyncio.gather(
+        udiskie.info(),
+        cdemu.info(),
+        sshfs.info(),
+    )
+    for item in udiskie_info:
         if item['is_filesystem'] == 'True':
             key = '\t'.join([
                 'mount' if item['is_mounted'] == 'False' else 'unmount',
@@ -236,13 +259,11 @@ def main():
             raise RuntimeError
         items[key] = ['udiskie', item]
 
-    for item in cdemu.info():
-        print(item)
+    for item in cdemu_info:
         key = '\t'.join(['detach', item['device'] + ' ' + item['ui_label']])
         items[key] = ['cdemu', item]
-        pass
 
-    for item in sshfs.info():
+    for item in sshfs_info:
         key = '\t'.join(['unmount', item['mount_point']])
         items[key] = ['sshfs', item]
 
@@ -264,11 +285,11 @@ def main():
             udiskie.unmount(item['device_file'])
     elif item_type == 'sshfs':
         if action == 'unmount':
-            sshfs.unmount(item['mount_point'])
+            await sshfs.unmount(item['mount_point'])
     elif item_type == 'cdemu':
         if action == 'detach':
-            cdemu.unload(item['cdemu_id'])
+            await cdemu.unload(item['cdemu_id'])
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())
