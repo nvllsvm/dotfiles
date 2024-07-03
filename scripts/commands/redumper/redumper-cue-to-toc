@@ -1,0 +1,366 @@
+#!/usr/bin/env python3
+import argparse
+import datetime
+import pathlib
+
+
+class MSF:
+    FRAMES_PER_SECOND = 75
+    BYTES_PER_SECTOR = 2352
+
+    def __init__(self, minutes, seconds, frames):
+        self.seconds, self.frames = divmod(frames, self.FRAMES_PER_SECOND)
+        self.minutes, self.seconds = divmod(seconds + self.seconds, 60)
+        self.minutes += minutes
+
+        if self.minutes > 99:
+            raise ValueError
+
+    @classmethod
+    def from_str(cls, value):
+        minutes, seconds, frames = [
+            int(v)
+            for v in value.split(':')
+        ]
+        return MSF(minutes, seconds, frames)
+
+    @classmethod
+    def from_byte_size(cls, value):
+        sectors, remainder = divmod(value, cls.BYTES_PER_SECTOR)
+        if remainder:
+            raise ValueError
+        return MSF(0, 0, sectors)
+
+    def __add__(self, other):
+        return MSF(
+            self.minutes + other.minutes,
+            self.seconds + other.seconds,
+            self.frames + other.frames,
+        )
+
+    def __eq__(self, other):
+        return self.minutes == other.minutes \
+           and self.seconds == other.seconds \
+           and self.frames == other.frames
+
+    def __str__(self):
+        return '{:02d}:{:02d}:{:02d}'.format(
+            self.minutes,
+            self.seconds,
+            self.frames,
+        )
+
+    def total_sectors(self):
+        seconds = (self.minutes * 60) + self.seconds
+        return (seconds * self.FRAMES_PER_SECOND) + self.frames
+
+    def total_bytes(self):
+        return self.total_sectors() * self.BYTES_PER_SECTOR
+
+
+
+def msf_to_seconds(msf):
+    parts = []
+    for p in msf.split(':'):
+        if len(p) != 2:
+            raise ValueError
+        parts.append(int(p))
+    if len(parts) != 3:
+        raise ValueError
+
+    return datetime.timedelta(
+        minutes=parts[0],
+        seconds=parts[1],
+        milliseconds=parts[2] * 10,
+    ).total_seconds()
+
+
+def seconds_to_msf(seconds):
+    seconds, milliseconds = str(float(seconds)).split('.')
+
+
+def tokenize_line(line):
+    tokens = []
+    current = []
+    end_quote = None
+    for c in line:
+        if c in ('"', "'"):
+            if end_quote is None:
+                end_quote = c
+            elif end_quote == c:
+                tokens.append(''.join(current))
+                current = []
+                end_quote = None
+            else:
+                current.append(c)
+        elif not c.strip():
+            if end_quote is not None:
+                current.append(c)
+            elif current:
+                tokens.append(''.join(current))
+                current = []
+        else:
+            current.append(c)
+    if end_quote:
+        raise ValueError('unclosed quote')
+    if current:
+        tokens.append(''.join(current))
+    return tokens
+
+
+class Index:
+    def __init__(self, number=None, msf=None):
+        self.number = int(number)
+        self.msf = MSF.from_str(msf)
+
+
+class Catalog:
+    def __init__(self, number):
+        self.number = int(number)
+
+
+class Track:
+    def __init__(self, number=None, mode=None):
+        self.number = number
+        self.mode = mode
+        self.indexes = []
+        self.title = None
+        self.performer = None
+
+
+class Title:
+    def __init__(self, title):
+        self.title = title
+
+
+class Performer:
+    def __init__(self, performer):
+        self.performer = performer
+
+
+class Remark:
+    def __new__(cls, *tokens):
+        if tokens[0]:
+            token = tokens[0].upper()
+            c = REMARK_CLASS.get(token)
+            if c:
+                return c(*tokens[1:])
+        return super().__new__(cls)
+
+    def __init__(self, *tokens):
+        self.tokens = tokens
+
+
+class RemarkLeadOut:
+    def __init__(self, msf):
+        self.msf = MSF.from_str(msf)
+
+
+class RemarkLeadIn:
+    def __init__(self, msf):
+        self.msf = MSF.from_str(msf)
+
+
+class RemarkPreGap:
+    def __init__(self, msf):
+        self.msf = MSF.from_str(msf)
+
+
+class RemarkSession:
+    def __init__(self, number):
+        self.number = int(number)
+        if not (0 <= self.number <= 99):
+            raise ValueError
+
+
+class File:
+    def __init__(self, name=None, format=None):
+        self.name = name
+        self.format = format
+        self.tracks = []
+
+
+KEYWORD_CLASS = {
+    'REM': Remark,
+    'FILE': File,
+    'TRACK': Track,
+    'INDEX': Index,
+    'CATALOG': Catalog,
+    'TITLE': Title,
+    'PERFORMER': Performer,
+}
+
+
+REMARK_CLASS = {
+    'LEAD-IN': RemarkLeadIn,
+    'LEAD-OUT': RemarkLeadOut,
+    'PREGAP': RemarkPreGap,
+    'SESSION': RemarkSession,
+}
+
+
+def parse_cue(path):
+    contents = path.read_text()
+
+    items = []
+    for line in contents.splitlines():
+        line = line.strip()
+        tokens = tokenize_line(line)
+        if not tokens:
+            continue
+        item = KEYWORD_CLASS[tokens.pop(0)](*tokens)
+        items.append(item)
+    return items
+
+
+def _default_json(obj):
+    if isinstance(obj, MSF):
+        return str(obj)
+    elif hasattr(obj, '__dict__'):
+        return obj.__dict__()
+    else:
+        # value will be null without this
+        raise TypeError
+
+
+class Cuesheet:
+    def __init__(self, path):
+        self.path = path
+        self.children = []
+
+
+TRACK_TYPE_MAP = {
+    'AUDIO': 'AUDIO',
+    'MODE2/2352': 'MODE2_RAW',
+    'MODE1/2352': 'MODE1_RAW',
+}
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--fix-iso', type=pathlib.Path)
+    parser.add_argument('path', type=pathlib.Path)
+    args = parser.parse_args()
+
+    parsed = parse_cue(args.path)
+    total_sectors = 0
+    sessions = []
+    disc_title = None
+    disc_performer = None
+    current_session = []
+    current_file = None
+    current_track = None
+    for item in parsed:
+        start = total_sectors
+        if isinstance(item, File):
+            current_file = item
+            current_track = None
+            current_session.append(item)
+        elif isinstance(item, Catalog):
+            # TODO
+            #current_session.append(item)
+            pass
+        elif isinstance(item, Track):
+            current_file.tracks.append(item)
+            if current_track is not None:
+                raise RuntimeError
+            current_track = item
+        elif isinstance(item, RemarkSession):
+            current_track = None
+            current_file = None
+            if current_session:
+                sessions.append(current_session)
+            current_session = []
+        elif isinstance(item, Index):
+            current_track.indexes.append(item)
+        elif isinstance(item, Title):
+            if current_track is None:
+                disc_title = item
+            else:
+                current_track.title = item
+        elif isinstance(item, Performer):
+            if current_track is None:
+                disc_performer = item
+            else:
+                current_track.performer = item
+        elif isinstance(item, RemarkLeadOut):
+            continue
+        elif isinstance(item, RemarkLeadIn):
+            continue
+        elif isinstance(item, RemarkPreGap):
+            continue
+        else:
+            raise NotImplementedError(item)
+    if current_session:
+        sessions.append(current_session)
+
+    for session_num, files in enumerate(sessions):
+        session_num += 1
+        toc_lines = []
+
+        num_audio = 0
+        num_mode1 = 0
+        num_mode2 = 0
+        for file in files:
+            for track in file.tracks:
+                if track.mode.startswith('MODE1'):
+                    num_mode1 += 1
+                elif track.mode.startswith('MODE2'):
+                    num_mode2 += 1
+                elif track.mode.startswith('AUDIO'):
+                    num_audio += 1
+
+        if num_mode2:
+            session_type = 'CD_ROM_XA'
+        elif num_mode1:
+            session_type = 'CD_ROM'
+        elif num_audio:
+            session_type = 'CD_DA'
+        else:
+            raise RuntimeError
+
+        toc_lines.extend([
+            session_type,
+            '',
+        ])
+
+        for file in files:
+            assert len(file.tracks) == 1
+            track = file.tracks[0]
+
+            index_by_num = {}
+            for index in file.tracks[0].indexes:
+                index_by_num[index.number] = index
+
+            start = MSF(0, 0, 0)
+            indexes = []
+            for num in sorted(index_by_num):
+                value = index_by_num[num]
+                if num == 0:
+                    if value.msf != MSF(0, 0, 0):
+                        raise RuntimeError
+                elif index.number == 1:
+                    start = index.msf
+                else:
+                    indexes.append(index.msf)
+
+            path = args.path.parent / file.name
+            bytesize = path.stat().st_size
+            msf = MSF.from_byte_size(bytesize)
+            track_type = TRACK_TYPE_MAP[track.mode]
+            assert '"' not in file.name
+            toc_lines.extend([
+                f'TRACK {track_type}',
+                f'FILE "{file.name}" 00:00:00 {msf}',
+            ])
+            if start != MSF(0, 0, 0):
+                toc_lines.append(f'START {start}')
+            for index in indexes:
+                toc_lines.append(f'INDEX {index}')
+            toc_lines.append('')
+        pathlib.Path(f'session_{session_num}.toc')\
+            .write_text('\n'.join(toc_lines))
+
+
+if __name__ == '__main__':
+    main()
