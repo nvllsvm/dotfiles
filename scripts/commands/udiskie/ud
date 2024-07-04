@@ -195,7 +195,7 @@ class udiskie:
     async def unmount(device):
         proc = await asyncio.create_subprocess_exec(
             'udiskie-umount', device)
-        await proc.communicate
+        await proc.communicate()
         if proc.returncode:
             raise RuntimeError
 
@@ -209,8 +209,8 @@ class udiskie:
         else:
             args.append('--no-recursive')
         proc = await asyncio.create_subprocess_exec(
-            'udiskie-umount', *args, device)
-        await proc.communicate
+            'udiskie-mount', *args, device)
+        await proc.communicate()
         if proc.returncode:
             raise RuntimeError
 
@@ -291,12 +291,12 @@ async def main():
     action, _ = result.split('\t')
     if item_type == 'udiskie':
         if action == 'mount':
-            udiskie.mount(item['device_file'],
-                          options=args.options)
+            await udiskie.mount(item['device_file'],
+                                options=args.options)
         elif action == 'unmount':
-            udiskie.unmount(item['device_file'])
+            await udiskie.unmount(item['device_file'])
         elif action == 'detach':
-            udiskie.unmount(item['device_file'])
+            await udiskie.unmount(item['device_file'])
     elif item_type == 'sshfs':
         if action == 'unmount':
             await sshfs.unmount(item['mount_point'])
