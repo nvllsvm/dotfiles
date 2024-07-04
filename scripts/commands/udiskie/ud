@@ -3,7 +3,6 @@ import argparse
 import asyncio
 import json
 import pathlib
-import subprocess
 import sys
 
 
@@ -216,15 +215,19 @@ class udiskie:
             raise RuntimeError
 
 
-def fzf(data):
-    proc = subprocess.run(
-        ['fzf', '--black', '--prompt=', '--no-info', '--exact', '--no-sort',
-         '--no-extended', '-i', '--layout=reverse', '--print-query'],
-        input='\n'.join(data).encode(),
-        stdout=subprocess.PIPE,
+async def fzf(data):
+    proc = await asyncio.create_subprocess_exec(
+        'fzf', '--black', '--prompt=', '--no-info', '--exact', '--no-sort',
+        '--no-extended', '-i', '--layout=reverse', '--print-query',
+        stdin=asyncio.subprocess.PIPE,
+        stdout=asyncio.subprocess.PIPE,
     )
+    stdin = []
+    for line in data:
+        stdin.append(line.encode())
+    stdout, _ = await proc.communicate(b'\n'.join(stdin))
     try:
-        result = proc.stdout.decode().splitlines()[-1]
+        result = stdout.decode().splitlines()[-1]
     except IndexError:
         result = None
 
@@ -280,7 +283,7 @@ async def main():
 
     if not items:
         sys.exit(1)
-    result = fzf(sorted(items))
+    result = await fzf(sorted(items))
     if not result:
         sys.exit(1)
 
