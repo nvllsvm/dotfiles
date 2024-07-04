@@ -83,10 +83,21 @@ class cdemu:
         if proc.returncode:
             raise RuntimeError
 
-    @staticmethod
-    async def unload(cdemu_id):
+    @classmethod
+    async def unload(cls, cdemu_id):
         proc = await asyncio.create_subprocess_exec(
             'cdemu', 'unload', cdemu_id)
+
+        # cdemu unload exits before the image is unloaded
+        while True:
+            if proc.returncode:
+                raise RuntimeError
+            status = await cls._status()
+            if status[cdemu_id] is not None:
+                await asyncio.sleep(0.5)
+            else:
+                break
+
         await proc.communicate()
         if proc.returncode:
             raise RuntimeError
