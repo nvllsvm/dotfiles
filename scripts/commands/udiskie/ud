@@ -35,6 +35,8 @@ class cdemu:
         devmap = {}
         for line in stdout.decode().splitlines()[2:]:
             parts = line.split(maxsplit=2)
+            if len(parts) < 2:
+                raise RuntimeError(parts)
             cdemu_id = parts[0]
             device = parts[1]
             devmap[cdemu_id] = device
