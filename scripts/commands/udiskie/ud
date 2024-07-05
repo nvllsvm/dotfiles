@@ -328,7 +328,7 @@ async def main():
             pass
         case 1:
             image = args.image[0]
-            if image.name.lower().endswith('.cue'):
+            if image.name.lower().endswith(('.cue', '.toc')):
                 await cdemu.load(image)
             else:
                 await udiskie.mount(image, options=args.options)
