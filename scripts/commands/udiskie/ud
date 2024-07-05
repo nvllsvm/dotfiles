@@ -8,18 +8,44 @@ import sys
 
 class cdemu:
 
+    @staticmethod
+    def _is_multisession_cue(path):
+        if not path.name.lower().endswith('.cue'):
+            return False
+        for line in pathlib.Path(path).read_text().splitlines():
+            parts = line.upper().strip().split()
+            if len(parts) < 2:
+                continue
+            if parts[0:2] == ['REM', 'SESSION']:
+                return True
+        return False
+
     @classmethod
     async def info(cls):
         status, devmap = await asyncio.gather(
             cls._status(),
             cls._device_mapping(ignore_missing_device=True))
         mounted = []
-        for cdemu_id, path in status.items():
-            if path is not None:
+
+        for cdemu_id, paths in status.items():
+            if paths:
+                parents = set(
+                    pathlib.Path(path).parent
+                    for path in paths
+                )
+                if len(parents) == 1:
+                    names = [
+                        pathlib.Path(path).name
+                        for path in paths
+                    ]
+                    label_names = names[0] if len(names) == 1 else str(names)
+                    label = f'{label_names} ({parents.pop()})'
+                else:
+                    label = str(paths)
                 info = {
                     'cdemu_id': cdemu_id,
                     'device': devmap[cdemu_id],
-                    'ui_label': str(path),
+                    'ui_label': label,
                 }
                 mounted.append(info)
         return mounted
@@ -36,17 +62,29 @@ class cdemu:
             if proc.returncode:
                 raise RuntimeError
             devmap = {}
+
             for line in stdout.decode().splitlines()[2:]:
-                parts = line.split(maxsplit=2)
-                if len(parts) == 1:
+                # DEV   SCSI CD-ROM     SCSI generic
+                parts = (
+                    line[0:6].strip(),
+                    line[6:17].strip() or None,
+                    line[17:].strip() or None,
+                )
+
+                cdemu_id = parts[0]
+                if not cdemu_id:
+                    raise RuntimeError
+
+                device_cd = parts[1]
+                # device_generic = parts[2]
+                if not device_cd:
                     if ignore_missing_device:
                         continue
-                    retry = True
-                    await asyncio.sleep(0.25)
-                    break
-                cdemu_id = parts[0]
-                device = parts[1]
-                devmap[cdemu_id] = device
+                    else:
+                        retry = True
+                        await asyncio.sleep(0.25)
+                        break
+                devmap[cdemu_id] = device_cd
         return devmap
 
     @staticmethod
@@ -58,35 +96,66 @@ class cdemu:
         if proc.returncode:
             raise RuntimeError
         devmap = {}
+
         for line in stdout.decode().splitlines()[2:]:
-            parts = line.split(maxsplit=2)
-            cdemu_id = parts[0]
-            match parts[1]:
-                case 'True':
-                    is_loaded = True
-                case 'False':
-                    is_loaded = False
-                case _:
-                    raise ValueError(parts)
-            path = None
-            if is_loaded:
-                path = pathlib.Path(parts[2])
-                assert path.is_file()
-            devmap[cdemu_id] = path
+            # DEV   LOADED     FILENAME
+            parts = (
+                line[0:6].strip() or None,
+                line[6:17].strip() or None,
+                line[17:].strip() or None,
+            )
+            if parts[0]:
+                cdemu_id = parts[0]
+                match parts[1]:
+                    case 'True':
+                        is_loaded = True
+                    case 'False':
+                        is_loaded = False
+                    case _:
+                        raise ValueError(parts)
+                devmap[cdemu_id] = []
+                if parts[2]:
+                    if not is_loaded:
+                        raise RuntimeError
+                    devmap[cdemu_id].append(parts[2])
+            else:
+                if parts[0] or parts[1]:
+                    raise RuntimeError
+                if not parts[2]:
+                    raise RuntimeError
+                devmap[cdemu_id].append(parts[2])
         return devmap
 
     @classmethod
-    async def load(cls, path):
+    async def _find_available_device(cls):
         status = await cls._status()
-        target_cdemu_id = None
-        for cdemu_id, loaded_path in status.items():
-            if loaded_path is None:
-                target_cdemu_id = cdemu_id
-                break
-        if target_cdemu_id is None:
-            raise NotImplementedError
+        for cdemu_id, paths in status.items():
+            if not paths:
+                return cdemu_id
+
+    @classmethod
+    async def load(cls, *paths):
+        for path in paths:
+            if cls._is_multisession_cue(path):
+                raise NotImplementedError('multisession cue not supported')
+
+        cdemu_id = await cls._find_available_device()
+        if cdemu_id is None:
+            await cls._add_device()
+        cdemu_id = await cls._find_available_device()
+        if cdemu_id is None:
+            raise RuntimeError
+
         proc = await asyncio.create_subprocess_exec(
-            'cdemu', 'load', cdemu_id, '--', path)
+            'cdemu', 'load', cdemu_id, '--', *paths)
+        await proc.communicate()
+        if proc.returncode:
+            raise RuntimeError
+
+    @staticmethod
+    async def _add_device():
+        proc = await asyncio.create_subprocess_exec(
+            'cdemu', 'add-device')
         await proc.communicate()
         if proc.returncode:
             raise RuntimeError
@@ -101,8 +170,8 @@ class cdemu:
             if proc.returncode:
                 raise RuntimeError
             status = await cls._status()
-            if status[cdemu_id] is not None:
-                await asyncio.sleep(0.5)
+            if status[cdemu_id]:
+                await asyncio.sleep(0.25)
             else:
                 break
 
@@ -245,21 +314,32 @@ async def fzf(data):
 
 async def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('image', type=pathlib.Path, nargs='?')
     parser.add_argument('--json', action='store_true')
     parser.add_argument('-o', '--options', default='')
+    parser.add_argument('image', type=pathlib.Path, nargs='*')
     args = parser.parse_args()
 
     if args.json:
         print(json.dumps(await udiskie.info(), indent=2, sort_keys=True))
         return
 
-    if args.image is not None:
-        if args.image.name.lower().endswith('.cue'):
-            await cdemu.load(args.image)
-        else:
-            await udiskie.mount(args.image, options=args.options)
-        return
+    match len(args.image):
+        case 0:
+            pass
+        case 1:
+            image = args.image[0]
+            if image.name.lower().endswith('.cue'):
+                await cdemu.load(image)
+            else:
+                await udiskie.mount(image, options=args.options)
+            return
+        case _:
+            for image in args.image:
+                if not image.name.lower().endswith('.toc'):
+                    raise ValueError(
+                        'all files must be .toc when specifying multiple')
+            await cdemu.load(*args.image)
+            return
 
     items = {}
     udiskie_info, cdemu_info, sshfs_info = await asyncio.gather(
@@ -283,7 +363,7 @@ async def main():
         items[key] = ['udiskie', item]
 
     for item in cdemu_info:
-        key = '\t'.join(['detach', item['device'] + ' ' + item['ui_label']])
+        key = '\t'.join(['detach', item['device'] + ': ' + item['ui_label']])
         items[key] = ['cdemu', item]
 
     for item in sshfs_info:
