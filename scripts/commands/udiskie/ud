@@ -26,20 +26,25 @@ class cdemu:
 
     @staticmethod
     async def _device_mapping():
-        proc = await asyncio.create_subprocess_exec(
-            'cdemu', 'device-mapping',
-            stdout=asyncio.subprocess.PIPE)
-        stdout, _ = await proc.communicate()
-        if proc.returncode:
-            raise RuntimeError
-        devmap = {}
-        for line in stdout.decode().splitlines()[2:]:
-            parts = line.split(maxsplit=2)
-            if len(parts) < 2:
-                raise RuntimeError(parts)
-            cdemu_id = parts[0]
-            device = parts[1]
-            devmap[cdemu_id] = device
+        retry = True
+        while retry:
+            retry = False
+            proc = await asyncio.create_subprocess_exec(
+                'cdemu', 'device-mapping',
+                stdout=asyncio.subprocess.PIPE)
+            stdout, _ = await proc.communicate()
+            if proc.returncode:
+                raise RuntimeError
+            devmap = {}
+            for line in stdout.decode().splitlines()[2:]:
+                parts = line.split(maxsplit=2)
+                if len(parts) == 1:
+                    retry = True
+                    await asyncio.sleep(0.25)
+                    break
+                cdemu_id = parts[0]
+                device = parts[1]
+                devmap[cdemu_id] = device
         return devmap
 
     @staticmethod
