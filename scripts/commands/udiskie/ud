@@ -12,7 +12,7 @@ class cdemu:
     async def info(cls):
         status, devmap = await asyncio.gather(
             cls._status(),
-            cls._device_mapping())
+            cls._device_mapping(ignore_missing_device=True))
         mounted = []
         for cdemu_id, path in status.items():
             if path is not None:
@@ -25,7 +25,7 @@ class cdemu:
         return mounted
 
     @staticmethod
-    async def _device_mapping():
+    async def _device_mapping(ignore_missing_device=False):
         retry = True
         while retry:
             retry = False
@@ -39,6 +39,8 @@ class cdemu:
             for line in stdout.decode().splitlines()[2:]:
                 parts = line.split(maxsplit=2)
                 if len(parts) == 1:
+                    if ignore_missing_device:
+                        continue
                     retry = True
                     await asyncio.sleep(0.25)
                     break
