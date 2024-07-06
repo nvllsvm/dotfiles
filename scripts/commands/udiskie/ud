@@ -302,6 +302,7 @@ CDEMU_SUFFIXES = (
     '.iso',
     '.mds',
     '.mdf',
+    '.nrg',
     '.toc',
 )
 
