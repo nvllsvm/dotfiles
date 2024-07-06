@@ -296,6 +296,16 @@ async def fzf(data):
     return result
 
 
+CDEMU_SUFFIXES = (
+    '.ccd',
+    '.cue',
+    '.iso',
+    '.mds',
+    '.mdf',
+    '.toc',
+)
+
+
 async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--json', action='store_true')
@@ -312,7 +322,7 @@ async def main():
             pass
         case 1:
             image = args.image[0]
-            if image.name.lower().endswith(('.cue', '.toc')):
+            if image.name.lower().endswith(CDEMU_SUFFIXES):
                 await cdemu.load(image)
             else:
                 await udiskie.mount(image, options=args.options)
