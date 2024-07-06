@@ -8,18 +8,6 @@ import sys
 
 class cdemu:
 
-    @staticmethod
-    def _is_multisession_cue(path):
-        if not path.name.lower().endswith('.cue'):
-            return False
-        for line in pathlib.Path(path).read_text().splitlines():
-            parts = line.upper().strip().split()
-            if len(parts) < 2:
-                continue
-            if parts[0:2] == ['REM', 'SESSION']:
-                return True
-        return False
-
     @classmethod
     async def info(cls):
         status, devmap = await asyncio.gather(
@@ -135,10 +123,6 @@ class cdemu:
 
     @classmethod
     async def load(cls, *paths):
-        for path in paths:
-            if cls._is_multisession_cue(path):
-                raise NotImplementedError('multisession cue not supported')
-
         cdemu_id = await cls._find_available_device()
         if cdemu_id is None:
             await cls._add_device()
