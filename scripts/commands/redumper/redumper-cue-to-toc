@@ -58,7 +58,6 @@ class MSF:
         return self.total_sectors() * self.BYTES_PER_SECTOR
 
 
-
 def msf_to_seconds(msf):
     parts = []
     for p in msf.split(':'):
@@ -238,8 +237,13 @@ TRACK_TYPE_MAP = {
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('-o', '--output',
+                        type=pathlib.Path,
+                        help='directory to output to')
     parser.add_argument('path', type=pathlib.Path)
     args = parser.parse_args()
+
+    output_dir = args.output or args.path.parent
 
     parsed = parse_cue(args.path)
     total_sectors = 0
@@ -357,7 +361,7 @@ def main():
             for index in indexes:
                 toc_lines.append(f'INDEX {index}')
             toc_lines.append('')
-        pathlib.Path(f'session_{session_num}.toc')\
+        (output_dir / f'{args.path.stem} (Session {session_num}).toc')\
             .write_text('\n'.join(toc_lines))
 
 
