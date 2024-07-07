@@ -16,14 +16,12 @@ function isActive(client) {
 }
 
 function activate(client) {
+    client.minimized = false;
     workspace.activeWindow = client;
 }
 
 function setupClient(client) {
-    client.skipTaskbar = true;
-    client.skipSwitcher = true;
-    client.skipPager = true;
-    client.onAllDesktops = true;
+    configure_as_floating_window(client);
     hide(client);
     client.activeChanged.connect(function() {
         if (!isNormal && !client.active) {
@@ -37,7 +35,7 @@ const scaleFactor = 0.8;
 let isNormal = false;
 
 
-function show_normal(client) {
+function configure_as_normal_window(client) {
     isNormal = true;
 
     client.onAllDesktops = false;
@@ -49,22 +47,19 @@ function show_normal(client) {
 
     client.minimized = false;
     client.fullScreen = false;
-    client.keepAbove = false;
     client.noBorder = false;
 }
 
-function show(client) {
+function configure_as_floating_window(client) {
     isNormal = false;
 
-    client.onAllDesktops = true;
+    client.noBorder = true;
     client.skipTaskbar = true;
     client.skipSwitcher = true;
     client.skipPager = true;
-
-    client.minimized = false;
+    client.onAllDesktops = true;
     client.fullScreen = false;
     client.keepAbove = true;
-    client.noBorder = true;
 
     let wsWidth = workspace.workspaceWidth;
     let wsHeight = workspace.workspaceHeight;
@@ -87,7 +82,6 @@ function show(client) {
 
 function hide(client) {
     client.minimized = true;
-    client.fullScreen = false;
     client.keepAbove = false;
 }
 
@@ -95,7 +89,7 @@ function toggleAlacritty() {
     let alacritty = findAlacritty();
     if ( alacritty ) {
         if ( isNormal ) {
-            show(alacritty);
+            configure_as_floating_window(alacritty);
             activate(alacritty);
         } else if ( isVisible(alacritty) ) {
             if ( isActive(alacritty) ) {
@@ -104,7 +98,7 @@ function toggleAlacritty() {
                 activate(alacritty);
             }
         } else {
-            show(alacritty);
+            configure_as_floating_window(alacritty);
             activate(alacritty);
         }
     }
@@ -113,7 +107,7 @@ function toggleAlacritty() {
 function showNormal() {
     let alacritty = findAlacritty();
     if ( alacritty ) {
-        show_normal(alacritty);
+        configure_as_normal_window(alacritty);
         activate(alacritty);
     }
 }
@@ -128,7 +122,6 @@ function init() {
     let alacritty = findAlacritty();
     if ( alacritty ) {
         setupClient(alacritty);
-        show(alacritty);
     }
 
     workspace.windowAdded.connect(setupAlacritty);
