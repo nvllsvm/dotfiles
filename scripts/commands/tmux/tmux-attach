@@ -1,6 +1,15 @@
 #!/usr/bin/env sh
 cd ~
-if [ "$(tmux list-sessions 2> /dev/null)" ]; then
+SESSIONS="$(tmux list-sessions | head -n 1)"
+if [ -n "$SESSIONS" ]; then
+    case "$SESSIONS" in
+        *"(attached)")
+            if [ "$1" = '--prompt' ]; then
+                echo 'Press enter to attach to tmux session ...'
+                head -n 1 > /dev/null
+            fi
+            ;;
+    esac
     exec tmux a -d
 else
     exec tmux
