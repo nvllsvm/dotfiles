@@ -1,0 +1,4 @@
+#!/bin/sh
+while true; do 
+    foot --title tmux-scratchpad --app-id tmux-scratchpad -- zsh -ic 'tmux-attach'
+done

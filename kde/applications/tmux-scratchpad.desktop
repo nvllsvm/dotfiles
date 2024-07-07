@@ -1,6 +1,0 @@
-[Desktop Entry]
-Name=tmux-scratchpad
-Comment=foot & tmux-attach
-Type=Application
-Icon=foot
-Exec=foot --title tmux-scratchpad --app-id tmux-scratchpad -- zsh -ic 'tmux-attach'

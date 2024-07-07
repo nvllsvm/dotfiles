@@ -20,6 +20,11 @@ function activate(client) {
 }
 
 function setupClient(client) {
+    client.skipTaskbar = true;
+    client.skipSwitcher = true;
+    client.skipPager = true;
+    client.onAllDesktops = true;
+    hide(client);
     client.activeChanged.connect(function() {
         if (!isNormal && !client.active) {
             hide(client);

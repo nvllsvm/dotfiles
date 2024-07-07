@@ -1,0 +1,7 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Exec=/home/ar/.dotfiles/public/.bin/tmux-scratchpad
+Icon=application-x-shellscript
+Name=tmux-scratchpad
+Type=Application
+X-KDE-AutostartScript=true
