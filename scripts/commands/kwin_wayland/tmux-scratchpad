@@ -4,6 +4,7 @@ while true; do
     foot --title tmux-scratchpad --app-id tmux-scratchpad -- zsh -ic 'tmux-attach'
     END="$(date +%s)"
     if [ "${START}" = "${END}" ]; then
+        echo 'warning: application exited immediately' >&2
         sleep 1
     fi
 done
