@@ -142,6 +142,7 @@ EXPECTED_PACKAGES_DESKTOP = {
     'obs-studio',
     'okular',
     'piavpn-bin',
+    'plasma6-runners-emojirunner',
     'podman',
     'proton-ge-custom-bin',
     'signal-desktop',
