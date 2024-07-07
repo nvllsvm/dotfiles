@@ -110,6 +110,8 @@ EXPECTED_PACKAGES = {
 
 EXPECTED_PACKAGES_DESKTOP = {
     'alacritty',
+    'android-tools',
+    'android-udev',
     'art-rawconverter',
     'audacity',
     'base16-shell-preview',
