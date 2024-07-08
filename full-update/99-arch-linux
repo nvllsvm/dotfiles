@@ -168,7 +168,6 @@ EXPECTED_PACKAGE_DEPENDENCIES = {
         'art-rawconverter-ctlscripts',
     },
     'cdemu-daemon': {
-        'libmirage-nvllsvm',
         'vhba-module-dkms',
     },
     'digikam': {
