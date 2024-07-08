@@ -63,3 +63,4 @@ x-scheme-handler/unknown=web-browser-dotfiles.desktop
 x-scheme-handler/bitwarden=bitwarden.desktop
 x-scheme-handler/element=io.element.Element.desktop
 x-scheme-handler/discord-956262381762261034=discord-956262381762261034.desktop
+x-scheme-handler/io.element.desktop=Element.desktop
