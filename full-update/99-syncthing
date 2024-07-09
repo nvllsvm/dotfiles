@@ -8,7 +8,7 @@ EXPECTED = '#include syncthing/ignore_default_folder.txt\n'
 
 STIGNORE_INCLUDE = {
     '~/syncthing/default': '.syncthing/ignore_default_folder.txt',
-    '~/storage/shared': '.syncthing/ignore_android.txt',
+    '~/storage/shared': 'syncthing/default/.syncthing/ignore_android.txt',
 }
 
 def write_stignore(path, contents):
