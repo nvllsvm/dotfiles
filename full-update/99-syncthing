@@ -1,0 +1,14 @@
+#!/usr/bin/env python3
+import pathlib
+
+FOLDER = pathlib.Path('~/syncthing/default').expanduser()
+STIGNORE = FOLDER / '.stignore'
+
+EXPECTED = '#include syncthing/ignore_default_folder.txt\n'
+
+if FOLDER:
+    if STIGNORE.exists():
+        if STIGNORE.read_text() != EXPECTED:
+            STIGNORE.write_text(EXPECTED)
+    else:
+        STIGNORE.write_text(EXPECTED)
