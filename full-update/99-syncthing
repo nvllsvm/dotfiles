@@ -6,9 +6,15 @@ STIGNORE = FOLDER / '.stignore'
 
 EXPECTED = '#include syncthing/ignore_default_folder.txt\n'
 
+
+def write_expected(path):
+    print('Writing', path)
+    path.write_text(EXPECTED)
+
+
 if FOLDER:
     if STIGNORE.exists():
         if STIGNORE.read_text() != EXPECTED:
-            STIGNORE.write_text(EXPECTED)
+            write_expected(STIGNORE)
     else:
-        STIGNORE.write_text(EXPECTED)
+        write_expected(STIGNORE)
