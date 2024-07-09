@@ -6,15 +6,29 @@ STIGNORE = FOLDER / '.stignore'
 
 EXPECTED = '#include syncthing/ignore_default_folder.txt\n'
 
+STIGNORE_INCLUDE = {
+    '~/syncthing/default': '.syncthing/ignore_default_folder.txt',
+    '~/storage/shared': '.syncthing/ignore_android.txt',
+}
 
-def write_expected(path):
-    print('Writing', path)
-    path.write_text(EXPECTED)
+def write_stignore(path, contents):
+    print('Writring', path)
+    path.write_text(contents)
 
 
-if FOLDER:
-    if STIGNORE.exists():
-        if STIGNORE.read_text() != EXPECTED:
-            write_expected(STIGNORE)
-    else:
-        write_expected(STIGNORE)
+for sync_folder, include_path in STIGNORE_INCLUDE.items():
+    sync_folder = pathlib.Path(sync_folder).expanduser()
+    expected_contents = f'#include {include_path}\n'
+
+    needs_write = False
+    stignore = sync_folder / '.stignore'
+    if sync_folder.is_dir():
+        if stignore.is_file():
+            if stignore.read_text() != expected_contents:
+                needs_write = True
+        else:
+            needs_write = True
+
+    if needs_write:
+        print('Writing', stignore)
+        stignore.write_text(expected_contents)
