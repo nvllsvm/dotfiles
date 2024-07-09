@@ -1,21 +1,26 @@
 #!/usr/bin/env python3
 import argparse
 import asyncio
+import importlib.machinery
 import json
 import pathlib
+import shutil
 import sys
 
 
-class cdemu:
+class cdemu_proxy:
 
-    @classmethod
-    async def info(cls):
-        status, devmap = await asyncio.gather(
-            cls._status(),
-            cls._device_mapping(ignore_missing_device=True))
+    def __init__(self):
+        cdemu_cli = importlib.machinery.SourceFileLoader(
+            'cdemu', shutil.which('cdemu')).load_module()
+        self.proxy = cdemu_cli.CDEmuDaemonProxy('session')
+
+    async def info(self):
+        devices = self._get_devices()
         mounted = []
 
-        for cdemu_id, paths in status.items():
+        for device in devices.values():
+            paths = device['filenames']
             if paths:
                 parents = set(
                     pathlib.Path(path).parent
@@ -31,137 +36,62 @@ class cdemu:
                 else:
                     label = str(paths)
                 info = {
-                    'cdemu_id': cdemu_id,
-                    'device': devmap[cdemu_id],
+                    'cdemu_id': device['device'],
+                    'device': device['dev_sr'],
                     'ui_label': label,
                 }
                 mounted.append(info)
         return mounted
 
-    @staticmethod
-    async def _device_mapping(ignore_missing_device=False):
-        retry = True
-        while retry:
-            retry = False
-            proc = await asyncio.create_subprocess_exec(
-                'cdemu', 'device-mapping',
-                stdout=asyncio.subprocess.PIPE)
-            stdout, _ = await proc.communicate()
-            if proc.returncode:
-                raise RuntimeError
-            devmap = {}
+    def _get_devices(self):
+        devices = {}
+        for device in range(self.proxy.GetNumberOfDevices()):
+            is_loaded, filenames = self.proxy.DeviceGetStatus(device)
+            dev_sr, dev_sg = self.proxy.DeviceGetMapping(device)
+            devices[str(device)] = {
+                'device': str(device),
+                'is_loaded': is_loaded,
+                'filenames': filenames,
+                'dev_sr': dev_sr,
+                'dev_sg': dev_sg,
+            }
+        return devices
 
-            for line in stdout.decode().splitlines()[2:]:
-                # DEV   SCSI CD-ROM     SCSI generic
-                parts = (
-                    line[0:6].strip(),
-                    line[6:17].strip() or None,
-                    line[17:].strip() or None,
-                )
+    async def _find_available_device(self):
+        for device in self._get_devices().values():
+            if not device['is_loaded']:
+                return device['device']
 
-                cdemu_id = parts[0]
-                if not cdemu_id:
-                    raise RuntimeError
-
-                device_cd = parts[1]
-                # device_generic = parts[2]
-                if not device_cd:
-                    if ignore_missing_device:
-                        continue
-                    else:
-                        retry = True
-                        await asyncio.sleep(0.25)
-                        break
-                devmap[cdemu_id] = device_cd
-        return devmap
-
-    @staticmethod
-    async def _status():
-        proc = await asyncio.create_subprocess_exec(
-            'cdemu', 'status',
-            stdout=asyncio.subprocess.PIPE)
-        stdout, _ = await proc.communicate()
-        if proc.returncode:
-            raise RuntimeError
-        devmap = {}
-
-        for line in stdout.decode().splitlines()[2:]:
-            # DEV   LOADED     FILENAME
-            parts = (
-                line[0:6].strip() or None,
-                line[6:17].strip() or None,
-                line[17:].strip() or None,
-            )
-            if parts[0]:
-                cdemu_id = parts[0]
-                match parts[1]:
-                    case 'True':
-                        is_loaded = True
-                    case 'False':
-                        is_loaded = False
-                    case _:
-                        raise ValueError(parts)
-                devmap[cdemu_id] = []
-                if parts[2]:
-                    if not is_loaded:
-                        raise RuntimeError
-                    devmap[cdemu_id].append(parts[2])
-            else:
-                if parts[0] or parts[1]:
-                    raise RuntimeError
-                if not parts[2]:
-                    raise RuntimeError
-                devmap[cdemu_id].append(parts[2])
-        return devmap
-
-    @classmethod
-    async def _find_available_device(cls):
-        status = await cls._status()
-        for cdemu_id, paths in status.items():
-            if not paths:
-                return cdemu_id
-
-    @classmethod
-    async def load(cls, *paths):
-        cdemu_id = await cls._find_available_device()
+    async def load(self, *paths):
+        cdemu_id = await self._find_available_device()
         if cdemu_id is None:
-            await cls._add_device()
-        cdemu_id = await cls._find_available_device()
+            await self._add_device()
+        cdemu_id = await self._find_available_device()
         if cdemu_id is None:
             raise RuntimeError
 
-        proc = await asyncio.create_subprocess_exec(
-            'cdemu', 'load', cdemu_id, '--', *paths)
-        await proc.communicate()
-        if proc.returncode:
-            raise RuntimeError
+        paths = [
+            str(pathlib.Path(p).absolute())
+            for p in paths
+        ]
+        self.proxy.DeviceLoad(int(cdemu_id), paths, {})
 
-    @staticmethod
-    async def _add_device():
-        proc = await asyncio.create_subprocess_exec(
-            'cdemu', 'add-device')
-        await proc.communicate()
-        if proc.returncode:
-            raise RuntimeError
+    async def _add_device(self):
+        old = self.proxy.GetNumberOfDevices()
+        new = old
+        self.proxy.AddDevice()
+        while new == old:
+            new = self.proxy.GetNumberOfDevices()
+            await asyncio.sleep(0.25)
 
-    @classmethod
-    async def unload(cls, cdemu_id):
-        proc = await asyncio.create_subprocess_exec(
-            'cdemu', 'unload', cdemu_id)
-
-        # cdemu unload exits before the image is unloaded
+    async def unload(self, cdemu_id):
+        self.proxy.DeviceUnload(int(cdemu_id))
         while True:
-            if proc.returncode:
-                raise RuntimeError
-            status = await cls._status()
-            if status[cdemu_id]:
+            devices = self._get_devices()
+            if devices[cdemu_id]['is_loaded']:
                 await asyncio.sleep(0.25)
             else:
                 break
-
-        await proc.communicate()
-        if proc.returncode:
-            raise RuntimeError
 
 
 class sshfs:
@@ -317,6 +247,8 @@ async def main():
     if args.json:
         print(json.dumps(await udiskie.info(), indent=2, sort_keys=True))
         return
+
+    cdemu = cdemu_proxy()
 
     match len(args.image):
         case 0:
