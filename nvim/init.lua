@@ -1,5 +1,7 @@
-require("plugins")
-require("config")
+require("config.buffers")
+require("config.lazy")
+require("config.cmp")
+require("config.lsp")
 
 vim.o.ruler = true
 vim.o.tabstop = 4

@@ -20,4 +20,4 @@ if command -v pipx > /dev/null; then
         pipx install pyright
     fi
 fi
-nvim -c 'autocmd User PackerComplete quitall' -c 'PackerSync'
+nvim --headless "+Lazy! sync" +TSUpdateSync +qa
