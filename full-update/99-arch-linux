@@ -73,6 +73,7 @@ EXPECTED_PACKAGES = {
     'pyright',
     'python',
     'python-async-executor',
+    'python-dbus-fast',
     'python-httpx',
     'python-magic',
     'python-mutagen',
