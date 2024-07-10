@@ -23,6 +23,7 @@ EXPECTED_PACKAGES = {
     'bat',
     'bchunk',
     'binmerge',
+    'busybox',
     'cabextract',
     'cdemu-client',
     'cuetools',
