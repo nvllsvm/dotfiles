@@ -1,4 +1,5 @@
 sid=no
+ao=pulse
 sub-scale=0.7
 tone-mapping=reinhard
 force-window=immediate
