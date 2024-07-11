@@ -4,6 +4,7 @@ import asyncio
 import re
 import shutil
 import sys
+import urllib.parse
 
 
 async def clipboard_contents():
@@ -102,7 +103,9 @@ async def main():
 
     for url in urls:
         print(url)
-        if url.startswith('https://www.youtube.com') or args.yt:
+        parsed = urllib.parse.urlparse(url)
+        hostparts = parsed.hostname.split('.')
+        if hostparts[-2:] == ['youtube', 'com'] or args.yt:
             await download_ytdlp(url)
         else:
             await download(url, insecure=args.insecure)
