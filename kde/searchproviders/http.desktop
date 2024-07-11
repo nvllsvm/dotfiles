@@ -1,0 +1,7 @@
+[Desktop Entry]
+Charset=
+Hidden=false
+Keys=http
+Name=MDN HTTP Status Codes
+Query=https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/\\{@}
+Type=Service
