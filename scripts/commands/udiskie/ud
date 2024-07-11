@@ -6,9 +6,10 @@ import pathlib
 import sys
 
 
-class cdemu_proxy:
+class cdemu:
 
-    async def info(self):
+    @staticmethod
+    async def info():
         proc = await asyncio.create_subprocess_exec(
             'cdemu-tool', 'status', '--json',
             stdout=asyncio.subprocess.PIPE)
@@ -37,12 +38,14 @@ class cdemu_proxy:
             mounted.append(info)
         return mounted
 
-    async def load(self, *paths):
+    @staticmethod
+    async def load(*paths):
         proc = await asyncio.create_subprocess_exec(
             'cdemu-tool', 'load', '--', *paths)
         await proc.communicate()
 
-    async def remove(self, device):
+    @staticmethod
+    async def remove(device):
         proc = await asyncio.create_subprocess_exec(
             'cdemu-tool', 'remove', device)
         await proc.communicate()
@@ -140,7 +143,7 @@ class udiskie:
     @staticmethod
     async def unmount(device):
         proc = await asyncio.create_subprocess_exec(
-            'udiskie-umount', device)
+            'udiskie-umount', '-q', device)
         await proc.communicate()
         if proc.returncode:
             raise RuntimeError
@@ -155,7 +158,7 @@ class udiskie:
         else:
             args.append('--no-recursive')
         proc = await asyncio.create_subprocess_exec(
-            'udiskie-mount', *args, device)
+            'udiskie-mount', '-q', *args, device)
         await proc.communicate()
         if proc.returncode:
             raise RuntimeError
@@ -201,8 +204,6 @@ async def main():
     if args.json:
         print(json.dumps(await udiskie.info(), indent=2, sort_keys=True))
         return
-
-    cdemu = cdemu_proxy()
 
     match len(args.image):
         case 0:
