@@ -9,6 +9,7 @@ note_contents_rg() {
         --glob '!*.drawio' \
         --glob '!*.svg' \
         --glob '!.git/' \
+        --glob '!.obsidian/' \
         --sortr modified \
         --hidden \
         '.+'
