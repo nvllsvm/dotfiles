@@ -327,6 +327,16 @@ EXPECTED_SERVICES = {
 }
 
 if HOSTNAME in ('mars', 'phobos'):
+    EXPECTED_PACKAGE_DEPENDENCIES.setdefault('podman', set())
+    EXPECTED_PACKAGE_DEPENDENCIES['podman'].update({
+        'apparmor',
+        'btrfs-progs',
+        'cni-plugins',
+        'fuse-overlayfs',
+        'podman-compose',
+        'podman-docker',
+        'slirp4netns',
+    })
     EXPECTED_GROUPS['ar'].update({
         'games',  # for proton to automatically set niceness
         'realtime',
