@@ -79,6 +79,10 @@ def file_hash_recorder(path):
     return json.loads(proc.stdout.decode())
 
 
+def pretty_json_dumps(data):
+    return json.dumps(data, indent=2, sort_keys=True, ensure_ascii=False)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--no-progress', action='store_true')
@@ -139,7 +143,7 @@ def main():
         if output_path:
             safe_write(
                 output_path,
-                json.dumps(results, indent=2, sort_keys=True),
+                pretty_json_dumps(results),
             )
 
     modified = False
@@ -151,7 +155,7 @@ def main():
         if modified:
             safe_write(
                 output_path,
-                json.dumps(results, indent=2, sort_keys=True),
+                pretty_json_dumps(results),
             )
         if args.show_dupes:
             by_sha256 = {}
@@ -162,9 +166,9 @@ def main():
             for sha256, items in by_sha256.items():
                 if len(items) > 1:
                     dupes_results[sha256] = sorted(items)
-            print(json.dumps(dupes_results, indent=2, sort_keys=True))
+            print(pretty_json_dumps(dupes_results))
     else:
-        print(json.dumps(results, indent=2, sort_keys=True))
+        print(pretty_json_dumps(results))
 
 
 if __name__ == '__main__':
