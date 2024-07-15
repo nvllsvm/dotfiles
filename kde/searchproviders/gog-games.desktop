@@ -1,0 +1,7 @@
+[Desktop Entry]
+Charset=
+Hidden=false
+Keys=gog-games
+Name=gog-games.to
+Query=https://gog-games.to/search/\\{@}
+Type=Service
