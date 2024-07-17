@@ -9,7 +9,7 @@
   "fzf.vim": { "branch": "master", "commit": "279e1ec068f526e985ee7e3f62a71f083bbe0196" },
   "lazy.nvim": { "branch": "main", "commit": "9d445ebbd89401544a538c6af080e4d2785abb49" },
   "neomake": { "branch": "master", "commit": "584f882b9f991245374e7e7d7d1f78bae90b7a35" },
-  "nvim-cmp": { "branch": "main", "commit": "e1757aea6145d14208f3035f6b56c99e36593799" },
+  "nvim-cmp": { "branch": "main", "commit": "d818fd0624205b34e14888358037fb6f5dc51234" },
   "nvim-lspconfig": { "branch": "master", "commit": "216deb2d1b5fbf24398919228208649bbf5cbadf" },
   "nvim-treesitter": { "branch": "master", "commit": "a6b2f4ecc8a47011868632142a9b687d7e0f9aaf" },
   "vim-ledger": { "branch": "master", "commit": "dbc683e24bd5338b8c12540227a58b2d247e097a" },
