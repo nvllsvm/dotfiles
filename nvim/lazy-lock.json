@@ -7,7 +7,7 @@
   "cmp-path": { "branch": "main", "commit": "91ff86cd9c29299a64f968ebb45846c485725f23" },
   "fzf": { "branch": "master", "commit": "b4ddffdc6167d23077139f5a24a2709097bc660c" },
   "fzf.vim": { "branch": "master", "commit": "279e1ec068f526e985ee7e3f62a71f083bbe0196" },
-  "lazy.nvim": { "branch": "main", "commit": "5473e3d77c13e40fc4758fa977a1f2c14d0b4ceb" },
+  "lazy.nvim": { "branch": "main", "commit": "6ca90a21202808796418e46d3cebfbb5a44e54a2" },
   "neomake": { "branch": "master", "commit": "584f882b9f991245374e7e7d7d1f78bae90b7a35" },
   "nvim-cmp": { "branch": "main", "commit": "d818fd0624205b34e14888358037fb6f5dc51234" },
   "nvim-lspconfig": { "branch": "master", "commit": "01e08d4bf1c35e5126b2ad5209725e4c552289ab" },
