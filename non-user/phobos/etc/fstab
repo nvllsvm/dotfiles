@@ -9,5 +9,6 @@ UUID=b5da17db-934d-4d6d-bacb-490a22aec780	/         	ext4      	rw,relatime	0 1
 UUID=2640-B55F      	/boot     	vfat      	rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro	0 2
 
 sol.nullsum.lan:/srv/nfs4/storage /storage nfs _netdev,noauto,noatime 0 0
+sol.nullsum.lan:/srv/nfs4/frigate /mnt/sol/frigate nfs _netdev,noauto,noatime 0 0
 
 /swapfile none swap defaults 0 0
