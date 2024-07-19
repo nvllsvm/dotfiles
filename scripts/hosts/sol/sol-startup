@@ -19,7 +19,7 @@ sol-docker up -d
 echo Starting NFS binds ...
 sudo mount --bind ~ar /srv/nfs4/ar
 sudo mount --bind /storage /srv/nfs4/storage
-sudo mount --bind /mnt/frigate /srv/nfs4/frigate
+sudo mount --bind /mnt/frigate/media /srv/nfs4/frigate
 sudo systemctl restart nfs-server.service
 
 echo Starting systemd units ...
