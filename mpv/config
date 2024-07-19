@@ -1,8 +1,8 @@
 sid=no
-ao=pulse
 sub-scale=0.7
 tone-mapping=reinhard
 force-window=immediate
+audio-channels=stereo
 
 [deinterlace]
 profile-cond=p["video-frame-info/interlaced"]
