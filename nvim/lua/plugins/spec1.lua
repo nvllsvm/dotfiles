@@ -18,6 +18,7 @@ return {
 
   {"Vimjas/vim-python-pep8-indent"},
 
+  {"godlygeek/tabular"},
   {"plasticboy/vim-markdown"},
   {"dhruvasagar/vim-table-mode"},
 
@@ -31,14 +32,13 @@ return {
     "nvim-treesitter/nvim-treesitter",
     config = function()
         require("nvim-treesitter.configs").setup({
-            ensure_installed = { "lua", "markdown","rust" },
+            ensure_installed = { "lua", "markdown", "rust" },
             sync_install = #vim.api.nvim_list_uis() == 0,
             highlight = {
                 enable = true,
                 disable = { 
-                    -- broken in Arch neovim-0.9.5-4
-                    -- last working in neovim-0.9.5-2
-                    --'markdown',
+                    -- breaks gx on urls
+                    'markdown',
                 },
             },
         })
