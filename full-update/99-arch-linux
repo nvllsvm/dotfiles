@@ -347,6 +347,8 @@ if HOSTNAME in ('mars', 'phobos'):
 
 if HOSTNAME == 'mars':
     EXPECTED_PACKAGES.update({
+        'linux',
+        'linux-headers',
         'linux-zen',
         'linux-zen-headers',
     })
