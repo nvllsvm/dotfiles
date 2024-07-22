@@ -1,3 +1,5 @@
+*.ko
+*.o
 *.pyc
 *.pyo
 __pycache__/
