@@ -182,6 +182,7 @@ EXPECTED_PACKAGE_DEPENDENCIES = {
         'kde-cli-tools',
         'kdegraphics-thumbnailers',
         'kio-admin',
+        'konsole',
         'purpose',
     },
     'gimp': {
