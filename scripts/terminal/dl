@@ -88,7 +88,7 @@ async def download(url, insecure=False):
 async def download_ytdlp(url):
     proc = await asyncio.create_subprocess_exec(
         'yt-dlp',
-        '--output', '%(upload_date)s %(title)s [%(id)s]',
+        '--output', '%(upload_date)s %(title)s [%(id)s].mkv',
         '--embed-subs',
         '--add-metadata',
         '--merge-output-format=mkv',
