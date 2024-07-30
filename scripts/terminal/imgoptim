@@ -317,6 +317,7 @@ async def main():
     parser.add_argument('-n', metavar='NUM', dest='num_procs',
                         type=_num_procs, default=None,
                         help='number of parallel jobs (default: %(default)s)')
+    parser.add_argument('-q', '--quiet', action='store_true')
     parser.add_argument('path', nargs='+', type=pathlib.Path)
     args = parser.parse_args()
 
@@ -352,9 +353,11 @@ async def main():
             print('error', file=sys.stderr)
             continue
 
-        size_diff_printer.print(before, after, path)
+        if not args.quiet:
+            size_diff_printer.print(before, after, path)
 
-    size_diff_printer.print_total()
+    if not args.quiet:
+        size_diff_printer.print_total()
 
 
 if __name__ == '__main__':
