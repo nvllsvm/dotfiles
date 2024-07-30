@@ -714,7 +714,7 @@ class cli_7zip:
         proc = await asyncio.create_subprocess_exec(*args, **kwargs)
         await proc.wait()
         if proc.returncode:
-            raise ProcessError(proc.returncode)
+            raise ProcessError(proc)
 
     @classmethod
     async def contents(cls, path):
@@ -723,7 +723,7 @@ class cli_7zip:
             *args, stdout=asyncio.subprocess.PIPE)
         stdout, _ = await proc.communicate()
         if proc.returncode:
-            raise ProcessError(proc.returncode)
+            raise ProcessError(proc)
 
         contents = []
         for line in stdout.splitlines():
@@ -743,7 +743,7 @@ class cli_7zip:
             *args, stdout=asyncio.subprocess.PIPE)
         stdout, _ = await proc.communicate()
         if proc.returncode:
-            raise ProcessError(proc.returncode)
+            raise ProcessError(proc)
 
         num_volumes = 1
         for line in reversed(stdout.splitlines()):
@@ -789,7 +789,7 @@ class dolphin_tool_gcm:
             stdout=asyncio.subprocess.PIPE)
         stdout, _ = await proc.communicate()
         if proc.returncode:
-            raise ProcessError(proc.returncode)
+            raise ProcessError(proc)
         return [
             line.split(maxsplit=3)[-1]
             for line in stdout.splitlines()
@@ -813,7 +813,7 @@ class dolphin_tool_gcm:
         )
         await proc.communicate()
         if proc.returncode:
-            raise ProcessError(proc.returncode)
+            raise ProcessError(proc)
 
     @classmethod
     async def volumes(cls, path, password=''):
@@ -857,7 +857,7 @@ class dolphin_tool_rvz:
             stdout=asyncio.subprocess.DEVNULL)
         await proc.wait()
         if proc.returncode:
-            raise ProcessError(proc.returncode)
+            raise ProcessError(proc)
 
     @classmethod
     async def volumes(cls, path, password=''):
@@ -1081,7 +1081,7 @@ class unzip:
             stdout=asyncio.subprocess.PIPE)
         stdout, _ = await proc.communicate()
         if proc.returncode:
-            raise ProcessError(proc.returncode)
+            raise ProcessError(proc)
         return [
             line.split(maxsplit=3)[-1]
             for line in stdout.splitlines()
@@ -1107,7 +1107,7 @@ class unzip:
             stdout=asyncio.subprocess.PIPE)
         await proc.communicate()
         if proc.returncode:
-            raise ProcessError(proc.returncode)
+            raise ProcessError(proc)
 
     @staticmethod
     async def volumes(path, password=''):
@@ -1161,7 +1161,7 @@ class unshield:
             stdout=asyncio.subprocess.PIPE)
         stdout, _ = await proc.communicate()
         if proc.returncode:
-            raise ProcessError(proc.returncode)
+            raise ProcessError(proc)
         contents = []
         for line in stdout.splitlines()[1:-2]:
             # convert windows-separated (\) path to local
@@ -1262,7 +1262,7 @@ class unrar:
             stdout=asyncio.subprocess.PIPE)
         stdout, _ = await proc.communicate()
         if proc.returncode:
-            raise ProcessError(proc.returncode)
+            raise ProcessError(proc)
         return set(stdout.splitlines())
 
     @staticmethod
@@ -1282,7 +1282,7 @@ class unrar:
             stdin=asyncio.subprocess.DEVNULL)
         await proc.communicate()
         if proc.returncode:
-            raise ProcessError(proc.returncode)
+            raise ProcessError(proc)
 
     @staticmethod
     async def volumes(path, password=''):
@@ -1291,7 +1291,7 @@ class unrar:
             stdout=asyncio.subprocess.PIPE)
         stdout, _ = await proc.communicate()
         if proc.returncode:
-            raise ProcessError(proc.returncode)
+            raise ProcessError(proc)
         return [
             path.parent / line.split(maxsplit=1)[-1]
             for line in stdout.decode().splitlines()
@@ -1367,7 +1367,7 @@ class cuefile:
                 )
                 await proc.communicate()
                 if proc.returncode:
-                    raise ProcessError(proc.returncode)
+                    raise ProcessError(proc)
                 source_cue = 'merged.cue'
                 source_bin = 'merged.bin'
             else:
@@ -1380,7 +1380,7 @@ class cuefile:
             )
             await proc.communicate()
             if proc.returncode:
-                raise ProcessError(proc.returncode)
+                raise ProcessError(proc)
             results = {}
             chunk_files = list(pathlib.Path(tmp).iterdir())
             if len(chunk_files) == 1:
@@ -1639,7 +1639,7 @@ class gnu_tar:
             stderr=subprocess.DEVNULL)
         stdout, _ = await proc.communicate()
         if proc.returncode:
-            raise ProcessError(proc.returncode)
+            raise ProcessError(proc)
         return stdout.splitlines()
 
     @staticmethod
@@ -1661,7 +1661,7 @@ class gnu_tar:
         proc = await asyncio.create_subprocess_exec(*args)
         await proc.wait()
         if proc.returncode:
-            raise ProcessError(proc.returncode)
+            raise ProcessError(proc)
 
     @staticmethod
     async def volumes(path, password=''):
@@ -1692,7 +1692,7 @@ class gzip:
                 stdout=handle)
             await proc.wait()
             if proc.returncode:
-                raise ProcessError(proc.returncode)
+                raise ProcessError(proc)
 
     @staticmethod
     async def volumes(path, password=''):
@@ -1717,7 +1717,7 @@ class cpio:
             stdout=asyncio.subprocess.PIPE)
         stdout, _ = await proc.communicate()
         if proc.returncode:
-            raise ProcessError(proc.returncode)
+            raise ProcessError(proc)
         return stdout.splitlines()
 
     @staticmethod
@@ -1737,7 +1737,7 @@ class cpio:
             '--file', path)
         await proc.wait()
         if proc.returncode:
-            raise ProcessError(proc.returncode)
+            raise ProcessError(proc)
 
     @staticmethod
     async def volumes(path, password=''):
@@ -1768,7 +1768,7 @@ class pbzip2:
                 stdout=handle)
             await proc.wait()
             if proc.returncode:
-                raise ProcessError(proc.returncode)
+                raise ProcessError(proc)
 
     @staticmethod
     async def volumes(path, password=''):
@@ -1803,7 +1803,7 @@ class pigz:
                 stdout=handle)
             await proc.wait()
             if proc.returncode:
-                raise ProcessError(proc.returncode)
+                raise ProcessError(proc)
 
     @staticmethod
     async def volumes(path, password=''):
@@ -1836,7 +1836,7 @@ class pixz:
             target)
         await proc.wait()
         if proc.returncode:
-            raise ProcessError(proc.returncode)
+            raise ProcessError(proc)
 
     @staticmethod
     async def volumes(path, password=''):
@@ -1867,7 +1867,7 @@ class bzip2:
                 stdout=handle)
             await proc.wait()
             if proc.returncode:
-                raise ProcessError(proc.returncode)
+                raise ProcessError(proc)
 
     @staticmethod
     async def volumes(path, password=''):
@@ -1898,7 +1898,7 @@ class xz:
                 stdout=handle)
             await proc.wait()
             if proc.returncode:
-                raise ProcessError(proc.returncode)
+                raise ProcessError(proc)
 
     @staticmethod
     async def volumes(path, password=''):
@@ -1956,7 +1956,7 @@ class zstd:
         proc = await asyncio.create_subprocess_exec(*args)
         await proc.wait()
         if proc.returncode:
-            raise ProcessError(proc.returncode)
+            raise ProcessError(proc)
 
     @staticmethod
     async def volumes(path, password=''):
@@ -1986,7 +1986,7 @@ class brotli:
         proc = await asyncio.create_subprocess_exec(*args)
         await proc.wait()
         if proc.returncode:
-            raise ProcessError(proc.returncode)
+            raise ProcessError(proc)
 
     @staticmethod
     async def volumes(path, password=''):
@@ -2008,7 +2008,7 @@ class unsquashfs:
             stderr=subprocess.DEVNULL)
         stdout, _ = await proc.communicate()
         if proc.returncode:
-            raise ProcessError(proc.returncode)
+            raise ProcessError(proc)
         return stdout.splitlines()
 
     @staticmethod
@@ -2027,7 +2027,7 @@ class unsquashfs:
         proc = await asyncio.create_subprocess_exec(*args)
         await proc.wait()
         if proc.returncode:
-            raise ProcessError(proc.returncode)
+            raise ProcessError(proc)
 
     @staticmethod
     async def volumes(path, password=''):
@@ -2216,7 +2216,24 @@ async def _get_class(path):
 
 
 class ProcessError(Exception):
-    """Process exited non-zero"""
+    def __init__(self, process, message=None):
+        self.process = process
+        self.message = message
+
+    def __str__(self):
+        proc = self.process
+
+        text = f'exit {proc.returncode}'
+        if self.message is not None:
+            text = f'{text} - {self.message}'
+
+        try:
+            args = proc._transport._extra['subprocess'].args
+        except (AttributeError, KeyError):
+            pass
+        else:
+            text = f'{text}: {args}'
+        return text
 
 
 def format_contents(paths):
