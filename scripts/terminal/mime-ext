@@ -45,6 +45,9 @@ MIME_SUFFIXES = {
     'audio/mpeg': [
         '.mp3'
     ],
+    'audio/x-m4a': [
+        '.m4a'
+    ],
     'image/avif': [
         '.avif',
     ],
@@ -158,7 +161,7 @@ def main():
             suffixes = MIME_SUFFIXES.get(mime)
             if mime == 'text/plain' or not suffixes:
                 missing.add(mime)
-                if not args.always_fix:
+                if not args.fix:
                     continue
 
             for path in paths:
