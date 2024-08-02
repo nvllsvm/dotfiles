@@ -32,7 +32,20 @@ def sha256sum(path):
 
 
 def _pretty_json(data):
-    return json.dumps(data, indent=2, sort_keys=True)
+    def _default_json(obj):
+        if isinstance(obj, set):
+            return sorted(obj)
+        elif isinstance(obj, pathlib.Path):
+            return str(obj)
+        else:
+            raise TypeError
+    return json.dumps(
+        data,
+        indent=2,
+        sort_keys=True,
+        default=_default_json,
+        ensure_ascii=False,
+    )
 
 
 def main():
@@ -46,7 +59,7 @@ def main():
 
     files = set()
     for path in args.path:
-        path = pathlib.Path(path)
+        path = pathlib.Path(path).absolute()
         if path.is_dir():
             files.update(all_files(path))
         else:
@@ -56,33 +69,33 @@ def main():
     for path in sorted(files):
         by_size[path.stat().st_size].add(path)
 
-    hashes = collections.defaultdict(set)
+    by_hashes = collections.defaultdict(set)
+    unique = set()
     for paths in by_size.values():
-        if len(paths) > 1 or args.unique:
+        if len(paths) == 1:
+            unique.update(paths)
+        else:
             for path in paths:
-                hashes[sha256sum(path)].add(path)
+                by_hashes[sha256sum(path)].add(path)
+
+    duplicates_by_hash = {}
+    for hashval, paths in by_hashes.items():
+        if len(paths) == 1:
+            unique.update(paths)
+        else:
+            duplicates_by_hash[hashval] = paths
 
     if args.unique:
-        unique = sorted(
-            str(list(v)[0].absolute())
-            for k, v in hashes.items()
-            if len(v) == 1
-        )
         print(_pretty_json(unique))
     else:
-        duplicates = {
-            k: sorted(str(p.absolute()) for p in v)
-            for k, v in hashes.items()
-            if len(v) > 1
-        }
         if args.rm:
-            for values in duplicates.values():
+            for values in duplicates_by_hash.values():
                 for path in values[1:]:
                     path = pathlib.Path(path)
                     print(path)
                     path.unlink()
         else:
-            print(_pretty_json(duplicates))
+            print(_pretty_json(duplicates_by_hash))
 
 
 if __name__ == '__main__':
