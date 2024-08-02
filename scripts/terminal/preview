@@ -74,6 +74,9 @@ else
         image/x-canon-cr3)
             exiftool -- "$1"
             ;;
+        image/tiff)
+            tiffinfo -- "$1"
+            ;;
         image/*)
             #chafa -f sixel -s "$2x$3" --animate off --polite on "$1"
             exiv2 "$1" || true
