@@ -101,6 +101,7 @@ EXPECTED_PACKAGES = {
     'unrar',
     'unshield',
     'unzip',
+    'usbutils',
     'vim',
     'vorbis-tools',
     'wl-clipboard',
