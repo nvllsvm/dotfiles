@@ -53,7 +53,7 @@ def _pretty_json(data):
     )
 
 
-def _rm_sort_key(path):
+def _sorted_duplicates_key(path):
     path = path.absolute()
     lf_matches = [
         bool(LF_DUPLICATE_PATTERN.match(p))
@@ -102,14 +102,14 @@ def main():
         if len(paths) == 1:
             unique.update(paths)
         else:
-            duplicates_by_hash[hashval] = paths
+            duplicates_by_hash[hashval] = \
+                sorted(paths, key=_sorted_duplicates_key)
 
     if args.unique:
         print(_pretty_json(unique))
     else:
         if args.rm:
-            for values in duplicates_by_hash.values():
-                paths = sorted(values, key=_rm_sort_key)
+            for paths in duplicates_by_hash.values():
                 for path in paths[1:]:
                     print(path)
                     path.unlink()
