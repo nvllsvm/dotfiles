@@ -13,6 +13,7 @@ CONFIG = HOME / '.config'
 LOCAL_SHARE = HOME / '.local' / 'share'
 
 DOTFILES = pathlib.Path(os.environ['DOTFILES'])
+DOTFILES_PRIVATE = pathlib.PATH(os.environ['DOTFILES_PRIVATE'])
 
 
 LINKS = {
@@ -22,7 +23,7 @@ LINKS = {
         DOTFILES / 'kde' / 'kuriikwsfilterrc',
 
     LOCAL_SHARE / 'kf6' / 'searchproviders':
-        DOTFILES / 'kde' / 'searchproviders',
+        DOTFILES_PRIVATE / 'kde' / 'searchproviders',
     LOCAL_SHARE / 'icons':
         DOTFILES / 'kde' / 'icons',
     LOCAL_SHARE / 'applications':

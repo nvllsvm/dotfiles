@@ -1,7 +1,0 @@
-[Desktop Entry]
-Charset=
-Hidden=false
-Keys=docker,dockerhub
-Name=Docker Hub
-Query=https://hub.docker.com/search?q=\\{@}
-Type=Service

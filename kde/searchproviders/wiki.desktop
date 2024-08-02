@@ -1,7 +1,0 @@
-[Desktop Entry]
-Charset=
-Hidden=false
-Keys=wikipedia,wiki
-Name=Wikipedia
-Query=https://en.wikipedia.org/wiki/Special:Search?search=\\{@}
-Type=Service
