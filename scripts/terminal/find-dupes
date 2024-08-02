@@ -4,7 +4,12 @@ import collections
 import hashlib
 import json
 import pathlib
+import re
 import sys
+
+
+# lf adds `.~1~` to the end of a file when a copy/move destination exists
+LF_DUPLICATE_PATTERN = re.compile(r'.*\.~\d+\~$')
 
 
 def all_files(root):
@@ -45,6 +50,20 @@ def _pretty_json(data):
         sort_keys=True,
         default=_default_json,
         ensure_ascii=False,
+    )
+
+
+def _rm_sort_key(path):
+    path = path.absolute()
+    lf_matches = [
+        bool(LF_DUPLICATE_PATTERN.match(p))
+        for p in path.parts
+    ]
+    return (
+        lf_matches[-1],  # filename
+        any(lf_matches),  # parent dir(s)
+        len(lf_matches),  # try to keep least-nested
+        str(path),
     )
 
 
@@ -90,8 +109,8 @@ def main():
     else:
         if args.rm:
             for values in duplicates_by_hash.values():
-                for path in values[1:]:
-                    path = pathlib.Path(path)
+                paths = sorted(values, key=_rm_sort_key)
+                for path in paths[1:]:
                     print(path)
                     path.unlink()
         else:
