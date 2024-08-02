@@ -10,6 +10,7 @@ import sys
 
 
 # lf adds `.~1~` to the end of a file when a copy/move destination exists
+LF_DUPLICATE_SUFFIX = '.~1~'
 LF_DUPLICATE_PATTERN = re.compile(r'.*\.~\d+\~$')
 
 
@@ -126,11 +127,11 @@ def main():
             hash_parent = parent / hasval
             hash_parent.mkdir()
             for path in paths:
-                parts = path.name.split('.')
+                name = path.name
                 while True:
-                    dest = hash_parent / '.'.join(parts)
+                    dest = hash_parent / name
                     if dest.exists():
-                        parts[0] += '_'
+                        name += LF_DUPLICATE_SUFFIX
                     else:
                         break
                 shutil.move(path, dest)
