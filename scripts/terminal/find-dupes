@@ -5,6 +5,7 @@ import hashlib
 import json
 import pathlib
 import re
+import shutil
 import sys
 
 
@@ -69,9 +70,15 @@ def _sorted_duplicates_key(path):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-u', '--unique', action='store_true')
-    parser.add_argument('--rm', action='store_true',
-                        help='remove duplicates (keeps first match)')
+    action_group = parser.add_mutually_exclusive_group()
+    action_group.add_argument(
+        '-u', '--unique', action='store_true')
+    action_group.add_argument(
+        '--rm', action='store_true',
+        help='remove duplicates (keeps first match)')
+    action_group.add_argument(
+        '--mv', type=pathlib.Path,
+        help='move duplicates to a directory')
     parser.add_argument('path', default=[''], nargs='*',
                         type=lambda x: pathlib.Path(x).resolve().absolute())
     args = parser.parse_args()
@@ -107,14 +114,28 @@ def main():
 
     if args.unique:
         print(_pretty_json(unique))
+    elif args.rm:
+        for paths in duplicates_by_hash.values():
+            for path in paths[1:]:
+                print(path)
+                path.unlink()
+    elif args.mv:
+        parent = args.mv
+        parent.mkdir()
+        for hasval, paths in duplicates_by_hash.items():
+            hash_parent = parent / hasval
+            hash_parent.mkdir()
+            for path in paths:
+                parts = path.name.split('.')
+                while True:
+                    dest = hash_parent / '.'.join(parts)
+                    if dest.exists():
+                        parts[0] += '_'
+                    else:
+                        break
+                shutil.move(path, dest)
     else:
-        if args.rm:
-            for paths in duplicates_by_hash.values():
-                for path in paths[1:]:
-                    print(path)
-                    path.unlink()
-        else:
-            print(_pretty_json(duplicates_by_hash))
+        print(_pretty_json(duplicates_by_hash))
 
 
 if __name__ == '__main__':
