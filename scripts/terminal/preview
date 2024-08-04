@@ -58,8 +58,6 @@ else
             ;;
         video/x-matroska)
             mkv-preview "$1"
-            echo
-            ffprobe -hide_banner -- "$1" 2>&1
             ;;
         audio/*|\
         video/*)

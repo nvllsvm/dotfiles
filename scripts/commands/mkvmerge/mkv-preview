@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import collections
 import json
 import subprocess
 
@@ -24,31 +25,46 @@ def main():
         'subtitles': [],
         'video': [],
     }
-    for track in metadata['tracks']:
+    type_counts = collections.Counter()
+    for i, track in enumerate(metadata['tracks']):
+        type_counts[track['type']] += 1
+        type_selector = None
+        if track['type'] in ['video', 'audio', 'subtitles']:
+            type_selector = 'track:{}{}'.format(
+                track['type'][0],
+                type_counts[track['type']],
+            )
+        track['selectors'] = {
+            'global': f'track:{i+1}',
+            'type': type_selector,
+        }
         results[track['type']].append(track)
 
     for track_type in ['video', 'audio', 'subtitles']:
         if tracks := results[track_type]:
             print(track_type)
+
             for track in tracks:
-                if track['type'] == 'video':
-                    line = [
-                        track['id'],
-                        track['codec'],
-                        track['properties']['pixel_dimensions'],
-                    ]
-                elif track['type'] == 'audio':
-                    line = [
-                        track['id'],
-                        track['properties'].get('language', 'und'),
-                        track['codec'],
-                    ]
-                elif track['type'] == 'subtitles':
-                    line = [
-                        track['id'],
-                        track['properties'].get('language', 'und'),
-                        track['codec'],
-                    ]
+                line = [
+                    track['selectors']['type'],
+                ]
+                match track['type']:
+                    case 'video':
+                        line.extend([
+                            track['codec'],
+                            track['properties']['pixel_dimensions'],
+                        ])
+                    case 'audio':
+                        line.extend([
+                            track['properties'].get('language', 'und'),
+                            track['codec'],
+                        ])
+                    case 'subtitles':
+                        line.extend([
+                            track['properties'].get('language', 'und'),
+                            track['codec'],
+                            track['properties'].get('track_name', None),
+                        ])
                 info = '\t'.join(
                     str(value)
                     for value in line
