@@ -46,7 +46,10 @@ def main():
 
             for track in tracks:
                 line = [
-                    track['selectors']['type'],
+                    '{} {}'.format(
+                        track['id'],
+                        track['selectors']['type'],
+                    ),
                 ]
                 match track['type']:
                     case 'video':
