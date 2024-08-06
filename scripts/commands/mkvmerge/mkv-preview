@@ -40,6 +40,9 @@ def main():
         }
         results[track['type']].append(track)
 
+    title = metadata['container']['properties'].get('title')
+    if title is not None:
+        print('title:', title.strip())
     for track_type in ['video', 'audio', 'subtitles']:
         if tracks := results[track_type]:
             print(track_type)
