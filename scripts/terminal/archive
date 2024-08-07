@@ -1303,6 +1303,7 @@ class cuefile:
     TRACK_TYPE_SUFFIXES = {
         'AUDIO': '.wav',
         'MODE1/2352': '.iso',
+        'MODE2/2352': '.iso',
     }
 
     @staticmethod
