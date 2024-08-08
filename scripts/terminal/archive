@@ -1123,13 +1123,16 @@ class cabextract:
 
     @staticmethod
     async def contents(path):
-        proc = subprocess.run(
-            ['cabextract', '--list', '--quiet', '--', path],
-            stdout=subprocess.PIPE,
-            check=True)
+        proc = await asyncio.create_subprocess_exec(
+            'cabextract', '--list', '--quiet', '--', path,
+            stdout=asyncio.subprocess.PIPE,
+        )
+        stdout, _ = await proc.communicate()
+        if proc.returncode:
+            raise ProcessError(proc)
         return [
             line.split(maxsplit=6)[-1]
-            for line in proc.stdout.splitlines()[2:]
+            for line in stdout.splitlines()[2:]
         ]
 
     @staticmethod
@@ -1138,9 +1141,12 @@ class cabextract:
             raise NotImplementedError
         if overwrite:
             raise NotImplementedError
-        subprocess.run(
-            ['cabextract', '--quiet', '--directory', dest, '--', path],
-            check=True)
+        proc = await asyncio.create_subprocess_exec(
+            'cabextract', '--quiet', '--directory', dest, '--', path,
+        )
+        await proc.communicate()
+        if proc.returncode:
+            raise ProcessError(proc)
 
     @staticmethod
     async def volumes(path, password=''):
