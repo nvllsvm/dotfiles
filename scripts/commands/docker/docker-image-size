@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-docker inspect "$1" | jq '.[].Size' | xargs numfmt --to=iec
+docker inspect --format '{{.Size}}' -- "$1" | numfmt --to=iec
