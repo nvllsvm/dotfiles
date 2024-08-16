@@ -130,7 +130,7 @@ EXPECTED_PACKAGES_DESKTOP = {
     'foot',
     'gamescope',
     'gifski',
-    'gimp',
+    'gimp-devel',
     'gparted',
     'gwenview',
     'inkscape',
