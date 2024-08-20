@@ -197,7 +197,7 @@ async def main():
         if suffix in IGNORED_SUFFIXES:
             continue
         elif suffix not in PHOTO_EXT and suffix not in VIDEO_EXT:
-            print('warning: unhandled suffix in "{path}"', file=sys.stderr)
+            print(f'warning: unhandled suffix in "{path}"', file=sys.stderr)
         executor.submit(process_file, path, args.target, args.dry_run)
 
     async for task in tqdm.asyncio.tqdm(executor):
