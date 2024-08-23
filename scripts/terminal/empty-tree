@@ -48,6 +48,9 @@ def main():
         '-r', '--remove', action='store_true',
         help='remove the trees from disk'
     )
+    parser.add_argument(
+        '-q', '--quiet', action='store_true',
+        help='suppress non-error output')
     parser.add_argument('path', type=pathlib.Path, nargs='*')
     args = parser.parse_args()
 
@@ -58,7 +61,8 @@ def main():
             continue
         parent_paths = empty_dirs(parent_path, include_parent=args.parent)
         for path in sorted(parent_paths, reverse=True):
-            print(path)
+            if not args.quiet:
+                print(path)
             if args.remove:
                 # prefer over shutil.rmtree to ensure nothing added since scan
                 try:

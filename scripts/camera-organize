@@ -27,8 +27,12 @@ VIDEO_EXT = {
     '.mov',
 }
 
-IGNORED_SUFFIXES = {
+DELETABLE_EXT = {
     '.ctg',
+}
+
+IGNORABLE_EXT = {
+    '.sh',
 }
 
 
@@ -45,7 +49,7 @@ class exiv2:
                 'exiv2', '--key', key, '--', path,
                 stderr=asyncio.subprocess.PIPE,
                 stdout=asyncio.subprocess.PIPE)
-            stdout, stderr = await proc.communicate()
+            stdout, _ = await proc.communicate()
 
             if proc.returncode == 0:
                 _, _, _, value = stdout.decode().split(maxsplit=3)
@@ -63,7 +67,7 @@ class ffprobe:
             'ffprobe', '--', path,
             stderr=asyncio.subprocess.PIPE,
             stdout=asyncio.subprocess.PIPE)
-        stdout, stderr = await proc.communicate()
+        _, stderr = await proc.communicate()
 
         if proc.returncode != 0:
             raise SubprocessError
@@ -109,6 +113,7 @@ async def parse_date(path):
             )
         elif not set(name[:10]) - set(string.digits):
             dt = datetime.datetime.utcfromtimestamp(int(name[:10]))
+            raise RuntimeError(f'TODO: fix utcfromtimestamp: {name}')
         else:
             raise ValueError('unknown date format')
 
@@ -146,8 +151,6 @@ async def process_file(path, target_root, dry_run):
         target_path = target_root.joinpath(PHOTO_DIR)
     elif suffix in VIDEO_EXT:
         target_path = target_root.joinpath(VIDEO_DIR)
-    elif suffix in IGNORED_SUFFIXES:
-        return
     else:
         raise KeyError(f'unhandled suffix in {path}')
 
@@ -194,10 +197,14 @@ async def main():
     executor = async_executor.AsyncExecutor()
     for path in paths:
         suffix = path.suffix.lower()
-        if suffix in IGNORED_SUFFIXES:
+        if suffix in IGNORABLE_EXT:
+            continue
+        if suffix in DELETABLE_EXT:
+            path.unlink()
             continue
         elif suffix not in PHOTO_EXT and suffix not in VIDEO_EXT:
             print(f'warning: unhandled suffix in "{path}"', file=sys.stderr)
+            continue
         executor.submit(process_file, path, args.target, args.dry_run)
 
     async for task in tqdm.asyncio.tqdm(executor):
