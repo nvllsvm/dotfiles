@@ -11,7 +11,9 @@ import sys
 
 # lf adds `.~1~` to the end of a file when a copy/move destination exists
 LF_DUPLICATE_SUFFIX = '.~1~'
-LF_DUPLICATE_PATTERN = re.compile(r'.*\.~\d+\~$')
+LF_DUPLICATE_PATTERN = re.compile(r'(.+)(\.~\d+\~)+$')
+
+FIREFOX_DUPLICATE_PATTERN = re.compile(r'(.)(\(\d+\))(\.[^\.]+|\.tar\.[^\.]+$)')
 
 
 def all_files(root):
@@ -61,7 +63,28 @@ def _sorted_duplicates_key(path):
         bool(LF_DUPLICATE_PATTERN.match(p))
         for p in path.parts
     ]
+    is_lf_dupe = False
+    is_firefox_dupe = False
+
+    name = path.name
+    while True:
+        name, num_subs = LF_DUPLICATE_PATTERN.subn(r'\1', name)
+        if num_subs == 0:
+            break
+        is_lf_dupe = True
+
+    new = FIREFOX_DUPLICATE_PATTERN.sub(r'\1\3', name)
+    if new != name:
+        is_firefox_dupe = True
+        name = new
+
+    dupe_score = 0
+    if is_lf_dupe:
+        dupe_score += 1
+    if is_firefox_dupe:
+        dupe_score += 1
     return (
+        dupe_score,
         lf_matches[-1],  # filename
         any(lf_matches),  # parent dir(s)
         len(lf_matches),  # try to keep least-nested
