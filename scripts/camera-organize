@@ -112,15 +112,18 @@ async def parse_date(path):
                 int(name[10:12])
             )
         elif not set(name[:10]) - set(string.digits):
-            dt = datetime.datetime.utcfromtimestamp(int(name[:10]))
-            raise RuntimeError(f'TODO: fix utcfromtimestamp: {name}')
+            dt = datetime.datetime.fromtimestamp(int(name[:10]))
         else:
             raise ValueError('unknown date format')
 
         lower_bound = datetime.timedelta(weeks=52 * 5)
         upper_bound = datetime.timedelta(days=1)
 
-        now = datetime.datetime.now(datetime.UTC)
+        now = datetime.datetime.now()
+        if dt.tzinfo is not None:
+            # cannot compare dt with tz to one without and vice-versa.
+            # the local tz is good enough for this comparison
+            now = now.astimezone()
         if dt > (now + upper_bound):
             raise ValueError('date in the future')
         elif dt < (now - lower_bound):
