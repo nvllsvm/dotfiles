@@ -73,7 +73,7 @@ else
             exiftool -- "$1"
             ;;
         application/vnd.iccprofile)
-            iccdump -v 1 "$1"
+            iccdump -t desc "$1"
             ;;
         image/tiff)
             tiffinfo -- "$1"
