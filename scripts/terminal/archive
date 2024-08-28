@@ -1741,6 +1741,7 @@ class cpio:
             '--directory', dest,
             '--make-directories',
             '--no-absolute-filenames',
+            '--preserve-modification-time',
             '--file', path)
         await proc.wait()
         if proc.returncode:

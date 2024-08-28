@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+WIDTH=3840
+HEIGHT=2160
+exec gamescope \
+    --borderless \
+    --rt \
+    --adaptive-sync \
+    -W "$WIDTH" \
+    -H "$HEIGHT" \
+    -w "$WIDTH" \
+    -h "$HEIGHT" \
+    -- "$@"
