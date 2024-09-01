@@ -140,7 +140,6 @@ EXPECTED_PACKAGES_DESKTOP = {
     'kdeconnect',
     'kid3-qt',
     'krita',
-    'kwin-polonium',
     'mangohud',
     'mkvtoolnix-gui',
     'noto-fonts',
