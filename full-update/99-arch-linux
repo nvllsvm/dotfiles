@@ -54,6 +54,7 @@ EXPECTED_PACKAGES = {
     'less',
     'lf',
     'mac',
+    'mediainfo',
     'moreutils',
     'mp3val',
     'mprime-bin',

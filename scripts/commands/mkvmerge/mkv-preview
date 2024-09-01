@@ -1,24 +1,69 @@
 #!/usr/bin/env python3
+import asyncio
 import argparse
 import collections
 import json
-import subprocess
 
 
-def mkv_info(path):
-    proc = subprocess.run(
-        ['mkvmerge', '-J', path],
-        stdout=subprocess.PIPE,
-        check=True)
-    return json.loads(proc.stdout)
+async def mediainfo(path):
+    proc = await asyncio.create_subprocess_exec(
+        'mediainfo', '--Output=JSON', '--', path,
+        stdout=asyncio.subprocess.PIPE)
+    stdout, _ = await proc.communicate()
+    if proc.returncode != 0:
+        raise ProcessError(proc)
+    return json.loads(stdout)
 
 
-def main():
+async def mkvmerge_identify(path):
+    proc = await asyncio.create_subprocess_exec(
+        'mkvmerge', '-J', path,
+        stdout=asyncio.subprocess.PIPE)
+    stdout, _ = await proc.communicate()
+    if proc.returncode != 0:
+        raise ProcessError(proc)
+    return json.loads(stdout)
+
+
+class ProcessError(Exception):
+    def __init__(self, process, message=None):
+        self.process = process
+        self.message = message
+
+    def __str__(self):
+        proc = self.process
+
+        text = f'exit {proc.returncode}'
+        if self.message is not None:
+            text = f'{text} - {self.message}'
+
+        try:
+            args = proc._transport._extra['subprocess'].args
+        except (AttributeError, KeyError):
+            pass
+        else:
+            text = f'{text}: {args}'
+        return text
+
+
+async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('path')
     args = parser.parse_args()
 
-    metadata = mkv_info(args.path)
+    metadata_mkvmerge, metadata_mediainfo = await asyncio.gather(
+        mkvmerge_identify(args.path),
+        mediainfo(args.path),
+    )
+
+    mediainfo_by_uid = {}
+    for track in metadata_mediainfo['media']['track']:
+        unique_id = track.get('UniqueID', None)
+        if unique_id is not None:
+            unique_id = int(unique_id)
+            if unique_id in mediainfo_by_uid:
+                raise RuntimeError
+            mediainfo_by_uid[unique_id] = track
 
     results = {
         'audio': [],
@@ -26,7 +71,7 @@ def main():
         'video': [],
     }
     type_counts = collections.Counter()
-    for i, track in enumerate(metadata['tracks']):
+    for i, track in enumerate(metadata_mkvmerge['tracks']):
         type_counts[track['type']] += 1
         type_selector = None
         if track['type'] in ['video', 'audio', 'subtitles']:
@@ -40,7 +85,7 @@ def main():
         }
         results[track['type']].append(track)
 
-    title = metadata['container']['properties'].get('title')
+    title = metadata_mkvmerge['container']['properties'].get('title')
     if title is not None:
         print('title:', title.strip())
     for track_type in ['video', 'audio', 'subtitles']:
@@ -48,6 +93,7 @@ def main():
             print(track_type)
 
             for track in tracks:
+                uid = track['properties']['uid']
                 line = [
                     '{} {}'.format(
                         track['id'],
@@ -56,9 +102,19 @@ def main():
                 ]
                 match track['type']:
                     case 'video':
+                        mediainfo_track = mediainfo_by_uid[uid]
+                        vformat = mediainfo_track['Format']
+                        match vformat:
+                            case 'HEVC':
+                                bd = mediainfo_track['BitDepth']
+                                if bd is not None:
+                                    vformat += f' ({bd}-bit)'
                         line.extend([
-                            track['codec'],
-                            track['properties']['pixel_dimensions'],
+                            vformat,
+                            '{}x{}'.format(
+                                mediainfo_track['Width'],
+                                mediainfo_track['Height'],
+                            )
                         ])
                     case 'audio':
                         line.extend([
@@ -80,4 +136,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())
