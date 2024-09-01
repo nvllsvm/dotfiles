@@ -643,10 +643,16 @@ class nsz:
                 '-D',  # decompress
                 f'--output={tmp}',
                 path,
-                # DEVNULL causes issues, idk why
+                stdin=asyncio.subprocess.PIPE,
                 stdout=asyncio.subprocess.PIPE)
-            await proc.communicate()
-            assert proc.returncode == 0
+
+            # if prod keys are missing, the presents the error, but doesn't
+            # exit until enter is pressed. ugh
+            stdout, _ = await proc.communicate(b'\n')
+
+            if proc.returncode != 0:
+                raise ProcessError(proc, stdout.decode())
+
             tmp_files = list(pathlib.Path(tmp).iterdir())
             assert len(tmp_files) == 1
             tmp_file = tmp_files[0]
