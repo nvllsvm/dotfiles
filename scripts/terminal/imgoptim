@@ -237,6 +237,7 @@ def determine_mime(path):
             return 'image/svg+xml', {}
         elif path.suffix.lower() == '.svg':
             return 'image/svg+xml', {}
+    return None, None
 
 
 def _sigint_handler(*_):
