@@ -75,6 +75,9 @@ else
         application/vnd.iccprofile)
             iccdump -t desc "$1"
             ;;
+        image/jxl)
+            jxlinfo --verbose "$1"
+            ;;
         image/tiff)
             tiffinfo -- "$1"
             ;;
