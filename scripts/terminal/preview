@@ -28,6 +28,7 @@ else
         application/java-archive|\
         application/vnd.comicbook-rar|\
         application/vnd.comicbook+zip|\
+        application/vnd.efi.iso|\
         application/vnd.google-earth.kmz|\
         application/vnd.ms-cab-compressed|\
         application/vnd.rar|\
