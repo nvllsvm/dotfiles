@@ -234,6 +234,9 @@ EXPECTED_PACKAGE_DEPENDENCIES = {
         'kdegraphics-mobipocket',
         'unrar',
     },
+    'print-manager': {
+        'system-config-printer',
+    },
     'proton-ge-custom-bin': {
         'kdialog',
         'lib32-vulkan-icd-loader',
