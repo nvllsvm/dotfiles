@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import argparse
 import asyncio
 import grp
 import pathlib
@@ -374,6 +375,18 @@ if HOSTNAME in ('mars', 'phobos', 'sol'):
     })
 
 
+async def ensure_using_systemd_resolved():
+    unit = 'systemd-resolved'
+    if await is_unit_enabled(unit):
+        await enable_unit(unit)
+
+    source = pathlib.Path('/run/systemd/resolve/stub-resolv.conf')
+    target = pathlib.Path('/etc/resolv.conf')
+    if target.resolve() != source:
+        print(f'Linking {target} to {source}')
+        target.symlink_to(source)
+
+
 async def ensure_users_in_expected_groups():
     for user, expected_groups in EXPECTED_GROUPS.items():
         current_groups = {
@@ -505,17 +518,63 @@ async def ensure_package_dependencies():
         await install_packages(missing, asdeps=True)
 
 
+async def run_mode(mode):
+    args = []
+    if mode == 'root':
+        args.append('sudo')
+    args.extend([__file__, mode])
+    proc = await asyncio.create_subprocess_exec(*args)
+    await proc.wait()
+    if proc.returncode:
+        raise ProcessError(proc)
+
+
+class ProcessError(Exception):
+    def __init__(self, process, message=None):
+        self.process = process
+        self.message = message
+
+    def __str__(self):
+        proc = self.process
+
+        text = f'exit {proc.returncode}'
+        if self.message is not None:
+            text = f'{text} - {self.message}'
+
+        try:
+            args = proc._transport._extra['subprocess'].args
+        except (AttributeError, KeyError):
+            pass
+        else:
+            text = f'{text}: {args}'
+        return text
+
+
 async def main():
     if not pathlib.Path('/etc/arch-release').exists():
         return
 
-    await ensure_users_in_expected_groups()
+    modes = ['user', 'root']
+    parser = argparse.ArgumentParser()
+    parser.add_argument('mode', choices=modes, nargs='?')
+    args = parser.parse_args()
 
-    await ensure_packages()
-    await ensure_package_dependencies()
+    # TODO: always run as root
+    match args.mode:
+        case 'user':
+            await ensure_users_in_expected_groups()
 
-    for service in EXPECTED_SERVICES:
-        await enable_unit(service, now=True)
+            await ensure_packages()
+            await ensure_package_dependencies()
+
+            for service in EXPECTED_SERVICES:
+                await enable_unit(service, now=True)
+        case 'root':
+            if HOSTNAME in ('mars', 'phobos'):
+                await ensure_using_systemd_resolved()
+        case _:
+            for mode in modes:
+                await run_mode(mode)
 
 
 if __name__ == '__main__':
