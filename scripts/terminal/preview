@@ -13,7 +13,17 @@ elif [ -d "$1" ]; then
     cd "$1" || exit 1
     fd --color=always --maxdepth=1
 else
-    if command -v xdg-mime > /dev/null; then
+    mimetype=''
+    USE_XDG_MIME=1
+    case "$1" in
+        # xdg-mime incorrectly identifies all files ending with this as
+        # application/x-trash
+        # lf appends this when copying to a target that already exists.
+        *'.~1~')
+            USE_XDG_MIME=
+            ;;
+    esac
+    if command -v xdg-mime > /dev/null && [ -n "$USE_XDG_MIME" ]; then
         # allows for overrides in ~/.local/share/mime/packages to work
         # on headless system.
         export XDG_CURRENT_DESKTOP="${XDG_CURRENT_DESKTOP:=kde}"
