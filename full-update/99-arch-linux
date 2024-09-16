@@ -384,6 +384,10 @@ async def ensure_using_systemd_resolved():
     target = pathlib.Path('/etc/resolv.conf')
     if target.resolve() != source:
         print(f'Linking {target} to {source}')
+        try:
+            target.unlink()
+        except FileNotFoundError:
+            pass
         target.symlink_to(source)
 
 
