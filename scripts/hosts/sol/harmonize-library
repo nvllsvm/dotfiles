@@ -2,4 +2,18 @@
 set -e
 SOURCE=/storage/Audio/Library
 TARGET=/storage/Audio/Lossy_opus_128
-harmonize "$SOURCE" "$TARGET" --codec opus --bitrate 128 --music
+
+alias harmonize='/home/ar/src/github/nvllsvm/harmonize/env/bin/harmonize'
+
+harmonize "$SOURCE" "$TARGET" \
+    --exclude '*.pdf' \
+    --exclude '*.accurip' \
+    --exclude '*.auCDtect' \
+    --exclude '*.cue' \
+    --exclude '*.log' \
+    --exclude '*.nfo' \
+    --exclude '*.pdf' \
+    --exclude '*.txt' \
+    --codec opus \
+    --bitrate 128 \
+    --music
