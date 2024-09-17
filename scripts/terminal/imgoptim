@@ -9,6 +9,7 @@ import sys
 import tempfile
 
 import async_executor
+import mozjpeg_lossless_optimization
 
 
 @contextlib.contextmanager
@@ -55,24 +56,16 @@ async def optimize_jpeg(source, dest, fast=False, strip=False):
         args.append('--strip-none')
 
     args.extend(['--', source])
-    read, write = os.pipe()
-    proc1 = await asyncio.create_subprocess_exec(
+    proc = await asyncio.create_subprocess_exec(
         *args,
-        stdout=write)
-    os.close(write)
-
-    proc2 = await asyncio.create_subprocess_exec(
-        'mozjpeg-lossless-optimization',
-        stdin=read,
         stdout=asyncio.subprocess.PIPE)
-    stdout, _ = await proc2.communicate()
-    if proc2.returncode != 0:
-        raise SubprocessError
-    await proc1.communicate()
-    if proc1.returncode != 0:
+    stdout, _ = await proc.communicate()
+    if proc.returncode != 0:
         raise SubprocessError
 
-    dest.write_bytes(stdout)
+    dest.write_bytes(
+        mozjpeg_lossless_optimization.optimize(stdout)
+    )
 
     # lossless rotation is not always possible - use EXIF instead
     if strip:
