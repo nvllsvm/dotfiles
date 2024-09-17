@@ -302,6 +302,10 @@ EXPECTED_PACKAGE_DEPENDENCIES = {
         'wine-gecko',
         'wine-mono',
     },
+    'xdg-utils': {
+        # needed to correctly identify .cbz as application/vnd.comicbook+zip
+        'perl-file-mimeinfo',
+    },
     'yt-dlp': {
         'aria2',
         'atomicparsley',
