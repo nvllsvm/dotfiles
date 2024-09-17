@@ -9,6 +9,7 @@ import sys
 import tempfile
 
 import async_executor
+import mozjpeg_lossless_optimization
 
 
 @contextlib.contextmanager
@@ -62,7 +63,9 @@ async def optimize_jpeg(source, dest, fast=False, strip=False):
     if proc.returncode != 0:
         raise SubprocessError
 
-    dest.write_bytes(stdout)
+    dest.write_bytes(
+        mozjpeg_lossless_optimization.optimize(stdout)
+    )
 
     # lossless rotation is not always possible - use EXIF instead
     if strip:
@@ -71,6 +74,8 @@ async def optimize_jpeg(source, dest, fast=False, strip=False):
         # 1 is the default, "correct" orientation
         if orientation and orientation != 1:
             await exiv2.set_orientation(dest, orientation)
+    else:
+        await exiv2.copy_metadata(source, dest)
 
 
 async def optimize_png(source, dest, fast=False, strip=False):
@@ -183,6 +188,21 @@ class exiv2:
         result, _ = await proc.communicate()
         if proc.returncode != 0:
             raise SubprocessError
+
+    @staticmethod
+    async def copy_metadata(source, target):
+        read, write = os.pipe()
+        proc1 = await asyncio.create_subprocess_exec(
+            'exiv2', '-ea-', '--', source,
+            stdout=write)
+        os.close(write)
+        proc2 = await asyncio.create_subprocess_exec(
+            'exiv2', '-ia-', '--', target,
+            stdin=read)
+        await asyncio.gather(proc1.wait(), proc2.wait())
+        for proc in (proc1, proc2):
+            if proc.returncode != 0:
+                raise SubprocessError
 
 
 class SubprocessError(Exception):

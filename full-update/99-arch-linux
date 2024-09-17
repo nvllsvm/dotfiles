@@ -80,6 +80,7 @@ EXPECTED_PACKAGES = {
     'python-dbus-fast',
     'python-httpx',
     'python-magic',
+    'python-mozjpeg-lossless-optimization',
     'python-mutagen',
     'python-numpy',
     'python-psutil',
