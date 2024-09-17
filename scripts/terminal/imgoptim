@@ -204,6 +204,7 @@ class exiv2:
             'exiv2', '-ia-', '--', target,
             stderr=asyncio.subprocess.PIPE,
             stdin=read)
+        os.close(read)
         for proc in (proc1, proc2):
             _, stderr = await proc.communicate()
             if proc.returncode != 0:
