@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import argparse
 import asyncio
+import concurrent.futures
 import contextlib
 import os
 import pathlib
@@ -63,9 +64,12 @@ async def optimize_jpeg(source, dest, fast=False, strip=False):
     if proc.returncode != 0:
         raise SubprocessError
 
-    dest.write_bytes(
-        mozjpeg_lossless_optimization.optimize(stdout)
-    )
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(
+            mozjpeg_lossless_optimization.optimize, stdout)
+        data = future.result()
+
+    dest.write_bytes(data)
 
     # lossless rotation is not always possible - use EXIF instead
     if strip:
