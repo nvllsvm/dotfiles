@@ -185,9 +185,11 @@ class exiv2:
         proc = await asyncio.create_subprocess_exec(
             'exiv2', '--Modify', f'set Exif.Image.Orientation {orientation}',
             'mo', path,
-            stdout=asyncio.subprocess.PIPE)
-        result, _ = await proc.communicate()
+            stderr=asyncio.subprocess.PIPE)
+        _, stderr = await proc.communicate()
         if proc.returncode != 0:
+            raise SubprocessError
+        if stderr:
             raise SubprocessError
 
     @staticmethod
@@ -195,14 +197,19 @@ class exiv2:
         read, write = os.pipe()
         proc1 = await asyncio.create_subprocess_exec(
             'exiv2', '-ea-', '--', source,
+            stderr=asyncio.subprocess.PIPE,
             stdout=write)
         os.close(write)
         proc2 = await asyncio.create_subprocess_exec(
             'exiv2', '-ia-', '--', target,
+            stderr=asyncio.subprocess.PIPE,
             stdin=read)
-        await asyncio.gather(proc1.wait(), proc2.wait())
         for proc in (proc1, proc2):
+            _, stderr = await proc.communicate()
             if proc.returncode != 0:
+                raise SubprocessError
+            # treat warnings as errors
+            if stderr:
                 raise SubprocessError
 
 
