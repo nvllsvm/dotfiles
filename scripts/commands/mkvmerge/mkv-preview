@@ -105,7 +105,10 @@ async def main():
                         mediainfo_track = mediainfo_by_uid[uid]
                         vformat = mediainfo_track['Format']
                         match vformat:
+                            case 'AVC':
+                                vformat = 'AVC (H.264)'
                             case 'HEVC':
+                                vformat = 'HEVC (H.265)'
                                 bd = mediainfo_track['BitDepth']
                                 if bd is not None:
                                     vformat += f' ({bd}-bit)'
