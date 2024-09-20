@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import argparse
 import asyncio
+from asyncio.subprocess import Process
 import contextlib
 import os
 import pathlib
@@ -32,9 +33,16 @@ def TempPath(**kwargs):
                 pass
 
 
-def all_files(root):
-    stack = [root]
+def all_files(*paths):
+    stack = []
     files = set()
+    for path in paths:
+        if not path.exists():
+            raise ValueError(f'path does not exist: {path}')
+        elif path.is_file():
+            files.add(path)
+        elif path.is_dir():
+            stack.append(path)
     while stack:
         for path in stack.pop().iterdir():
             if path.is_dir():
@@ -61,7 +69,7 @@ async def optimize_jpeg(source, dest, fast=False, strip=False):
         stdout=asyncio.subprocess.PIPE)
     stdout, _ = await proc.communicate()
     if proc.returncode != 0:
-        raise SubprocessError
+        raise ProcessError(proc)
 
     data = await asyncio.to_thread(
             mozjpeg_lossless_optimization.optimize, stdout)
@@ -79,6 +87,21 @@ async def optimize_jpeg(source, dest, fast=False, strip=False):
         await exiv2.copy_metadata(source, dest)
 
 
+async def optimize_jxl(source, dest, fast=False, strip=False):
+    args = [
+        'cjxl',
+        '--quiet',
+        '--distance=0.0',
+        '--effort=10',
+        '--lossless_jpeg=1',
+        '--', source, dest,
+    ]
+    proc = await asyncio.create_subprocess_exec(*args)
+    await proc.wait()
+    if proc.returncode != 0:
+        raise ProcessError(proc)
+
+
 async def optimize_png(source, dest, fast=False, strip=False):
     args = ['oxipng', '--quiet', '--out', dest]
     if fast:
@@ -93,7 +116,7 @@ async def optimize_png(source, dest, fast=False, strip=False):
     proc = await asyncio.create_subprocess_exec(*args)
     await proc.wait()
     if proc.returncode != 0:
-        raise SubprocessError
+        raise ProcessError(proc)
 
 
 async def optimize_gif(source, dest, fast=False, strip=False):
@@ -109,7 +132,7 @@ async def optimize_gif(source, dest, fast=False, strip=False):
     proc = await asyncio.create_subprocess_exec(*args)
     await proc.wait()
     if proc.returncode != 0:
-        raise SubprocessError
+        raise ProcessError(proc)
 
 
 async def optimize_svg(source, dest, fast=False, strip=False):
@@ -123,7 +146,7 @@ async def optimize_svg(source, dest, fast=False, strip=False):
     proc = await asyncio.create_subprocess_exec(*args)
     await proc.wait()
     if proc.returncode != 0:
-        raise SubprocessError
+        raise ProcessError(proc)
 
 
 async def optimize_tiff(source, dest, fast=False, strip=False, bigtiff=False):
@@ -145,7 +168,7 @@ async def optimize_tiff(source, dest, fast=False, strip=False, bigtiff=False):
     proc = await asyncio.create_subprocess_exec(*args)
     await proc.wait()
     if proc.returncode != 0:
-        raise SubprocessError
+        raise ProcessError(proc)
 
 
 class exiv2:
@@ -173,7 +196,7 @@ class exiv2:
         if proc.returncode == 1 and not stderr:
             return None
         elif proc.returncode != 0:
-            raise SubprocessError
+            raise ProcessError(proc)
 
         _, _, _, value = stdout.decode().split(maxsplit=3)
         value = value.strip()
@@ -187,10 +210,8 @@ class exiv2:
             'mo', path,
             stderr=asyncio.subprocess.PIPE)
         _, stderr = await proc.communicate()
-        if proc.returncode != 0:
-            raise SubprocessError
-        if stderr:
-            raise SubprocessError
+        if stderr or proc.returncode != 0:
+            raise ProcessError(proc)
 
     @staticmethod
     async def copy_metadata(source, target):
@@ -207,20 +228,36 @@ class exiv2:
         os.close(read)
         for proc in (proc1, proc2):
             _, stderr = await proc.communicate()
-            if proc.returncode != 0:
-                raise SubprocessError
             # treat warnings as errors
-            if stderr:
-                raise SubprocessError
+            if stderr or proc.returncode != 0:
+                raise ProcessError(proc)
 
 
-class SubprocessError(Exception):
-    """Raised when an error occurs in a subprocess"""
+class ProcessError(Exception):
+    def __init__(self, process, message=None):
+        self.process = process
+        self.message = message
+
+    def __str__(self):
+        proc = self.process
+
+        text = f'exit {proc.returncode}'
+        if self.message is not None:
+            text = f'{text} - {self.message}'
+
+        try:
+            args = proc._transport._extra['subprocess'].args
+        except (AttributeError, KeyError):
+            pass
+        else:
+            text = f'{text}: {args}'
+        return text
 
 
-_MIME_OPTIMIZATIONS = {
+_MIME_OPTIM = {
     'image/gif': optimize_gif,
     'image/jpeg': optimize_jpeg,
+    'image/jxl': optimize_jxl,
     'image/png': optimize_png,
     'image/svg+xml': optimize_svg,
     'image/tiff': optimize_tiff,
@@ -229,11 +266,21 @@ _MIME_OPTIMIZATIONS = {
 _TYPE_TO_MIME = {
     'gif': 'image/gif',
     'jpeg': 'image/jpeg',
+    'jxl': 'image/jxl',
     'png': 'image/png',
     'svg': 'image/svg+xml',
     'tiff': 'image/tiff',
 }
 
+
+_MIME_SUFFIXES = {
+    'image/bmp': ('.bmp',),
+    'image/jpeg': ('.jpg', '.jpeg'),
+    'image/jxl': ('.jxl',),
+    'image/png': ('.png',),
+    'image/x-portable-pixmap': ('.ppm',),
+    'image/tiff': ('.tiff',),
+}
 
 # tiff support is experimental
 _DEFAULT_TYPES = {
@@ -244,7 +291,7 @@ _DEFAULT_TYPES = {
 def determine_mime(path):
     # roughly 2.5x faster than using libmagic
     with open(path, 'rb') as f:
-        start = f.read(8)
+        start = f.read(12)
         if start == b'\x89PNG\r\n\x1a\n':
             return 'image/png', {}
         elif start[0:3] == b'\xff\xd8\xff':
@@ -264,6 +311,10 @@ def determine_mime(path):
             return 'image/svg+xml', {}
         elif start[0:6] == b'<?svg ':
             return 'image/svg+xml', {}
+        elif start[0:12] == b'\x00\x00\x00\x0c\x4a\x58\x4c\x20\x0d\x0a\x87\x0a':
+            return 'image/jxl', {}
+        elif start[0:2] == b'\xff\x0a':
+            return 'image/jxl', {}
         elif path.suffix.lower() == '.svg':
             return 'image/svg+xml', {}
     return None, None
@@ -273,7 +324,51 @@ def _sigint_handler(*_):
     sys.exit(130)
 
 
-async def _process(func, path, fast, strip, **options):
+async def convert_to_jpeg(source, dest):
+    args = [
+        'cjpegli',
+        '--', source, dest,
+    ]
+    proc = await asyncio.create_subprocess_exec(*args)
+    await proc.wait()
+    if proc.returncode != 0:
+        raise ProcessError(proc)
+
+
+async def convert_to_ppm(source, dest):
+    args = [
+        'vips',
+        'ppmsave',
+        '--',
+        source,
+        dest,
+    ]
+    proc = await asyncio.create_subprocess_exec(*args)
+    await proc.wait()
+    if proc.returncode != 0:
+        raise ProcessError(proc)
+
+
+async def convert_to_jxl(source, dest, fast=False):
+    args = [
+        'cjxl',
+        '--quiet',
+        '--distance=0.0',
+        '--lossless_jpeg=1',
+    ]
+    if not fast:
+        args.append('--effort=10')
+
+    args.extend([
+        '--', source, dest,
+    ])
+    proc = await asyncio.create_subprocess_exec(*args)
+    await proc.wait()
+    if proc.returncode != 0:
+        raise ProcessError(proc)
+
+
+async def _process_optim(func, path, fast, strip, **options):
     before = path.stat().st_size
 
     with TempPath(dir=path.parent, prefix='.imgoptim_',
@@ -287,6 +382,40 @@ async def _process(func, path, fast, strip, **options):
             after = before
 
     return path, before, after
+
+
+_SUPPORTED_CONVERT_SUFFIXES = {
+    'image/jpeg': [
+        'image/png',
+        'image/ppm',
+    ],
+    'image/jxl': [
+        'image/jpeg',
+        'image/png',
+        'image/ppm',
+    ],
+}
+
+
+async def _process_convert(path, source_mimetype, target_mimetype):
+    dest = path.parent / (path.stem or path.name)
+    suffixes = _MIME_SUFFIXES[target_mimetype]
+    if dest.suffix.lower() not in suffixes:
+        dest = dest.with_name(dest.stem + suffixes[0])
+
+    with contextlib.ExitStack() as stack:
+        temp_path = stack.enter_context(TempPath(
+            dir=path.parent, prefix='.imgconvert_', suffix=path.name + '.tmp'))
+        match target_mimetype:
+            case 'image/jxl':
+                await convert_to_jxl(path, temp_path)
+                temp_path.rename(dest)
+            case 'image/jpeg':
+                await convert_to_jpeg(path, temp_path)
+                temp_path.rename(dest)
+            case _:
+                raise RuntimeError('invalid target_type')
+    return path, dest
 
 
 class SizeDiffPrinter:
@@ -343,7 +472,126 @@ def _num_procs(value):
         raise argparse.ArgumentError('invalid num_procs')
 
 
-async def main():
+def _parser_path_file(value):
+    path = pathlib.Path(value)
+    if path.is_file():
+        return path
+    elif path.is_dir():
+        raise argparse.ArgumentError('path must be file')
+    else:
+        raise argparse.ArgumentError('invalid path')
+
+
+async def sha256sum(pipe):
+    proc = await asyncio.create_subprocess_exec(
+        'sha256sum',
+        stdin=pipe,
+        stdout=asyncio.subprocess.PIPE)
+    os.close(pipe)
+    stdout, _ = await proc.communicate()
+    if proc.returncode:
+        raise ProcessError(proc)
+    return stdout.split()[0].decode()
+
+
+async def sha256sum_djxl(source):
+    read, write = os.pipe()
+    proc = await asyncio.create_subprocess_exec(
+        'djxl', '--quiet', '--output_format=ppm', '--', source, '-',
+        stdout=write)
+    os.close(write)
+    sha256 = await sha256sum_vips_copy(read)
+    await proc.wait()
+    if proc.returncode:
+        raise ProcessError(proc)
+    return sha256
+
+
+async def sha256sum_vips_copy(source):
+    read1, write1 = os.pipe()
+    if isinstance(source, int):
+        proc1 = await asyncio.create_subprocess_exec(
+            'vips', 'copy', 'stdin[]', '.ppm[]',
+            stdin=source,
+            stdout=write1)
+        os.close(source)
+    else:
+        proc1 = await asyncio.create_subprocess_exec(
+            'vips', 'copy', source, '.ppm[]',
+            stdout=write1)
+    os.close(write1)
+
+    read2, write2 = os.pipe()
+    proc2 = await asyncio.create_subprocess_exec(
+        'magick', 'ppm:-', '-set', 'comment', '', 'ppm:-',
+        stdin=read1,
+        stdout=write2)
+    os.close(write2)
+
+    sha256 = await sha256sum(read2)
+    for proc in (proc1, proc2):
+        await proc.wait()
+        if proc.returncode:
+            raise ProcessError(proc)
+    return sha256
+
+
+async def main_compare():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('paths', metavar='path', nargs=2)
+    args = parser.parse_args()
+
+    hashes = []
+    for path in args.paths:
+        mimetype, _ = determine_mime(path)
+        match mimetype:
+            case 'image/jxl':
+                res = await sha256sum_djxl(path)
+                print(res)
+            case 'image/jpeg':
+                res = await sha256sum_vips_copy(path)
+                print(res)
+            case _:
+                raise NotImplemented
+    # vips copy 'stdin[]' '.ppm[]' < "$1" | tail -n+3 | sha256sum | awk '{print $1}'
+
+
+async def main_convert():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-n', metavar='NUM', dest='num_procs',
+                        type=_num_procs, default=None,
+                        help='number of parallel jobs (default: %(default)s)')
+    parser.add_argument('--rm', action='store_true')
+    parser.add_argument(
+        '-f', '--format', dest='format',
+        choices=('jpeg', 'jxl'), required=True)
+    parser.add_argument(
+        'paths', metavar='path', nargs='+', type=_parser_path_file)
+    args = parser.parse_args()
+
+    executor = async_executor.AsyncExecutor(args.num_procs)
+    for path in args.paths:
+        try:
+            mimetype, _ = determine_mime(path)
+        except (FileNotFoundError, IsADirectoryError):
+            # broken symlink can cause this
+            continue
+
+        executor.submit(_process_convert, path,
+                        source_mimetype=mimetype,
+                        target_mimetype=_TYPE_TO_MIME[args.format])
+
+    async for result in executor:
+        try:
+            source, dest = result.result()
+        except ProcessError as e:
+            # TODO give this a competent error message
+            print(f'error: {e}', file=sys.stderr)
+            continue
+        print(source, '->', dest)
+
+
+async def main_optim():
     parser = argparse.ArgumentParser()
     parser.add_argument('-s', '--strip', action='store_true')
     parser.add_argument(
@@ -355,20 +603,13 @@ async def main():
                         type=_num_procs, default=None,
                         help='number of parallel jobs (default: %(default)s)')
     parser.add_argument('-q', '--quiet', action='store_true')
-    parser.add_argument('path', nargs='+', type=pathlib.Path)
+    parser.add_argument('paths', metavar='path', nargs='+', type=pathlib.Path)
     args = parser.parse_args()
-
-    files = set()
-    for path in args.path:
-        if path.is_file():
-            files.add(path)
-        else:
-            files.update(all_files(path))
 
     mimetypes = set(_TYPE_TO_MIME[t] for t in (args.types or _DEFAULT_TYPES))
 
     executor = async_executor.AsyncExecutor(args.num_procs)
-    for f in sorted(files):
+    for f in all_files(*args.paths):
         try:
             mimetype, options = determine_mime(f)
         except (FileNotFoundError, IsADirectoryError):
@@ -378,18 +619,18 @@ async def main():
         if mimetype not in mimetypes:
             continue
 
-        if func := _MIME_OPTIMIZATIONS.get(mimetype):
+        if func := _MIME_OPTIM.get(mimetype):
             executor.submit(
-                _process, func, f, fast=args.fast, strip=args.strip,
+                _process_optim, func, f, fast=args.fast, strip=args.strip,
                 **options)
 
     size_diff_printer = SizeDiffPrinter(num_items=len(executor))
     async for result in executor:
         try:
             path, before, after = result.result()
-        except SubprocessError:
+        except ProcessError as e:
             # TODO give this a competent error message
-            print('error', file=sys.stderr)
+            print(f'error: {e}', file=sys.stderr)
             continue
 
         if not args.quiet:
@@ -401,4 +642,10 @@ async def main():
 
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, _sigint_handler)
-    asyncio.run(main())
+    match pathlib.Path(sys.argv[0]).name:
+        case 'imgcompare':
+            asyncio.run(main_compare())
+        case 'imgconvert':
+            asyncio.run(main_convert())
+        case 'imgoptim' | _:
+            asyncio.run(main_optim())
