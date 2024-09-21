@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
-cd ~
-SESSIONS="$(tmux list-sessions | head -n 1)"
+cd ~ || exit 1
+SESSIONS="$(tmux list-sessions 2> /dev/null | head -n 1)"
 if [ -n "$SESSIONS" ]; then
     case "$SESSIONS" in
         *"(attached)")
