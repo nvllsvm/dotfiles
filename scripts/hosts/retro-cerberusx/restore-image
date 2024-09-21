@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+case "$1" in
+	*.zst)
+		;;
+	*)
+		exit 1
+esac
+case "$2" in
+	/dev/sda*)
+		;;
+	*)
+		exit 1
+esac
+zstd -q -d --stdout "$1" | dd of="$2" bs=4M status=progress

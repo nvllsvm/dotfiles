@@ -15,4 +15,10 @@ gsettings set org.gnome.settings-daemon.plugins.xsettings overrides \
 
 pactl set-sink-volume @DEFAULT_SINK@ 100%
 
+URL='https://jellyfin.nullsum.net/System/Ping'
+echo 'Waiting for server to be available'
+while ! curl --silent --fail "${URL}"; do
+    sleep 1;
+done
+echo 'Server is available'
 exec jellyfinmediaplayer --scale-factor=1.5
