@@ -2,5 +2,5 @@
 Description=Certbot renew
 
 [Service]
-ExecStart=/home/ar/src/certs-nullsum.net/renew.sh
+ExecStart=/home/ar/src/git.nullsum.net/nvllsvm/certs-nullsum.net/bin/renew_all.sh
 SyslogIdentifier=certbot-renew
