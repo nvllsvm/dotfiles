@@ -1,6 +1,0 @@
-[Desktop Entry]
-Name=tmux (phobos)
-Comment=tmux phobos
-Type=Application
-Icon=foot
-Exec=foot --title tmux-phobos --app-id tmux-phobos -- zsh -ic 'ssh -t phobos -- zsh -lic tmux-attach'
