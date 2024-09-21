@@ -1,36 +1,11 @@
-set $mod Mod4
-set $gap_size 0px
-set $border_size 4
-
-set $color_bg #000000
-set $color_fg #E0E0E0
-set $color_00 #000000
-set $color_01 #FB0120
-set $color_02 #A1C659
-set $color_03 #FDA331
-set $color_04 #6FB3D2
-set $color_05 #D381C3
-set $color_06 #76C7B7
-set $color_07 #E0E0E0
-set $color_08 #B0B0B0
-set $color_09 #FB0120
-set $color_10 #A1C659
-set $color_11 #FDA331
-set $color_12 #6FB3D2
-set $color_13 #D381C3
-set $color_14 #76C7B7
-set $color_15 #FFFFFF
-set $color_16 #FC6D24
-set $color_17 #BE643C
-set $color_18 #303030
-set $color_19 #505050
-set $color_20 #D0D0D0
-set $color_21 #F5F5F5
-
-set $font monospace
-set $fontSize 12
-
-output * background #000000 solid_color
-
-include config.d/*.conf
-include config.d/hostname/`hostname`.conf
+output HDMI-A-1 mode 3840x2160@60.00Hz position 0,0 scale 3
+default_border none
+default_floating_border none
+include /etc/sway/config.d/*
+bindsym XF86AudioMute exec --no-startup-id systemd-cat -t lounge-htpc-cli lounge-htpc-cli volume-mute-toggle
+bindsym XF86AudioLowerVolume exec --no-startup-id systemd-cat -t lounge-htpc-cli lounge-htpc-cli volume-down
+bindsym XF86AudioRaiseVolume exec --no-startup-id systemd-cat -t lounge-htpc-cli lounge-htpc-cli volume-up
+bindsym Menu exec --no-startup-id systemd-cat -t lounge-htpc-cli lounge-htpc-cli power-toggle
+exec systemd-cat -t jellyfinmediaplayer start-jellyfinmediaplayer
+exec systemd-cat -t wlsunset wlsunset -t 4000 -T 4001
+#exec systemd-cat -t firefox firefox
