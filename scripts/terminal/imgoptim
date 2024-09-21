@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import argparse
 import asyncio
-from asyncio.subprocess import Process
 import contextlib
 import os
 import pathlib
@@ -268,6 +267,7 @@ _TYPE_TO_MIME = {
     'jpeg': 'image/jpeg',
     'jxl': 'image/jxl',
     'png': 'image/png',
+    'ppm': 'image/x-portable-pixmap',
     'svg': 'image/svg+xml',
     'tiff': 'image/tiff',
 }
@@ -394,6 +394,11 @@ _SUPPORTED_CONVERT_SUFFIXES = {
         'image/png',
         'image/ppm',
     ],
+    'image/jxl': [
+        'image/jpeg',
+        'image/png',
+        'image/ppm',
+    ],
 }
 
 
@@ -407,6 +412,9 @@ async def _process_convert(path, source_mimetype, target_mimetype):
         temp_path = stack.enter_context(TempPath(
             dir=path.parent, prefix='.imgconvert_', suffix=path.name + '.tmp'))
         match target_mimetype:
+            case 'image/x-portable-pixmap':
+                await convert_to_ppm(path, temp_path)
+                temp_path.rename(dest)
             case 'image/jxl':
                 await convert_to_jxl(path, temp_path)
                 temp_path.rename(dest)
@@ -552,7 +560,7 @@ async def main_compare():
                 res = await sha256sum_vips_copy(path)
                 print(res)
             case _:
-                raise NotImplemented
+                raise NotImplementedError
     # vips copy 'stdin[]' '.ppm[]' < "$1" | tail -n+3 | sha256sum | awk '{print $1}'
 
 
@@ -564,7 +572,7 @@ async def main_convert():
     parser.add_argument('--rm', action='store_true')
     parser.add_argument(
         '-f', '--format', dest='format',
-        choices=('jpeg', 'jxl'), required=True)
+        choices=('jpeg', 'jxl', 'ppm'), required=True)
     parser.add_argument(
         'paths', metavar='path', nargs='+', type=_parser_path_file)
     args = parser.parse_args()
