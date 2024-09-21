@@ -53,11 +53,9 @@ autocmd StdinReadPre * let s:std_in=1
 
 autocmd BufWritePost * call system("lmk")
 
-let base16colorspace=256
 if !empty(glob("~/.base16_theme"))
+    let base16colorspace=256
     execute "colorscheme " . system("basename $(readlink ~/.base16_theme) .sh")
-else
-    colorscheme base16-default-dark
 endif
 
 let g:markdown_enable_spell_checking = 0
