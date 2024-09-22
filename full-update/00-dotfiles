@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
 set -eu
 VERBOSE=
+
 INSTALL_SYSTEM=
 
 NO_PUSH=
