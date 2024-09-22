@@ -1,25 +1,55 @@
 #!/usr/bin/env sh
 set -eu
 VERBOSE=
-ALL=
+INSTALL_SYSTEM=
+
+NOGIT=
+case "$(git -C "$DOTFILES" remote get-url origin)" in
+    https://*)
+        NOGIT=1
+        ;;
+esac
+
+usage() {
+    cat << EOF
+usage: [OPTION]
+  --nogit       skip git synchronization
+  --system      also install system files
+  -h, --help
+  --verbose
+EOF
+}
+
 while [ $# -gt 0 ]; do
     case "$1" in
+        -h|--help)
+            usage
+            exit
+            ;;
+        --nogit)
+            NOGIT=1
+            shift
+            ;;
         -v)
             VERBOSE=1
             shift
             ;;
-        --all)
-            ALL=1
+        --system)
+            INSTALL_SYSTEM=1
             shift
             ;;
         *)
+            usage >&2
             echo 'error: unrecognized arguments' >&2
             exit 1
     esac
 done
 
 MAGENTA='\033[1;35m'
+RED='\033[1;31m'
+YELLOW='\033[1;34m'
 RESET='\033[0m'
+BOLD='\033[1m'
 
 HOSTNAME="$(hostname)"
 if [ -z "$HOSTNAME" ]; then
@@ -47,14 +77,18 @@ update_non_user() {
     fi
 }
 
+if [ -n "$NOGIT" ]; then
+    printf "%b%bWarning: skipping git pull%b\n" "$BOLD" "$RED" "$RESET"
+fi
+
 update_repo() {
     dotfiles_root="$2"
-    if [ -z "${FULL_UPDATE_READ_ONLY:-}" ]; then
+    if [ -z "${NOGIT}" ]; then
         printf "%bUpdating %s (%s)...%b\n" "$MAGENTA" "$1" "$dotfiles_root" "$RESET"
         git auto-update "$dotfiles_root"
     fi
 
-    if [ -n "$ALL" ]; then
+    if [ -n "$INSTALL_SYSTEM" ]; then
         printf "%bUpdating non-user files %s (%s)...%b\n" "$MAGENTA" "$1" "$dotfiles_root" "$RESET"
         if command -v sudo > /dev/null; then
             update_non_user "$dotfiles_root" common

@@ -41,7 +41,7 @@ process() {
     # update dotfiles to ensure full-update/* is up-to-date
     cmd="$1"/full-update/00-dotfiles
     if [ -f "$cmd" ]; then
-        run_script "$cmd" --all
+        run_script "$cmd" --system
     fi
 
     for cmd in "$1"/full-update/*; do
