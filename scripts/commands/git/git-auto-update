@@ -63,7 +63,7 @@ fi
 
 branch=$(git rev-parse --abbrev-ref HEAD)
 if [ "$(git log origin/$branch..$branch | wc -l)" -gt 0 ]; then
-    if [ -n "$NO_PUSH" ]; then
+    if [ -z "$NO_PUSH" ]; then
         git push
     else
         echo 'warning: local changes exist, but push is disabled' >&2
