@@ -54,10 +54,14 @@ if [ "$(git rev-parse HEAD)" != "$(git rev-parse '@{u}')" ]; then
 fi
 
 if [ "$(git status --porcelain | wc -l)" -gt 0 ]; then
-    if [ -z "$STAGED" ]; then
-        git add -A
+    if [ -n "$NO_PUSH" ]; then
+        echo 'warning: uncommitted changes' >&2
+    else
+        if [ -z "$STAGED" ]; then
+            git add -A
+        fi
+        git commit -m "git-auto-update $(TZ=UTC date -Is)"
     fi
-    git commit -m "git-auto-update $(TZ=UTC date -Is)"
 fi
 
 branch=$(git rev-parse --abbrev-ref HEAD)
