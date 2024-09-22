@@ -3,17 +3,17 @@ set -eu
 VERBOSE=
 INSTALL_SYSTEM=
 
-NOGIT=
+NO_PUSH=
 case "$(git -C "$DOTFILES" remote get-url origin)" in
     https://*)
-        NOGIT=1
+        NO_PUSH=1
         ;;
 esac
 
 usage() {
     cat << EOF
 usage: [OPTION]
-  --nogit       skip git synchronization
+  --no-push     disable git push
   --system      also install system files
   -h, --help
   --verbose
@@ -26,8 +26,8 @@ while [ $# -gt 0 ]; do
             usage
             exit
             ;;
-        --nogit)
-            NOGIT=1
+        --no-push)
+            NO_PUSH=1
             shift
             ;;
         -v)
@@ -77,15 +77,13 @@ update_non_user() {
     fi
 }
 
-if [ -n "$NOGIT" ]; then
-    printf "%b%bWarning: skipping git pull%b\n" "$BOLD" "$RED" "$RESET"
-fi
-
 update_repo() {
     dotfiles_root="$2"
-    if [ -z "${NOGIT}" ]; then
-        printf "%bUpdating %s (%s)...%b\n" "$MAGENTA" "$1" "$dotfiles_root" "$RESET"
+    printf "%bUpdating %s (%s)...%b\n" "$MAGENTA" "$1" "$dotfiles_root" "$RESET"
+    if [ -z "${NO_PUSH}" ]; then
         git auto-update "$dotfiles_root"
+    elif [ -n "$(git -C "$dotfiles_root" status -s)" ]; then
+        printf "%b%bWarning: local changes exist, but git push is disabled%b\n" "$BOLD" "$RED" "$RESET"
     fi
 
     if [ -n "$INSTALL_SYSTEM" ]; then
