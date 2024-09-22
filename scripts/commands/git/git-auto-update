@@ -1,6 +1,5 @@
 #!/usr/bin/env sh
 set -e
-echo "$*"
 STAGED=
 NO_PUSH=
 GIT_DIR=
