@@ -1,0 +1,6 @@
+LABEL=LINUX	/	ext4	rw,relatime	0 1
+
+/dev/sda1	/win98	auto	noauto,x-systemd.automount,rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,umask=0000	0 0
+/dev/sda2	/winxp	auto	noauto,x-systemd.automount,rw,nosuid,nodev,relatime,user_id=0,group_id=0,allow_other,umask=0000	0 0
+
+//sol.nullsum.lan/public	/sol	cifs	_netdev,noauto,x-systemd.automount,username=ar,password=	0 0
