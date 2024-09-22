@@ -1,20 +1,51 @@
 #!/usr/bin/env sh
 set -e
+echo "$*"
 STAGED=
-if [ "$1" = '--staged' ]; then
-    STAGED=1
-    shift
-fi
+NO_PUSH=
+GIT_DIR=
 
-if [ -z $1 ]; then
+usage() {
+    echo 'usage: [--no-push] [--staged] [REPO_DIR]'
+}
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --staged)
+            STAGED=1
+            shift
+            ;;
+        --no-push)
+            NO_PUSH=1
+            shift
+            ;;
+        -h|--help)
+            usage
+            exit
+            ;;
+        -)
+            usage >&2
+            exit 1
+            ;;
+        *)
+            if [ -z "$GIT_DIR" ]; then
+                GIT_DIR="$1"
+                shift
+            else
+                usage >&2
+                echo 'error: unrecognized argument' >&2
+                exit 1
+            fi
+            ;;
+    esac
+done
+
+if [ -z "$GIT_DIR" ]; then
     if git status 2> /dev/null; then
         GIT_DIR='.'
     else
         echo ERROR: No git directory specified
         exit 1
     fi
-else
-    GIT_DIR="$1"
 fi
 
 cd "${GIT_DIR}"
@@ -32,5 +63,9 @@ fi
 
 branch=$(git rev-parse --abbrev-ref HEAD)
 if [ "$(git log origin/$branch..$branch | wc -l)" -gt 0 ]; then
-    git push
+    if [ -n "$NO_PUSH" ]; then
+        git push
+    else
+        echo 'warning: local changes exist, but push is disabled' >&2
+    fi
 fi

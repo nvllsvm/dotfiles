@@ -6,7 +6,7 @@ INSTALL_SYSTEM=
 NO_PUSH=
 case "$(git -C "$DOTFILES" remote get-url origin)" in
     https://*)
-        NO_PUSH=1
+        NO_PUSH='--no-push'
         ;;
 esac
 
@@ -27,7 +27,7 @@ while [ $# -gt 0 ]; do
             exit
             ;;
         --no-push)
-            NO_PUSH=1
+            NO_PUSH='--no-push'
             shift
             ;;
         -v)
@@ -80,11 +80,7 @@ update_non_user() {
 update_repo() {
     dotfiles_root="$2"
     printf "%bUpdating %s (%s)...%b\n" "$MAGENTA" "$1" "$dotfiles_root" "$RESET"
-    if [ -z "${NO_PUSH}" ]; then
-        git auto-update "$dotfiles_root"
-    elif [ -n "$(git -C "$dotfiles_root" status -s)" ]; then
-        printf "%b%bWarning: local changes exist, but git push is disabled%b\n" "$BOLD" "$RED" "$RESET"
-    fi
+    git auto-update $NO_PUSH "$dotfiles_root"
 
     if [ -n "$INSTALL_SYSTEM" ]; then
         printf "%bUpdating non-user files %s (%s)...%b\n" "$MAGENTA" "$1" "$dotfiles_root" "$RESET"
