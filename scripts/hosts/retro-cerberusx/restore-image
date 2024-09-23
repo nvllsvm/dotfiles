@@ -1,14 +1,64 @@
-#!/usr/bin/env sh
-case "$1" in
-	*.zst)
+#!/bin/sh
+set -e
+
+if [ $# -ne 3 ]; then
+    echo 'usage: (win98|winxp) PART_DEV IMG_ZST' >&2
+    exit 1
+fi
+
+OSTYPE="$1"
+PART_DEV="$2"
+IMG_ZST="$3"
+
+case "$IMG_ZST" in
+	*.img.zst)
 		;;
 	*)
-		exit 1
+        usage >&2
+        echo 'error: image must endwith .img.zst' >&2
+        exit 1
 esac
-case "$2" in
-	/dev/sda*)
-		;;
-	*)
-		exit 1
+
+if [ "$(lsblk -ndo type "$PART_DEV")" != 'part' ]; then
+    echo 'error: PART_DEV is not a partition' >&2
+    exit 1
+fi
+
+PARENT_DEV="/dev/$(lsblk -ndo pkname "$PART_DEV")"
+if [ "$(lsblk --nodeps -no type "$PARENT_DEV")" != 'disk' ]; then
+    echo 'error: cannot determine parent device' >&2
+    exit 1
+fi
+
+# partx is more likely to be up-to-date than lsblk
+# (ex. after modifying the partition table)
+PART_SIZE="$(partx --noheadings --output SIZE --bytes "$PART_DEV")"
+PART_NR="$(partx --noheadings --output NR "$PART_DEV")"
+
+restore_image() {
+    zstd -q -d --stdout "$IMG_ZST" | dd of="$PART_DEV" bs=4M status=progress
+}
+
+case "$OSTYPE" in
+    win98)
+        restore_image
+        fatresize -p --verbose -s $((PART_SIZE - 1)) "$PART_DEV"
+
+        # OOM with 512MB RAM
+        #fsck.fat -aw "$PART_DEV"
+
+        parted "$PARENT_DEV" type "$PART_NR" 0x0c
+        parted "$PARENT_DEV" set "$PART_NR" boot off
+        ;;
+    winxp)
+        restore_image
+        yes | ntfsresize -f -s "$PART_SIZE" "$PART_DEV"
+        ntfsfix -b -d "$PART_DEV"
+        parted "$PARENT_DEV" type "$PART_NR" 0x07
+        parted "$PARENT_DEV" set "$PART_NR" boot on
+        ;;
+    _)
+        echo 'error: must specify either fat32 or ntfs' >&2
+        exit 1
+        ;;
 esac
-zstd -q -d --stdout "$1" | dd of="$2" bs=4M status=progress
