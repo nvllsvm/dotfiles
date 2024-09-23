@@ -28,6 +28,23 @@ vim.o.relativenumber = true
 
 vim.o.mouse = "a"
 
+do
+    -- false so default uses base terminal colors.
+    -- true breaks base16 themes
+    local colorscheme = 'default'
+    vim.o.termguicolors = false
+    local base16_path = vim.fs.normalize('~/.base16_theme')
+    if vim.fn.filereadable(base16_path) then
+        local proc = vim.system({'readlink', base16_path})
+        if proc.code == 0 then
+            -- remove .sh suffix
+            vim.g.base16colorspace = 256
+            colorscheme = vim.fs.basename(proc.stdout, 0, -4)
+        end
+    end
+    vim.cmd.colorscheme(colorscheme)
+end
+
 vim.api.nvim_set_keymap("n", "<C-n>", ":set number!<CR>:set relativenumber!<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<C-c>", ":set cursorcolumn!<CR>", { noremap = true, silent = true })
 
@@ -52,11 +69,6 @@ let g:fzf_preview_window = ['right,50%,<70(hidden,right,50%)', 'ctrl-/']
 autocmd StdinReadPre * let s:std_in=1
 
 autocmd BufWritePost * call system("lmk")
-
-if !empty(glob("~/.base16_theme"))
-    let base16colorspace=256
-    execute "colorscheme " . system("basename $(readlink ~/.base16_theme) .sh")
-endif
 
 let g:markdown_enable_spell_checking = 0
 
