@@ -35,11 +35,12 @@ do
     vim.o.termguicolors = false
     local base16_path = vim.fs.normalize('~/.base16_theme')
     if vim.fn.filereadable(base16_path) then
-        local proc = vim.system({'readlink', base16_path})
+        local proc = vim.system({'readlink', base16_path}, { text = true }):wait()
+        print(proc.code)
         if proc.code == 0 then
             -- remove .sh suffix
             vim.g.base16colorspace = 256
-            colorscheme = vim.fs.basename(proc.stdout, 0, -4)
+            colorscheme = vim.fs.basename(string.sub(proc.stdout, 0, -5))
         end
     end
     vim.cmd.colorscheme(colorscheme)
