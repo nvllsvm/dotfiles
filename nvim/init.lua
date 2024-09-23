@@ -36,7 +36,6 @@ do
     local base16_path = vim.fs.normalize('~/.base16_theme')
     if vim.fn.filereadable(base16_path) then
         local proc = vim.system({'readlink', base16_path}, { text = true }):wait()
-        print(proc.code)
         if proc.code == 0 then
             -- remove .sh suffix
             vim.g.base16colorspace = 256
