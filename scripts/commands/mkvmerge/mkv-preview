@@ -2,6 +2,7 @@
 import asyncio
 import argparse
 import collections
+import datetime
 import json
 
 
@@ -85,6 +86,9 @@ async def main():
         }
         results[track['type']].append(track)
 
+    duration = metadata_mkvmerge['container']['properties'].get('duration')
+    if duration is not None:
+        print('duration', datetime.timedelta(milliseconds=duration / 1000000))
     title = metadata_mkvmerge['container']['properties'].get('title')
     if title is not None:
         print('title:', title.strip())
