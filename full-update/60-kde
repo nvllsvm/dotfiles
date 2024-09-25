@@ -91,7 +91,7 @@ def main():
     if HOSTNAME:
         source = DOTFILES / 'kde' / 'applications_host' / HOSTNAME
         target = LOCAL_SHARE / 'applications' / 'dotfiles-localhost'
-        if target:
+        if source.exists():
             copy_into_replace_contents(source, target)
         else:
             delete(target)
