@@ -1,6 +1,7 @@
 #!/usr/bin/env zsh
 if [ $# -ne 1 ]; then
     echo 'usage: SSH_HOST' >&2
+    exit 1
 fi
 SSH_HOST="$1"
 TITLE="tmux-${SSH_HOST}"
