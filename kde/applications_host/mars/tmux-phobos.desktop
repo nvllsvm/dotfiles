@@ -1,6 +1,0 @@
-[Desktop Entry]
-Name=tmux (phobos)
-Comment=tmux phobos
-Type=Application
-Icon=foot
-Exec=foot-ssh-tmux phobos

@@ -1,6 +1,0 @@
-[Desktop Entry]
-Name=tmux (sol)
-Comment=tmux sol
-Type=Application
-Icon=foot
-Exec=foot-ssh-tmux sol

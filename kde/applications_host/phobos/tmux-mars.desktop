@@ -1,6 +1,0 @@
-[Desktop Entry]
-Name=tmux (mars)
-Comment=tmux mars
-Type=Application
-Icon=foot
-Exec=foot-ssh-tmux mars
