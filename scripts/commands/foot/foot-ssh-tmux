@@ -1,0 +1,11 @@
+#!/usr/bin/env zsh
+if [ $# -ne 1 ]; then
+    echo 'usage: SSH_HOST' >&2
+fi
+SSH_HOST="$1"
+TITLE="tmux-${SSH_HOST}"
+foot \
+    --title "${TITLE}" \
+    --app-id  "${TITLE}" \
+    -- sh -c ". ~/.base16_theme; ssh -t ${SSH_HOST} -- zsh -lic tmux-attach" 2> /dev/null > /dev/null &
+disown

@@ -1,7 +1,6 @@
 #!/usr/bin/env sh
-DOLPHIN_PATH='/usr/share/applications/org.kde.dolphin.desktop'
-if [ -f "$DOLPHIN_PATH" ]; then
-    exec gio launch "$DOLPHIN_PATH" -- "$PWD"
+if command -v kioclient > /dev/null; then
+    exec kioclient exec -- "$PWD"
 else
     exit 1
 fi
