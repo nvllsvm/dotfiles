@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=tmux (retro-cerberusx)
+Comment=tmux retro-cerberusx
+Type=Application
+Icon=foot
+Exec=foot-ssh-tmux retro-cerberusx

@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=tmux (lounge-htpc)
+Comment=tmux lounge-htpc
+Type=Application
+Icon=foot
+Exec=foot-ssh-tmux lounge-htpc
