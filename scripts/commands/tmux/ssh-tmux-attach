@@ -3,4 +3,10 @@ if [ $# -ne 1 ]; then
     echo 'usage: SSH_HOST' >&2
 fi
 SSH_HOST="$1"
-exec ssh -t "${SSH_HOST}" -- systemd-inhibit --who='ssh-tmux-attach' --what=idle --mode=block zsh -lic tmux-attach
+case "$SSH_HOST" in
+    mars|phobos|lounge-htpc)
+        exec ssh -t "${SSH_HOST}" -- systemd-inhibit --who='ssh-tmux-attach' --what=idle --mode=block zsh -lic tmux-attach
+        ;;
+    *)
+        exec ssh -t "${SSH_HOST}" -- zsh -lic tmux-attach
+esac
