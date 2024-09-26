@@ -1,9 +1,16 @@
 #!/usr/bin/env zsh
-if [ $# -ne 1 ]; then
-    echo 'usage: SSH_HOST' >&2
-    exit 1
-fi
-SSH_HOST="$1"
+case $# in
+    0)
+        SSH_HOST="$(kdialog --inputbox '<b>foot-ssh-tmux</b>\nEnter hostname:')"
+        ;;
+    1)
+        SSH_HOST="$1"
+        ;;
+    *)
+        echo 'usage: SSH_HOST' >&2
+        exit 1
+        ;;
+esac
 TITLE="tmux-${SSH_HOST}"
 foot \
     --title "${TITLE}" \
