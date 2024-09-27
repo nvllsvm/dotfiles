@@ -77,6 +77,9 @@ else
         application/epub+zip)
             epubmeta -- "$1"
             ;;
+        application/vnd.microsoft.portable-executable)
+            exiftool -- "$1" || extract -l -- "$1"
+            ;;
         application/pdf|\
         image/gif|\
         image/x-canon-cr2|\
