@@ -1,38 +1,10 @@
 #!/usr/bin/env bash
 set -e
-
-uptime --pretty
-
-systemctl --user import-environment HOME PATH MAIL DOTFILES
-
-sudo zfs load-key storage/encrypted
-
-sudo systemctl start zfs-mount
-sudo systemctl start zfs-share.service
-sudo systemctl start zpool-check-health-storage.service
-sudo zpool status -v
-
-echo Starting Docker ...
-sudo systemctl enable --now docker
-sol-docker up -d
-
-echo Starting NFS binds ...
-sudo mount --bind ~ar /srv/nfs4/ar
-sudo mount --bind /storage /srv/nfs4/storage
-sudo mount --bind /mnt/frigate/media /srv/nfs4/frigate
-sudo systemctl restart nfs-server.service
-
-echo Starting systemd units ...
-systemctl --user enable --now git-repo-backup.timer
-systemctl --user enable --now gog-update.timer
-systemctl --user enable --now harmonize-library.timer
-systemctl --user enable --now mbsync.timer
-systemctl --user enable --now sol-fix-permissions.timer
-systemctl --user enable --now sol-update-check.timer
-systemctl --user enable --now sol-update-remotes.timer
-
-echo Starting podman ...
-podman system migrate || true
-
-echo Starting wireguard ...
-sudo wg-quick up sol
+echo Starting smb binds ...
+sudo mount --bind /storage/Audio    /srv/smb/storage/Audio
+sudo mount --bind /storage/Books    /srv/smb/storage/Books
+sudo mount --bind /storage/Games    /srv/smb/storage/Games
+sudo mount --bind /storage/Software /srv/smb/storage/Software
+sudo mount --bind /storage/Video    /srv/smb/storage/Video
+sudo mount --bind /storage/Public   /srv/smb/public
+sudo systemctl restart smb.service
