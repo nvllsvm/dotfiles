@@ -292,7 +292,7 @@ def determine_mime(path):
     # roughly 2.5x faster than using libmagic
     with open(path, 'rb') as f:
         start = f.read(12)
-        if start == b'\x89PNG\r\n\x1a\n':
+        if start[0:8] == b'\x89PNG\r\n\x1a\n':
             return 'image/png', {}
         elif start[0:3] == b'\xff\xd8\xff':
             return 'image/jpeg', {}
@@ -617,9 +617,9 @@ async def main_optim():
     mimetypes = set(_TYPE_TO_MIME[t] for t in (args.types or _DEFAULT_TYPES))
 
     executor = async_executor.AsyncExecutor(args.num_procs)
-    for f in all_files(*args.paths):
+    for file in all_files(*args.paths):
         try:
-            mimetype, options = determine_mime(f)
+            mimetype, options = determine_mime(file)
         except (FileNotFoundError, IsADirectoryError):
             # broken symlink can cause this
             continue
@@ -629,7 +629,7 @@ async def main_optim():
 
         if func := _MIME_OPTIM.get(mimetype):
             executor.submit(
-                _process_optim, func, f, fast=args.fast, strip=args.strip,
+                _process_optim, func, file, fast=args.fast, strip=args.strip,
                 **options)
 
     size_diff_printer = SizeDiffPrinter(num_items=len(executor))
