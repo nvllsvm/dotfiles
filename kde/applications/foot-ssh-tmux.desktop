@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=foot-ssh-tmux
+Comment=foot-ssh-tmux
+Type=Application
+Icon=foot
+Exec=foot-ssh-tmux

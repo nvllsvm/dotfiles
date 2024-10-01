@@ -1,6 +1,7 @@
 *
 !/.gitignore
 !/dotfiles-localhost
+!/foot-ssh-tmux.desktop
 !/maliit-breeze.desktop
 !/neovim-dotfiles.desktop
 !/tmux-scratchpad.desktop
