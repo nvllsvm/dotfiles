@@ -45,6 +45,7 @@ else
         application/x-7z-compressed|\
         application/x-ace|\
         application/x-bzip-compressed-tar|\
+        application/x-bzip2-compressed-tar|\
         application/x-cd-image|\
         application/x-compressed-tar|\
         application/x-dosexec|\
