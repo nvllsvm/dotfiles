@@ -125,6 +125,7 @@ EXPECTED_PACKAGES_DESKTOP = {
     'bitwig-studio',
     'chromium',
     'discord',
+    'docker',
     'docker-compose',
     'dolphin',
     'element-desktop',
@@ -347,9 +348,17 @@ if HOSTNAME in ('mars', 'phobos'):
         'cni-plugins',
         'fuse-overlayfs',
         'podman-compose',
-        'podman-docker',
         'slirp4netns',
     })
+
+    EXPECTED_PACKAGE_DEPENDENCIES.setdefault('docker', set())
+    EXPECTED_PACKAGE_DEPENDENCIES['docker'].update({
+        'btrfs-progs',
+        'docker-buildx',
+        'docker-scan',
+        'pigz',
+    })
+
     EXPECTED_GROUPS['ar'].update({
         'games',  # for proton to automatically set niceness
         'realtime',
