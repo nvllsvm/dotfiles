@@ -101,7 +101,8 @@ def main():
         else:
             delete(target)
 
-    subprocess.run(['update-desktop-database'], check=True)
+    if shutil.which('update-desktop-database'):
+        subprocess.run(['update-desktop-database'], check=True)
 
 
 if __name__ == '__main__':
