@@ -101,7 +101,7 @@ def main():
         else:
             delete(target)
 
-    if shutil.which('update-desktop-database'):
+    if HOSTNAME in ('mars', 'phobos'): 
         subprocess.run(['update-desktop-database'], check=True)
 
 
