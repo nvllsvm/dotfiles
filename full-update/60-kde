@@ -13,8 +13,9 @@ CONFIG = HOME / '.config'
 LOCAL_SHARE = HOME / '.local' / 'share'
 
 DOTFILES = pathlib.Path(os.environ['DOTFILES'])
-DOTFILES_PRIVATE = pathlib.Path(os.environ['DOTFILES_PRIVATE'])
 
+if DOTFILES_PRIVATE := os.environ.get('DOTFILES_PRIVATE', None):
+    DOTFILES_PRIVATE = pathlib.Path(DOTFILES_PRIVATE)
 
 LINKS = {
     CONFIG / 'kdesurc':
@@ -22,8 +23,6 @@ LINKS = {
     CONFIG / 'kuriikwsfilterrc':
         DOTFILES / 'kde' / 'kuriikwsfilterrc',
 
-    LOCAL_SHARE / 'kf6' / 'searchproviders':
-        DOTFILES_PRIVATE / 'kde' / 'searchproviders',
     LOCAL_SHARE / 'icons':
         DOTFILES / 'kde' / 'icons',
     LOCAL_SHARE / 'applications':
@@ -33,6 +32,12 @@ LINKS = {
     LOCAL_SHARE / 'color-schemes':
         DOTFILES / 'kde' / 'color-schemes',
 }
+
+if DOTFILES_PRIVATE is not None:
+    LINKS.update({
+        LOCAL_SHARE / 'kf6' / 'searchproviders':
+            DOTFILES_PRIVATE / 'kde' / 'searchproviders',
+    })
 
 
 match HOSTNAME:
