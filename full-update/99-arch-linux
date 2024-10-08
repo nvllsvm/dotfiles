@@ -67,6 +67,7 @@ EXPECTED_PACKAGES = {
     'openssh',
     'opus-tools',
     'oxipng',
+    'pacman-contrib',
     'pandoc-cli',
     'pbzip2',
     'perl-image-exiftool',

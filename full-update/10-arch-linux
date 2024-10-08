@@ -41,11 +41,13 @@ if command -v pkgfile > /dev/null; then
 fi
 
 # TODO create prune script which keeps n-number of old versions of a package
-log 'Pruning package cache'
-paccache \
-    --remove \
-    --keep 3 \
-    --min-mtime '30 days ago'
+if command -v paccache > /dev/null; then
+    log 'Pruning package cache'
+    paccache \
+        --remove \
+        --keep 3 \
+        --min-mtime '30 days ago'
+fi
 
 log 'Locating .pac* files'
 sudo find /etc -regextype posix-extended -regex ".+\.pac(new|save)" 2> /dev/null || true
