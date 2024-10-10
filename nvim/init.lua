@@ -14,9 +14,6 @@ vim.o.hidden = true
 vim.o.foldmethod = "syntax"
 vim.o.foldenable = false
 
--- true breaks base16
-vim.o.termguicolors = false
-
 -- case insensitive search
 vim.o.ignorecase = true
 
