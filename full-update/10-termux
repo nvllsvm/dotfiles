@@ -31,6 +31,9 @@ ln -sfT /storage/emulated/0/Syncthing/default/notes ~/notes
 ln -sfT /storage/emulated/0/Syncthing ~/syncthing
 ln -sfT /storage/emulated/0/Download ~/download
 
+# symlinking wont work 
+rsync -a --delete "${DOTFILES}/termux/shortcuts/" ~/.shortcuts
+
 yes | pkg upgrade
 yes | apt autoremove
 
