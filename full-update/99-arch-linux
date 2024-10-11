@@ -2,9 +2,12 @@
 import argparse
 import asyncio
 import grp
+import hashlib
 import pathlib
+import shutil
 import socket
 import subprocess
+import sys
 
 if not pathlib.Path('/etc/arch-release').is_file():
     exit()
@@ -341,6 +344,10 @@ EXPECTED_SERVICES = {
     'systemd-timesyncd.service',
 }
 
+EFI_SHELL_HOSTS = ('mars', 'phobos', 'lounge-htpc', 'sol')
+if HOSTNAME in EFI_SHELL_HOSTS:
+    EXPECTED_PACKAGES.add('edk2-shell')
+
 if HOSTNAME in ('mars', 'phobos'):
     EXPECTED_PACKAGE_DEPENDENCIES.setdefault('podman', set())
     EXPECTED_PACKAGE_DEPENDENCIES['podman'].update({
@@ -388,6 +395,27 @@ if HOSTNAME in ('mars', 'phobos', 'sol'):
     EXPECTED_SERVICES.update({
         'smb.service',
     })
+
+
+def sha256sum(path):
+    hasher = hashlib.sha256()
+    try:
+        with open(path, 'rb') as handle:
+            while data := handle.read(65536):
+                hasher.update(data)
+    except OSError:
+        print(f'error reading "{path}"', file=sys.stderr)
+        raise
+    return hasher.hexdigest()
+
+
+async def install_efi_shell():
+    source = pathlib.Path('/usr/share/edk2-shell/x64/Shell_Full.efi')
+    target = pathlib.Path('/boot/shellx64.efi')
+
+    if not target.exists() or sha256sum(source) != sha256sum(target):
+        print('Installing', target)
+        shutil.copyfile(source, target)
 
 
 async def ensure_using_systemd_resolved():
@@ -591,6 +619,8 @@ async def main():
         case 'root':
             if HOSTNAME in ('mars', 'phobos'):
                 await ensure_using_systemd_resolved()
+            if HOSTNAME in EFI_SHELL_HOSTS:
+                await install_efi_shell()
         case _:
             for mode in modes:
                 await run_mode(mode)
