@@ -2210,7 +2210,7 @@ async def _get_class(path):
         elif suffixes[-1] == '.ace':
             return unace
         elif suffixes[-1] == '.img':
-            return udisksctl
+            return cli_7zip
         # non-iso9660 ex. bluray
         elif suffixes[-1] == '.iso':
             return udisksctl

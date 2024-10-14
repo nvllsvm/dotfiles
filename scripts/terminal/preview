@@ -36,8 +36,9 @@ else
         application/gzip|\
         application/x-rpm|\
         application/java-archive|\
-        application/vnd.comicbook-rar|\
         application/vnd.comicbook+zip|\
+        application/vnd.comicbook-rar|\
+        application/vnd.efi.img|\
         application/vnd.efi.iso|\
         application/vnd.google-earth.kmz|\
         application/vnd.ms-cab-compressed|\
