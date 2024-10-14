@@ -18,6 +18,7 @@ PHOTO_EXT = {
     '.cr3',
     '.jpg',
     '.jpeg',
+    '.jxl',
     '.png'
 }
 
@@ -89,6 +90,7 @@ class SubprocessError(Exception):
 async def parse_date(path):
     try:
         dt = await exiv2.get_image_datetime(path)
+        print(dt)
         if dt:
             return dt
     except Exception as e:
