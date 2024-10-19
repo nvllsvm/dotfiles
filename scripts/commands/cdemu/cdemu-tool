@@ -185,21 +185,21 @@ async def main():
     subparsers = parser.add_subparsers(
         dest='command', metavar='COMMAND', required=True)
 
-    status_parser = subparsers.add_parser('status')
-    status_parser.set_defaults(func=_Parser.status)
-    status_parser.add_argument('--json', action='store_true')
-
-    load_parser = subparsers.add_parser('load')
+    load_parser = subparsers.add_parser('load', help='')
     load_parser.set_defaults(func=_Parser.load)
     load_parser.add_argument('file', type=pathlib.Path, nargs='+')
 
-    systemd_load_parser = subparsers.add_parser('systemd-load')
-    systemd_load_parser.set_defaults(func=_Parser.systemd_load)
-    systemd_load_parser.add_argument('file', type=pathlib.Path, nargs='+')
-
-    remove_parser = subparsers.add_parser('remove')
+    remove_parser = subparsers.add_parser('remove', help='')
     remove_parser.set_defaults(func=_Parser.remove)
     remove_parser.add_argument('device')
+
+    status_parser = subparsers.add_parser('status', help='')
+    status_parser.set_defaults(func=_Parser.status)
+    status_parser.add_argument('--json', action='store_true')
+
+    systemd_load_parser = subparsers.add_parser('systemd-load', help='')
+    systemd_load_parser.set_defaults(func=_Parser.systemd_load)
+    systemd_load_parser.add_argument('file', type=pathlib.Path, nargs='+')
 
     args = parser.parse_args()
 
