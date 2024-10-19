@@ -278,19 +278,22 @@ def main():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest='command', metavar='COMMAND', required=True)
 
-    update_parser = subparsers.add_parser('update')
-
-    add_parser = subparsers.add_parser('add')
+    add_parser = subparsers.add_parser('add', help='')
     add_parser.add_argument('package', nargs='+')
 
-    remove_parser = subparsers.add_parser('remove')
+    list_parser = subparsers.add_parser('list', help='')
+    prune_parser = subparsers.add_parser('prune', help='')
+
+    remove_parser = subparsers.add_parser('remove', help='')
     remove_parser.add_argument('package', nargs='+')
 
-    prune_parser = subparsers.add_parser('prune')
-    list_parser = subparsers.add_parser('list')
-    sync_parser = subparsers.add_parser('sync')
-    sign_parser = subparsers.add_parser('sign')
+    sign_parser = subparsers.add_parser('sign', help='')
     sign_parser.add_argument('--all', action='store_true')
+
+    sync_parser = subparsers.add_parser('sync', help='')
+
+    update_parser = subparsers.add_parser('update', help='')
+
     args = parser.parse_args()
 
     match args.command:
