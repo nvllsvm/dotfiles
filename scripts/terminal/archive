@@ -1461,14 +1461,16 @@ class unace:
 
     @staticmethod
     async def contents(path):
-        proc = subprocess.run(
-            ['unace', 'l', path],
-            stdout=subprocess.PIPE,
-            check=True)
+        proc = await asyncio.create_subprocess_exec(
+            'unace', 'l', path,
+            stdout=asyncio.subprocess.PIPE)
+        stdout, _ = await proc.communicate()
+        if proc.returncode:
+            raise ProcessError(proc)
 
         magic_string = b'Date    Time     Packed      Size  Ratio  File'
         lines = None
-        for line in proc.stdout.splitlines():
+        for line in stdout.splitlines():
             line = line.strip()
             if lines is not None:
                 lines.append(line)
@@ -1499,7 +1501,12 @@ class unace:
         if not dest.endswith('/'):
             dest += '/'
         args.extend([path, dest])
-        subprocess.run(args, check=True)
+        proc = await asyncio.create_subprocess_exec(
+            *args,
+            stdout=asyncio.subprocess.DEVNULL)
+        await proc.wait()
+        if proc.returncode:
+            raise ProcessError(proc)
 
     @staticmethod
     async def volumes(path, password=''):
