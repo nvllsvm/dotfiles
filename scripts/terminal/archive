@@ -1212,15 +1212,17 @@ class xorriso:
 
     @staticmethod
     async def contents(path):
-        proc = subprocess.run(
-            ['xorriso', '-osirrox', 'on', '-indev', path,
-             '-find', '/', '-exec', 'lsdl'],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
-            check=True)
+        proc = await asyncio.create_subprocess_exec(
+            'xorriso', '-osirrox', 'on', '-indev', path,
+            '-find', '/', '-exec', 'lsdl',
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.DEVNULL)
+        stdout, _ = await proc.communicate()
+        if proc.returncode:
+            raise ProcessError(proc)
 
         parents = {}
-        for line in proc.stdout.splitlines():
+        for line in stdout.splitlines():
             name = line.split(b"'", maxsplit=1)[-1][:-1]\
                 .decode()\
                 .strip()\
@@ -1248,12 +1250,14 @@ class xorriso:
             raise NotImplementedError
         if overwrite:
             raise NotImplementedError
-        subprocess.run(
-            ['xorriso', '-osirrox', 'on', '-indev', path,
-             '-chmod_r', 'u+rw', '/', '--', '-extract', '/', dest,
-             '-rollback_end'],
-            stderr=subprocess.DEVNULL,
-            check=True)
+        proc = await asyncio.create_subprocess_exec(
+            'xorriso', '-osirrox', 'on', '-indev', path,
+            '-chmod_r', 'u+rw', '/', '--', '-extract', '/', dest,
+            '-rollback_end',
+            stderr=subprocess.DEVNULL)
+        await proc.wait()
+        if proc.returncode:
+            raise ProcessError(proc)
 
     @staticmethod
     async def volumes(path, password=''):
