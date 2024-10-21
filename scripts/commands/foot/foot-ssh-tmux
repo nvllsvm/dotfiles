@@ -11,7 +11,7 @@ case $# in
         exit 1
         ;;
 esac
-TITLE="ssh-tmux - ${SSH_HOST}"
+TITLE="${SSH_HOST} - ssh-tmux"
 foot \
     --title "${TITLE}" \
     --app-id  "${TITLE}" \
