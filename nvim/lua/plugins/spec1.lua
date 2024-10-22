@@ -13,7 +13,6 @@ return {
   {"hrsh7th/cmp-nvim-lsp"},
   {"hrsh7th/cmp-path"},
   {"hrsh7th/nvim-cmp"},
-  {"neomake/neomake"},
   {"neovim/nvim-lspconfig"},
 
   {"Vimjas/vim-python-pep8-indent"},
