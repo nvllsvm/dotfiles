@@ -352,7 +352,12 @@ async def create_tar_xz(path, dest, fast=False):
     assert tar_proc.returncode == 0
 
 
-async def create_tar_zstd(path, dest, fast=False):
+async def create_sparse_tar_zstd(*args, **kwargs):
+    # TODO add --sparse option to this script
+    return await create_tar_zstd(*args, sparse=True, **kwargs)
+
+
+async def create_tar_zstd(path, dest, fast=False, sparse=False):
     if path.is_dir():
         cwd = path
         paths = _all_paths(path)
@@ -364,9 +369,13 @@ async def create_tar_zstd(path, dest, fast=False):
 
     read, write = os.pipe()
 
+    args = []
+    if sparse:
+        args.append('--sparse')
+
     tar_proc = await asyncio.create_subprocess_exec(
         'tar', 'cf', '-', '-C', cwd, '--no-recursion',
-        '--verbatim-files-from', '--null', '-T', '-',
+        *args, '--verbatim-files-from', '--null', '-T', '-',
         stdin=asyncio.subprocess.PIPE,
         stdout=write)
     os.close(write)
@@ -471,6 +480,10 @@ _FORMATS = {
         'func': create_zstd,
         'suffix': '.zst'
     },
+    'sparse:tar.zst': {
+        'func': create_sparse_tar_zstd,
+        'suffix': '.tar.zst'
+    }
 }
 
 
