@@ -45,6 +45,7 @@ EXPECTED_PACKAGES = {
     'gifsicle',
     'git',
     'git-lfs',
+    'guestfs-tools',
     'htop',
     'hugo',
     'hyperfine',
