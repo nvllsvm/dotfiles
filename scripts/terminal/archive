@@ -2388,6 +2388,9 @@ async def extract_main():
         '-l', '--list', action='store_true',
         help='list contents')
     parser.add_argument(
+        '--volumes', action='store_true',
+        help='list volumes')
+    parser.add_argument(
         '-f', '--force', action='store_true',
         help='overwrite existing files/directories')
     parser.add_argument(
@@ -2449,6 +2452,11 @@ async def extract_main():
                 LOGGER.exception(e)
                 error_paths.append(path)
                 continue
+            if args.volumes and volumes:
+                sys.stdout.buffer.write(b'\n'.join(sorted(str(v).encode() for v in volumes)) + b'\n')
+                sys.stdout.buffer.flush()
+                continue
+
             all_volumes.update(volumes)
             task = executor.submit(
                 process_archive, cls, volumes, path, paths, password, args)
