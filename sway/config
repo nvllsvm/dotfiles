@@ -7,5 +7,5 @@ bindsym XF86AudioLowerVolume exec --no-startup-id systemd-cat -t lounge-htpc-cli
 bindsym XF86AudioRaiseVolume exec --no-startup-id systemd-cat -t lounge-htpc-cli lounge-htpc-cli volume-up
 bindsym Menu exec --no-startup-id systemd-cat -t lounge-htpc-cli lounge-htpc-cli power-toggle
 exec systemd-cat -t jellyfinmediaplayer start-jellyfinmediaplayer
-exec systemd-cat -t wlsunset wlsunset -t 4000 -T 4001
+#exec systemd-cat -t wlsunset wlsunset -t 4000 -T 4001
 #exec systemd-cat -t firefox firefox
