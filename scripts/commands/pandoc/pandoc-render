@@ -20,7 +20,7 @@ fi
 
 pandoc \
     --from "${pandoc_format}+rebase_relative_paths" \
-    --to html \
+    --to html5 \
     -c "${DOTFILES}"/pandoc/css/github-markdown.css \
     --embed-resources \
     --standalone \
