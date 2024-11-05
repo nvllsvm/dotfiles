@@ -597,6 +597,11 @@ async def main_convert():
             print(f'error: {e}', file=sys.stderr)
             continue
         print(source, '->', dest)
+        try:
+            if args.rm:
+                source.unlink()
+        except FileNotFoundError:
+            pass
 
 
 async def main_optim():
