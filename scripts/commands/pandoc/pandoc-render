@@ -19,10 +19,10 @@ else
 fi
 
 pandoc \
-    --from "${pandoc_format}" \
+    --from "${pandoc_format}+rebase_relative_paths" \
     --to html \
     -c "${DOTFILES}"/pandoc/css/github-markdown.css \
-    --self-contained \
+    --embed-resources \
     --standalone \
     --columns=10000 \
     "$@"
