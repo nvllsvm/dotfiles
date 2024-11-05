@@ -403,11 +403,24 @@ _SUPPORTED_CONVERT_SUFFIXES = {
 
 
 async def _process_convert(path, source_mimetype, target_mimetype):
-    dest = path.parent / (path.stem or path.name)
-    suffixes = _MIME_SUFFIXES[target_mimetype]
-    if dest.suffix.lower() not in suffixes:
-        dest = dest.with_name(dest.stem + suffixes[0])
+    source_suffixes = _MIME_SUFFIXES[source_mimetype]
+    name = path.name
+    for suffix in source_suffixes:
+        if name.lower().endswith(suffix):
+            name = name.removesuffix(suffix)
+            break
 
+    target_suffixes = _MIME_SUFFIXES[target_mimetype]
+    has_proper_suffix = False
+    for suffix in target_suffixes:
+        if name.lower().endswith(suffix):
+            has_proper_suffix = True
+            break
+
+    if not has_proper_suffix:
+        name = name + target_suffixes[0]
+
+    dest = path.parent / name
     with contextlib.ExitStack() as stack:
         temp_path = stack.enter_context(TempPath(
             dir=path.parent, prefix='.imgconvert_', suffix=path.name + '.tmp'))
