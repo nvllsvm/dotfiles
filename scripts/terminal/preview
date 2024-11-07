@@ -97,8 +97,9 @@ else
         image/tiff)
             tiffinfo -- "$1"
             ;;
-        image/x-portable-pixmap)
-            identify -- "$1"
+        image/x-portable-pixmap|\
+        image/vnd.microsoft.icon)
+            identify -- "$1" | awk '{$1=""; print}' | sed 's/^ //'
             ;;
         image/*)
             #chafa -f sixel -s "$2x$3" --animate off --polite on "$1"
