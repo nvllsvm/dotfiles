@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+import argparse
+import collections
+import pathlib
+
+
+def all_files(root):
+    stack = [root]
+    files = set()
+    while stack:
+        for path in stack.pop().iterdir():
+            if path.is_dir():
+                stack.append(path)
+            else:
+                files.add(path)
+    return files
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-s', '--case-sensitive', action='store_true')
+    parser.add_argument('path', type=pathlib.Path, nargs='+')
+    args = parser.parse_args()
+
+    files = set()
+    for path in set(args.path or (pathlib.Path(), )):
+        files.update(all_files(path))
+
+    suffix_count = collections.Counter()
+    for path in files:
+        suffix = path.suffix
+        if not suffix:
+            continue
+        if not args.case_sensitive:
+            suffix = suffix.lower()
+        if not suffix:
+            print(path)
+        suffix_count[suffix] += 1
+
+    for suffix, count in sorted(suffix_count.items(), key=lambda x: x[1]):
+        print(count, suffix)
+
+
+
+
+
+if __name__ == '__main__':
+    main()
