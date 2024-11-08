@@ -79,7 +79,8 @@ else
         application/epub+zip)
             epubmeta -- "$1"
             ;;
-        application/vnd.microsoft.portable-executable)
+        application/vnd.microsoft.portable-executable|\
+        application/x-msdownload)
             exiftool -- "$1" || extract -l -- "$1"
             ;;
         application/pdf|\
