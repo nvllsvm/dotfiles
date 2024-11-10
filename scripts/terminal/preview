@@ -6,6 +6,13 @@ default_preview() {
     bat -r :1024 --color=always --plain -- "$1"
 }
 
+identify_without_filename() {
+    magick identify \
+        -quiet \
+        -format 'File name       : %m\nResolution      : %wx%h\nColorspace      : %[colorspace]\nBit-depth       : %z\n' \
+        -- "$1"
+}
+
 if [ $# -eq 0 ]; then
     echo 'error: missing argument' >&2
     exit 1
@@ -100,11 +107,17 @@ else
             ;;
         image/x-portable-pixmap|\
         image/vnd.microsoft.icon)
-            identify -- "$1" | awk '{$1=""; print}' | sed 's/^ //'
+            identify_without_filename "$1"
             ;;
         image/*)
             #chafa -f sixel -s "$2x$3" --animate off --polite on "$1"
-            exiv2 "$1" || true
+            identify_without_filename "$1"
+            exiv2 "$1" 2> /dev/null | grep -v \
+                -e '^File name       : ' \
+                -e '^Image size      : ' \
+                -e '^File size       : ' \
+                -e '^MIME type       : ' \
+                || true
             ;;
         application/octet-stream)
             case "$(printf %s "$1" | tr '[:upper:]' '[:lower:]')" in
