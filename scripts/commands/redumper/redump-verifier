@@ -94,6 +94,7 @@ class Redump:
         LOGGER.info('Updating .dat files')
         systems_dict = {}
         systems = [
+            'cdi',      # CD-i
             'dc',       # dreamcast
             'gc',       # gamecube
             'mac',      # macintosh
@@ -267,7 +268,10 @@ async def process_path(redump, path, args):
                         has_cue = True
     if has_iso or (has_cue and has_bin):
         if name and system:
-            target = path.with_name(f'redump_{system} {name}{suffix}')
+            name = f'{name}{suffix}'
+            if not args.no_prefix:
+                name = f'redump_{system} {name}'
+            target = path.with_name(name)
 
             if path == target:
                 LOGGER.info('✅ validated')
@@ -298,6 +302,7 @@ async def main():
     parser.add_argument('--rename', action='store_true')
     parser.add_argument('--update', action='store_true')
     parser.add_argument('--verbose', action='store_true')
+    parser.add_argument('--no-prefix', action='store_true')
     parser.add_argument('path', type=pathlib.Path, nargs='*')
     args = parser.parse_args()
 
