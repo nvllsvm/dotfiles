@@ -4,8 +4,6 @@ tone-mapping=reinhard
 force-window=immediate
 audio-channels=stereo
 
-profile=high-quality
-video-sync=display-resample
 interpolation
 [deinterlace]
 profile-cond=p["video-frame-info/interlaced"]
