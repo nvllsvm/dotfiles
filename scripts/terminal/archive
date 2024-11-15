@@ -1501,21 +1501,32 @@ class unace:
             if line
         ))
 
-    @staticmethod
-    async def extract(path, dest, paths=None, password=None, overwrite=False):
+    @classmethod
+    async def extract(cls, path, dest, paths=None, password=None, overwrite=False):
         if paths:
             raise NotImplementedError
-        args = ['unace', 'e']
+        args = ['unace', 'x']
         if overwrite:
             args.append('-o')
         if password:
             raise NotImplementedError
         dest = str(dest)
+
+        # I might be overly cautious here, but unace's help
+        # makes describes the `x` command as "Extract with full-path".
+        # The c command will not exctract relative sub folders.
+        for c in await cls.contents(path):
+            if c.startswith(b'/'):
+                raise NotImplementedError
+            elif b'..' in c:
+                raise NotImplementedError
+
         if not dest.endswith('/'):
             dest += '/'
         args.extend([path, dest])
         proc = await asyncio.create_subprocess_exec(
             *args,
+            cwd=dest,  # only way to specify dest dir
             stdout=asyncio.subprocess.DEVNULL)
         await proc.wait()
         if proc.returncode:
