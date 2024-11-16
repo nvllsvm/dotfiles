@@ -2096,7 +2096,7 @@ async def _get_class(path):
     suffixes = [suffix.lower() for suffix in path.suffixes]
 
     with open(path, 'rb') as f:
-        start = f.read(10)
+        start = f.read(16)
 
         # tar
         if start.startswith(b'ustar\x0000'):
@@ -2209,6 +2209,9 @@ async def _get_class(path):
             if f.read(58) == b'# with modifications for mojosetup and GOG.com installer.\n':  # noqa: E501
                 return gog_linux
 
+        elif start[7:14] == b'**ACE**':
+            return unace
+
         # iso9660
         f.seek(32769)
         if f.read(5) == b'CD001':
@@ -2231,9 +2234,6 @@ async def _get_class(path):
         # ffs - brotli doesn't have a file signature
         if suffixes[-1] == '.br':
             return brotli
-        # unable to find magic number
-        elif suffixes[-1] == '.ace':
-            return unace
         elif suffixes[-1] == '.img':
             return cli_7zip
         # non-iso9660 ex. bluray
