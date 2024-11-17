@@ -52,6 +52,7 @@ EXPECTED_PACKAGES = {
     'iftop',
     'innoextract',
     'iperf3',
+    'ipython',
     'jpegoptim',
     'jq',
     'ledger',

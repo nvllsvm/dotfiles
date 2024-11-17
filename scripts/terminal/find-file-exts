@@ -19,6 +19,7 @@ def all_files(root):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-s', '--case-sensitive', action='store_true')
+    parser.add_argument('-c', '--count', action='store_true')
     parser.add_argument('path', type=pathlib.Path, nargs='+')
     args = parser.parse_args()
 
@@ -37,11 +38,12 @@ def main():
             print(path)
         suffix_count[suffix] += 1
 
-    for suffix, count in sorted(suffix_count.items(), key=lambda x: x[1]):
-        print(count, suffix)
-
-
-
+    if args.count:
+        for suffix, count in sorted(suffix_count.items(), key=lambda x: x[1]):
+            print(count, suffix)
+    else:
+        for suffix in sorted(suffix_count):
+            print(suffix)
 
 
 if __name__ == '__main__':

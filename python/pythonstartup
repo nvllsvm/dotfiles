@@ -223,6 +223,10 @@ def cbcopy(data):
         check=True)
 
 
+def read_json(path):
+    return json.loads(pathlib.Path(path).read_text())
+
+
 def cbpaste():
     proc = subprocess.run(
         ['cbpaste'],

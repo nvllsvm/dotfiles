@@ -394,11 +394,6 @@ _SUPPORTED_CONVERT_SUFFIXES = {
         'image/png',
         'image/ppm',
     ],
-    'image/jxl': [
-        'image/jpeg',
-        'image/png',
-        'image/ppm',
-    ],
 }
 
 
@@ -611,7 +606,7 @@ async def main_convert():
             continue
         print(source, '->', dest)
         try:
-            if args.rm:
+            if args.rm and source != dest:
                 source.unlink()
         except FileNotFoundError:
             pass

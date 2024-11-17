@@ -135,7 +135,8 @@ def main():
             'md5':  hashes['md5'],
             'crc32':  hashes['crc32'],
         }
-        if args.archive_contents and path.name.endswith('.tar.zst'):
+        if args.archive_contents \
+                and path.name.lower().endswith(('.7z', '.tar.zst')):
             with tempfile.TemporaryDirectory() as tmp:
                 extract(path, tmp)
                 data['archive_contents'] = file_hash_recorder(tmp)
