@@ -1,31 +1,4 @@
-#!/usr/bin/env sh
-export PYTHONSTARTUP="$DOTFILES/python/pythonstartup"
-case $# in
-    0)
-        exec python3 -q "$@"
-        ;;
-    1)
-        DATA="$(cat "$PYTHONSTARTUP")"
-        COMMANDS="$(printf %s "$1" | base64)"
-        python3 << EOF
-$DATA
-command = base64.b64decode('$COMMANDS').decode()
-try:
-    compiled = compile(command, '<string>', 'eval')
-    func = eval
-except SyntaxError:
-    compiled = compile(command, '<string>', 'exec')
-    func = exec
+#!/usr/bin/env python3
+import IPython
 
-ret = func(compiled)
-if ret is not None:
-    if isinstance(ret, bytes):
-        sys.stdout.buffer.write(ret)
-    else:
-        print(ret, end='')
-EOF
-        ;;
-    *)
-        echo 'error: unexpected arguments' >&2
-        exit 1
-esac
+IPython.embed()
