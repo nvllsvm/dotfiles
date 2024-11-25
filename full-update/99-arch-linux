@@ -218,6 +218,7 @@ EXPECTED_PACKAGE_DEPENDENCIES = {
         'polkit',
         'udftools',
         'xfsprogs',
+        'xorg-xhost',
     },
     'libvirt': {
         'dmidecode',
