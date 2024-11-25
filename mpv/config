@@ -3,6 +3,7 @@ sub-scale=0.7
 tone-mapping=reinhard
 force-window=immediate
 audio-channels=stereo
+screenshot-format=png
 
 interpolation
 [deinterlace]
