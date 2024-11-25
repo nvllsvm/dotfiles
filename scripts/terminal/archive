@@ -238,6 +238,14 @@ async def create_rvz(path, dest, fast=False):
         raise NotImplementedError
 
 
+async def create_iso(path, dest, fast=False):
+    proc = await asyncio.create_subprocess_exec(
+        'mkisofs', '-o', dest, path)
+    await proc.wait()
+    if proc.returncode:
+        raise ProcessError(proc)
+
+
 async def create_nsz(path, dest, fast=False):
     if path.is_dir():
         raise RuntimeError
@@ -438,6 +446,10 @@ _FORMATS = {
     'epub': {
         'func': create_epub,
         'suffix': '.epub',
+    },
+    'iso': {
+        'func': create_iso,
+        'suffix': '.iso',
     },
     'gz': {
         'func': create_gzip,
