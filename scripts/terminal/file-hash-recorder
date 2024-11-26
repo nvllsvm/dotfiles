@@ -105,11 +105,12 @@ def main():
         has_error = False
         for path in tqdm.tqdm(results):
             info = results[path]
-            hashes = multi_hash(path)
-            if path.exists():
+            path = pathlib.Path(path)
+            if not path.exists():
                 has_error = True
                 print('File not found:', path, file=sys.stderr)
                 continue
+            hashes = multi_hash(path)
             for hash_type, hash_value in hashes.items():
                 if hash_value != info[hash_type]:
                     has_error = True
