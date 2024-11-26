@@ -1,0 +1,16 @@
+#compdef file-hash-recorder
+typeset -A opt_args
+
+_file-hash-recorder() {
+
+  _arguments \
+    '(-h --help)'{-h,--help}'[show this help message and exit]' \
+    '-o=[output json file]: :_files' \
+    '--no-progress' \
+    '--absolute-paths' \
+    '--archive-contents' \
+    '--show-dupes' \
+    '*:: :_files'
+
+}
+_file-hash-recorder
