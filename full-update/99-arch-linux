@@ -151,6 +151,7 @@ EXPECTED_PACKAGES_DESKTOP = {
     'krita',
     'mangohud',
     'mkvtoolnix-gui',
+    'mtpfs',
     'noto-fonts',
     'noto-fonts-cjk',
     'noto-fonts-emoji',
