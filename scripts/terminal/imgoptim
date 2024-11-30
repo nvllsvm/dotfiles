@@ -280,6 +280,7 @@ _MIME_SUFFIXES = {
     'image/png': ('.png',),
     'image/x-portable-pixmap': ('.ppm',),
     'image/tiff': ('.tiff',),
+    'image/webp': ('.webp',),
 }
 
 # tiff support is experimental
@@ -313,6 +314,11 @@ def determine_mime(path):
             return 'image/svg+xml', {}
         elif start[0:12] == b'\x00\x00\x00\x0c\x4a\x58\x4c\x20\x0d\x0a\x87\x0a':
             return 'image/jxl', {}
+
+        # start[4:8] contains the file size
+        elif start[0:4] == b'RIFF' and start[8:12] == b'WEBP':
+            return 'image/webp', {}
+
         elif start[0:2] == b'\xff\x0a':
             return 'image/jxl', {}
         elif path.suffix.lower() == '.svg':
@@ -334,11 +340,30 @@ async def convert_to_jpeg(source, dest):
     if proc.returncode != 0:
         raise ProcessError(proc)
 
+    data = await asyncio.to_thread(
+            mozjpeg_lossless_optimization.optimize, dest.read_bytes())
+    dest.write_bytes(data)
+
 
 async def convert_to_ppm(source, dest):
     args = [
         'vips',
         'ppmsave',
+        '--',
+        source,
+        dest,
+    ]
+    proc = await asyncio.create_subprocess_exec(*args)
+    await proc.wait()
+    if proc.returncode != 0:
+        raise ProcessError(proc)
+
+
+async def convert_to_png(source, dest):
+    args = [
+        'vips',
+        'pngsave',
+        '--compression=0',
         '--',
         source,
         dest,
@@ -427,7 +452,12 @@ async def _process_convert(path, source_mimetype, target_mimetype):
                 await convert_to_jxl(path, temp_path)
                 temp_path.rename(dest)
             case 'image/jpeg':
-                await convert_to_jpeg(path, temp_path)
+                source_path = path
+                if source_mimetype == 'image/webp':
+                    source_path = stack.enter_context(TempPath(
+                        dir=path.parent, prefix='.imgconvert_', suffix=path.name + '.tmp'))
+                    await convert_to_ppm(path, source_path)
+                await convert_to_jpeg(source_path, temp_path)
                 temp_path.rename(dest)
             case _:
                 raise RuntimeError('invalid target_type')
