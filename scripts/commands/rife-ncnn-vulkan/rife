@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+import argparse
+import asyncio
+import pathlib
+
+DEFAULT_MODEL = 'rife-HD'
+
+
+async def rife_ncnn_vulkan(input_path, output_path, time_step=0.5):
+    proc = await asyncio.create_subprocess_exec(
+        '/usr/share/rife-ncnn-vulkan/rife-ncnn-vulkan',
+        '-vv',
+        '-m', DEFAULT_MODEL,
+        '-i', input_path,
+        '-o', output_path,
+        '-x',
+        '-z',
+        '-u',
+    )
+    await proc.communicate()
+    if proc.returncode:
+        raise ProcessError(proc)
+
+
+class ProcessError(Exception):
+    def __init__(self, process, message=None):
+        self.process = process
+        self.message = message
+
+    def __str__(self):
+        proc = self.process
+
+        text = f'exit {proc.returncode}'
+        if self.message is not None:
+            text = f'{text} - {self.message}'
+
+        try:
+            args = proc._transport._extra['subprocess'].args
+        except (AttributeError, KeyError):
+            pass
+        else:
+            text = f'{text}: {args}'
+        return text
+
+
+
+async def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-m', '--model-path', type=pathlib.Path,
+                        default=DEFAULT_MODEL)
+    parser.add_argument('-s', '--time-step', default=0.5, type=float)
+    parser.add_argument('input', type=pathlib.Path)
+    parser.add_argument('output', type=pathlib.Path)
+    args = parser.parse_args()
+
+    await rife_ncnn_vulkan(args.input, args.output, args.time_step)
+
+
+if __name__ == '__main__':
+    asyncio.run(main())
