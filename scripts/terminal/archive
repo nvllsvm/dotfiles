@@ -2,9 +2,11 @@
 import argparse
 import asyncio
 import contextlib
+import datetime
 import functools
 import getpass
 import io
+import json
 import logging
 import os
 import pathlib
@@ -731,10 +733,10 @@ class cli_7zip:
             args.append('-aoa')  # overwrite all without prompting
 
         if dest == sys.stdout.buffer:
-            args.extend(['e', f'-p{password}', '-so', '--', str(path)])
+            args.extend(['e', f'-p{password}', '-spd', '-so', '--', str(path)])
         else:
             args.extend([
-                'x', f'-p{password}', '-spe', f'-o{dest}', '--', str(path)
+                'x', f'-p{password}', '-spe', '-spd', f'-o{dest}', '--', str(path)
             ])
             # supress output that shows even at the quiest log level
             kwargs['stdout'] = asyncio.subprocess.DEVNULL
@@ -749,7 +751,8 @@ class cli_7zip:
 
     @classmethod
     async def contents(cls, path):
-        args = [cls._path(), '-ba', 'l', '--', str(path)]
+        # -ba flag removes table and header formatting
+        args = [cls._path(), '-ba', 'l', '-slt', '--', str(path)]
         proc = await asyncio.create_subprocess_exec(
             *args, stdout=asyncio.subprocess.PIPE)
         stdout, _ = await proc.communicate()
@@ -757,15 +760,43 @@ class cli_7zip:
             raise ProcessError(proc)
 
         contents = []
+        current = {}
         for line in stdout.splitlines():
-            # - date+time may be blank
-            # - size may be blank
-            attrs = line[20:25]
-            name = line[53:]
-            if attrs == b'D....':
-                name += b'/'
-            contents.append(name)
-        return contents
+            if not line:
+                if current:
+                    contents.append(current)
+                    current = {}
+                continue
+            key, value = line.split(b' = ', maxsplit=1)
+            key = key.decode()
+            if key in current:
+                raise RuntimeError
+            match key:
+                case 'Path':
+                    current['path'] = value
+                case 'Attributes':
+                    current['is_dir'] = value.split()[0] == b'D'
+                case 'Size':
+                    current['size'] = int(value)
+                case 'Modified':
+                    dt, dt_frac = value.decode().split('.')
+                    # ns not supported by datetime
+                    current['mtime'] = float('{}.{}'.format(
+                        int(datetime.datetime\
+                            .strptime(dt, '%Y-%m-%d %H:%M:%S')\
+                            .timestamp()),
+                        int(dt_frac)))
+                case _:
+                    pass
+        if current:
+            contents.append(current)
+
+        new_contents = {}
+        for c in contents:
+            if c.pop('is_dir'):
+                continue
+            new_contents[c.pop('path')] = c
+        return new_contents
 
     @classmethod
     async def volumes(cls, path, password=''):
@@ -2399,6 +2430,22 @@ async def process_archive(cls, volumes, path, paths, password, args):
                 path.unlink()
 
 
+def pretty_json(data):
+    """
+    Return a pretty JSON string
+
+    The resulting string is valid JSON - both indented and sorted.
+
+    :param data: Python data object
+    """
+    return json.dumps(
+        data,
+        indent=2,
+        sort_keys=True,
+        ensure_ascii=False
+    )
+
+
 async def extract_main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -2413,6 +2460,9 @@ async def extract_main():
     parser.add_argument(
         '-l', '--list', action='store_true',
         help='list contents')
+    parser.add_argument(
+        '--json', action='store_true',
+        help='output as json')
     parser.add_argument(
         '--volumes', action='store_true',
         help='list volumes')
@@ -2466,11 +2516,20 @@ async def extract_main():
         LOGGER.debug('Using %s for %s', cls, path)
         cls.check()
         if args.list:
-            contents = format_contents(await cls.contents(path))
+            contents = await cls.contents(path)
+            if args.json:
+                if isinstance(contents, list):
+                    contents = {k: {} for k in contents}
+                print(pretty_json({
+                    k.decode(): v
+                    for k, v in contents.items()
+                }))
+            else:
+                contents = format_contents(contents)
 
-            # avoid errors with non-unicode file names
-            sys.stdout.buffer.write(b'\n'.join(contents) + b'\n')
-            sys.stdout.buffer.flush()
+                # avoid errors with non-unicode file names
+                sys.stdout.buffer.write(b'\n'.join(contents) + b'\n')
+                sys.stdout.buffer.flush()
         else:
             try:
                 volumes = await cls.volumes(path, password)
