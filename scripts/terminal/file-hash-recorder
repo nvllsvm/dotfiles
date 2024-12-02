@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 import argparse
+import asyncio
 import hashlib
 import json
 import pathlib
-import subprocess
 import sys
 import tempfile
 import zlib
 
 import tqdm
+
+
+BUFFER_SIZE = 16 * 1024 * 1024
 
 
 def all_files(root):
@@ -23,23 +26,34 @@ def all_files(root):
     return files
 
 
-def multi_hash(path):
-    checksum_crc32 = 0
-    hasher_md5 = hashlib.md5()
-    hasher_sha1 = hashlib.sha1()
-    hasher_sha256 = hashlib.sha256()
-    with open(path, 'rb') as handle:
-        while data := handle.read(65536):
-            checksum_crc32 = zlib.crc32(data, checksum_crc32)
-            hasher_md5.update(data)
-            hasher_sha1.update(data)
-            hasher_sha256.update(data)
-    return {
-        'crc32': hex(checksum_crc32)[2:],
-        'md5': hasher_md5.hexdigest(),
-        'sha1': hasher_sha1.hexdigest(),
-        'sha256': hasher_sha256.hexdigest(),
-    }
+class MultiHash:
+    def __init__(self):
+        self.checksum_crc32 = 0
+        self.hasher_md5 = hashlib.md5()
+        self.hasher_sha1 = hashlib.sha1()
+        self.hasher_sha256 = hashlib.sha256()
+
+    def update(self, data):
+        self.checksum_crc32 = zlib.crc32(data, self.checksum_crc32)
+        self.hasher_md5.update(data)
+        self.hasher_sha1.update(data)
+        self.hasher_sha256.update(data)
+
+    def hashes(self):
+        return {
+            'crc32': hex(self.checksum_crc32)[2:],
+            'md5': self.hasher_md5.hexdigest(),
+            'sha1': self.hasher_sha1.hexdigest(),
+            'sha256': self.hasher_sha256.hexdigest(),
+        }
+
+    @classmethod
+    def from_path(cls, path):
+        mh = cls()
+        with open(path, 'rb') as handle:
+            while data := handle.read(BUFFER_SIZE):
+                mh.update(data)
+        return mh.hashes()
 
 
 def safe_write(path, data):
@@ -58,33 +72,67 @@ def safe_write(path, data):
                 pass
 
 
-def extract(source, target):
-    subprocess.run(
-        ['extract',
-         '--quiet',
-         '-p', target,
-         '--',
-         source],
-        check=True)
+class ProcessError(Exception):
+    def __init__(self, process, message=None):
+        self.process = process
+        self.message = message
+
+    def __str__(self):
+        proc = self.process
+
+        text = f'exit {proc.returncode}'
+        if self.message is not None:
+            text = f'{text} - {self.message}'
+
+        try:
+            args = proc._transport._extra['subprocess'].args
+        except (AttributeError, KeyError):
+            pass
+        else:
+            text = f'{text}: {args}'
+        return text
 
 
-def file_hash_recorder(path):
-    proc = subprocess.run(
-        ['file-hash-recorder',
-         '--no-progress',
-         '--archive-contents',
-         '--',
-         path],
-        stdout=subprocess.PIPE,
-        check=True)
-    return json.loads(proc.stdout.decode())
+async def archive_contents(path):
+    proc = await asyncio.create_subprocess_exec(
+        'extract', '--list', '--json', '--', path,
+        stdout=asyncio.subprocess.PIPE)
+    stdout, _ = await proc.communicate()
+    if proc.returncode:
+        raise ProcessError(proc)
+
+    contents = {}
+    for name, info in json.loads(stdout.decode()).items():
+        print(path)
+        proc = await asyncio.create_subprocess_exec(
+            'extract', '--stdout', '--', path, name,
+            stdout=asyncio.subprocess.PIPE)
+        mh = MultiHash()
+        while True:
+            if proc.returncode is not None:
+                break
+            try:
+                data = await asyncio.wait_for(
+                    proc.stdout.read(BUFFER_SIZE), 1)
+                if data:
+                    mh.update(data)
+                else:
+                    break
+            except TimeoutError:
+                pass
+        await proc.wait()
+        if proc.returncode:
+            raise ProcessError(proc)
+        info.update(mh.hashes())
+        contents[name] = info
+    return contents
 
 
 def pretty_json_dumps(data):
     return json.dumps(data, indent=2, sort_keys=True, ensure_ascii=False)
 
 
-def main():
+async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--no-progress', action='store_true')
     parser.add_argument('--absolute-paths', action='store_true')
@@ -110,7 +158,7 @@ def main():
                 has_error = True
                 print('File not found:', path, file=sys.stderr)
                 continue
-            hashes = multi_hash(path)
+            hashes = MultiHash.from_path(path)
             for hash_type, hash_value in hashes.items():
                 if hash_value != info[hash_type]:
                     has_error = True
@@ -157,7 +205,7 @@ def main():
         pending_paths = tqdm.tqdm(pending_paths)
 
     for path, name, stat in pending_paths:
-        hashes = multi_hash(path)
+        hashes = MultiHash.from_path(path)
         data = {
             'mtime': stat.st_mtime,
             'size': stat.st_size,
@@ -167,10 +215,8 @@ def main():
             'crc32':  hashes['crc32'],
         }
         if args.archive_contents \
-                and path.name.lower().endswith(('.7z', '.tar.zst')):
-            with tempfile.TemporaryDirectory() as tmp:
-                extract(path, tmp)
-                data['archive_contents'] = file_hash_recorder(tmp)
+                and path.name.lower().endswith('.7z'):
+            data['archive_contents'] = await archive_contents(path)
         results[name] = data
         if output_path:
             safe_write(
@@ -204,4 +250,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())
