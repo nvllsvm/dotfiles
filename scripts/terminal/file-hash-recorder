@@ -146,7 +146,11 @@ def main():
                 and results[name]['mtime'] == stat.st_mtime \
                 and results[name]['size'] == stat.st_size \
                 and not args.force:
-            continue
+            if args.archive_contents:
+                if 'archive_contents' in results:
+                    continue
+            else:
+                continue
         pending_paths.append((path, name, stat))
 
     if not args.no_progress:

@@ -1,0 +1,40 @@
+#!/usr/bin/env python3
+import argparse
+import hashlib
+import json
+import sys
+import zlib
+
+
+def multi_hash(handle):
+    checksum_crc32 = 0
+    hasher_md5 = hashlib.md5()
+    hasher_sha1 = hashlib.sha1()
+    hasher_sha256 = hashlib.sha256()
+    while data := handle.read(65536):
+        checksum_crc32 = zlib.crc32(data, checksum_crc32)
+        hasher_md5.update(data)
+        hasher_sha1.update(data)
+        hasher_sha256.update(data)
+    return {
+        'crc32': hex(checksum_crc32)[2:],
+        'md5': hasher_md5.hexdigest(),
+        'sha1': hasher_sha1.hexdigest(),
+        'sha256': hasher_sha256.hexdigest(),
+    }
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        'path', nargs='?',
+        default=sys.stdin.buffer,
+        type=argparse.FileType('rb'))
+    args = parser.parse_args()
+
+    hashes = multi_hash(args.path)
+    print(json.dumps(hashes, indent=2, sort_keys=True))
+
+
+if __name__ == '__main__':
+    main()
