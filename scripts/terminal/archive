@@ -760,12 +760,16 @@ class cli_7zip:
             raise ProcessError(proc)
 
         contents = []
-        current = {}
+        current = {
+            'is_dir': False,
+        }
         for line in stdout.splitlines():
             if not line:
                 if current:
                     contents.append(current)
-                    current = {}
+                    current = {
+                        'is_dir': False,
+                    }
                 continue
             key, value = line.split(b' = ', maxsplit=1)
             key = key.decode()
@@ -774,12 +778,21 @@ class cli_7zip:
             match key:
                 case 'Path':
                     current['path'] = value
+                # seems to be for zip files
+                case 'Folder':
+                    if value == b'+':
+                        current['is_dir'] = True
                 case 'Attributes':
-                    current['is_dir'] = value.split()[0] == b'D'
+                    parts = value.split()
+                    if parts and parts[0] == b'D':
+                        current['is_dir'] = True
                 case 'Size':
                     current['size'] = int(value)
                 case 'Modified':
-                    dt, dt_frac = value.decode().split('.')
+                    dt = value.decode()
+                    dt_frac = 0
+                    if '.' in dt:
+                        dt, dt_frac = dt.split('.')
                     # ns not supported by datetime
                     current['mtime'] = float('{}.{}'.format(
                         int(datetime.datetime\
@@ -788,7 +801,7 @@ class cli_7zip:
                         int(dt_frac)))
                 case _:
                     pass
-        if current:
+        if current.get('Path'):
             contents.append(current)
 
         new_contents = {}
