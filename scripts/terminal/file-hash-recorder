@@ -198,7 +198,7 @@ async def main():
                 and results[name]['size'] == stat.st_size \
                 and not args.force:
             if args.archive_contents:
-                if 'archive_contents' in results:
+                if results[name].get('archive_contents'):
                     continue
             else:
                 continue
