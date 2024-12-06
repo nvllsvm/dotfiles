@@ -6,12 +6,14 @@ import json
 import pathlib
 import sys
 import tempfile
+import time
 import zlib
 
 import tqdm
 
 
 BUFFER_SIZE = 16 * 1024 * 1024
+FLUSH_SECONDS = 120
 
 
 def all_files(root):
@@ -207,6 +209,8 @@ async def main():
     if not args.path.is_file() and not args.no_progress:
         pending_paths = tqdm.tqdm(pending_paths)
 
+    pending_write = False
+    prev_time = time.time()
     for path, name, stat in pending_paths:
         hashes = MultiHash.from_path(path)
         data = {
@@ -221,19 +225,22 @@ async def main():
                 and path.name.lower().endswith('.7z'):
             data['archive_contents'] = await archive_contents(path)
         results[name] = data
-        if output_path:
+        pending_write = True
+        curr_time = time.time()
+        if output_path and (curr_time - prev_time) > FLUSH_SECONDS:
             safe_write(
                 output_path,
                 pretty_json_dumps(results),
             )
+            pending_write = False
+        prev_time = curr_time
 
-    modified = False
     for name in list(results):
         if name not in found:
             results.pop(name)
-            modified = True
+            pending_write = True
     if output_path:
-        if modified:
+        if pending_write:
             safe_write(
                 output_path,
                 pretty_json_dumps(results),
