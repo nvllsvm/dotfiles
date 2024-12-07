@@ -13,7 +13,7 @@ import tqdm
 
 
 BUFFER_SIZE = 16 * 1024 * 1024
-FLUSH_SECONDS = 30
+FLUSH_SECONDS = 60
 
 
 def all_files(root):
@@ -135,6 +135,10 @@ def pretty_json_dumps(data):
     return json.dumps(data, indent=2, sort_keys=True, ensure_ascii=False)
 
 
+def is_archive(path):
+    return path.name.lower().endswith('.7z')
+
+
 async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--no-progress', action='store_true')
@@ -199,7 +203,7 @@ async def main():
                 and results[name]['mtime'] == stat.st_mtime \
                 and results[name]['size'] == stat.st_size \
                 and not args.force:
-            if args.archive_contents:
+            if args.archive_contents and is_archive(path):
                 if results[name].get('archive_contents'):
                     continue
             else:
@@ -221,8 +225,7 @@ async def main():
             'md5':  hashes['md5'],
             'crc32':  hashes['crc32'],
         }
-        if args.archive_contents \
-                and path.name.lower().endswith('.7z'):
+        if args.archive_contents and is_archive(path):
             data['archive_contents'] = await archive_contents(path)
         results[name] = data
         pending_write = True

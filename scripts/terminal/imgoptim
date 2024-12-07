@@ -295,6 +295,8 @@ def determine_mime(path):
         start = f.read(12)
         if start[0:8] == b'\x89PNG\r\n\x1a\n':
             return 'image/png', {}
+        elif start[0:3] == b'P6\x0A':
+            return 'image/x-portable-pixmap', {}
         elif start[0:3] == b'\xff\xd8\xff':
             return 'image/jpeg', {}
         elif start[0:6] in (b'GIF87a', b'GIF89a'):
@@ -359,7 +361,7 @@ async def convert_to_ppm(source, dest):
         raise ProcessError(proc)
 
 
-async def convert_to_png(source, dest):
+async def convert_to_png(source, dest, fast=True):
     args = [
         'vips',
         'pngsave',
@@ -447,6 +449,9 @@ async def _process_convert(path, source_mimetype, target_mimetype):
         match target_mimetype:
             case 'image/x-portable-pixmap':
                 await convert_to_ppm(path, temp_path)
+                temp_path.rename(dest)
+            case 'image/png':
+                await convert_to_png(path, temp_path)
                 temp_path.rename(dest)
             case 'image/jxl':
                 await convert_to_jxl(path, temp_path)
@@ -610,7 +615,7 @@ async def main_convert():
     parser.add_argument('--rm', action='store_true')
     parser.add_argument(
         '-f', '--format', dest='format',
-        choices=('jpeg', 'jxl', 'ppm'), required=True)
+        choices=('jpeg', 'jxl', 'png', 'ppm'), required=True)
     parser.add_argument(
         'paths', metavar='path', nargs='+', type=_parser_path_file)
     args = parser.parse_args()
