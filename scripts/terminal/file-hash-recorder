@@ -13,7 +13,7 @@ import tqdm
 
 
 BUFFER_SIZE = 16 * 1024 * 1024
-FLUSH_SECONDS = 120
+FLUSH_SECONDS = 30
 
 
 def all_files(root):
@@ -233,7 +233,7 @@ async def main():
                 pretty_json_dumps(results),
             )
             pending_write = False
-        prev_time = curr_time
+            prev_time = curr_time
 
     for name in list(results):
         if name not in found:
