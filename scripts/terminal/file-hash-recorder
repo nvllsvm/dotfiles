@@ -214,40 +214,50 @@ async def main():
         pending_paths = tqdm.tqdm(pending_paths)
 
     pending_write = False
-    prev_time = time.time()
-    for path, name, stat in pending_paths:
-        hashes = MultiHash.from_path(path)
-        data = {
-            'mtime': stat.st_mtime,
-            'size': stat.st_size,
-            'sha1': hashes['sha1'],
-            'sha256':  hashes['sha256'],
-            'md5':  hashes['md5'],
-            'crc32':  hashes['crc32'],
-        }
-        if args.archive_contents and is_archive(path):
-            data['archive_contents'] = await archive_contents(path)
-        results[name] = data
-        pending_write = True
-        curr_time = time.time()
-        if output_path and (curr_time - prev_time) > FLUSH_SECONDS:
+    try:
+        prev_time = time.time()
+        for path, name, stat in pending_paths:
+            hashes = MultiHash.from_path(path)
+            data = {
+                'mtime': stat.st_mtime,
+                'size': stat.st_size,
+                'sha1': hashes['sha1'],
+                'sha256':  hashes['sha256'],
+                'md5':  hashes['md5'],
+                'crc32':  hashes['crc32'],
+            }
+            if args.archive_contents and is_archive(path):
+                data['archive_contents'] = await archive_contents(path)
+            results[name] = data
+            pending_write = True
+            curr_time = time.time()
+            if output_path and (curr_time - prev_time) > FLUSH_SECONDS:
+                safe_write(
+                    output_path,
+                    pretty_json_dumps(results),
+                )
+                pending_write = False
+                prev_time = curr_time
+
+        for name in list(results):
+            if name not in found:
+                results.pop(name)
+                pending_write = True
+        if output_path and pending_write:
             safe_write(
                 output_path,
                 pretty_json_dumps(results),
             )
             pending_write = False
-            prev_time = curr_time
-
-    for name in list(results):
-        if name not in found:
-            results.pop(name)
-            pending_write = True
-    if output_path:
-        if pending_write:
+    except KeyboardInterrupt:
+        if output_path and pending_write:
             safe_write(
                 output_path,
                 pretty_json_dumps(results),
             )
+        sys.exit(1)
+
+    if output_path:
         if args.show_dupes:
             by_sha256 = {}
             for path, info in results.items():
