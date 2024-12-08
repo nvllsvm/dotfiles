@@ -382,7 +382,6 @@ if HOSTNAME in ('mars', 'phobos'):
     EXPECTED_PACKAGE_DEPENDENCIES['docker'].update({
         'btrfs-progs',
         'docker-buildx',
-        'docker-scan',
         'pigz',
     })
 
