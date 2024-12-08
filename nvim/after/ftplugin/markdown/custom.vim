@@ -11,7 +11,7 @@ let g:vim_markdown_new_list_item_indent=0
 setlocal formatlistpat=^\\s*\\d\\+[.\)]\\s\\+\\\|^\\s*[*+~-]\\s\\+\\\|^\\(\\\|[*#]\\)\\[^[^\\]]\\+\\]:\\s 
 setlocal comments=n:>
 setlocal formatoptions+=cn
-nnoremap <leader>m 0:TableModeRealign<Cr>:TableSort<Cr>
+nnoremap <leader>m 0:TableFormat<Cr>
 set linebreak
 set list& listchars&
 highlight Title cterm=bold
