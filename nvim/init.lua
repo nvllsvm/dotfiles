@@ -35,7 +35,7 @@ do
         local proc = vim.system({'readlink', base16_path}, { text = true }):wait()
         if proc.code == 0 then
             -- remove .sh suffix
-            vim.g.base16colorspace = 256
+            vim.g.tinted_colorspace = 256
             colorscheme = vim.fs.basename(string.sub(proc.stdout, 0, -5))
         end
     end
