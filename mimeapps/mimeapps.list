@@ -7,7 +7,6 @@ application/epub+zip=com.github.johnfactotum.Foliate.desktop
 application/pdf=org.kde.okular.desktop
 application/vnd.adobe.flash.movie=ruffle.desktop
 application/vnd.comicbook+zip=org.kde.okular.desktop
-application/vnd.jgraph.mxfile=draw.io.desktop
 application/x-bittorrent=torrent.desktop
 application/x-extension-htm=firefox.desktop
 application/x-extension-html=firefox.desktop
