@@ -263,6 +263,7 @@ _MIME_OPTIM = {
 }
 
 _TYPE_TO_MIME = {
+    'bmp': 'image/bmp',
     'gif': 'image/gif',
     'jpeg': 'image/jpeg',
     'jxl': 'image/jxl',
@@ -361,6 +362,21 @@ async def convert_to_ppm(source, dest):
         raise ProcessError(proc)
 
 
+async def convert_to_bmp(source, dest, fast=True):
+    args = [
+        'vips',
+        'magicksave',
+        '--format=BMP',
+        '--',
+        source,
+        dest,
+    ]
+    proc = await asyncio.create_subprocess_exec(*args)
+    await proc.wait()
+    if proc.returncode != 0:
+        raise ProcessError(proc)
+
+
 async def convert_to_png(source, dest, fast=True):
     args = [
         'vips',
@@ -447,6 +463,9 @@ async def _process_convert(path, source_mimetype, target_mimetype):
         temp_path = stack.enter_context(TempPath(
             dir=path.parent, prefix='.imgconvert_', suffix=path.name + '.tmp'))
         match target_mimetype:
+            case 'image/bmp':
+                await convert_to_bmp(path, temp_path)
+                temp_path.rename(dest)
             case 'image/x-portable-pixmap':
                 await convert_to_ppm(path, temp_path)
                 temp_path.rename(dest)
@@ -592,7 +611,6 @@ async def main_compare():
     parser.add_argument('paths', metavar='path', nargs=2)
     args = parser.parse_args()
 
-    hashes = []
     for path in args.paths:
         mimetype, _ = determine_mime(path)
         match mimetype:
@@ -615,7 +633,7 @@ async def main_convert():
     parser.add_argument('--rm', action='store_true')
     parser.add_argument(
         '-f', '--format', dest='format',
-        choices=('jpeg', 'jxl', 'png', 'ppm'), required=True)
+        choices=('bmp', 'jpeg', 'jxl', 'png', 'ppm'), required=True)
     parser.add_argument(
         'paths', metavar='path', nargs='+', type=_parser_path_file)
     args = parser.parse_args()
