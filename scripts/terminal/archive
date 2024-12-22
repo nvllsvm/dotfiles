@@ -790,6 +790,8 @@ class cli_7zip:
                     current['size'] = int(value)
                 case 'Modified':
                     dt = value.decode()
+                    if not dt:
+                        continue
                     dt_frac = 0
                     if '.' in dt:
                         dt, dt_frac = dt.split('.')
