@@ -21,7 +21,7 @@ except ImportError:
 HOSTNAME = socket.gethostname()
 
 EXPECTED_PACKAGES = {
-    '7-zip',
+    '7zip',
     'advancecomp',
     'aria2',
     'bat',
