@@ -106,7 +106,7 @@ async def create_7z(path, dest, fast=False):
         source = path
 
     proc = await asyncio.create_subprocess_exec(
-        '7zz',
+        '7z',
         'a',  # create archive
         level,
         '--', dest, source,
@@ -710,9 +710,9 @@ class cli_7zip:
     @staticmethod
     @functools.cache
     def _path():
-        for name in ('7zz', '7z'):
-            if shutil.which(name):
-                return name
+        name = '7z'
+        if shutil.which(name):
+            return name
         raise KeyError
 
     @classmethod
@@ -2299,7 +2299,7 @@ async def _get_class(path):
         elif suffixes[-1] == '.tar':
             return gnu_tar
 
-    # 7zz supports a bunch of things
+    # 7z supports a bunch of things
     try:
         cli_7zip.check()
         if await cli_7zip.contents(path):
