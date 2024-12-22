@@ -705,21 +705,14 @@ class cli_7zip:
 
     @classmethod
     def check(cls):
-        return cls._path()
-
-    @staticmethod
-    @functools.cache
-    def _path():
-        name = '7z'
-        if shutil.which(name):
-            return name
-        raise KeyError
+        if not shutil.which('7z'):
+            raise KeyError
 
     @classmethod
     async def extract(cls, path, dest, paths=None, password='',
                       overwrite=False):
         args = [
-            cls._path(),
+            '7z',
             '-bd',  # disable progress indicator
             '-bb0',  # quietest log level
         ]
@@ -752,7 +745,7 @@ class cli_7zip:
     @classmethod
     async def contents(cls, path):
         # -ba flag removes table and header formatting
-        args = [cls._path(), '-ba', 'l', '-slt', '--', str(path)]
+        args = ['7z', '-ba', 'l', '-slt', '--', str(path)]
         proc = await asyncio.create_subprocess_exec(
             *args, stdout=asyncio.subprocess.PIPE)
         stdout, _ = await proc.communicate()
@@ -815,7 +808,7 @@ class cli_7zip:
 
     @classmethod
     async def volumes(cls, path, password=''):
-        args = [cls._path(), 'l', f'-p{password}', '--', str(path)]
+        args = ['7z', 'l', f'-p{password}', '--', str(path)]
         proc = await asyncio.create_subprocess_exec(
             *args, stdout=asyncio.subprocess.PIPE)
         stdout, _ = await proc.communicate()
