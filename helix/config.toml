@@ -1,4 +1,0 @@
-theme = "base16_default"
-
-[keys.normal]
-"C-s" = [":write", ":run-shell-command lmk"]
