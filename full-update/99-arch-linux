@@ -342,15 +342,7 @@ EXPECTED_PACKAGE_DEPENDENCIES = {
     },
 }
 
-EXPECTED_GROUPS = {
-    'ar': {
-        'libvirt',
-        'libvirt-qemu',
-        'storage',
-        'video',
-        'wheel',
-    }
-}
+EXPECTED_GROUPS = {}
 
 EXPECTED_SERVICES = {
     'fstrim.timer',
@@ -361,6 +353,17 @@ EXPECTED_SERVICES = {
 EFI_SHELL_HOSTS = ('mars', 'phobos', 'lounge-htpc', 'sol')
 if HOSTNAME in EFI_SHELL_HOSTS:
     EXPECTED_PACKAGES.add('edk2-shell')
+
+if HOSTNAME in ('lounge-htpc'):
+    EXPECTED_GROUPS.setdefault('lounge-htpc', set())
+    EXPECTED_GROUPS['lounge-htpc'].update({
+        'audio',
+        'games',
+        'nopasswdlogin',
+        'realtime',
+        'video',
+        'wheel',
+    })
 
 if HOSTNAME in ('mars', 'phobos'):
     EXPECTED_PACKAGE_DEPENDENCIES.setdefault('podman', set())
@@ -380,9 +383,15 @@ if HOSTNAME in ('mars', 'phobos'):
         'pigz',
     })
 
+    EXPECTED_GROUPS.setdefault('ar', set())
     EXPECTED_GROUPS['ar'].update({
         'games',  # for proton to automatically set niceness
         'realtime',
+        'libvirt',
+        'libvirt-qemu',
+        'storage',
+        'video',
+        'wheel',
     })
     EXPECTED_PACKAGES.update({
         'python-pytorch-opt-rocm',
