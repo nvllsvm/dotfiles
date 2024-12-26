@@ -56,6 +56,7 @@ else
         application/x-bzip2-compressed-tar|\
         application/x-cd-image|\
         application/x-compressed-tar|\
+        application/x-cue|\
         application/x-dosexec|\
         application/x-iso9660-image|\
         application/x-ms-dos-executable|\
