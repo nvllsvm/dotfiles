@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import asyncio
+import enum
 import io
 import os
 import pathlib
@@ -22,7 +23,21 @@ DEFAULT_LIMIT = 200
 PATH_LENGTH_MAX = 255
 
 
-async def get_itunes_art(*terms, country='us', entity='album', limit=None):
+class Entity(enum.StrEnum):
+    ALBUM = 'album'
+    APPLE_ID_MOVIE = 'id'
+    APP_IPAD = 'IpadSoftware'
+    APP_IPHONE_OR_UNIVERSAL = 'software'
+    APP_MACOS = 'macSoftware'
+    AUDIOBOOK = 'audiobook'
+    EBOOK = 'ebook'
+    MOVIE = 'movie'
+    MUSIC_VIDEO = 'musicVideo'
+    PODCAST = 'podcast'
+    TV_SHOW = 'tv'
+
+
+async def get_itunes_art(*terms, country='us', entity=Entity.ALBUM, limit=None):
     query = {
         'country': country,
         'entity': entity,
@@ -108,16 +123,20 @@ async def convert_to_png(data):
 
 async def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('-e', '--entity', choices=Entity, default=Entity.ALBUM)
     parser.add_argument('--limit', type=int, default=DEFAULT_LIMIT)
     parser.add_argument('terms', nargs='+')
     args = parser.parse_args()
 
     executor = async_executor.AsyncExecutor()
     task_names = {}
-    for result in await get_itunes_art(*args.terms, limit=args.limit):
-        name = '{} - {}'.format(
-            result['artistName'],
-            result['collectionName'])
+    for result in await get_itunes_art(
+            *args.terms, entity=args.entity, limit=args.limit):
+        name = ' - '.join(
+            result[k]
+            for k in ('artistName', 'collectionName', 'trackName')
+            if result.get(k)
+        )
         task = executor.submit(download_image, result['artworkUrl'])
         task_names[task] = name
 
