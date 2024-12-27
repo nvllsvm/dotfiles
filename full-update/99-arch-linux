@@ -177,7 +177,6 @@ if HOSTNAME in ('mars', 'phobos'):
         'spectacle',
         'strawberry',
         'tremotesf',
-        'upscayl-bin',
         'virt-manager',
         'wine',
         'xboxdrv',
