@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
-import IPython
-
-IPython.embed()
+#!/usr/bin/env sh
+export PYTHONSTARTUP="${DOTFILES}/python/pythonstartup"
+exec python "$@"
