@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
 set -e
 cd ~/src/github/comfyanonymous/comfyui
-. ./venv/bin/activate
+. ./venv_system/bin/activate
 exec python main.py --listen 0.0.0.0
