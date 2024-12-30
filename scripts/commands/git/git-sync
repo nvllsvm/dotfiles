@@ -8,6 +8,7 @@ import urllib.parse
 
 CODE_ROOT_DIR = pathlib.Path('~/src').expanduser()
 CACHE_PATH = pathlib.Path('~/.cache/gs').expanduser()
+CACHE_ITEM_LIMIT = 1000
 
 
 class Git:
@@ -69,7 +70,8 @@ def _find_git_repos(root):
 class SrcName(enum.StrEnum):
     ARCH_LINUX_AUR = 'aur'
     GITHUB = 'github'
-    GITLAB = 'github'
+    GITLAB = 'gitlab'
+    NULLSUM_NET = 'git.nullsum.net'
 
 
 def parse_repo(repo):
@@ -96,6 +98,12 @@ def parse_repo(repo):
                 parts = path.split('/')
                 if parts[0] == 'packages':
                     path = parts[1]
+            case 'git.nullsum.net':
+                host = SrcName.NULLSUM_NET
+                parts = path.split('/')
+                if len(parts) < 2:
+                    raise RuntimeError('invalid git.nullsum.net url')
+                path = '/'.join(parts)
             case _:
                 raise NotImplementedError(f'unhandled netloc: {parsed.netloc}')
     elif parsed.scheme:
@@ -126,9 +134,22 @@ def main():
             cache.append(repo)
 
     if args.show_cache:
-        print('\n'.join(
-            str(repo)
-            for repo in sorted(_find_git_repos(CODE_ROOT_DIR))))
+        repos = []
+        for repo in _find_git_repos(CODE_ROOT_DIR):
+            try:
+                host = SrcName(repo.parts[0])
+            except KeyError:
+                continue
+            repos.append(f'{host}:{"/".join(repo.parts[1:])}')
+        cache_index = {
+            name: index
+            for index, name in enumerate(cache)
+        }
+        repos = sorted(
+            repos,
+            key=lambda x: (cache_index.get(x, -1), x)
+        )
+        print('\n'.join(repos))
     elif args.repo is None:
         for repo_dir in _find_git_repos(pathlib.Path().absolute()):
             print(repo_dir)
@@ -155,7 +176,7 @@ def main():
             print(repo_dir)
 
     if cache_modified:
-        CACHE_PATH.write_text('\n'.join(cache))
+        CACHE_PATH.write_text('\n'.join(cache[-CACHE_ITEM_LIMIT:]))
 
 
 if __name__ == '__main__':
