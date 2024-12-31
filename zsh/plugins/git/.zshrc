@@ -27,6 +27,7 @@ if command -v git > /dev/null; then
         fi
 
         local repo_dir
+        print -s -- gs "$target"
         repo_dir="$(git-sync "$target")"
         if [ -z "$repo_dir" ]; then
             return 130
