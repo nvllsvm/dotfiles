@@ -128,19 +128,25 @@ def main():
     cache = []
     cache_modified = False
     for repo in CACHE_PATH.read_text().splitlines():
-        repo_dir, _, _ = parse_repo(repo)
+        repo_dir = CODE_ROOT_DIR / repo
+        if not repo_dir.exists():
+            repo_dir, _, _ = parse_repo(repo)
         if repo_dir.is_dir():
-            cache_modified = True
             cache.append(repo)
+        else:
+            cache_modified = True
 
     if args.show_cache:
         repos = []
         for repo in _find_git_repos(CODE_ROOT_DIR):
             try:
                 host = SrcName(repo.parts[0])
-            except KeyError:
-                continue
-            repos.append(f'{host}:{"/".join(repo.parts[1:])}')
+            except ValueError:
+                host = None
+            if host is None:
+                repos.append(str(repo))
+            else:
+                repos.append(f'{host}:{"/".join(repo.parts[1:])}')
         cache_index = {
             name: index
             for index, name in enumerate(cache)
@@ -155,8 +161,13 @@ def main():
             print(repo_dir)
             Git.fetch(repo_dir)
     else:
-        repo = args.repo.lower()
-        repo_dir, host, path = parse_repo(repo)
+        repo_dir = CODE_ROOT_DIR / args.repo
+        if repo_dir.exists():
+            repo = args.repo
+        else:
+            repo = args.repo.lower()
+            repo_dir, host, path = parse_repo(repo)
+
         if args.rm:
             if repo_dir.exists():
                 shutil.rmtree(repo_dir)
