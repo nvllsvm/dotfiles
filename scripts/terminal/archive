@@ -106,7 +106,7 @@ async def create_7z(path, dest, fast=False):
         source = path
 
     proc = await asyncio.create_subprocess_exec(
-        '7z',
+        cli_7zip.bin(),
         'a',  # create archive
         level,
         '--', dest, source,
@@ -703,16 +703,27 @@ class cli_7zip:
     _PART_RE = re.compile(r'(.*\.part)(\d+)(\.rar)$')
     _ALT_PART_RE = re.compile(r'(.*\.)(\d+)$')
 
+    @staticmethod
+    @functools.cache
+    def bin():
+        """
+        As of late 2024, Arch Linux has `7z` for the official 7-zip.
+        Termux still has `7z` for p7zip and `7zz` for the official 7-zip.
+        """
+        for name in ('7zz', '7z'):
+            if shutil.which(name):
+                return name
+        raise KeyError
+
     @classmethod
     def check(cls):
-        if not shutil.which('7z'):
-            raise KeyError
+        cls.bin()
 
     @classmethod
     async def extract(cls, path, dest, paths=None, password='',
                       overwrite=False):
         args = [
-            '7z',
+            cls.bin(),
             '-bd',  # disable progress indicator
             '-bb0',  # quietest log level
         ]
@@ -745,7 +756,7 @@ class cli_7zip:
     @classmethod
     async def contents(cls, path):
         # -ba flag removes table and header formatting
-        args = ['7z', '-ba', 'l', '-slt', '--', str(path)]
+        args = [cls.bin(), '-ba', 'l', '-slt', '--', str(path)]
         proc = await asyncio.create_subprocess_exec(
             *args, stdout=asyncio.subprocess.PIPE)
         stdout, _ = await proc.communicate()
@@ -808,7 +819,7 @@ class cli_7zip:
 
     @classmethod
     async def volumes(cls, path, password=''):
-        args = ['7z', 'l', f'-p{password}', '--', str(path)]
+        args = [cls.bin(), 'l', f'-p{password}', '--', str(path)]
         proc = await asyncio.create_subprocess_exec(
             *args, stdout=asyncio.subprocess.PIPE)
         stdout, _ = await proc.communicate()

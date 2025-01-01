@@ -42,7 +42,6 @@ else
     case "$mimetype" in
         application/gzip|\
         application/x-rpm|\
-        application/java-archive|\
         application/vnd.comicbook+zip|\
         application/vnd.comicbook-rar|\
         application/vnd.efi.img|\
@@ -69,6 +68,9 @@ else
         application/zip|\
         application/zstd)
             extract -l -- "$1"
+            ;;
+        application/java-archive)
+            extract --stdout -- "$1" 'META-INF/MANIFEST.MF'
             ;;
         audio/x-mod)
             # xdg-mime reports go.mod files as this
