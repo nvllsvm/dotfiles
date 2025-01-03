@@ -69,6 +69,7 @@ def _find_git_repos(root):
 
 class SrcName(enum.StrEnum):
     ARCH_LINUX_AUR = 'aur'
+    CODEBERG = 'codeberg'
     GITHUB = 'github'
     GITLAB = 'gitlab'
     NULLSUM_NET = 'git.nullsum.net'
@@ -81,6 +82,12 @@ def parse_repo(repo):
     if parsed.scheme in ('http', 'https'):
         # TODO: parse .ssh/config for HostName
         match parsed.netloc:
+            case 'codeberg.org':
+                host = SrcName.CODEBERG
+                parts = path.split('/')
+                if len(parts) < 2:
+                    raise RuntimeError('invalid codeberg url')
+                path = '/'.join(parts[0:])
             case 'github.com' | 'www.github.com':
                 host = SrcName.GITHUB
                 parts = path.split('/')
