@@ -58,7 +58,7 @@ async def main():
     parser.add_argument('output', type=pathlib.Path)
     args = parser.parse_args()
 
-    args.output.mkdir()
+    args.output.mkdir(exist_ok=True)
     await rife_ncnn_vulkan(args.input, args.output, args.time_step)
 
 
