@@ -1406,10 +1406,8 @@ class cuefile:
 
     @classmethod
     async def contents(cls, path):
-        if path.suffix != '.cue':
-            raise NotImplementedError('must end with .cue')
-        parts = cls._parse_cue(path)
         name = cls._content_name(path)
+        parts = cls._parse_cue(path)
         contents = []
         for i, (part_path, track_type) in enumerate(parts):
             suffix = cls.TRACK_TYPE_SUFFIXES[track_type]
@@ -1422,7 +1420,12 @@ class cuefile:
 
     @staticmethod
     def _content_name(cue_path):
-        name = pathlib.Path(cue_path).name.removesuffix('.cue')
+        expected = '.cue'
+        path = pathlib.Path(cue_path)
+        if path.suffix.lower() != '.cue':
+            raise NotImplementedError('must end with .cue')
+        # remove any case
+        name = path.name[:-len(expected)]
         if not name:
             raise RuntimeError
         return name
