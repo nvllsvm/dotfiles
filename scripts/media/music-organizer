@@ -10,7 +10,7 @@ import subprocess
 import tempfile
 import unicodedata
 
-import chardet
+import charset_normalizer
 import magic  # package: python-magic
 import mutagen.flac
 import mutagen.mp3
@@ -94,7 +94,7 @@ def cue_track_count(path):
     Also converts the file to UTF-8 if it's not
     """
     data = path.read_bytes()
-    text = data.decode(chardet.detect(data)['encoding'])
+    text = data.decode(charset_normalizer.detect(data)['encoding'])
     if data != text:
         path.write_text(text)
 

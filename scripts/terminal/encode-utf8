@@ -2,13 +2,13 @@
 import argparse
 import pathlib
 
-import chardet
+import charset_normalizer
 
 
 def convert_to_utf8(path):
     path = pathlib.Path(path)
     data = path.read_bytes()
-    text = data.decode(chardet.detect(data)['encoding'])
+    text = data.decode(charset_normalizer.detect(data)['encoding'])
     text_utf8 = text.encode()
     if data != text_utf8:
         print(f'Encoding {path}')
