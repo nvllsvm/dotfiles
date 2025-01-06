@@ -101,7 +101,7 @@ def format_human(now, state):
     for key, value in state.items():
         match key:
             case 'IBUS':
-                key =  'IBUS (A)'
+                key = 'IBUS (A)'
                 if value < 0:
                     value = -1 * value
                 value = value * 0.001
@@ -141,7 +141,7 @@ def format_raw(ts, state, logfile):
         'timestamp': ts.isoformat(),
         'state': state,
     }
-    line = json.dumps(data, sort_keys=True)
+    line = json.dumps(data, separators=(',', ':'), sort_keys=True)
     return line
 
 
