@@ -136,7 +136,7 @@ def format_human(now, state):
     return line
 
 
-def format_raw(ts, state, logfile):
+def format_raw(ts, state):
     data = {
         'timestamp': ts.isoformat(),
         'state': state,
@@ -148,9 +148,9 @@ def format_raw(ts, state, logfile):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-n', '--interval', type=int, default=1)
-    parser.add_argument('-o', '--output', type=pathlib.Path)
+    parser.add_argument('-o', '--output', type=pathlib.Path,
+                        help='write raw values as JSON to a file')
     parser.add_argument('-i', '--input', type=pathlib.Path)
-    parser.add_argument('--raw', action='store_true')
     args = parser.parse_args()
 
     if args.input:
@@ -170,13 +170,9 @@ def main():
     while True:
         now = datetime.datetime.now(tz=datetime.timezone.utc)
         state = read_device(path)
-        if args.raw:
-            line = format_raw(now, state)
-        else:
-            line = format_human(now, state)
-        print(line)
+        print(format_human(now, state))
         if handle:
-            handle.write(line + '\n')
+            handle.write(format_raw(now, state) + '\n')
             handle.flush()
         time.sleep(args.interval)
 
