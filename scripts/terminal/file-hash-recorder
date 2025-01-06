@@ -97,6 +97,16 @@ class ProcessError(Exception):
         return text
 
 
+async def multi_hash(path):
+    proc = await asyncio.create_subprocess_exec(
+        'file-hash-recorder', '--multihash', '--', path,
+        stdout=asyncio.subprocess.PIPE)
+    stdout, _ = await proc.communicate()
+    if proc.returncode:
+        raise ProcessError(proc)
+    return json.loads(stdout)
+
+
 async def archive_contents(path):
     proc = await asyncio.create_subprocess_exec(
         'extract', '--list', '--json', '--', path,
@@ -144,12 +154,17 @@ async def main():
     parser.add_argument('--no-progress', action='store_true')
     parser.add_argument('--absolute-paths', action='store_true')
     parser.add_argument('-f', '--force', action='store_true')
+    parser.add_argument('--multihash', action='store_true')
     parser.add_argument('-o', '--output', type=pathlib.Path)
     parser.add_argument('-a', '--archive-contents', action='store_true')
     parser.add_argument('--show-dupes', action='store_true')
     parser.add_argument('--verify', action='store_true')
     parser.add_argument('path', type=pathlib.Path)
     args = parser.parse_args()
+
+    if args.multihash:
+        print(json.dumps(MultiHash.from_path(args.path)))
+        parser.exit()
 
     if args.verify:
         if not args.output:
@@ -217,7 +232,7 @@ async def main():
     try:
         prev_time = time.time()
         for path, name, stat in pending_paths:
-            hashes = MultiHash.from_path(path)
+            hashes = await multi_hash(path)
             data = {
                 'mtime': stat.st_mtime,
                 'size': stat.st_size,
