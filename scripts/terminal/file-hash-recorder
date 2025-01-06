@@ -110,38 +110,59 @@ async def multi_hash(path):
     return json.loads(stdout)
 
 
-async def archive_contents(path):
+async def file_hash_recorder(path):
     proc = await asyncio.create_subprocess_exec(
-        'extract', '--list', '--json', '--base64', '--', path,
+        'file-hash-recorder', '--no-progress', '--', '.',
+        cwd=path,
         stdout=asyncio.subprocess.PIPE)
     stdout, _ = await proc.communicate()
     if proc.returncode:
         raise ProcessError(proc)
+    return json.loads(stdout)
 
-    contents = {}
-    for name, info in json.loads(stdout.decode()).items():
-        name = base64.b64decode(name).decode()
+
+async def archive_contents(path, use_tmpdir=False):
+    if use_tmpdir:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            proc = await asyncio.create_subprocess_exec(
+                'extract', '-q', '-p', tmpdir, '--', path)
+            await proc.wait()
+            if proc.returncode:
+                raise ProcessError(proc)
+
+            contents = await file_hash_recorder(tmpdir)
+    else:
         proc = await asyncio.create_subprocess_exec(
-            'extract', '--stdout', '--', path, name,
+            'extract', '--list', '--json', '--base64', '--', path,
             stdout=asyncio.subprocess.PIPE)
-        mh = MultiHash()
-        while True:
-            if proc.returncode is not None:
-                break
-            try:
-                data = await asyncio.wait_for(
-                    proc.stdout.read(BUFFER_SIZE), 1)
-                if data:
-                    mh.update(data)
-                else:
-                    break
-            except TimeoutError:
-                pass
-        await proc.wait()
+        stdout, _ = await proc.communicate()
         if proc.returncode:
             raise ProcessError(proc)
-        info.update(mh.hashes())
-        contents[name] = info
+
+        contents = {}
+        for name, info in json.loads(stdout.decode()).items():
+            name = base64.b64decode(name).decode()
+            proc = await asyncio.create_subprocess_exec(
+                'extract', '--stdout', '--', path, name,
+                stdout=asyncio.subprocess.PIPE)
+            mh = MultiHash()
+            while True:
+                if proc.returncode is not None:
+                    break
+                try:
+                    data = await asyncio.wait_for(
+                        proc.stdout.read(BUFFER_SIZE), 1)
+                    if data:
+                        mh.update(data)
+                    else:
+                        break
+                except TimeoutError:
+                    pass
+            await proc.wait()
+            if proc.returncode:
+                raise ProcessError(proc)
+            info.update(mh.hashes())
+            contents[name] = info
     return contents
 
 
@@ -153,8 +174,10 @@ def is_archive(path):
     return path.name.lower().endswith('.7z')
 
 
-async def _process_path(path, stat, hash_archive_contents=False,
-                        multihash_subprocess=False):
+async def _process_path(path, stat,
+                        hash_archive_contents=False,
+                        multihash_subprocess=False,
+                        use_tmpdir=False):
     if multihash_subprocess:
         hashes = await multi_hash(path)
     else:
@@ -168,7 +191,7 @@ async def _process_path(path, stat, hash_archive_contents=False,
         'crc32':  hashes['crc32'],
     }
     if hash_archive_contents and is_archive(path):
-        data['archive_contents'] = await archive_contents(path)
+        data['archive_contents'] = await archive_contents(path, use_tmpdir=use_tmpdir)
     return data
 
 
@@ -184,6 +207,8 @@ async def main():
     parser.add_argument('--skip-errors', action='store_true')
     parser.add_argument('--show-dupes', action='store_true')
     parser.add_argument('--verify', action='store_true')
+    parser.add_argument('--tmpdir', action='store_true',
+                        help='extract to tempdir when hashing archive contents')
     parser.add_argument('path', type=pathlib.Path)
     args = parser.parse_args()
 
@@ -258,6 +283,7 @@ async def main():
             path, stat, 
             hash_archive_contents=args.archive_contents,
             multihash_subprocess=args.num_procs > 1,
+            use_tmpdir=args.tmpdir,
         )
         future_info[future] = (path, name)
 

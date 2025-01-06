@@ -1,0 +1,76 @@
+#!/usr/bin/env python3
+import argparse
+import pathlib
+import shutil
+import datetime
+import subprocess
+import tempfile
+
+
+def ffmpeg_merge(path, target, framerate='30/1', loops=1):
+    subprocess.run(
+        ['ffmpeg',
+        '-y', '-stream_loop', str(loops),
+        '-framerate', framerate,
+        '-pattern_type', 'glob', '-i', f'{path}/*.png',
+        '-c:v', 'libx264', '-preset', 'slow', '-crf', '16', 
+        target],
+        stderr=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        check=True)
+
+
+def rife(source, target):
+    subprocess.run(
+        ['rife', source, target], 
+        stderr=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        check=True)
+
+
+def main():
+    now = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-o', '--output', type=pathlib.Path, 
+                        default=pathlib.Path(f'{now}.mp4'))
+    parser.add_argument('-l', '--loops', type=int, default=5)
+    parser.add_argument('-r', '--rife-iterations', type=int, default=5)
+    parser.add_argument('-f', '--framerate', default='30/1')
+    parser.add_argument('--no-bounce', action='store_true')
+    parser.add_argument('source', type=pathlib.Path)
+    args = parser.parse_args()
+
+    with tempfile.TemporaryDirectory(dir=args.source.parent) as tmpdir:
+        tmpdir = pathlib.Path(tmpdir)
+        sources = sorted(list(args.source.iterdir()))
+
+        new = [*sources]
+        if not args.no_bounce:
+            new.extend([*list(reversed(sources[:-1]))])
+
+        for i, p in enumerate(new):
+            shutil.copy(p, tmpdir / f'{i}.png')
+
+        for i in range(args.rife_iterations - 1):
+            with tempfile.TemporaryDirectory(dir=args.source.parent) as tmpdir2:
+                tmpdir2 = pathlib.Path(tmpdir2)
+                rife(tmpdir, tmpdir2)
+                shutil.rmtree(tmpdir)
+                shutil.move(tmpdir2, tmpdir)
+
+        if not args.no_bounce:
+            sources = sorted(list(tmpdir.iterdir()))
+            for i, path in enumerate(sources[-pow(2, args.rife_iterations-1):]):
+                path.unlink()
+
+        ffmpeg_merge(
+            tmpdir, 
+            args.output,
+            framerate=args.framerate,
+            loops=args.loops,
+        )
+        print(args.output)
+
+
+if __name__ == '__main__':
+    main()
