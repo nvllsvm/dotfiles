@@ -94,7 +94,7 @@ def read_device(hwmon_path):
     return state
 
 
-def output_human(now, state):
+def format_human(now, state):
     new_state = {}
     ibus = None
     vbus = None
@@ -132,31 +132,52 @@ def output_human(now, state):
         line.append(
             f'{Style.BRIGHT}{color}{key}:{Style.RESET} {value}'
         )
-    print('   '.join(line))
+    line = '   '.join(line)
+    return line
 
 
-def output_raw(ts, state):
+def format_raw(ts, state, logfile):
     data = {
         'timestamp': ts.isoformat(),
         'state': state,
     }
-    print(json.dumps(data, sort_keys=True))
+    line = json.dumps(data, sort_keys=True)
+    return line
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-n', '--interval', type=int, default=1)
+    parser.add_argument('-o', '--output', type=pathlib.Path)
+    parser.add_argument('-i', '--input', type=pathlib.Path)
     parser.add_argument('--raw', action='store_true')
     args = parser.parse_args()
 
+    if args.input:
+        for raw_line in args.input.read_text().splitlines():
+            data = json.loads(raw_line)
+            line = format_human(
+                now=datetime.datetime.fromisoformat(data['timestamp']),
+                state=data['state'],
+            )
+            print(line)
+        parser.exit()
+
     path = find_device()
+    handle = None
+    if args.output:
+        handle = open(args.output, 'w')
     while True:
         now = datetime.datetime.now(tz=datetime.timezone.utc)
         state = read_device(path)
         if args.raw:
-            output_raw(now, state)
+            line = format_raw(now, state)
         else:
-            output_human(now, state)
+            line = format_human(now, state)
+        print(line)
+        if handle:
+            handle.write(line + '\n')
+            handle.flush()
         time.sleep(args.interval)
 
 
