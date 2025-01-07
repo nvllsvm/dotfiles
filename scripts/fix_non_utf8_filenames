@@ -1,0 +1,34 @@
+#!/usr/bin/env python3
+import argparse
+import os
+import pathlib
+import sys
+
+import charset_normalizer
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-a', '--all', action='store_true')
+parser.add_argument('--rename', action='store_true')
+parser.add_argument('path', type=pathlib.Path)
+args = parser.parse_args()
+
+name = os.fsencode(args.path.name)
+try:
+    name.decode()
+except UnicodeDecodeError:
+    results = charset_normalizer.from_bytes(name)
+    if args.all:
+        for result in results:
+            print(dir(result))
+    else:
+        result = results.best()
+        print(result)
+        if args.rename:
+            target = args.path.parent / str(result)
+            if target.exists():
+                print('error: target exists', file=sys.stderr)
+                sys.exit(1)
+            args.path.rename(target)
+            sys.exit(0)
+    sys.exit(1)
