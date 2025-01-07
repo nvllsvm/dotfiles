@@ -5,3 +5,5 @@ LABEL=LINUX / ext4 rw,relatime 0 1
 
 //sol.nullsum.lan/public    /mnt/sol/public     cifs  _netdev,noauto,x-systemd.automount,username=ar,password=,uid=ar,gid=ar  0 0
 //sol.nullsum.lan/storage   /mnt/sol/storage    cifs  _netdev,noauto,x-systemd.automount,username=ar,password=,uid=ar,gid=ar  0 0
+
+/swapfile none swap defaults 0 0
