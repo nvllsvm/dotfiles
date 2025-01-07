@@ -5,6 +5,7 @@ VERBOSE=
 INSTALL_SYSTEM=
 
 NO_PUSH=
+NO_PULL=
 case "$(git -C "$DOTFILES" remote get-url origin)" in
     https://*)
         NO_PUSH='--no-push'
@@ -26,6 +27,10 @@ while [ $# -gt 0 ]; do
         -h|--help)
             usage
             exit
+            ;;
+        --no-pull)
+            NO_PULL='--no-pull'
+            shift
             ;;
         --no-push)
             NO_PUSH='--no-push'
@@ -81,7 +86,9 @@ update_non_user() {
 update_repo() {
     dotfiles_root="$2"
     printf "%bUpdating %s (%s)...%b\n" "$MAGENTA" "$1" "$dotfiles_root" "$RESET"
-    git auto-update $NO_PUSH "$dotfiles_root"
+    if [ -z "$NO_PULL" ]; then
+        git auto-update $NO_PUSH "$dotfiles_root"
+    fi
 
     if [ -n "$INSTALL_SYSTEM" ]; then
         printf "%bUpdating non-user files %s (%s)...%b\n" "$MAGENTA" "$1" "$dotfiles_root" "$RESET"
