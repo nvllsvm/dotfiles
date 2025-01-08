@@ -1,5 +1,5 @@
 [Unit]
-Description=Run sol-update-check daily
+Description=Run check-update-mars-bios daily
 
 [Timer]
 OnCalendar=daily

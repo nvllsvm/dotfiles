@@ -1,6 +1,0 @@
-[Unit]
-Description=Run sol-update-check
-
-[Service]
-ExecStart=zsh -lc sol-update-check
-SyslogIdentifier=sol-update-check

@@ -1,0 +1,6 @@
+[Unit]
+Description=Run check-update-mars-bios
+
+[Service]
+ExecStart=zsh -lc check-update-mars-bios
+SyslogIdentifier=check-update-mars-bios

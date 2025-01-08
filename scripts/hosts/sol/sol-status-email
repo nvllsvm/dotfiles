@@ -18,11 +18,12 @@ SYSTEM_UNITS = {
 }
 
 USER_UNITS = {
+    'check-update-phobos-bios.service',
+    'check-update-mars-bios.service',
     'git-repo-backup.service',
     'gog-update.service',
     'mbsync.service',
     'sol-fix-permissions.service',
-    'sol-update-check.service',
     'sol-update-remotes.service',
     'vdirsyncer.service',
 }
