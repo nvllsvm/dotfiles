@@ -1,4 +1,4 @@
 #!/bin/sh
 set -e
-sudo grub-editenv /boot/grub/grubenv set saved_entry=win7
+sudo grub-editenv /boot/grub/grubenv set saved_entry='win7_ultimate_64'
 sudo reboot
