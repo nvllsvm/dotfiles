@@ -53,6 +53,7 @@ if HOSTNAME in ('sol', 'mars', 'phobos'):
         'hugo',
         'hyperfine',
         'iftop',
+        'inetutils',  # hostname command
         'innoextract',
         'iperf3',
         'ipython',
