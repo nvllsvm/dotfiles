@@ -20,7 +20,7 @@ except UnicodeDecodeError:
     results = charset_normalizer.from_bytes(name)
     if args.all:
         for result in results:
-            print(dir(result))
+            print(result)
     else:
         result = results.best()
         print(result)

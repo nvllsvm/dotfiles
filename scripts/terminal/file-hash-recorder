@@ -175,7 +175,15 @@ def compact_json_dumps(data):
 
 
 def is_archive(path):
-    return path.name.lower().endswith('.7z')
+    return path.name.lower().endswith((
+        '.7z',
+        '.bz2',
+        '.gz',
+        '.tgz',
+        '.xz',
+        '.zip',
+        '.zst',
+    ))
 
 
 async def _process_path(path, stat,
@@ -203,6 +211,7 @@ async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--no-progress', action='store_true')
     parser.add_argument('--absolute-paths', action='store_true')
+    parser.add_argument('-l', '--list', action='store_true')
     parser.add_argument('-f', '--force', action='store_true')
     parser.add_argument('-c', '--compact', action='store_true',
                         help='output compact json')
@@ -217,6 +226,25 @@ async def main():
                         help='extract to tempdir when hashing archive contents')
     parser.add_argument('path', type=pathlib.Path)
     args = parser.parse_args()
+
+    json_dumps = compact_json_dumps if args.compact else pretty_json_dumps
+
+    if args.list:
+        if not args.output:
+            raise RuntimeError
+        path = args.path.absolute().relative_to(args.output.parent)
+        data = json.loads(args.output.read_text())
+        if path.is_dir():
+            path = str(path) + '/'
+            data = {
+                k: v
+                for k, v in data.items()
+                if k.startswith(path)
+            }
+        else:
+            data = data[str(path)]
+        print(json_dumps(data))
+        parser.exit()
 
     if args.multihash:
         print(json.dumps(MultiHash.from_path(args.path)))
@@ -295,8 +323,6 @@ async def main():
 
     if not args.path.is_file() and not args.no_progress:
         executor = tqdm.asyncio.tqdm(executor)
-
-    json_dumps = compact_json_dumps if args.compact else pretty_json_dumps
 
     pending_write = False
     try:
