@@ -49,7 +49,7 @@ def main():
             new.extend([*list(reversed(sources[:-1]))])
 
         for i, p in enumerate(new):
-            shutil.copy(p, tmpdir / f'{i}.png')
+            shutil.copy(p, tmpdir / f'{i:032d}.png')
 
         for i in range(args.rife_iterations - 1):
             with tempfile.TemporaryDirectory(dir=args.source.parent) as tmpdir2:
