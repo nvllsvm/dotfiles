@@ -122,8 +122,11 @@ else
                 -e '^MIME type       : ' \
                 || true
             ;;
-        application/octet-stream)
+        application/octet-stream|'')
             case "$(printf %s "$1" | tr '[:upper:]' '[:lower:]')" in
+                *.rvz)
+                    extract -l -- "$1"
+                    ;;
                 *.umx)
                     ffprobe -hide_banner -- "$1" 2>&1
                     ;;
