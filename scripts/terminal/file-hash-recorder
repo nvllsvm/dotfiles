@@ -102,7 +102,7 @@ class ProcessError(Exception):
 
 async def multi_hash(path):
     proc = await asyncio.create_subprocess_exec(
-        'file-hash-recorder', '--multihash', '--', path,
+        'file-hash-recorder', '--multihash', '--stdout', '--', path,
         stdout=asyncio.subprocess.PIPE)
     stdout, _ = await proc.communicate()
     if proc.returncode:
@@ -112,7 +112,7 @@ async def multi_hash(path):
 
 async def file_hash_recorder(path):
     proc = await asyncio.create_subprocess_exec(
-        'file-hash-recorder', '--no-progress', '--', '.',
+        'file-hash-recorder', '--no-progress', '--stdout', '--', '.',
         cwd=path,
         stdout=asyncio.subprocess.PIPE)
     stdout, _ = await proc.communicate()
@@ -210,33 +210,22 @@ async def _process_path(path, stat,
     return data
 
 
-async def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--no-progress', action='store_true')
-    parser.add_argument('--absolute-paths', action='store_true')
-    parser.add_argument('-l', '--list', action='store_true')
-    parser.add_argument('-f', '--force', action='store_true')
-    parser.add_argument('-c', '--compact', action='store_true',
-                        help='output compact json')
-    parser.add_argument('--multihash', action='store_true')
-    parser.add_argument('-o', '--output', type=pathlib.Path)
-    parser.add_argument('-n', '--num-procs', type=int, default=1)
-    parser.add_argument('-a', '--archive-contents', action='store_true')
-    parser.add_argument('--skip-errors', action='store_true')
-    parser.add_argument('--show-dupes', action='store_true')
-    parser.add_argument('--verify', action='store_true')
-    parser.add_argument('--tmpdir', action='store_true',
-                        help='extract to tempdir when hashing archive contents')
-    parser.add_argument('path', type=pathlib.Path)
-    args = parser.parse_args()
-
+async def _process_root_path(root_path, args, parser):
     json_dumps = compact_json_dumps if args.compact else pretty_json_dumps
 
+    if args.multihash:
+        print(json.dumps(MultiHash.from_path(root_path)))
+        parser.exit()
+
+    output_path = None
+    if not args.stdout:
+        output_path = args.output or (root_path / 'file_info.json')
+
     if args.list:
-        if not args.output:
+        if not output_path.is_file():
             raise RuntimeError
-        path = args.path.absolute().relative_to(args.output.parent)
-        data = json.loads(args.output.read_text())
+        path = root_path.absolute().relative_to(output_path.parent)
+        data = json.loads(output_path.read_text())
         if path.is_dir():
             path = str(path) + '/'
             data = {
@@ -249,20 +238,17 @@ async def main():
         print(json_dumps(data))
         parser.exit()
 
-    if args.multihash:
-        print(json.dumps(MultiHash.from_path(args.path)))
-        parser.exit()
-
     if args.verify:
-        if not args.output:
+        if not output_path.is_file():
             raise RuntimeError
-        results = json.loads(args.output.read_text())
+        results = json.loads(output_path.read_text())
 
         found = set()
         has_error = False
+        print('Processing', root_path)
         for path in tqdm.tqdm(results):
             info = results[path]
-            path = pathlib.Path(path)
+            path = root_path / path
             if not path.exists():
                 has_error = True
                 print('File not found:', path, file=sys.stderr)
@@ -275,30 +261,30 @@ async def main():
         if has_error:
             sys.exit(1)
         else:
-            sys.exit()
+            return
 
 
     results = {}
     ignore_paths = set()
-    output_path = None
-    if args.output is not None:
-        output_path = args.output
-        ignore_paths.add(output_path)
-        if output_path.exists():
+    if output_path and output_path.exists():
+        if output_path.is_file():
             results = json.loads(output_path.read_text())
+        else:
+            raise RuntimeError
+    ignore_paths.add(output_path)
 
     found = set()
 
     pending_paths = []
-    for path in all_files(args.path):
+    for path in all_files(root_path):
         if path in ignore_paths:
             continue
         if args.absolute_paths:
             name = str(path.absolute())
-        elif args.path == path:
+        elif root_path == path:
             name = str(path)
         else:
-            name = str(path.relative_to(args.path))
+            name = str(path.relative_to(root_path))
         found.add(name)
         stat = path.stat()
         if name in results \
@@ -324,7 +310,8 @@ async def main():
         )
         future_info[future] = (path, name)
 
-    if not args.path.is_file() and not args.no_progress:
+    if not root_path.is_file() and not args.no_progress:
+        print('Processing', root_path)
         executor = tqdm.asyncio.tqdm(executor)
 
     pending_write = False
@@ -388,6 +375,39 @@ async def main():
             print(json_dumps(dupes_results))
     else:
         print(json_dumps(results))
+
+
+async def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--no-progress', action='store_true')
+    parser.add_argument('--absolute-paths', action='store_true')
+
+    mode_mutex = parser.add_mutually_exclusive_group()
+    mode_mutex.add_argument('-l', '--list', action='store_true')
+    mode_mutex.add_argument('--verify', action='store_true')
+    mode_mutex.add_argument('--multihash', action='store_true')
+
+    parser.add_argument('-f', '--force', action='store_true')
+    parser.add_argument('-c', '--compact', action='store_true',
+                        help='output compact json')
+    parser.add_argument('--stdout', action='store_true')
+    parser.add_argument('-o', '--output', type=pathlib.Path)
+    parser.add_argument('-n', '--num-procs', type=int, default=1)
+    parser.add_argument('-a', '--archive-contents', action='store_true')
+    parser.add_argument('--skip-errors', action='store_true')
+    parser.add_argument('--show-dupes', action='store_true')
+    parser.add_argument('--tmpdir', action='store_true',
+                        help='extract to tempdir when hashing archive contents')
+    parser.add_argument('path', type=pathlib.Path, nargs='+')
+    args = parser.parse_args()
+
+    if len(args.path) > 1:
+        if any((args.output, args.show_dupes, args.list, args.stdout, args.multihash)):
+            raise RuntimeError
+
+    for path in args.path:
+        await _process_root_path(path, args, parser)
+
 
 
 if __name__ == '__main__':
