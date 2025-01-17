@@ -47,6 +47,7 @@ video/mpeg=mpv.desktop
 video/quicktime=mpv.desktop
 video/vnd.radgamettools.bink=mpv.desktop
 video/vnd.radgamettools.smacker=mpv.desktop
+video/ogg=mpv.desktop
 video/webm=mpv.desktop
 video/x-m4v=mpv.desktop
 video/x-matroska=mpv.desktop
