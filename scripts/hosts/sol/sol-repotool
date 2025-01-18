@@ -253,9 +253,14 @@ def db_remove(packages):
     database.remove(*packages)
 
 
-def db_add(packages):
+def db_add(packages, delete=False):
     database = Database(DATABASE)
     database.add(*packages)
+    if delete:
+        for package in packages:
+            path = pathlib.Path(package)
+            if path.is_file():
+                path.unlink()
 
 
 def db_update():
@@ -279,6 +284,7 @@ def main():
     subparsers = parser.add_subparsers(dest='command', metavar='COMMAND', required=True)
 
     add_parser = subparsers.add_parser('add', help='')
+    add_parser.add_argument('--rm', action='store_true')
     add_parser.add_argument('package', nargs='+')
 
     list_parser = subparsers.add_parser('list', help='')
@@ -302,7 +308,7 @@ def main():
         case 'update':
             db_update()
         case 'add':
-            db_add(args.package)
+            db_add(args.package, delete=args.rm)
         case 'remove':
             db_remove(args.package)
         case 'list':
