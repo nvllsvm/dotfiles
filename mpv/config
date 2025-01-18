@@ -4,6 +4,7 @@ tone-mapping=reinhard
 force-window=immediate
 audio-channels=stereo
 screenshot-format=png
+screenshot-png-compression=0
 
 [deinterlace]
 profile-cond=p["video-frame-info/interlaced"]
