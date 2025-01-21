@@ -119,3 +119,9 @@ all_commands() {
 }
 
 PROMPT_EOL_MARK=''
+
+# ensures tmux opens in the symlink pwd instead of the resolved link
+chpwd_osc_7() {
+    printf '\033]7;%s\033\\' "$PWD" > /dev/tty
+}
+add-zsh-hook chpwd chpwd_osc_7

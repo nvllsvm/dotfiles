@@ -32,3 +32,7 @@ cmd nopreview &{{
 }}
 map <tab> nopreview
 set autoquit
+
+cmd on-cd &printf '\033]7;%s\033\\' "$PWD" > /dev/tty
+cmd on-quit &printf '\033]7;\033\\' > /dev/tty
+on-cd
