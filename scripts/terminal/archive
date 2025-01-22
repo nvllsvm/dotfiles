@@ -1289,8 +1289,12 @@ class xorriso:
     @staticmethod
     async def contents(path):
         proc = await asyncio.create_subprocess_exec(
-            'xorriso', '-osirrox', 'on', '-indev', path,
-            '-find', '/', '-exec', 'lsdl',
+            'xorriso',
+            '-osirrox', 'on',
+            '-indev', path,
+            '-abort_on', 'WARNING',
+            '-find', '/',
+            '-exec', 'lsdl',
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.DEVNULL)
         stdout, _ = await proc.communicate()
@@ -2278,10 +2282,20 @@ async def _get_class(path):
         elif start[7:14] == b'**ACE**':
             return unace
 
-        # iso9660
+        # iso9660, udf
         f.seek(32769)
-        if f.read(5) == b'CD001':
-            return xorriso
+        if f.read(5) in (
+                b'CD001',  # contains an ISO 9660 file system
+                b'BEA01',  # beginning of the extended descriptor section
+                b'NSR02',  # contains a UDF file system
+                b'NSR03',  # this volume contains a UDF file system
+                b'BOOT2',  # includes information concerning boot loader location and entry point address
+                b'TEA01'):  # end of the extended descriptor section
+            try:
+                await xorriso.contents(path)
+                return xorriso
+            except Exception:
+                pass
 
     if suffixes := [suffix.lower() for suffix in path.suffixes]:
         if suffixes[-1] == '.cue':
