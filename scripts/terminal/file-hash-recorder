@@ -189,6 +189,23 @@ def is_archive(path):
     ))
 
 
+def find_default_file_info_json(root_path):
+    if not root_path.exists():
+        raise FileNotFoundError
+
+    path = root_path.absolute()
+    search_dirs = list(root_path.parents)
+    if root_path.is_dir():
+        search_dirs = [root_path, *search_dirs]
+
+    for path in search_dirs:
+        path = path / 'file_info.json'
+        if path.is_file():
+            return path
+    raise RuntimeError
+
+
+
 async def _process_path(path, stat,
                         hash_archive_contents=False,
                         multihash_subprocess=False,
@@ -219,14 +236,17 @@ async def _process_root_path(root_path, args, parser):
 
     output_path = None
     if not args.stdout:
-        output_path = args.output or (root_path / 'file_info.json')
+        output_path = args.output or find_default_file_info_json(root_path)
 
     if args.list:
         if not output_path.is_file():
             raise RuntimeError
-        path = root_path.absolute().relative_to(output_path.parent)
+        root_path = root_path.absolute()
+        if output_path.parent.absolute() not in root_path.parents:
+            raise RuntimeError
+        path = root_path.relative_to(output_path.parent)
         data = json.loads(output_path.read_text())
-        if path.is_dir():
+        if root_path.is_dir():
             path = str(path) + '/'
             data = {
                 k: v
