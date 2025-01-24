@@ -243,7 +243,7 @@ async def create_rvz(path, dest, fast=False):
 
 async def create_iso(path, dest, fast=False):
     proc = await asyncio.create_subprocess_exec(
-        'mkisofs', '-o', dest, path)
+        'mkisofs', '-volid', path.name, '-o', dest, path)
     await proc.wait()
     if proc.returncode:
         raise ProcessError(proc)
