@@ -2,12 +2,13 @@
 import argparse
 import asyncio
 import base64
+import dataclasses
 import hashlib
 import json
 import pathlib
+import sqlite3
 import sys
 import tempfile
-import time
 import zlib
 
 import async_executor
@@ -17,6 +18,166 @@ import tqdm.asyncio
 
 BUFFER_SIZE = 16 * 1024 * 1024
 FLUSH_SECONDS = 60
+
+@dataclasses.dataclass
+class FileInfo:
+    path: str
+    crc32: str
+    md5: str
+    mtime: float
+    sha1: str
+    sha256: str
+    size: int
+    archive_contents: dict = dataclasses.field(default_factory=dict)
+
+
+@dataclasses.dataclass
+class ArchiveContentsInfo:
+    parent: str
+    path: str
+    crc32: str
+    md5: str
+    mtime: float
+    sha1: str
+    sha256: str
+    size: int
+
+
+class FileInfoDB:
+    SCHEMA = """
+    CREATE TABLE IF NOT EXISTS files(
+        path,
+        crc32,
+        md5,
+        mtime
+        real,
+        sha1,
+        sha256,
+        size int,
+
+        primary key(path)
+    );
+    CREATE TABLE IF NOT EXISTS archive_contents(
+        parent,
+        path,
+        crc32,
+        md5,
+        mtime
+        real,
+        sha1,
+        sha256,
+        size int,
+
+        primary key(parent, path),
+        foreign key(parent) references files(path)
+    );
+    """
+
+    def __init__(self, path):
+        self.path = path.absolute()
+        self.conn = sqlite3.connect(self.path)
+        self.conn.row_factory = self._dict_factory
+        cur = self.conn.cursor()
+        cur.executescript(self.SCHEMA)
+        cur.close()
+
+    @staticmethod
+    def _dict_factory(cursor, row):
+        fields = [column[0] for column in cursor.description]
+        return {key: value for key, value in zip(fields, row)}
+
+    def upsert_file(self, file_info):
+        for ac in file_info.archive_contents.values():
+            if ac.parent != file_info.path:
+                raise ValueError
+        fi = dataclasses.asdict(file_info)
+        ac = fi.pop('archive_contents')
+        cur = self.conn.cursor()
+        cur.execute(
+            """
+            INSERT INTO files(path, crc32, md5, mtime, sha1, sha256, size)
+            VALUES(:path, :crc32, :md5, :mtime, :sha1, :sha256, :size)
+            ON CONFLICT DO UPDATE
+                SET crc32 = :crc32,
+                    md5 = :md5,
+                    mtime = :mtime,
+                    sha1 = :sha1,
+                    sha256 = :sha256,
+                    size = :size
+            """,
+            fi,
+        )
+        if ac:
+            cur.executemany(
+                """
+                INSERT INTO archive_contents(parent, path, crc32, md5, mtime, sha1, sha256, size)
+                VALUES(:parent, :path, :crc32, :md5, :mtime, :sha1, :sha256, :size)
+                ON CONFLICT DO UPDATE
+                    SET crc32 = :crc32,
+                        md5 = :md5,
+                        mtime = :mtime,
+                        sha1 = :sha1,
+                        sha256 = :sha256,
+                        size = :size
+                """,
+                ac.values(),
+            )
+        self.conn.commit()
+        cur.close()
+
+    def delete_file(self, path):
+        cur = self.conn.cursor()
+        cur.execute(
+            'DELETE FROM archive_contents WHERE parent = :parent',
+            {'parent': path})
+        cur.execute(
+            'DELETE FROM files WHERE path = :path',
+            {'path': path})
+        self.conn.commit()
+        cur.close()
+
+    @staticmethod
+    def _escape_like(value, escape):
+        for c in set(('%', '_', escape)):
+            value = value.replace(c, escape + c)
+        return value
+
+    def get_all(self, filepath=None, prefix='', suffix=''):
+        data = {}
+        cur = self.conn.cursor()
+
+        clause_files = ''
+        clause_archive_contents = ''
+        params = {}
+        if filepath is not None:
+            clause_files = 'WHERE path = :filepath'
+            clause_archive_contents = 'WHERE parent = :filepath'
+            params['filepath'] = filepath
+        elif prefix or suffix:
+            cur.execute('PRAGMA case_sensitive_like = true')
+            clause_files = 'WHERE path LIKE :like ESCAPE :escape'
+            clause_archive_contents = 'WHERE parent LIKE :like ESCAPE :escape'
+            escape = '\\'
+            like = '%'.join((
+                self._escape_like(prefix, escape),
+                self._escape_like(suffix, escape),
+            ))
+            params['escape'] = escape
+            params['like'] = like
+
+        cur.execute('SELECT * FROM files ' + clause_files, params)
+        for finfo in cur.fetchall():
+            finfo = FileInfo(**finfo)
+            data[finfo.path] = finfo
+        cur.close()
+
+        cur = self.conn.cursor()
+        cur.execute('SELECT * FROM archive_contents ' + clause_archive_contents, params)
+        for acinfo in cur.fetchall():
+            acinfo = ArchiveContentsInfo(**acinfo)
+            data[acinfo.parent].archive_contents[acinfo.path] = acinfo
+        cur.close()
+        return data
 
 
 def all_files(root):
@@ -102,7 +263,7 @@ class ProcessError(Exception):
 
 async def multi_hash(path):
     proc = await asyncio.create_subprocess_exec(
-        'file-hash-recorder', '--multihash', '--stdout', '--', path,
+        'file-hash-recorder', '--multihash', '--', path,
         stdout=asyncio.subprocess.PIPE)
     stdout, _ = await proc.communicate()
     if proc.returncode:
@@ -112,7 +273,7 @@ async def multi_hash(path):
 
 async def file_hash_recorder(path):
     proc = await asyncio.create_subprocess_exec(
-        'file-hash-recorder', '--no-progress', '--stdout', '--', '.',
+        'file-hash-recorder', '--multihash', '--', '.',
         cwd=path,
         stdout=asyncio.subprocess.PIPE)
     stdout, _ = await proc.communicate()
@@ -121,7 +282,7 @@ async def file_hash_recorder(path):
     return json.loads(stdout)
 
 
-async def archive_contents(path, use_tmpdir=False):
+async def archive_contents(path, use_tmpdir=True):
     if use_tmpdir:
         with tempfile.TemporaryDirectory() as tmpdir:
             proc = await asyncio.create_subprocess_exec(
@@ -167,11 +328,18 @@ async def archive_contents(path, use_tmpdir=False):
 
 
 def pretty_json_dumps(data):
-    return json.dumps(data, indent=2, sort_keys=True, ensure_ascii=False)
+    return json.dumps(
+        data,
+        indent=2,
+        sort_keys=True,
+        ensure_ascii=False)
 
 
-def compact_json_dumps(data):
-    return json.dumps(data, ensure_ascii=False, separators=(',', ':'))
+def json_dumps(data):
+    return json.dumps(
+        data,
+        ensure_ascii=False,
+        separators=(',', ':'))
 
 
 def is_archive(path):
@@ -189,27 +357,33 @@ def is_archive(path):
     ))
 
 
-def find_default_file_info_json(root_path):
+def find_default_file_info_db(root_path, must_exist=True):
     if not root_path.exists():
         raise FileNotFoundError
 
-    path = root_path.absolute()
+    root_path = root_path.absolute()
     search_dirs = list(root_path.parents)
     if root_path.is_dir():
         search_dirs = [root_path, *search_dirs]
 
     for path in search_dirs:
-        path = path / 'file_info.json'
+        path = path / 'file_info.db'
         if path.is_file():
             return path
-    raise RuntimeError
+
+    if must_exist:
+        raise RuntimeError
+    else:
+        return root_path / 'file_info.db'
 
 
-
-async def _process_path(path, stat,
-                        hash_archive_contents=False,
+async def _process_path(path,
+                        stat=None,
+                        hash_archive_contents=True,
                         multihash_subprocess=False,
                         use_tmpdir=False):
+    if stat is None:
+        stat = path.stat()
     if multihash_subprocess:
         hashes = await multi_hash(path)
     else:
@@ -228,51 +402,92 @@ async def _process_path(path, stat,
 
 
 async def _process_root_path(root_path, args, parser):
-    json_dumps = compact_json_dumps if args.compact else pretty_json_dumps
-
     if args.multihash:
-        print(json.dumps(MultiHash.from_path(root_path)))
-        parser.exit()
+        results = {}
+        for path in all_files(root_path):
+            results[path] = await _process_path(path, hash_archive_contents=False)
 
-    output_path = None
-    if not args.stdout:
-        output_path = args.output or find_default_file_info_json(root_path)
-
-    if args.list:
-        if not output_path.is_file():
-            raise RuntimeError
-        root_path = root_path.absolute()
-        if output_path.parent.absolute() not in root_path.parents:
-            raise RuntimeError
-        path = root_path.relative_to(output_path.parent)
-        data = json.loads(output_path.read_text())
-        if root_path.is_dir():
-            path = str(path) + '/'
-            data = {
-                k: v
-                for k, v in data.items()
-                if k.startswith(path)
-            }
+        if root_path.is_file():
+            results = tuple(results.values())[0]
         else:
-            data = data[str(path)]
-        print(json_dumps(data))
+            results = {
+                str(k.relative_to(root_path)): v
+                for k, v in results.items()
+            }
+        print(json_dumps(results))
+        return
+
+    root_path = root_path.absolute()
+    output_path = args.output or find_default_file_info_db(
+        root_path, must_exist=not args.mkdb)
+    db = FileInfoDB(output_path)
+
+    results = {}
+    if root_path == db.path.parent:
+        results = db.get_all()
+    elif db.path.parent in root_path.parents:
+        rel_root_path = root_path.relative_to(db.path.parent)
+        if root_path.is_dir():
+            results = db.get_all(prefix=str(rel_root_path) + '/')
+        else:
+            results = db.get_all(filepath=str(rel_root_path))
+
+    if args.list or args.show_dupes:
+        if root_path != db.path.parent:
+            prefix = str(rel_root_path) + '/'
+            results = {
+                k.removeprefix(prefix): v
+                for k, v in results.items()
+            }
+
+        results = {
+            k: dataclasses.asdict(v)
+            for k, v in results.items()
+        }
+        for info in results.values():
+            info.pop('path')
+            for ac_info in info['archive_contents'].values():
+                ac_info.pop('path')
+                ac_info.pop('parent')
+            if not info['archive_contents']:
+                info.pop('archive_contents')
+
+        if args.show_dupes:
+            grouped = {}
+            for path, info in results.items():
+                key = tuple(
+                    info[k]
+                    for k in ('size', 'crc32', 'md5', 'sha1', 'sha256')
+                )
+                grouped.setdefault(key, [])
+                grouped[key].append(path)
+            dupes_results = [
+                sorted(v)
+                for v in grouped.values()
+                if len(v) > 1
+            ]
+            print(pretty_json_dumps(dupes_results))
+        else:
+            if root_path.is_file():
+                results = tuple(results.values())[0]
+            print(pretty_json_dumps(results))
         parser.exit()
 
     if args.verify:
-        if not output_path.is_file():
-            raise RuntimeError
-        results = json.loads(output_path.read_text())
-
         found = set()
         has_error = False
         print('Processing', root_path)
         for path in tqdm.tqdm(results):
-            info = results[path]
-            path = root_path / path
+            info = dataclasses.asdict(results[path])
+            path = db.path.parent / path
             if not path.exists():
                 has_error = True
                 print('File not found:', path, file=sys.stderr)
                 continue
+            stat = path.stat()
+            if stat.st_size != info['size']:
+                has_error = True
+                print('size mismatch:', path, file=sys.stderr)
             hashes = MultiHash.from_path(path)
             for hash_type, hash_value in hashes.items():
                 if hash_value != info[hash_type]:
@@ -283,15 +498,7 @@ async def _process_root_path(root_path, args, parser):
         else:
             return
 
-
-    results = {}
-    ignore_paths = set()
-    if output_path and output_path.exists():
-        if output_path.is_file():
-            results = json.loads(output_path.read_text())
-        else:
-            raise RuntimeError
-    ignore_paths.add(output_path)
+    ignore_paths = {db.path}
 
     found = set()
 
@@ -301,18 +508,16 @@ async def _process_root_path(root_path, args, parser):
             continue
         if args.absolute_paths:
             name = str(path.absolute())
-        elif root_path == path:
-            name = str(path)
         else:
-            name = str(path.relative_to(root_path))
+            name = str(path.relative_to(db.path.parent))
         found.add(name)
         stat = path.stat()
         if name in results \
-                and results[name]['mtime'] == stat.st_mtime \
-                and results[name]['size'] == stat.st_size \
+                and results[name].mtime == stat.st_mtime \
+                and results[name].size == stat.st_size \
                 and not args.force:
-            if args.archive_contents and is_archive(path):
-                if results[name].get('archive_contents'):
+            if not args.no_archive_contents and is_archive(path):
+                if results[name].archive_contents:
                     continue
             else:
                 continue
@@ -322,79 +527,45 @@ async def _process_root_path(root_path, args, parser):
     executor = async_executor.AsyncExecutor(args.num_procs)
     for path, name, stat in pending_paths:
         future = executor.submit(
-            _process_path, 
-            path, stat, 
-            hash_archive_contents=args.archive_contents,
+            _process_path,
+            path,
+            stat=stat,
+            hash_archive_contents=not args.no_archive_contents,
             multihash_subprocess=args.num_procs > 1,
-            use_tmpdir=args.tmpdir,
+            use_tmpdir=not args.no_tmpdir,
         )
         future_info[future] = (path, name)
 
-    if not root_path.is_file() and not args.no_progress:
+    if not args.no_progress:
         print('Processing', root_path)
         executor = tqdm.asyncio.tqdm(executor)
 
-    pending_write = False
     try:
-        prev_time = time.time()
         async for future in executor:
             path, name = future_info[future]
             try:
                 data = future.result()
             except Exception as e:
-                if output_path and pending_write:
-                    safe_write(
-                        output_path,
-                        json_dumps(results),
-                )
                 print(f'error processing "{path}": {e}', file=sys.stderr)
                 if args.skip_errors:
                     continue
                 else:
                     raise
 
-            results[name] = data
-            pending_write = True
-            curr_time = time.time()
-            if output_path and (curr_time - prev_time) > FLUSH_SECONDS:
-                safe_write(
-                    output_path,
-                    json_dumps(results),
-                )
-                pending_write = False
-                prev_time = curr_time
 
-        for name in list(results):
+            archive_contents = {
+                k: ArchiveContentsInfo(parent=name, path=k, **v)
+                for k, v in data.pop('archive_contents', {}).items()
+            }
+            fileinfo = FileInfo(path=name, archive_contents=archive_contents, **data)
+            db.upsert_file(fileinfo)
+            results[name] = fileinfo
+
+        for name in results:
             if name not in found:
-                results.pop(name)
-                pending_write = True
-        if output_path and pending_write:
-            safe_write(
-                output_path,
-                json_dumps(results),
-            )
-            pending_write = False
+                db.delete_file(name)
     except KeyboardInterrupt:
-        if output_path and pending_write:
-            safe_write(
-                output_path,
-                json_dumps(results),
-            )
         sys.exit(1)
-
-    if output_path:
-        if args.show_dupes:
-            by_sha256 = {}
-            for path, info in results.items():
-                by_sha256.setdefault(info['sha256'], [])
-                by_sha256[info['sha256']].append(path)
-            dupes_results = {}
-            for sha256, items in by_sha256.items():
-                if len(items) > 1:
-                    dupes_results[sha256] = sorted(items)
-            print(json_dumps(dupes_results))
-    else:
-        print(json_dumps(results))
 
 
 async def main():
@@ -408,21 +579,22 @@ async def main():
     mode_mutex.add_argument('--multihash', action='store_true')
 
     parser.add_argument('-f', '--force', action='store_true')
+    parser.add_argument('--mkdb', action='store_true',
+                        help='create the database if one does not already exist')
     parser.add_argument('-c', '--compact', action='store_true',
                         help='output compact json')
-    parser.add_argument('--stdout', action='store_true')
     parser.add_argument('-o', '--output', type=pathlib.Path)
     parser.add_argument('-n', '--num-procs', type=int, default=1)
-    parser.add_argument('-a', '--archive-contents', action='store_true')
+    parser.add_argument('--no-archive-contents', action='store_true')
     parser.add_argument('--skip-errors', action='store_true')
     parser.add_argument('--show-dupes', action='store_true')
-    parser.add_argument('--tmpdir', action='store_true',
+    parser.add_argument('--no-tmpdir', action='store_true',
                         help='extract to tempdir when hashing archive contents')
     parser.add_argument('path', type=pathlib.Path, nargs='+')
     args = parser.parse_args()
 
     if len(args.path) > 1:
-        if any((args.output, args.show_dupes, args.list, args.stdout, args.multihash)):
+        if any((args.output, args.show_dupes, args.list, args.multihash)):
             raise RuntimeError
 
     for path in args.path:
