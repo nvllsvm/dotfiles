@@ -476,7 +476,7 @@ async def _process_root_path(root_path, args, parser):
     if args.verify:
         found = set()
         has_error = False
-        print('Processing', root_path)
+        print('Verifying', root_path)
         for path in tqdm.tqdm(results):
             info = dataclasses.asdict(results[path])
             path = db.path.parent / path
