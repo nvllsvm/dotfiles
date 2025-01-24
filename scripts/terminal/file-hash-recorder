@@ -17,7 +17,6 @@ import tqdm.asyncio
 
 
 BUFFER_SIZE = 16 * 1024 * 1024
-FLUSH_SECONDS = 60
 
 @dataclasses.dataclass
 class FileInfo:
@@ -222,22 +221,6 @@ class MultiHash:
             while data := handle.read(BUFFER_SIZE):
                 mh.update(data)
         return mh.hashes()
-
-
-def safe_write(path, data):
-    path = pathlib.Path(path)
-    if isinstance(data, str):
-        data = data.encode()
-    with tempfile.NamedTemporaryFile(delete=False, dir=path.parent) as handle:
-        temp_path = pathlib.Path(handle.name)
-        try:
-            temp_path.write_bytes(data)
-            temp_path.rename(path)
-        finally:
-            try:
-                temp_path.unlink()
-            except FileNotFoundError:
-                pass
 
 
 class ProcessError(Exception):
