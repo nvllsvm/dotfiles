@@ -137,7 +137,10 @@ class FileInfoDB:
 
     @staticmethod
     def _escape_like(value, escape):
-        for c in set(('%', '_', escape)):
+        escape_chars = sorted(
+            set(['%', '_', escape]),
+            key=lambda x: (0 if x == escape else 1, x))
+        for c in escape_chars:
             value = value.replace(c, escape + c)
         return value
 
