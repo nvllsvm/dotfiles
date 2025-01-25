@@ -227,7 +227,6 @@ async def file_hash_recorder_list(path):
         if proc.returncode:
             raise RuntimeError(proc.returncode)
         result = json.loads(stdout)
-        print(result.keys())
         FILE_HASH_RECORDER_LIST.update(result)
     return FILE_HASH_RECORDER_LIST.get(path)
 
