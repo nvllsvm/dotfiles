@@ -156,7 +156,6 @@ class FileInfoDB:
             clause_archive_contents = 'WHERE parent = :filepath'
             params['filepath'] = filepath
         elif prefix or suffix:
-            cur.execute('PRAGMA case_sensitive_like = true')
             clause_files = 'WHERE path LIKE :like ESCAPE :escape'
             clause_archive_contents = 'WHERE parent LIKE :like ESCAPE :escape'
             escape = '\\'
@@ -166,6 +165,7 @@ class FileInfoDB:
             ))
             params['escape'] = escape
             params['like'] = like
+            cur.execute('PRAGMA case_sensitive_like = true')
 
         cur.execute('SELECT * FROM files ' + clause_files, params)
         for finfo in cur.fetchall():
@@ -407,7 +407,6 @@ async def _process_root_path(root_path, args, parser):
     output_path = args.output or find_default_file_info_db(
         root_path, must_exist=not args.mkdb)
     db = FileInfoDB(output_path)
-
     results = {}
     if root_path == db.path.parent:
         results = db.get_all()
@@ -419,7 +418,12 @@ async def _process_root_path(root_path, args, parser):
             results = db.get_all(filepath=str(rel_root_path))
 
     if args.list or args.show_dupes:
-        if root_path != db.path.parent:
+        if args.absolute_paths:
+            results = {
+                str(db.path.parent) + '/' + k: v
+                for k, v in results.items()
+            }
+        elif root_path != db.path.parent:
             prefix = str(rel_root_path) + '/'
             results = {
                 k.removeprefix(prefix): v
@@ -454,8 +458,6 @@ async def _process_root_path(root_path, args, parser):
             ]
             print(pretty_json_dumps(dupes_results))
         else:
-            if root_path.is_file():
-                results = tuple(results.values())[0]
             print(pretty_json_dumps(results))
         parser.exit()
 
