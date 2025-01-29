@@ -48,8 +48,7 @@ class FileInfoDB:
         path,
         crc32,
         md5,
-        mtime
-        real,
+        mtime real,
         sha1,
         sha256,
         size int,
@@ -61,8 +60,7 @@ class FileInfoDB:
         path,
         crc32,
         md5,
-        mtime
-        real,
+        mtime real,
         sha1,
         sha256,
         size int,
