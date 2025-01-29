@@ -225,6 +225,7 @@ async def file_hash_recorder_list(path):
             stdout=asyncio.subprocess.PIPE)
         stdout, _ = await proc.communicate()
         if proc.returncode:
+            return None
             raise RuntimeError(proc.returncode)
         result = json.loads(stdout)
         FILE_HASH_RECORDER_LIST.update(result)
