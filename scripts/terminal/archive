@@ -56,7 +56,9 @@ def _all_paths(root):
     return sorted(paths)
 
 
-async def create_zip(path, dest, fast=False):
+async def create_zip(path, dest, fast=False, password=None):
+    if password is not None:
+        raise NotImplementedError
     if path.is_dir():
         cwd = path
         paths = sorted(
@@ -92,11 +94,18 @@ async def create_zip(path, dest, fast=False):
         await optimize_zip(dest)
 
 
-async def create_7z(path, dest, fast=False):
+async def create_7z(path, dest, fast=False, password=None):
     # 7z barfs on existing file
     dest.unlink()
 
-    level = '-mx=0' if fast else '-mx=9'
+    args = [
+        '-mx=0' if fast else '-mx=9',
+    ]
+
+    if password is not None:
+        if not password:
+            raise ValueError('password cannot be empty')
+        args.append(f'-p{password}')
 
     if path.is_dir():
         # avoid having all archive nested under a single folder
@@ -109,7 +118,7 @@ async def create_7z(path, dest, fast=False):
     proc = await asyncio.create_subprocess_exec(
         cli_7zip.bin(),
         'a',  # create archive
-        level,
+        *args,
         '--', dest, source,
         cwd=cwd,
         stdout=asyncio.subprocess.PIPE)
@@ -118,7 +127,9 @@ async def create_7z(path, dest, fast=False):
         raise RuntimeError('exit code {proc.returncode}')
 
 
-async def create_epub(path, dest, fast=False):
+async def create_epub(path, dest, fast=False, password=None):
+    if password is not None:
+        raise NotImplementedError
     if path.is_dir():
         cwd = path
         paths = sorted(
@@ -167,7 +178,9 @@ async def create_epub(path, dest, fast=False):
         await optimize_zip(dest)
 
 
-async def create_gzip(path, dest, fast=False):
+async def create_gzip(path, dest, fast=False, password=None):
+    if password is not None:
+        raise NotImplementedError
     if path.is_dir():
         raise RuntimeError
 
@@ -182,7 +195,9 @@ async def create_gzip(path, dest, fast=False):
     assert proc.returncode == 0
 
 
-async def create_xz(path, dest, fast=False):
+async def create_xz(path, dest, fast=False, password=None):
+    if password is not None:
+        raise NotImplementedError
     if path.is_dir():
         raise RuntimeError
 
@@ -204,7 +219,7 @@ async def create_xz(path, dest, fast=False):
     assert proc.returncode == 0
 
 
-async def create_zstd(path, dest, fast=False):
+async def create_zstd(path, dest, fast=False, password=None):
     if path.is_dir():
         raise RuntimeError
 
@@ -217,7 +232,9 @@ async def create_zstd(path, dest, fast=False):
     assert zstd_proc.returncode == 0
 
 
-async def create_rvz(path, dest, fast=False):
+async def create_rvz(path, dest, fast=False, password=None):
+    if password is not None:
+        raise NotImplementedError
     if path.is_dir():
         raise RuntimeError
 
@@ -241,7 +258,9 @@ async def create_rvz(path, dest, fast=False):
         raise NotImplementedError
 
 
-async def create_iso(path, dest, fast=False):
+async def create_iso(path, dest, fast=False, password=None):
+    if password is not None:
+        raise NotImplementedError
     proc = await asyncio.create_subprocess_exec(
         'mkisofs', '-volid', path.name, '-o', dest, path)
     await proc.wait()
@@ -249,7 +268,9 @@ async def create_iso(path, dest, fast=False):
         raise ProcessError(proc)
 
 
-async def create_nsz(path, dest, fast=False):
+async def create_nsz(path, dest, fast=False, password=None):
+    if password is not None:
+        raise NotImplementedError
     if path.is_dir():
         raise RuntimeError
 
@@ -277,7 +298,9 @@ async def create_nsz(path, dest, fast=False):
         tmp_file.rename(dest)
 
 
-async def create_tar(path, dest, fast=False):
+async def create_tar(path, dest, fast=False, password=None):
+    if password is not None:
+        raise NotImplementedError
     if path.is_dir():
         cwd = path
         paths = _all_paths(path)
@@ -301,7 +324,9 @@ async def create_tar(path, dest, fast=False):
     assert tar_proc.returncode == 0
 
 
-async def create_tar_gz(path, dest, fast=False):
+async def create_tar_gz(path, dest, fast=False, password=None):
+    if password is not None:
+        raise NotImplementedError
     if path.is_dir():
         cwd = path
         paths = _all_paths(path)
@@ -332,7 +357,9 @@ async def create_tar_gz(path, dest, fast=False):
     assert tar_proc.returncode == 0
 
 
-async def create_tar_xz(path, dest, fast=False):
+async def create_tar_xz(path, dest, fast=False, password=None):
+    if password is not None:
+        raise NotImplementedError
     if path.is_dir():
         cwd = path
         paths = _all_paths(path)
@@ -368,7 +395,9 @@ async def create_sparse_tar_zstd(*args, **kwargs):
     return await create_tar_zstd(*args, sparse=True, **kwargs)
 
 
-async def create_tar_zstd(path, dest, fast=False, sparse=False):
+async def create_tar_zstd(path, dest, fast=False, sparse=False, password=None):
+    if password is not None:
+        raise NotImplementedError
     if path.is_dir():
         cwd = path
         paths = _all_paths(path)
@@ -502,7 +531,7 @@ _FORMATS = {
 }
 
 
-async def process(source, archive_format, remove, fast=False, parent=None):
+async def process(source, archive_format, remove, fast=False, parent=None, password=None):
     formats = _FORMATS[archive_format]
 
     source = source.absolute()
@@ -514,7 +543,7 @@ async def process(source, archive_format, remove, fast=False, parent=None):
     before = sum(path.lstat().st_size for path in _all_paths(source))
     with TempPath(dir=dest.parent, prefix='.archive_',
                   suffix=source.name + '.tmp') as tmp:
-        await formats['func'](source, tmp, fast)
+        await formats['func'](source, tmp, fast, password=password)
         tmp.rename(dest)
     after = dest.lstat().st_size
 
@@ -605,6 +634,8 @@ def archive_main():
         '-p', dest='parent', metavar='DIR', type=pathlib.Path,
         help='parent directory to save the archive in')
     parser.add_argument(
+        '--password', help='archive password')
+    parser.add_argument(
         'source', type=lambda p: pathlib.Path(p).absolute(), nargs='+')
 
     args = parser.parse_args()
@@ -622,7 +653,7 @@ def archive_main():
                 sources.append(source)
 
             executor.submit(process, source, args.format, args.rm, args.fast,
-                            parent=args.parent)
+                            parent=args.parent, password=args.password)
 
         size_diff_printer = SizeDiffPrinter(num_items=len(executor))
         async for future in executor:
