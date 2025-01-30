@@ -2,6 +2,7 @@
 import argparse
 import asyncio
 import base64
+import contextlib
 import dataclasses
 import hashlib
 import json
@@ -77,6 +78,9 @@ class FileInfoDB:
         cur = self.conn.cursor()
         cur.executescript(self.SCHEMA)
         cur.close()
+
+    def close(self):
+        self.conn.close()
 
     @staticmethod
     def _dict_factory(cursor, row):
@@ -385,26 +389,23 @@ async def _process_path(path,
     return data
 
 
-async def _process_root_path(root_path, args, parser):
-    if args.multihash:
-        results = {}
-        for path in all_files(root_path):
-            results[path] = await _process_path(path, hash_archive_contents=False)
+async def _process_multihash_root_path(root_path, args, parser):
+    results = {}
+    for path in all_files(root_path):
+        results[path] = await _process_path(path, hash_archive_contents=False)
 
-        if root_path.is_file():
-            results = tuple(results.values())[0]
-        else:
-            results = {
-                str(k.relative_to(root_path)): v
-                for k, v in results.items()
-            }
-        print(json_dumps(results))
-        return
+    if root_path.is_file():
+        results = tuple(results.values())[0]
+    else:
+        results = {
+            str(k.relative_to(root_path)): v
+            for k, v in results.items()
+        }
+    print(json_dumps(results))
 
+
+async def _process_db_root_path(root_path, args, parser, db):
     root_path = root_path.absolute()
-    output_path = args.output or find_default_file_info_db(
-        root_path, must_exist=not args.mkdb)
-    db = FileInfoDB(output_path)
     results = {}
     if root_path == db.path.parent:
         results = db.get_all()
@@ -584,7 +585,13 @@ async def main():
             raise RuntimeError
 
     for path in args.path:
-        await _process_root_path(path, args, parser)
+        if args.multihash:
+            await _process_multihash_root_path(path, args, parser)
+        else:
+            output_path = args.output or find_default_file_info_db(
+                path, must_exist=not args.mkdb)
+            with contextlib.closing(FileInfoDB(output_path)) as db:
+                await _process_db_root_path(path, args, parser, db)
 
 
 
