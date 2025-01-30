@@ -47,9 +47,14 @@ def main():
     ])
     output = args.output
     base = pathlib.Path()
-    if output and output.is_dir():
-        base = output
-        output = None
+    if output is not None:
+        if output.is_dir():
+            base = output
+            output = None
+        elif output.name.endswith('.mkv') and output.parent.is_dir():
+            output = output
+        else:
+            raise ValueError
     if output is None:
         output = base / 'ffmpeg_concat_{}.mkv'.format(
             datetime.datetime.now().isoformat().split('.')[0].replace('-', '').replace(':', ''))

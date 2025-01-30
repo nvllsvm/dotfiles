@@ -278,8 +278,8 @@ async def process_path(redump, path, args):
             system, name = await get_name(path, redump)
             file_paths.append(path)
             has_iso = True
-        elif path.suffix.lower() == '.7z':
-            suffix = '.7z'
+        elif path.suffix.lower() in ('.7z', '.rvz'):
+            suffix = path.suffix.lower()
             recorded = await file_hash_recorder_list(path)
             stat = path.stat()
             if stat.st_size != recorded['size']:
