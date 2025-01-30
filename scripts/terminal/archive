@@ -105,6 +105,8 @@ async def create_7z(path, dest, fast=False, password=None):
     if password is not None:
         if not password:
             raise ValueError('password cannot be empty')
+        # encrypt file names
+        args.append('-mhe')
         args.append(f'-p{password}')
 
     if path.is_dir():
