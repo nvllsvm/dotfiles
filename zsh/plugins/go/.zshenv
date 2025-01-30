@@ -1,6 +1,7 @@
-if [ -d ~/go/bin ]; then
+if command -v go > /dev/null; then
+    export GOPATH=~/.local/share/go
     path=(
-        ~/go/bin
+        "$GOPATH"
         "$path[@]"
     )
 fi
