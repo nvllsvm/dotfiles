@@ -43,6 +43,14 @@ class ArchiveContentsInfo:
     size: int
 
 
+@staticmethod
+def _sqlite_vacuum(db_path):
+    with contextlib.closing(sqlite3.connect(db_path)) as conn:
+        cur = conn.cursor()
+        cur.execute('VACUUM')
+        cur.close()
+
+
 class FileInfoDB:
     SCHEMA = """
     CREATE TABLE IF NOT EXISTS files(
@@ -79,6 +87,8 @@ class FileInfoDB:
         cur.executescript(self.SCHEMA)
         cur.close()
 
+        self.was_modified = False
+
     def close(self):
         self.conn.close()
 
@@ -94,7 +104,7 @@ class FileInfoDB:
         fi = dataclasses.asdict(file_info)
         ac = fi.pop('archive_contents')
         cur = self.conn.cursor()
-        cur.execute(
+        res = cur.execute(
             """
             INSERT INTO files(path, crc32, md5, mtime, sha1, sha256, size)
             VALUES(:path, :crc32, :md5, :mtime, :sha1, :sha256, :size)
@@ -108,8 +118,9 @@ class FileInfoDB:
             """,
             fi,
         )
+        self.was_modified = self.was_modified or bool(res.rowcount)
         if ac:
-            cur.executemany(
+            res = cur.executemany(
                 """
                 INSERT INTO archive_contents(parent, path, crc32, md5, mtime, sha1, sha256, size)
                 VALUES(:parent, :path, :crc32, :md5, :mtime, :sha1, :sha256, :size)
@@ -123,17 +134,20 @@ class FileInfoDB:
                 """,
                 ac.values(),
             )
+            self.was_modified = self.was_modified or bool(res.rowcount)
         self.conn.commit()
         cur.close()
 
     def delete_file(self, path):
         cur = self.conn.cursor()
-        cur.execute(
+        res = cur.execute(
             'DELETE FROM archive_contents WHERE parent = :parent',
             {'parent': path})
-        cur.execute(
+        self.was_modified = self.was_modified or bool(res.rowcount)
+        res = cur.execute(
             'DELETE FROM files WHERE path = :path',
             {'path': path})
+        self.was_modified = self.was_modified or bool(res.rowcount)
         self.conn.commit()
         cur.close()
 
@@ -592,7 +606,9 @@ async def main():
                 path, must_exist=not args.mkdb)
             with contextlib.closing(FileInfoDB(output_path)) as db:
                 await _process_db_root_path(path, args, parser, db)
-
+                was_modified = db.was_modified
+            if was_modified:
+                _sqlite_vacuum(output_path)
 
 
 if __name__ == '__main__':
