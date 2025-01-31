@@ -1,0 +1,7 @@
+#!/usr/bin/env zsh
+echo 'error: incomplete script' >&2
+for d in */*/; do                                                                                                                                                                                /storage/Downloads/JDownloader/Home Improvement 1991 - 1999 NTSC 25xDVD9-Deadman
+new="${d:h}_${d:t}"
+mkdir -p ~/video/"$new"
+makemkvcon --robot mkv file:./"$d"/VIDEO_TS.IFO all ~/video/"$new"
+done
