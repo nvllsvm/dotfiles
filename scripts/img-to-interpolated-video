@@ -2,6 +2,7 @@
 import argparse
 import contextlib
 import datetime
+import json
 import pathlib
 import shutil
 import subprocess
@@ -21,15 +22,46 @@ def ffmpeg_merge(path, target, framerate='30/1', loops=1):
         check=True)
 
 
-def ffmpeg_frames_to_png(path, target):
+def ffmpeg_frames_to_png(path, target, remove_duplicates=True):
+    args = [
+        'ffmpeg',
+        '-i', path,
+    ]
+    if remove_duplicates:
+        info = ffprobe(path)
+        avg_frame_rate = None
+        for stream in info:
+            avg_frame_rate = stream.get('avg_frame_rate')
+            if avg_frame_rate:
+                x, y = avg_frame_rate.split('/')
+                avg_frame_rate = int(x) / int(y)
+        args.extend([
+            '-vsync', '0',
+            '-vf', f'mpdecimate,setpts=N/{round(avg_frame_rate, 3)}/TB',
+        ])
+
+    args.extend([
+        '-compression_level', '0',
+        f'{target}/%08d.png',
+    ])
     subprocess.run(
-        ['ffmpeg',
-         '-i', path,
-         '-compression_level', '0',
-         f'{target}/%08d.png'],
+        args,
         stderr=subprocess.DEVNULL,
         stdout=subprocess.DEVNULL,
         check=True)
+
+
+def ffprobe(path):
+    proc = subprocess.run(
+        ['ffprobe',
+         '-v', 'error',
+         '-show_streams',
+         '-print_format', 'json',
+         '--', path],
+        stderr=subprocess.DEVNULL,
+        stdout=subprocess.PIPE,
+        check=True)
+    return json.loads(proc.stdout)['streams']
 
 
 def rife(source, target):
