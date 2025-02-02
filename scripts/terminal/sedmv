@@ -5,7 +5,7 @@ shift
 for f in "$@"; do
     dir="$(dirname "$f")"
     base="$(basename "$f")"
-    new="$(printf %s "$base" | sed "$pattern")"
+    new="$(printf %s "$base" | sed -E "$pattern")"
     if [ "$new" != "$base" ]; then
         if [ -e "$new" ]; then
             printf 'error: target exists "%s" (original "%s")\n' "$new" "$base" >&2
