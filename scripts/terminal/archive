@@ -2307,6 +2307,9 @@ async def _get_class(path):
         elif start.startswith(b'hsqs'):
             return unsquashfs
 
+        elif start.startswith(b'!<arch>\x0a'):
+            return cli_7zip
+
         elif start.startswith(b'#!/bin/sh\n'):
             f.seek(271)
             if f.read(58) == b'# with modifications for mojosetup and GOG.com installer.\n':  # noqa: E501

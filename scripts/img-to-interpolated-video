@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 import argparse
+import contextlib
+import datetime
 import pathlib
 import shutil
-import datetime
 import subprocess
 import tempfile
 
@@ -15,6 +16,17 @@ def ffmpeg_merge(path, target, framerate='30/1', loops=1):
         '-pattern_type', 'glob', '-i', f'{path}/*.png',
         '-c:v', 'libx264', '-preset', 'slow', '-crf', '16', 
         target],
+        stderr=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        check=True)
+
+
+def ffmpeg_frames_to_png(path, target):
+    subprocess.run(
+        ['ffmpeg',
+         '-i', path,
+         '-compression_level', '0',
+         f'{target}/%08d.png'],
         stderr=subprocess.DEVNULL,
         stdout=subprocess.DEVNULL,
         check=True)
@@ -40,9 +52,20 @@ def main():
     parser.add_argument('source', type=pathlib.Path)
     args = parser.parse_args()
 
-    with tempfile.TemporaryDirectory(dir=args.source.parent) as tmpdir:
+    with contextlib.ExitStack() as exitstack:
+        if args.source.is_file():
+            source = pathlib.Path(
+                exitstack.enter_context(tempfile.TemporaryDirectory()))
+            ffmpeg_frames_to_png(args.source, source)
+        elif args.source.is_dir():
+            source = args.source
+        else:
+            raise FileNotFoundError
+
+        tmpdir = exitstack.enter_context(
+                tempfile.TemporaryDirectory(dir=source.parent))
         tmpdir = pathlib.Path(tmpdir)
-        sources = sorted(list(args.source.iterdir()))
+        sources = sorted(list(source.iterdir()))
 
         new = [*sources]
         if not args.no_bounce:
@@ -52,11 +75,12 @@ def main():
             shutil.copy(p, tmpdir / f'{i:032d}.png')
 
         for i in range(args.rife_iterations - 1):
-            with tempfile.TemporaryDirectory(dir=args.source.parent) as tmpdir2:
-                tmpdir2 = pathlib.Path(tmpdir2)
-                rife(tmpdir, tmpdir2)
-                shutil.rmtree(tmpdir)
-                shutil.move(tmpdir2, tmpdir)
+            tmpdir2 = exitstack.enter_context(
+                tempfile.TemporaryDirectory(dir=source.parent))
+            tmpdir2 = pathlib.Path(tmpdir2)
+            rife(tmpdir, tmpdir2)
+            shutil.rmtree(tmpdir)
+            shutil.move(tmpdir2, tmpdir)
 
         if not args.no_bounce:
             sources = sorted(list(tmpdir.iterdir()))
