@@ -2307,6 +2307,7 @@ async def _get_class(path):
         elif start.startswith(b'hsqs'):
             return unsquashfs
 
+        # debian .deb
         elif start.startswith(b'!<arch>\x0a'):
             return cli_7zip
 
