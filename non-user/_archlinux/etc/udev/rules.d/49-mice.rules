@@ -1,0 +1,14 @@
+# Pulsar X2v2 Mini
+## wired
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="3554", ATTRS{idProduct}=="f507", MODE="0660", TAG+="uaccess"
+## wireless 1k receiver
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="3554", ATTRS{idProduct}=="f508", MODE="0660", TAG+="uaccess"
+
+# MCHOSE L7 Ultra
+## wired
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="5253", ATTRS{idProduct}=="00b1", MODE="0660", TAG+="uaccess"
+## wireless 8k receiver
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="5253", ATTRS{idProduct}=="1020", MODE="0660", TAG+="uaccess"
+
+# Logitech G305
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c53f", MODE="0660", TAG+="uaccess"
