@@ -7,6 +7,7 @@ import dataclasses
 import hashlib
 import json
 import pathlib
+import pickle
 import sqlite3
 import sys
 import tempfile
@@ -265,23 +266,23 @@ class ProcessError(Exception):
 
 async def multi_hash(path):
     proc = await asyncio.create_subprocess_exec(
-        'file-hash-recorder', '--multihash', '--', path,
+        'file-hash-recorder', '--multihash', '--dump-pickle', '--', path,
         stdout=asyncio.subprocess.PIPE)
     stdout, _ = await proc.communicate()
     if proc.returncode:
         raise ProcessError(proc)
-    return json.loads(stdout)
+    return pickle.load(stdout)
 
 
 async def file_hash_recorder(path):
     proc = await asyncio.create_subprocess_exec(
-        'file-hash-recorder', '--multihash', '--', '.',
+        'file-hash-recorder', '--multihash', '--dump-pickle', '--', '.',
         cwd=path,
         stdout=asyncio.subprocess.PIPE)
     stdout, _ = await proc.communicate()
     if proc.returncode:
         raise ProcessError(proc)
-    return json.loads(stdout)
+    return pickle.load(stdout)
 
 
 async def archive_contents(path, use_tmpdir=True):
@@ -329,19 +330,16 @@ async def archive_contents(path, use_tmpdir=True):
     return contents
 
 
-def pretty_json_dumps(data):
-    return json.dumps(
-        data,
-        indent=2,
-        sort_keys=True,
-        ensure_ascii=False)
+def output_pickle_to_stdout(data):
+    sys.stdout.buffer.write(pickle.dumps(data))
 
 
 def json_dumps(data):
     return json.dumps(
         data,
-        ensure_ascii=False,
-        separators=(',', ':'))
+        indent=2,
+        sort_keys=True,
+        ensure_ascii=False)
 
 
 def is_archive(path):
@@ -415,7 +413,10 @@ async def _process_multihash_root_path(root_path, args, parser):
             str(k.relative_to(root_path)): v
             for k, v in results.items()
         }
-    print(json_dumps(results))
+    if args.dump_pickle:
+        output_pickle_to_stdout(results)
+    else:
+        print(json_dumps(results))
 
 
 async def _process_db_root_path(root_path, args, parser, db):
@@ -469,9 +470,15 @@ async def _process_db_root_path(root_path, args, parser, db):
                 for v in grouped.values()
                 if len(v) > 1
             ]
-            print(pretty_json_dumps(dupes_results))
+            if args.dump_pickle:
+                output_pickle_to_stdout(dupes_results)
+            else:
+                print(json_dumps(dupes_results))
         else:
-            print(pretty_json_dumps(results))
+            if args.dump_pickle:
+                output_pickle_to_stdout(results)
+            else:
+                print(json_dumps(results))
         parser.exit()
 
     if args.verify:
@@ -588,6 +595,7 @@ async def main():
     parser.add_argument('-n', '--num-procs', type=int, default=1)
     parser.add_argument('--no-archive-contents', action='store_true')
     parser.add_argument('--skip-errors', action='store_true')
+    parser.add_argument('--dump-pickle', action='store_true')
     parser.add_argument('--show-dupes', action='store_true')
     parser.add_argument('--no-tmpdir', action='store_true',
                         help='extract to tempdir when hashing archive contents')
