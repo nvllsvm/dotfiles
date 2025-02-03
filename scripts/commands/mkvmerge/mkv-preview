@@ -1,9 +1,18 @@
 #!/usr/bin/env python3
-import asyncio
 import argparse
+import asyncio
 import collections
 import datetime
 import json
+import pathlib
+
+
+def bytes_to_human(num):
+    for unit in ['B', 'KB', 'MB', 'GB', 'TB', 'PB']:
+        if abs(num) < 1024.0:
+            break
+        num /= 1024.0
+    return f'{num:.1f}{unit}'
 
 
 async def mediainfo(path):
@@ -49,7 +58,7 @@ class ProcessError(Exception):
 
 async def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('path')
+    parser.add_argument('path', type=pathlib.Path)
     args = parser.parse_args()
 
     metadata_mkvmerge, metadata_mediainfo = await asyncio.gather(
@@ -86,12 +95,13 @@ async def main():
         }
         results[track['type']].append(track)
 
-    duration = metadata_mkvmerge['container']['properties'].get('duration')
-    if duration is not None:
-        print('duration', datetime.timedelta(milliseconds=duration / 1000000))
     title = metadata_mkvmerge['container']['properties'].get('title')
     if title is not None:
         print('title:', title.strip())
+    duration = metadata_mkvmerge['container']['properties'].get('duration')
+    if duration is not None:
+        print('duration:', datetime.timedelta(milliseconds=duration / 1000000))
+    print('size:', bytes_to_human(args.path.stat().st_size))
     for track_type in ['video', 'audio', 'subtitles']:
         if tracks := results[track_type]:
             print(track_type)
