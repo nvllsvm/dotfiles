@@ -271,7 +271,7 @@ async def multi_hash(path):
     stdout, _ = await proc.communicate()
     if proc.returncode:
         raise ProcessError(proc)
-    return pickle.load(stdout)
+    return pickle.loads(stdout)
 
 
 async def file_hash_recorder(path):
@@ -282,7 +282,7 @@ async def file_hash_recorder(path):
     stdout, _ = await proc.communicate()
     if proc.returncode:
         raise ProcessError(proc)
-    return pickle.load(stdout)
+    return pickle.loads(stdout)
 
 
 async def archive_contents(path, use_tmpdir=True):
