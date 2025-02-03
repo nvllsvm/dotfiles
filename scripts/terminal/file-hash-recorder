@@ -381,9 +381,19 @@ def find_default_file_info_db(root_path, must_exist=True):
         return root_path / 'file_info.db'
 
 
+def multihash_key(item):
+    if isinstance(item, FileInfo):
+        item = dataclasses.asdict(item)
+    return tuple(
+        item[key]
+        for key in ('size', 'sha1', 'sha256', 'md5', 'crc32')
+    )
+
+
 async def _process_path(path,
                         stat=None,
                         hash_archive_contents=True,
+                        archive_contents_by_hash=None,
                         multihash_subprocess=False,
                         use_tmpdir=False):
     if stat is None:
@@ -400,8 +410,16 @@ async def _process_path(path,
         'md5':  hashes['md5'],
         'crc32':  hashes['crc32'],
     }
-    if hash_archive_contents and is_archive(path):
-        data['archive_contents'] = await archive_contents(path, use_tmpdir=use_tmpdir)
+
+    if hash_archive_contents:
+        current_key = multihash_key(data)
+        if archive_contents_by_hash is not None:
+            ac_info = archive_contents_by_hash.get(current_key, {})
+            if not ac_info and is_archive(path):
+                ac_info = await archive_contents(path, use_tmpdir=use_tmpdir)
+            data['archive_contents'] = ac_info
+            archive_contents_by_hash[current_key] = ac_info
+            ac_info = archive_contents_by_hash.get(current_key, {})
     return data
 
 
@@ -535,6 +553,16 @@ async def _process_db_root_path(root_path, args, parser, db):
                 continue
         pending_paths.append((path, name, stat))
 
+    archive_contents_by_hash = {}
+    for item in results.values():
+        ac_info = {}
+        for k, v in item.archive_contents.items():
+            v = dataclasses.asdict(v)
+            v.pop('parent')
+            v.pop('path')
+            ac_info[k] = v
+        archive_contents_by_hash[multihash_key(item)] = ac_info
+
     future_info = {}
     executor = async_executor.AsyncExecutor(args.num_procs)
     for path, name, stat in pending_paths:
@@ -543,6 +571,7 @@ async def _process_db_root_path(root_path, args, parser, db):
             path,
             stat=stat,
             hash_archive_contents=not args.no_archive_contents,
+            archive_contents_by_hash=archive_contents_by_hash,
             multihash_subprocess=args.num_procs > 1,
             use_tmpdir=not args.no_tmpdir,
         )
