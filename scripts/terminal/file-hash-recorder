@@ -63,7 +63,7 @@ class FileInfoDB:
         sha256,
         size int,
 
-        primary key(path)
+        PRIMARY KEY(path)
     );
     CREATE TABLE IF NOT EXISTS archive_contents(
         parent,
@@ -75,8 +75,12 @@ class FileInfoDB:
         sha256,
         size int,
 
-        primary key(parent, path),
-        foreign key(parent) references files(path)
+        PRIMARY KEY(parent, path),
+
+        FOREIGN KEY(parent)
+            REFERENCES FILES(path)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE
     );
     """
 
@@ -84,6 +88,7 @@ class FileInfoDB:
         self.path = path.absolute()
         self.conn = sqlite3.connect(self.path)
         self.conn.row_factory = self._dict_factory
+        self.conn.execute('PRAGMA foreign_keys = ON')
         cur = self.conn.cursor()
         cur.executescript(self.SCHEMA)
         cur.close()
@@ -141,10 +146,6 @@ class FileInfoDB:
 
     def delete_file(self, path):
         cur = self.conn.cursor()
-        res = cur.execute(
-            'DELETE FROM archive_contents WHERE parent = :parent',
-            {'parent': path})
-        self.was_modified = self.was_modified or bool(res.rowcount)
         res = cur.execute(
             'DELETE FROM files WHERE path = :path',
             {'path': path})
