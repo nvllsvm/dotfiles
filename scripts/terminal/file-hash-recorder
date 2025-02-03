@@ -362,6 +362,9 @@ def find_default_file_info_db(root_path, must_exist=True):
     if not root_path.exists():
         raise FileNotFoundError
 
+    if root_path.is_file() and root_path.name == 'file_info.db':
+        return root_path
+
     root_path = root_path.absolute()
     search_dirs = list(root_path.parents)
     if root_path.is_dir():
@@ -613,6 +616,8 @@ async def main():
         else:
             output_path = args.output or find_default_file_info_db(
                 path, must_exist=not args.mkdb)
+            if output_path == path:
+                path = output_path.parent
             with contextlib.closing(FileInfoDB(output_path)) as db:
                 await _process_db_root_path(path, args, parser, db)
                 was_modified = db.was_modified
