@@ -42,6 +42,7 @@ else
     case "$mimetype" in
         application/gzip|\
         application/x-rpm|\
+        application/x-stuffit|\
         application/vnd.comicbook+zip|\
         application/vnd.comicbook-rar|\
         application/vnd.efi.img|\

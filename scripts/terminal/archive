@@ -1229,6 +1229,70 @@ class unzip:
         return [path]
 
 
+class unarchiver:
+    @staticmethod
+    @functools.cache
+    def check():
+        for cmd in ('lsar', 'unar'):
+            if not shutil.which(cmd):
+                raise KeyError
+
+    @staticmethod
+    async def contents(path):
+        proc = await asyncio.create_subprocess_exec(
+            'lsar', '-json', '--', path,
+            stdout=asyncio.subprocess.PIPE)
+        stdout, _ = await proc.communicate()
+        if proc.returncode:
+            raise ProcessError(proc)
+        info = json.loads(stdout)
+        contents = set()
+        for item in info['lsarContents']:
+            name = item['XADFileName']
+            if item.get('XADIsResourceFork', 0):
+                name += '.rsrc'
+            name = name.encode()
+            if name in contents:
+                raise RuntimeError
+            contents.add(name)
+        return contents
+
+    @staticmethod
+    async def extract(path, dest, paths=None, password=None, overwrite=False):
+        if paths:
+            raise NotImplementedError
+        args = [
+            'unar',
+            '-quiet',
+            '-output-directory', dest,
+        ]
+        if overwrite:
+            args.append('-force-overwrite')  # overwrite without prompting
+        args.extend(['--', path])
+        proc = await asyncio.create_subprocess_exec(
+            *args,
+            stdin=asyncio.subprocess.DEVNULL,
+            stdout=asyncio.subprocess.PIPE)
+        await proc.communicate()
+        if proc.returncode:
+            raise ProcessError(proc)
+
+    @staticmethod
+    async def volumes(path, password=''):
+        proc = await asyncio.create_subprocess_exec(
+            'lsar', '-json', '--', path,
+            stdout=asyncio.subprocess.PIPE)
+        stdout, _ = await proc.communicate()
+        if proc.returncode:
+            raise ProcessError(proc)
+        info = json.loads(stdout)
+        return [
+            name
+            for name in info['lsarProperties']['XADVolumes']
+        ]
+
+
+
 class cabextract:
     @staticmethod
     @functools.cache
@@ -2310,6 +2374,10 @@ async def _get_class(path):
         # debian .deb
         elif start.startswith(b'!<arch>\x0a'):
             return cli_7zip
+
+        # stuffit .sit
+        elif start.startswith(b'StuffIt (c)1997-'):
+            return unarchiver
 
         elif start.startswith(b'#!/bin/sh\n'):
             f.seek(271)
