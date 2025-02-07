@@ -619,7 +619,7 @@ def archive_main():
     group_format = parser.add_argument_group('format')
     group_format.add_argument(
         '-f', metavar='FORMAT', choices=_FORMATS,
-        dest='format', default='tar.zst',
+        dest='format', default='7z',
         help='archive format: %(choices)s (default: %(default)s)')
     group_format.add_argument(
         '--fast', default=False, action='store_true',
