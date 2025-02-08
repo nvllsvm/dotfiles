@@ -5,8 +5,8 @@ extra-keys = [ \
      {key: '~'}, \
      {key: '$', popup: '*'}, \
      {key: '*'}, \
-     {key: '('}, \
-     {key: ')', popup: QUOTE}, \
+     {key: '['}, \
+     {key: ']', popup: QUOTE}, \
      {key: '|'}, \
      {key: "'"}, \
      {key: '"'} \
