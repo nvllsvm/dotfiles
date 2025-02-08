@@ -1,24 +1,34 @@
-soft-keyboard-toggle-behavior = enable
+soft-keyboard-toggle-behavior = disable
 bell-character = ignore
 extra-keys = [ \
  [ \
-     {key: '|'}, \
-     {key: '/', popup: BACKSLASH}, \
+     {key: '~'}, \
      {key: '$', popup: '*'}, \
-     {key: '~', popup: APOSTROPHE}, \
-     {key: 'UP'}, \
-     {key: '_'}, \
-     {key: '-'}, \
-     {key: '"', popup: QUOTE} \
+     {key: '*'}, \
+     {key: '('}, \
+     {key: ')', popup: QUOTE}, \
+     {key: '|'}, \
+     {key: "'"}, \
+     {key: '"'} \
  ], \
  [ \
      {key: 'TAB'}, \
+     {key: '/'}, \
+     {key: 'BACKSLASH'}, \
+     {key: '{', popup: "["}, \
+     {key: '}', popup: "["}, \
+     {key: 'UP'}, \
+     {key: '-'}, \
+     {key: '_'} \
+ ], \
+ [ \
+     {key: 'ESC'}, \
      {key: 'CTRL'}, \
      {key: 'ALT'}, \
+     {key: ';'}, \
      {key: 'LEFT'}, \
      {key: 'DOWN'}, \
      {key: 'RIGHT'}, \
-     {key: ':', popup: ';'}, \
-     {key: 'ESC'} \
+     {key: ':', popup: ';'} \
  ] \
 ]
