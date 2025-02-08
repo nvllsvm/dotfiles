@@ -263,8 +263,13 @@ async def create_rvz(path, dest, fast=False, password=None):
 async def create_iso(path, dest, fast=False, password=None):
     if password is not None:
         raise NotImplementedError
+    volid = path.name[:32]
     proc = await asyncio.create_subprocess_exec(
-        'mkisofs', '-volid', path.name, '-o', dest, path)
+        'mkisofs',
+        '-rational-rock',  # allow long filenames
+        '-volid', volid,
+        '-o', dest,
+        '--', path)
     await proc.wait()
     if proc.returncode:
         raise ProcessError(proc)
