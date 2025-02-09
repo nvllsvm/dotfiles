@@ -92,7 +92,8 @@ else
         application/x-dosexec|\
         application/x-ms-dos-executable|\
         application/x-msdownload)
-            exiftool -- "$1" || extract -l -- "$1"
+            exiftool -- "$1" || true
+            extract -l -- "$1"
             ;;
         application/pdf|\
         image/gif|\
