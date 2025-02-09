@@ -57,9 +57,7 @@ else
         application/x-cd-image|\
         application/x-compressed-tar|\
         application/x-cue|\
-        application/x-dosexec|\
         application/x-iso9660-image|\
-        application/x-ms-dos-executable|\
         application/x-pak|\
         application/x-rar|\
         application/x-raw-disk-image|\
@@ -91,6 +89,8 @@ else
             epubmeta -- "$1"
             ;;
         application/vnd.microsoft.portable-executable|\
+        application/x-dosexec|\
+        application/x-ms-dos-executable|\
         application/x-msdownload)
             exiftool -- "$1" || extract -l -- "$1"
             ;;
