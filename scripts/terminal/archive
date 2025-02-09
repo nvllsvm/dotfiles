@@ -266,7 +266,7 @@ async def create_iso(path, dest, fast=False, password=None):
     volid = path.name[:32]
     proc = await asyncio.create_subprocess_exec(
         'mkisofs',
-        '-rational-rock',  # allow long filenames
+        '-J',  # joilet dir records (long filenames)
         '-volid', volid,
         '-o', dest,
         '--', path)
