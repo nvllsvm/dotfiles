@@ -5,7 +5,7 @@ INSTALL_DIR="${XDG_DATA_DIR}/base16-shell"
 
 if ! [ -d "$INSTALL_DIR" ]; then
     mkdir -p "$XDG_DATA_DIR"
-    git clone https://github.com/tinted-theming/base16-shell "$INSTALL_DIR" > /dev/null
+    git clone https://github.com/tinted-theming/tinted-shell "$INSTALL_DIR" > /dev/null
 else
     cd "$INSTALL_DIR"
     git clean -fd
