@@ -1,6 +1,6 @@
 return {
   {
-    "tinted-theming/base16-vim",
+    "tinted-theming/tinted-vim",
     lazy = false,
     priority = 1000,
     config = function()
