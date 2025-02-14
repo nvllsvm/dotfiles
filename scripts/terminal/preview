@@ -56,7 +56,6 @@ else
         application/x-bzip2-compressed-tar|\
         application/x-cd-image|\
         application/x-compressed-tar|\
-        application/x-cue|\
         application/x-iso9660-image|\
         application/x-pak|\
         application/x-rar|\
@@ -67,6 +66,9 @@ else
         application/zip|\
         application/zstd)
             extract -l -- "$1"
+            ;;
+        application/x-cue)
+            extract -l -- "$1" || cat -- "$1"
             ;;
         application/java-archive)
             extract --stdout -- "$1" 'META-INF/MANIFEST.MF'
