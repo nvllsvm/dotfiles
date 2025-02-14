@@ -1469,7 +1469,7 @@ class unrar:
         if paths:
             raise NotImplementedError
         if overwrite:
-            raise NotImplementedError
+            args.append('-o+')
 
         if password is not None:
             args.append(f'-p{password}')
