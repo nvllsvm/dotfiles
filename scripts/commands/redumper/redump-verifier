@@ -222,6 +222,7 @@ async def file_hash_recorder_list(path):
     if not result:
         proc = await asyncio.create_subprocess_exec(
             'file-hash-recorder', '--absolute-paths', '--list', '--', path,
+            stderr=asyncio.subprocess.DEVNULL,
             stdout=asyncio.subprocess.PIPE)
         stdout, _ = await proc.communicate()
         if proc.returncode:
