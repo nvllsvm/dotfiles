@@ -50,7 +50,7 @@ def prepare_urls(raw_urls, urls=None, add_prefix=False, insecure=True):
     prefix = 'http://' if insecure else 'https://'
     for url in raw_urls:
         url = url.strip()
-        if not url.lower().startswith(('http://', 'https://')):
+        if not url.lower().startswith(('ftp://', 'http://', 'https://')):
             if not add_prefix:
                 continue
             url = prefix + url
