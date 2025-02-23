@@ -1,2 +1,2 @@
 #!/bin/sh
-exec ssh -t sol tmux-attach
+exec ssh-tmux-attach sol
