@@ -1713,42 +1713,108 @@ class innoextract:
     @staticmethod
     async def contents(path):
         # safe to pass --gog flag to non-gog installers
-        proc = subprocess.run(
-            ['innoextract', '--gog', '--exclude-temp', '--quiet', '--list',
-             str(path)],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            check=True)
+        proc = await asyncio.create_subprocess_exec(
+            'innoextract', '--gog', '--exclude-temp', '--quiet', '--list-checksums',
+             '--', str(path),
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.DEVNULL)
+        stdout, _ = await proc.communicate()
+        if proc.returncode:
+            raise ProcessError(proc)
 
-        contents = set()
+        contents = {}
         listing_files = False
-        for line in proc.stdout.splitlines():
+        for line in stdout.splitlines():
             if line == b'----------- ---------  ---------- -----  ----':
                 listing_files = not listing_files
             elif listing_files:
                 name = line.split(maxsplit=4)[-1]
-                contents.add(name)
+                contents[name] = {}
             elif line.startswith(b' - '):
-                _, name, _ = line.split(b'"', 2)
-                contents.add(name)
+                _, name, other = line.split(b'"', 2)
+                contents[name] = {}
+                hash_sep = {
+                    'md5': (b' MD5 ', 32),
+                    'sha1': (b' SHA-1 ', 40),
+                }
+                for key, (sep, val_len) in hash_sep.items():
+                    if sep not in other:
+                        continue
+                    _, hash_val = other.split(sep)
+                    if len(hash_val) != val_len:
+                        raise RuntimeError
+                    contents[name][key] = hash_val.decode()
 
         return contents
 
-    @staticmethod
-    async def extract(path, dest, paths=None, password=None, overwrite=False):
-        if paths:
-            raise NotImplementedError
-        if overwrite:
-            raise NotImplementedError
-        # safe to pass --gog flag to non-gog installers
-        subprocess.run(
-            ['innoextract', '--gog', '--exclude-temp', '--extract',
-             '--output-dir', dest, path],
-            check=True)
+    @classmethod
+    async def extract(cls, path, dest, paths=None, password=None, overwrite=False):
+        args = [
+            'innoextract',
+            '--silent',
+            # safe to pass --gog flag to non-gog installers
+            '--gog',
+            '--exclude-temp', '--extract',
+        ]
+
+        output_dir = dest
+        stdout_tmpdir = None
+
+        with contextlib.ExitStack() as exitstack:
+            if paths:
+                contents = await cls.contents(path)
+                for include_path in paths:
+                    if include_path.encode() in contents:
+                        include_path = f'/{include_path}'
+                        args.extend(['--include', include_path])
+                    else:
+                        raise RuntimeError('specified path is not included in the archive')
+
+                # stdout
+                if not isinstance(dest, pathlib.Path):
+                    if len(paths) != 1:
+                        raise ValueError('only one path can be specified when extracting to stdout')
+                    stdout_tmpdir = exitstack.enter_context(tempfile.TemporaryDirectory())
+                    output_dir = stdout_tmpdir
+
+            args.extend([
+                '--output-dir', output_dir,
+                path,
+            ])
+
+            if overwrite:
+                raise NotImplementedError
+
+            proc = await asyncio.create_subprocess_exec(*args)
+            await proc.wait()
+            if proc.returncode:
+                raise ProcessError(proc)
+
+            if stdout_tmpdir:
+                tmp_paths = list(pathlib.Path(stdout_tmpdir).iterdir())
+                if len(tmp_paths) != 1:
+                    raise RuntimeError
+                with open(tmp_paths[0], 'rb') as handle:
+                    while data := handle.read(io.DEFAULT_BUFFER_SIZE):
+                        dest.write(data)
+                        dest.flush()
 
     @staticmethod
     async def volumes(path, password=''):
-        return [path]
+        volumes = [path]
+
+        # probably a gog installer
+        if path.name.startswith('setup_') and path.suffix == '.exe':
+            base = path.stem
+            num = 1
+            while True:
+                binpath = path.parent / f'{base}-{num}.bin'
+                if not binpath.is_file():
+                    break
+                volumes.append(binpath)
+                num += 1
+
+        return volumes
 
 
 class gog_linux:
@@ -2673,7 +2739,7 @@ async def extract_main():
                     for k, v in contents.items()
                 }
             if args.json:
-                if isinstance(contents, list):
+                if isinstance(contents, (list, set)):
                     contents = {k: {} for k in contents}
                 print(pretty_json({
                     k.decode(): v
