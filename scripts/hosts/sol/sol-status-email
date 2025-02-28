@@ -25,6 +25,7 @@ USER_UNITS = {
     'mbsync.service',
     'sol-fix-permissions.service',
     'sol-update-remotes.service',
+    'sol-ytdl-sub.service',
     'vdirsyncer.service',
 }
 
