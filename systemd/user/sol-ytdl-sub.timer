@@ -1,9 +1,9 @@
 [Unit]
-Description=Run sol-ytdl-sub every 30 minutes
+Description=Run sol-ytdl-sub every 6 hours
 
 [Timer]
-OnBootSec=30min
-OnUnitActiveSec=30min
+OnBootSec=6h
+OnUnitActiveSec=6h
 
 [Install]
 WantedBy=timers.target
