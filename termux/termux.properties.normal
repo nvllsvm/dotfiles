@@ -1,5 +1,6 @@
 soft-keyboard-toggle-behavior = disable
 bell-character = ignore
+volumes-keys = volume
 extra-keys = [ \
  [ \
      {key: 'TAB'}, \
