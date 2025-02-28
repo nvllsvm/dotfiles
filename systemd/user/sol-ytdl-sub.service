@@ -1,0 +1,6 @@
+[Unit]
+Description=Run sol-ytdl-sub
+
+[Service]
+ExecStart=zsh -lc sol-ytdl-sub
+SyslogIdentifier=sol-ytdl-sub
