@@ -1704,17 +1704,20 @@ class innoextract:
     @functools.cache
     def check():
         if not shutil.which('innoextract'):
-            raise KeyError
+            raise KeyError('innoextract command not found')
 
         # needed for GOG only ? (*.bin files)
         if not shutil.which('unrar'):
-            raise KeyError
+            raise KeyError('unrar command not found')
 
     @staticmethod
     async def contents(path):
         # safe to pass --gog flag to non-gog installers
         proc = await asyncio.create_subprocess_exec(
-            'innoextract', '--gog', '--exclude-temp', '--quiet', '--list-checksums',
+            'innoextract', '--gog', '--exclude-temp',
+            '--silent',  # recommended for easily parsable output https://github.com/dscharrer/innoextract/issues/78#issuecomment-468518100
+            '--list-checksums',
+            '--list-sizes',
              '--', str(path),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.DEVNULL)
@@ -1723,27 +1726,23 @@ class innoextract:
             raise ProcessError(proc)
 
         contents = {}
-        listing_files = False
         for line in stdout.splitlines():
-            if line == b'----------- ---------  ---------- -----  ----':
-                listing_files = not listing_files
-            elif listing_files:
-                name = line.split(maxsplit=4)[-1]
-                contents[name] = {}
-            elif line.startswith(b' - '):
-                _, name, other = line.split(b'"', 2)
-                contents[name] = {}
-                hash_sep = {
-                    'md5': (b' MD5 ', 32),
-                    'sha1': (b' SHA-1 ', 40),
-                }
-                for key, (sep, val_len) in hash_sep.items():
-                    if sep not in other:
-                        continue
-                    _, hash_val = other.split(sep)
-                    if len(hash_val) != val_len:
+            file_size, hash_type, hash_value, name = line.split(maxsplit=3)
+            info = {
+                'size': int(file_size),
+            }
+            match hash_type:
+                case b'MD5':
+                    info['md5'] = hash_value.decode()
+                    if len(hash_value) != 32:
                         raise RuntimeError
-                    contents[name][key] = hash_val.decode()
+                case b'SHA-1':
+                    info['sha1'] = hash_value.decode()
+                    if len(hash_value) != 40:
+                        raise RuntimeError
+                case _:
+                    raise RuntimeError('unexpected hash type')
+            contents[name] = info
 
         return contents
 
