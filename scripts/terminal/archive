@@ -1710,8 +1710,8 @@ class innoextract:
         if not shutil.which('unrar'):
             raise KeyError('unrar command not found')
 
-    @staticmethod
-    async def contents(path):
+    @classmethod
+    async def contents(cls, path):
         # safe to pass --gog flag to non-gog installers
         proc = await asyncio.create_subprocess_exec(
             'innoextract', '--gog', '--exclude-temp',
@@ -1727,24 +1727,42 @@ class innoextract:
 
         contents = {}
         for line in stdout.splitlines():
-            file_size, hash_type, hash_value, name = line.split(maxsplit=3)
-            info = {
-                'size': int(file_size),
-            }
-            match hash_type:
-                case b'MD5':
-                    info['md5'] = hash_value.decode()
-                    if len(hash_value) != 32:
-                        raise RuntimeError
-                case b'SHA-1':
-                    info['sha1'] = hash_value.decode()
-                    if len(hash_value) != 40:
-                        raise RuntimeError
-                case _:
-                    raise RuntimeError('unexpected hash type')
-            contents[name] = info
+            if line.endswith(b'/'):
+                contents[line] = {}
+            else:
+                name, info = cls._parse_line_size_checksum(line)
+                contents[name] = info
 
         return contents
+
+    @staticmethod
+    def _parse_line_size_checksum(line):
+        parts = line.split(maxsplit=3)
+        info = {}
+
+        if len(parts) != 4:
+            return line, {}
+
+        file_size, hash_type, hash_value, name = parts
+
+        try:
+            info['size'] = int(file_size)
+        except ValueError:
+            return line, {}
+
+        match hash_type:
+            case b'MD5':
+                info['md5'] = hash_value.decode()
+                if len(hash_value) != 32:
+                    raise RuntimeError
+            case b'SHA-1':
+                info['sha1'] = hash_value.decode()
+                if len(hash_value) != 40:
+                    raise RuntimeError
+            case _:
+                return line, {}
+
+        return name, {}
 
     @classmethod
     async def extract(cls, path, dest, paths=None, password=None, overwrite=False):
@@ -2428,6 +2446,7 @@ async def _get_class(path):
                 await innoextract.contents(path)
                 return innoextract
             except Exception:
+                raise
                 pass
 
             unzip.check()
