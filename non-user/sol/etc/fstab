@@ -4,4 +4,6 @@ UUID=BECA-CD30 /boot vfat rw,relatime,fmask=0022,dmask=0022,codepage=437,iochars
 
 UUID=e02387d5-c96e-4896-ab3a-86e4741be77e   /mnt/frigate    ext4 rw,noatime,nofail 0 0
 
+//epson-v600.nullsum.lan/scans /mnt/epson-v600 cifs _netdev,noauto,x-systemd.automount,x-systemd.mount-timeout=10,x-systemd.idle-timeout=1min,password=,uid=1000,gid=1000,iocharset=utf8,file_mode=0666,dir_mode=0777,noperm 0 0
+
 /swapfile none swap defaults 0 0
