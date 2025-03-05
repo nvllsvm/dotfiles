@@ -3,46 +3,46 @@ http_request() {
     curl -v "http://127.0.0.1${1}"
 }
 
-is_any_sink_running() {    
-    python << EOF    
-import json        
-import subprocess        
-import sys        
-         
-proc = subprocess.run(        
-    ['pw-dump'],        
-    stdout=subprocess.PIPE,        
-    check=True)        
-data = json.loads(proc.stdout.decode())        
-         
-for item in data:        
-    if item.get('info', {}).get('state') == 'running':        
-        sys.exit(0)    
-sys.exit(1)    
-EOF    
-}                                                                                                                                                        
-                                                                                                                                                         
-case "$1" in    
-    volume-up)    
-        http_request /volume/up    
-        ;;    
-    volume-down)    
-        http_request /volume/down    
-        ;;    
-    volume-mute-toggle)    
-        http_request /volume/mute/toggle    
-        ;;    
-    power-toggle)    
-        http_request /power/toggle    
-        ;;    
-    picture-toggle)    
-        if is_any_sink_running; then    
-            http_request /picture/toggle    
-        else    
-            http_request /power/toggle    
-        fi    
-        ;;                                                                                                                                               
-    *)                                                     
-        echo 'usage: (picture-toggle|power-toggle|volume-up|volume-down|volume-mute-toggle)' >&2    
-        exit 1                                                                                      
-esac   
+is_any_sink_running() {
+    python << EOF
+import json
+import subprocess
+import sys
+
+proc = subprocess.run(
+    ['pw-dump'],
+    stdout=subprocess.PIPE,
+    check=True)
+data = json.loads(proc.stdout.decode())
+
+for item in data:
+    if item.get('info', {}).get('state') == 'running':
+        sys.exit(0)
+sys.exit(1)
+EOF
+}
+
+case "$1" in
+    volume-up)
+        http_request /volume/up
+        ;;
+    volume-down)
+        http_request /volume/down
+        ;;
+    volume-mute-toggle)
+        http_request /volume/mute/toggle
+        ;;
+    power-toggle)
+        http_request /power/toggle
+        ;;
+    picture-toggle)
+        if is_any_sink_running; then
+            http_request /picture/toggle
+        else
+            http_request /power/toggle
+        fi
+        ;;
+    *)
+        echo 'usage: (picture-toggle|power-toggle|volume-up|volume-down|volume-mute-toggle)' >&2
+        exit 1
+esac
