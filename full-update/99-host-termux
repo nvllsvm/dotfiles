@@ -6,6 +6,9 @@ if ! command -v termux-info > /dev/null; then
     exit
 fi
 
+if ! command -v pipx > /dev/null; then
+    pip install pipx
+fi
 if ! command -v flake8 > /dev/null; then
     pipx install flake8
 fi
