@@ -16,7 +16,10 @@ case "$1" in
     power-toggle)
         http_request /power/toggle
         ;;
+    picture-toggle)
+        http_request /picture/toggle
+        ;;
     *)
-        echo 'usage: (power-toggle|volume-up|volume-down|volume-mute-toggle)' >&2
+        echo 'usage: (picture-toggle|power-toggle|volume-up|volume-down|volume-mute-toggle)' >&2
         exit 1
 esac
