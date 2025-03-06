@@ -95,7 +95,10 @@ async def optimize_jxl(source, dest, fast=False, strip=False):
         '--lossless_jpeg=1',
         '--', source, dest,
     ]
-    proc = await asyncio.create_subprocess_exec(*args)
+    proc = await asyncio.create_subprocess_exec(
+        *args,
+        stderr=asyncio.subprocess.DEVNULL,
+    )
     await proc.wait()
     if proc.returncode != 0:
         raise ProcessError(proc)
@@ -340,7 +343,10 @@ async def convert_to_jpeg(source, dest):
         'cjpegli',
         '--', source, dest,
     ]
-    proc = await asyncio.create_subprocess_exec(*args)
+    proc = await asyncio.create_subprocess_exec(
+        *args,
+        stderr=asyncio.subprocess.DEVNULL,
+    )
     await proc.wait()
     if proc.returncode != 0:
         raise ProcessError(proc)

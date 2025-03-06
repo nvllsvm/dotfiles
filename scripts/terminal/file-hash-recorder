@@ -347,6 +347,7 @@ def is_archive(path):
     return path.name.lower().endswith((
         '.7z',
         '.bz2',
+        '.cbz',
         '.gz',
         '.nsz',
         '.rar',
