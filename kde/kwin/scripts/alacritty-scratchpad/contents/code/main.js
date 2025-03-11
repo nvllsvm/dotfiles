@@ -17,6 +17,26 @@ function isActive(client) {
 
 function activate(client) {
     client.minimized = false;
+
+    let activeScreen = workspace.activeScreen;
+    let wsWidth = activeScreen.geometry.width;
+    let wsHeight = activeScreen.geometry.height;
+    if ((wsWidth / wsHeight) > maxAspect) {
+        wsHeight = Math.min(wsWidth, wsHeight);
+        wsWidth = wsHeight * maxAspect;
+    }
+
+    let width = wsWidth * scaleFactor;
+    let height = wsHeight * scaleFactor;
+    let x = (activeScreen.geometry.width - width) / 2;
+    let y = (activeScreen.geometry.height - height) / 2;
+    client.frameGeometry = {
+        x: x,
+        y: y,
+        width: width,
+        height: height
+    };
+    workspace.sendClientToScreen(client, activeScreen);
     workspace.activeWindow = client;
 }
 
@@ -48,6 +68,30 @@ function configure_as_normal_window(client) {
     client.minimized = false;
     client.fullScreen = false;
     client.noBorder = false;
+
+}
+
+function set_geometry_and_screen(client) {
+    let activeScreen = workspace.screenAt(workspace.cursorPos);
+
+    let wsWidth = activeScreen.geometry.width;
+    let wsHeight = activeScreen.geometry.height;
+    if ((wsWidth / wsHeight) > maxAspect) {
+        wsHeight = Math.min(wsWidth, wsHeight);
+        wsWidth = wsHeight * maxAspect;
+    }
+
+    let width = wsWidth * scaleFactor;
+    let height = wsHeight * scaleFactor;
+    let x = (activeScreen.geometry.width - width) / 2;
+    let y = (activeScreen.geometry.height - height) / 2;
+    client.frameGeometry = {
+        x: x,
+        y: y,
+        width: width,
+        height: height
+    };
+    workspace.sendClientToScreen(client, activeScreen);
 }
 
 function configure_as_floating_window(client) {
@@ -60,24 +104,6 @@ function configure_as_floating_window(client) {
     client.onAllDesktops = true;
     client.fullScreen = false;
     client.keepAbove = true;
-
-    let wsWidth = workspace.workspaceWidth;
-    let wsHeight = workspace.workspaceHeight;
-    if ((wsWidth / wsHeight) > maxAspect) {
-        wsHeight = Math.min(wsWidth, wsHeight);
-        wsWidth = wsHeight * maxAspect;
-    }
-
-    let width = wsWidth * scaleFactor;
-    let height = wsHeight * scaleFactor;
-    let x = (workspace.workspaceWidth - width) / 2;
-    let y = (workspace.workspaceHeight - height) / 2;
-    client.frameGeometry = {
-        x: x,
-        y: y,
-        width: width,
-        height: height
-    };
 }
 
 function hide(client) {
@@ -89,15 +115,18 @@ function toggleAlacritty() {
     let alacritty = findAlacritty();
     if ( alacritty ) {
         if ( isNormal ) {
+            set_geometry_and_screen(alacritty);
             configure_as_floating_window(alacritty);
             activate(alacritty);
         } else if ( isVisible(alacritty) ) {
             if ( isActive(alacritty) ) {
                 hide(alacritty);
             } else {
+                set_geometry_and_screen(alacritty);
                 activate(alacritty);
             }
         } else {
+            set_geometry_and_screen(alacritty);
             configure_as_floating_window(alacritty);
             activate(alacritty);
         }
