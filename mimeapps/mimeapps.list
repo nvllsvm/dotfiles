@@ -25,6 +25,7 @@ audio/x-wav=mpv.desktop
 audio/x-xm=mpv.desktop
 audio/x-umx=mpv.desktop
 image/avif=org.kde.gwenview.desktop
+image/x-dds=org.kde.gwenview.desktop
 image/bmp=org.kde.gwenview.desktop
 image/gif=org.kde.gwenview.desktop
 image/jp2=org.kde.gwenview.desktop
