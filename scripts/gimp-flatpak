@@ -1,2 +1,0 @@
-#!/bin/sh
-exec flatpak --user run org.gimp.GIMP -- "$@"
