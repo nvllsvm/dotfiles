@@ -26,6 +26,7 @@ def run_lgogdownloader(*, pull=True, shell=False):
     args = [
         'podman', 'run',
         '--rm',
+        '--name', 'gog-update',
         '-e', 'HOME',
         '-v', f'{GOG_DIR}:/downloads',
         '-v', f'{CACHE_DIR}:/cache',
