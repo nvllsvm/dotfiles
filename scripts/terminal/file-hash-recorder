@@ -396,7 +396,10 @@ async def _process_path(path,
                         hash_archive_contents=True,
                         archive_contents_by_hash=None,
                         multihash_subprocess=False,
-                        use_tmpdir=False):
+                        use_tmpdir=False,
+                        verbose=False):
+    if verbose:
+        print('Processing', path)
     if stat is None:
         stat = path.stat()
     if multihash_subprocess:
@@ -427,7 +430,7 @@ async def _process_path(path,
 async def _process_multihash_root_path(root_path, args, parser):
     results = {}
     for path in all_files(root_path):
-        results[path] = await _process_path(path, hash_archive_contents=False)
+        results[path] = await _process_path(path, hash_archive_contents=False, verbose=args.verbose)
 
     if root_path.is_file():
         results = tuple(results.values())[0]
@@ -575,6 +578,7 @@ async def _process_db_root_path(root_path, args, parser, db):
             archive_contents_by_hash=archive_contents_by_hash,
             multihash_subprocess=args.num_procs > 1,
             use_tmpdir=not args.no_tmpdir,
+            verbose=args.verbose,
         )
         future_info[future] = (path, name)
 
@@ -613,6 +617,7 @@ async def _process_db_root_path(root_path, args, parser, db):
 async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--no-progress', action='store_true')
+    parser.add_argument('--verbose', action='store_true')
     parser.add_argument('--absolute-paths', action='store_true')
 
     mode_mutex = parser.add_mutually_exclusive_group()
