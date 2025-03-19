@@ -641,6 +641,9 @@ async def main():
     parser.add_argument('path', type=pathlib.Path, nargs='+')
     args = parser.parse_args()
 
+    if args.verbose:
+        args.no_progress = True
+
     if len(args.path) > 1:
         if any((args.output, args.show_dupes, args.list, args.multihash)):
             raise RuntimeError
