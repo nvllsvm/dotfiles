@@ -7,6 +7,8 @@ else
         local arg
         for arg in "$@"; do
             case "$arg" in
+                '-print-last-dir'|'--print-last-dir')
+                    ;;
                 '--')
                     break
                     ;;
