@@ -132,7 +132,7 @@ if HOSTNAME in ('mars', 'phobos', 'lounge-htpc'):
         'firefox',
         'gamescope',
         'gwenview',
-        'jellyfin-media-player',
+        'jellyfin-media-player-git',
         'mangohud',
         'noto-fonts',
         'noto-fonts-cjk',
