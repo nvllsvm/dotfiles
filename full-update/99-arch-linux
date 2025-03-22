@@ -36,6 +36,7 @@ if HOSTNAME in ('sol', 'mars', 'phobos'):
         'cuetools',
         'curlie',
         'dash',
+        'devtools',
         'direnv',
         'dosfstools',
         'e2fsprogs',
@@ -188,6 +189,11 @@ if HOSTNAME in ('mars', 'phobos'):
 EXPECTED_PACKAGE_DEPENDENCIES = {
     'cdemu-daemon': {
         'vhba-module-dkms',
+    },
+    'devtools': {
+        'bat',
+        'btrfs-progs',
+        'nvchecker',
     },
     'digikam': {
         'darktable',
