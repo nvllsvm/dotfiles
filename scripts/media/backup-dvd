@@ -1,0 +1,19 @@
+#!/usr/bin/env sh
+set -e
+
+DEVICE="$1"
+
+if ! [ -e "$DEVICE" ]; then
+    cat >&2 << EOF
+usage: DEVICE
+EOF
+    exit 1
+fi
+
+# on the Plextor PX-760A, redumper will sometimes fail to detect the disc.
+# running `lsdvd` until it outputs information about the DVD seems to fix the issue.
+# it "authenticates" the drive or something, not quite sure.
+echo 'Running lsdvd ...'
+lsdvd -x "$DEVICE"
+
+redumper --drive "$DEVICE"
