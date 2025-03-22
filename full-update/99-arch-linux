@@ -141,7 +141,7 @@ if HOSTNAME in ('mars', 'phobos', 'lounge-htpc'):
         'noto-fonts-extra',
         'proton-ge-custom-bin',
         'steam',
-        'ttf-dejavu-emojiless',
+        'ttf-hack',
     })
 
 if HOSTNAME in ('mars', 'phobos'):
