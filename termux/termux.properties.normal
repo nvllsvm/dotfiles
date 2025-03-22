@@ -1,3 +1,4 @@
+hide-soft-keyboard-on-startup = false
 soft-keyboard-toggle-behavior = disable
 bell-character = ignore
 volume-keys = volume
