@@ -2,4 +2,9 @@
 set -e
 cd ~/src/github/comfyanonymous/comfyui
 . ./venv_system/bin/activate
+
+# fix dwpose failing to detect ROCM
+export DWPOSE_ONNXRT_CHECKED='1'
+export AUX_ORT_PROVIDERS='ROCMExecutionProvider'
+
 exec python main.py --listen 0.0.0.0
