@@ -2055,11 +2055,13 @@ class pbzip2:
             raise NotImplementedError
         if overwrite:
             raise NotImplementedError
-        target = dest / path.with_suffix('').name
-        with open(target, 'w') as handle:
-            proc = await asyncio.create_subprocess_exec(
-                'pbzip2', '-d', '-c', '--', path,
-                stdout=handle)
+        with contextlib.ExitStack() as exit_stack:
+            args = ['pbzip2', '-d', '-c', '--', path]
+            kwargs = {}
+            if dest != sys.stdout.buffer:
+                target = dest / path.with_suffix('').name
+                kwargs['stdout'] = exit_stack.enter_context(open(target, 'w'))
+            proc = await asyncio.create_subprocess_exec(*args, **kwargs)
             await proc.wait()
             if proc.returncode:
                 raise ProcessError(proc)
