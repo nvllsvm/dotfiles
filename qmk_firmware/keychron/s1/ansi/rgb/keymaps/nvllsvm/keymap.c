@@ -1,5 +1,20 @@
 #include QMK_KEYBOARD_H
 
+#define PRODUCT_S1_ANSI_RGB 0x0410
+
+// these use the fork https://github.com/Keychron/qmk_firmware/tree/wireless_playground
+#define PRODUCT_K3_MAX_ANSI_RGB 0x0A30
+#define PRODUCT_K3_PRO_ANSI_RGB 0x0230
+
+#if PRODUCT_ID==PRODUCT_K3_MAX_ANSI_RGB
+    #include "keychron_common.h"
+#elif PRODUCT_ID==PRODUCT_S1_ANSI_RGB
+    #define BAT_LVL _______
+    #define BT_HST1 _______
+    #define BT_HST2 _______
+    #define BT_HST3 _______
+#endif
+
 // clang-format off
 
 enum layers{
@@ -8,14 +23,6 @@ enum layers{
     WIN_BASE,
     WIN_FN
 };
-
-// set for k3_pro in github:keychron/qmk_firmware branch=bluetooth_playground
-#ifndef KC_BLUETOOTH_ENABLE
-    #define BAT_LVL _______
-    #define BT_HST1 _______
-    #define BT_HST2 _______
-    #define BT_HST3 _______
-#endif
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [MAC_BASE] = LAYOUT_ansi_84(
