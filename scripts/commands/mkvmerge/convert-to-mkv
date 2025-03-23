@@ -9,6 +9,7 @@ import tempfile
 VIDEO_EXTENSIONS = {
     '.avi',
     '.flv',
+    '.m2ts',
     '.m4v',
     '.mov',
     '.mp4',
