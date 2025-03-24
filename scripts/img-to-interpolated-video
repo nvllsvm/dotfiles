@@ -106,7 +106,9 @@ def main():
         for i, p in enumerate(new):
             shutil.copy(p, tmpdir / f'{i:032d}.png')
 
+        iterations = args.rife_iterations
         for i in range(args.rife_iterations - 1):
+            print(i, 'of', iterations)
             tmpdir2 = exitstack.enter_context(
                 tempfile.TemporaryDirectory(dir=source.parent))
             tmpdir2 = pathlib.Path(tmpdir2)
