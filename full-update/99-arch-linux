@@ -134,6 +134,7 @@ if HOSTNAME in ('mars', 'phobos', 'lounge-htpc'):
         'firefox',
         'gamescope',
         'gwenview',
+        'haruna',
         'jellyfin-media-player',
         'mangohud',
         'noto-fonts',
