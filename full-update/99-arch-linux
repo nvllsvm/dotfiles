@@ -70,6 +70,7 @@ if HOSTNAME in ('sol', 'mars', 'phobos'):
         'mp3val',
         'mprime-bin',
         'mpv',
+        'mpv-mpris',
         'ms-sys',
         'neovim',
         'nsz',
