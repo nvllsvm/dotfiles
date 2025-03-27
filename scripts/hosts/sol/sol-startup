@@ -34,6 +34,7 @@ sudo mount --bind /storage/Video            /srv/smb/storage/Video
 sudo systemctl restart smb.service
 
 echo Starting systemd units ...
+systemctl --user enable --now check-update-dualsense-firmware.timer
 systemctl --user enable --now check-update-mars-bios.timer
 systemctl --user enable --now check-update-phobos-bios.timer
 systemctl --user enable --now git-repo-backup.timer

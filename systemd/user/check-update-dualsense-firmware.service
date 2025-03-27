@@ -1,0 +1,6 @@
+[Unit]
+Description=Run check-update-dualsense-firmware
+
+[Service]
+ExecStart=zsh -lc check-update-dualsense-firmware
+SyslogIdentifier=check-update-dualsense-firmware
