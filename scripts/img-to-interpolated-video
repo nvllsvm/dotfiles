@@ -77,9 +77,11 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-o', '--output', type=pathlib.Path, 
                         default=pathlib.Path(f'{now}.mp4'))
-    parser.add_argument('-l', '--loops', type=int, default=5)
-    parser.add_argument('-r', '--rife-iterations', type=int, default=5)
-    parser.add_argument('-f', '--framerate', default='30/1')
+    parser.add_argument(
+        '-l', '--loops', type=int, metavar='NUM', default=3, help='(default %(default)s)')
+    parser.add_argument(
+        '-r', '--rife-iterations', type=int, metavar='NUM', default=3, help='(default %(default)s)')
+    parser.add_argument('-f', '--framerate', default='30/1', metavar='FPS', help='(default %(default)s)')
     parser.add_argument('--no-bounce', action='store_true')
     parser.add_argument('source', type=pathlib.Path)
     args = parser.parse_args()
@@ -107,8 +109,8 @@ def main():
             shutil.copy(p, tmpdir / f'{i:032d}.png')
 
         iterations = args.rife_iterations
-        for i in range(args.rife_iterations - 1):
-            print(i, 'of', iterations)
+        for i in range(args.rife_iterations):
+            print('Rife iteration', i+1, 'of', iterations)
             tmpdir2 = exitstack.enter_context(
                 tempfile.TemporaryDirectory(dir=source.parent))
             tmpdir2 = pathlib.Path(tmpdir2)
@@ -121,6 +123,7 @@ def main():
             for i, path in enumerate(sources[-pow(2, args.rife_iterations-1):]):
                 path.unlink()
 
+        print('Rendering video')
         ffmpeg_merge(
             tmpdir, 
             args.output,
