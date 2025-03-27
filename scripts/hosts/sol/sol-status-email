@@ -18,6 +18,7 @@ SYSTEM_UNITS = {
 }
 
 USER_UNITS = {
+    'check-update-dualsense-firmware.service',
     'check-update-phobos-bios.service',
     'check-update-mars-bios.service',
     'git-repo-backup.service',
