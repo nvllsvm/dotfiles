@@ -14,9 +14,9 @@ LF_DUPLICATE_SUFFIX = '.~1~'
 LF_DUPLICATE_PATTERN = re.compile(r'(.+)(\.~\d+\~)+$')
 
 # encounterd with .tar.zst
-FIREFOX_DUPLICATE_PATTERN_1 = re.compile(r'(.)(\(\d+\))(\.[^\.]+|\.tar\.[^\.]+$)')
-# encounterd this with pdfs
-FIREFOX_DUPLICATE_PATTERN_2 = re.compile(r'(.)(\-\d+)(\.[^\.]+|\.tar\.[^\.]+$)')
+FIREFOX_DUPLICATE_PATTERN_1 = re.compile(r'(.)(\(\d+\))(\.[^\.]+|\.tar\.[^\.]+)$')
+# encounterd this with .exe and .pdf
+FIREFOX_DUPLICATE_PATTERN_2 = re.compile(r'(.)(\-\d+)(\.[^\.]+|\.tar\.[^\.]+)$')
 
 
 def all_files(root):
