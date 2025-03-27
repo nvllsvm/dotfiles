@@ -35,6 +35,6 @@ ln -sfT /storage/emulated/0/Download ~/download
 rsync -a --delete "${DOTFILES}/termux/shortcuts/" ~/.shortcuts
 
 yes | pkg upgrade
-yes | apt autoremove
+yes | pkg clean
 
 touch ~/.hushlogin
