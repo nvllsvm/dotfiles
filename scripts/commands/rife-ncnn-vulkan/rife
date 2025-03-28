@@ -3,7 +3,7 @@ import argparse
 import asyncio
 import pathlib
 
-DEFAULT_MODEL = 'rife-v4.6'
+DEFAULT_MODEL = 'rife-UHD'
 INSTALL_PATH = pathlib.Path('/usr/share/rife-ncnn-vulkan')
 MODELS = sorted(
     path.name
@@ -20,6 +20,7 @@ async def rife_ncnn_vulkan(input_path, output_path, time_step=0.5):
         '-m', DEFAULT_MODEL,
         '-i', input_path,
         '-o', output_path,
+        '-s', str(time_step),
         '-x',
         '-z',
     )
@@ -51,9 +52,12 @@ class ProcessError(Exception):
 
 
 async def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-m', '--model', choices=MODELS, default=DEFAULT_MODEL)
-    parser.add_argument('-s', '--time-step', default=0.5, type=float)
+    parser = argparse.ArgumentParser(description='models:\n' + '\n'.join(' ' + m for m in MODELS),
+                                     formatter_class=argparse.RawTextHelpFormatter)
+    parser.add_argument('-m', '--model', metavar='MODEL', choices=MODELS, default=DEFAULT_MODEL,
+                        help='(default: %(default)s)')
+    parser.add_argument('-s', '--time-step', metavar='NUM', default=0.5, type=float,
+                        help='(default: %(default)s)')
     parser.add_argument('input', type=pathlib.Path)
     parser.add_argument('output', type=pathlib.Path)
     args = parser.parse_args()
