@@ -21,8 +21,9 @@ async def rife_ncnn_vulkan(input_path, output_path, time_step=0.5):
         '-i', input_path,
         '-o', output_path,
         '-s', str(time_step),
-        '-x',
-        '-z',
+        '-u', # UHD mode
+        '-x', # spatial tta mode
+        '-z', # temporal tta mode
     )
     await proc.communicate()
     if proc.returncode:
