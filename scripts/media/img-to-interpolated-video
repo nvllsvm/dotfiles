@@ -8,8 +8,6 @@ import shutil
 import subprocess
 import tempfile
 
-import tqdm
-
 
 @contextlib.contextmanager
 def TempPath(**kwargs):
@@ -182,9 +180,8 @@ def main():
             shutil.copy(p, tmpdir / f"{i:032d}.png")
 
         if args.rife_iterations:
-            print("Running rife")
-            for i in tqdm.tqdm(list(range(args.rife_iterations))):
-                print("Rife iteration", i + 1, "of", args.rife_iterations)
+            for i in range(args.rife_iterations):
+                print(f"Running rife ({i + 1} of {args.rife_iterations})")
                 tmpdir2 = exitstack.enter_context(
                     tempfile.TemporaryDirectory(dir=source.parent)
                 )
