@@ -120,7 +120,7 @@ def main():
 
         if not args.no_bounce:
             sources = sorted(list(tmpdir.iterdir()))
-            for i, path in enumerate(sources[-pow(2, args.rife_iterations-1):]):
+            for i, path in enumerate(sources[-pow(2, args.rife_iterations):]):
                 path.unlink()
 
         print('Rendering video')
