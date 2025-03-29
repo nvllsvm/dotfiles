@@ -20,7 +20,7 @@ async def rife_ncnn_vulkan(input_path, output_path, time_step=0.5):
     estimated_result_count = math.ceil(start_count / time_step)
 
     with tqdm.tqdm(
-        total=estimated_result_count, bar_format="{percentage:.0f}% |{bar}"
+        total=estimated_result_count, bar_format="{percentage:.0f}% |{bar}| "
     ) as pbar:
         proc = await asyncio.create_subprocess_exec(
             "/usr/share/rife-ncnn-vulkan/rife-ncnn-vulkan",

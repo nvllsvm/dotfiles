@@ -36,6 +36,7 @@ def gifski(path, target, framerate="30", loops=1):
         subprocess.run(
             [
                 "gifski",
+                "--quiet",
                 "--extra",
                 "--fps",
                 framerate,
