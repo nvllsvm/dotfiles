@@ -36,10 +36,13 @@ def gifski(path, target, framerate="30", loops=1):
         subprocess.run(
             [
                 "gifski",
-                '--extra',
-                '--fps', framerate,
-                '--output', tmptarget,
-                '--', *list(path.iterdir()),
+                "--extra",
+                "--fps",
+                framerate,
+                "--output",
+                tmptarget,
+                "--",
+                *list(path.iterdir()),
             ],
             stdout=subprocess.DEVNULL,
             check=True,
@@ -135,8 +138,6 @@ def ffprobe(path):
 def rife(source, target):
     subprocess.run(
         ["rife", source, target],
-        stderr=subprocess.DEVNULL,
-        stdout=subprocess.DEVNULL,
         check=True,
     )
 
@@ -228,7 +229,7 @@ def main():
                     loops=args.loops,
                 )
             case "gif":
-                print('Rendering gif')
+                print("Rendering gif")
                 gifski(
                     tmpdir,
                     output,
