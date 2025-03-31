@@ -23,6 +23,12 @@ EOF
 }
 
 case "$1" in
+    brightness-max)
+        http_request /brightness/max
+        ;;
+    brightness-min)
+        http_request /brightness/min
+        ;;
     volume-up)
         http_request /volume/up
         ;;
