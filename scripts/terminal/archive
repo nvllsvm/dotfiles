@@ -538,14 +538,15 @@ _FORMATS = {
 }
 
 
-async def process(source, archive_format, remove, fast=False, parent=None, password=None):
+async def process(source, archive_format, remove, fast=False, parent=None, password=None, dest=None):
     formats = _FORMATS[archive_format]
 
     source = source.absolute()
     suffix = formats['suffix']
-    build_dest = formats.get('build_dest', _build_archive_dest)
 
-    dest = build_dest(source, suffix, parent=parent)
+    if dest is None:
+        build_dest = formats.get('build_dest', _build_archive_dest)
+        dest = build_dest(source, suffix, parent=parent)
 
     before = sum(path.lstat().st_size for path in _all_paths(source))
     with TempPath(dir=dest.parent, prefix='.archive_',
@@ -617,7 +618,7 @@ class SizeDiffPrinter:
                 print('Total: -')
 
 
-def archive_main():
+def main_archive():
     parser = argparse.ArgumentParser(
         usage='%(prog)s [OPTIONS] source [source ...]')
 
@@ -643,9 +644,20 @@ def archive_main():
     parser.add_argument(
         '--password', help='archive password')
     parser.add_argument(
+        '-o', '--output', metavar='FILE', type=pathlib.Path,
+        help='output filename')
+    parser.add_argument(
         'source', type=lambda p: pathlib.Path(p).absolute(), nargs='+')
 
     args = parser.parse_args()
+
+    if args.output is not None:
+        if len(args.source) != 1:
+            raise parser.ArgumentError(
+                'may only specify -o/--output when archiving a single source')
+        if args.output.exists():
+            raise parser.ArgumentError(
+                '-o/--ouput path already exists')
 
     async def run(args):
         has_error = False
@@ -660,7 +672,8 @@ def archive_main():
                 sources.append(source)
 
             executor.submit(process, source, args.format, args.rm, args.fast,
-                            parent=args.parent, password=args.password)
+                            parent=args.parent, password=args.password,
+                            dest=args.output)
 
         size_diff_printer = SizeDiffPrinter(num_items=len(executor))
         async for future in executor:
@@ -2679,7 +2692,7 @@ def pretty_json(data):
     )
 
 
-async def extract_main():
+async def main_extract():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '-p', dest='parent', metavar='DIR', type=pathlib.Path,
@@ -2803,6 +2816,6 @@ async def extract_main():
 
 if __name__ == '__main__':
     if sys.argv[0].endswith('archive'):
-        archive_main()
+        main_archive()
     else:
-        asyncio.run(extract_main())
+        asyncio.run(main_extract())
