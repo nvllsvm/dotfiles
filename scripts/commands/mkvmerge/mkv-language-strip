@@ -3,10 +3,8 @@ import argparse
 import contextlib
 import json
 import pathlib
-import shlex
 import shutil
 import subprocess
-import sys
 import tempfile
 
 import tqdm
@@ -60,27 +58,20 @@ class MKVFile:
             ]
         return track_command
 
-    def build_mkvmerge_command(self, target, audio=[], subtitle=[]):
-        return [
-            'mkvmerge', '-o', target,
-            *self.excluded_track_string('audio', audio),
-            *self.excluded_track_string('subtitle', subtitle),
-            self.path
-        ]
-
-    def remove_tracks(self, target, audio=[], subtitle=[]):
-        target.parent.mkdir(parents=True, exist_ok=True)
-        if target.exists():
-            print(f'error: already exists "{target}"', file=sys.stderr)
-            sys.exit(1)
-
-        with TempPath(dir=target.parent) as temp:
+    def remove_tracks(self, audio=[], subtitle=[]):
+        with TempPath(dir=self.path.parent) as temp:
+            args = [
+                'mkvmerge', '-o', temp,
+                *self.excluded_track_string('audio', audio),
+                *self.excluded_track_string('subtitle', subtitle),
+                self.path
+            ]
             subprocess.run(
-                self.build_mkvmerge_command(temp, audio, subtitle),
+                args,
                 stdout=subprocess.DEVNULL,
                 check=True
             )
-            temp.rename(target)
+            temp.rename(self.path)
 
 
 @contextlib.contextmanager
@@ -104,29 +95,34 @@ def TempPath(**kwargs):
                 pass
 
 
-def mkv_files(root):
-    files = []
-    if root.is_file():
-        files.append(root)
-    else:
-        stack = [root]
-        while stack:
-            for path in stack.pop().iterdir():
-                if path.is_file():
-                    files.append(path)
-                elif path.is_dir():
-                    stack.append(path)
+def find_mkv_files(*paths):
+    files = set()
+    stack = set()
+
+    for path in paths:
+        path = path.absolute()
+        if path.is_file():
+            files.add(path)
+        else:
+            stack.add(path)
+
+    while stack:
+        for path in stack.pop().iterdir():
+            if path.is_file():
+                files.add(path)
+            elif path.is_dir():
+                stack.add(path)
+
     return sorted(
-        f
-        for f in files
-        if f.suffix.lower() == '.mkv'
+        path
+        for path in files
+        if path.suffix.lower() == '.mkv'
     )
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('input', type=pathlib.Path)
-    parser.add_argument('output', type=pathlib.Path)
+    parser.add_argument('mkv', type=pathlib.Path, nargs='+')
     parser.add_argument(
         '-k',
         '--keep',
@@ -134,61 +130,44 @@ def main():
         help='Language to keep',
     )
     parser.add_argument(
-        '-i',
-        '--info',
-        action='store_true',
-        help='Show track language information'
-    )
-    parser.add_argument(
-        '--rm',
-        action='store_true')
-    parser.add_argument(
         '-d',
         '--dryrun',
         action='store_true'
     )
     args = parser.parse_args()
 
-    files = []
-    if args.input.is_dir():
-        files.extend([
-            path.absolute()
-            for path in mkv_files(args.input)
-        ])
-    else:
-        files.append(args.input)
+    valid_languages = set(args.keep) if args.keep else DEFAULT_LANGUAGES
+    if 'und' in valid_languages:
+        valid_languages.add(None)
 
-    if args.info:
-        for path in files:
-            mkv = MKVFile(path)
-            print(path, mkv.languages)
-    else:
-        if args.output.exists() and args.output.is_file():
-            raise RuntimeError
-        args.output.mkdir(exist_ok=True, parents=True)
+    mkv_files = find_mkv_files(*args.mkv)
 
-        valid_languages = set(args.keep) if args.keep else DEFAULT_LANGUAGES
-        if 'und' in valid_languages:
-            valid_languages.add(None)
+    if not mkv_files:
+        parser.error('no mkv files found')
 
-        input_path = args.input.absolute()
-        for path in tqdm.tqdm(files):
-            mkv = MKVFile(path)
-            invalid_languages = mkv.languages - valid_languages
-            target = args.output / path.relative_to(input_path)
-            target.parent.mkdir(parents=True, exist_ok=True)
-            audio = mkv.matching_audio_tracks(invalid_languages)
-            subtitle = mkv.matching_subtitle_tracks(invalid_languages)
+    pending = []
+    for path in mkv_files:
+        mkv = MKVFile(path)
+        invalid_languages = mkv.languages - valid_languages
+        audio_track_remove = mkv.matching_audio_tracks(invalid_languages)
+        subtitle_track_remove = mkv.matching_subtitle_tracks(invalid_languages)
 
-            if args.dryrun:
-                parts = mkv.build_mkvmerge_command(
-                    target, audio=audio, subtitle=subtitle
-                )
-                print(' '.join(shlex.quote(str(part)) for part in parts))
-            else:
-                mkv.remove_tracks(target, audio=audio, subtitle=subtitle)
-                if args.rm:
-                    path.unlink()
+        if audio_track_remove or subtitle_track_remove:
+            pending.append((path, audio_track_remove, subtitle_track_remove))
+
+    if pending:
+        for (path, audio_track_remove, subtitle_track_remove) in tqdm.tqdm(pending):
+            log = [str(path)]
+            if audio_track_remove:
+                log.append(f'(audio: {audio_track_remove})')
+            if subtitle_track_remove:
+                log.append(f'(subtitle: {subtitle_track_remove})')
+            print(*log)
+
+            if not args.dryrun:
+                mkv.remove_tracks(
+                    audio=audio_track_remove,
+                    subtitle=subtitle_track_remove)
 
 
 if __name__ == '__main__':
