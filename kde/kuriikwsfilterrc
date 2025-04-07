@@ -2,4 +2,5 @@
 DefaultWebShortcut=google
 EnableWebShortcuts=true
 KeywordDelimiter=:
+PreferredWebShortcuts=google,youtube,wikipedia,wikit,yahoo
 UsePreferredWebShortcutsOnly=false
