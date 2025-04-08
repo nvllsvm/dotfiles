@@ -13,6 +13,10 @@ identify_without_filename() {
         -- "$1"
 }
 
+print_delimiter() {
+    printf '\n%*s\n\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+}
+
 if [ $# -eq 0 ]; then
     echo 'error: missing argument' >&2
     exit 1
@@ -68,7 +72,9 @@ else
             extract -l -- "$1"
             ;;
         application/x-cue)
-            extract -l -- "$1" || cat -- "$1"
+            extract -l -- "$1" 2>&1
+            print_delimiter
+            cat -- "$1"
             ;;
         application/java-archive)
             extract --stdout -- "$1" 'META-INF/MANIFEST.MF'
