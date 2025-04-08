@@ -9,6 +9,9 @@ import shutil
 import sys
 
 
+FIRST_CHUNK_SIZE = 8192
+
+
 # lf adds `.~1~` to the end of a file when a copy/move destination exists
 LF_DUPLICATE_SUFFIX = '.~1~'
 LF_DUPLICATE_PATTERN = re.compile(r'(.+)(\.~\d+\~)+$')
@@ -98,6 +101,11 @@ def _sorted_duplicates_key(path):
     )
 
 
+def read_first_chunk(path):
+    with open(path, 'rb') as handle:
+        return handle.read(FIRST_CHUNK_SIZE)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -127,9 +135,20 @@ def main():
     for path in sorted(files):
         by_size[path.stat().st_size].add(path)
 
-    by_hashes = collections.defaultdict(set)
     unique = set()
-    for paths in by_size.values():
+
+    by_size_and_first_chunk = collections.defaultdict(set)
+    for size, paths in by_size.items():
+        if len(paths) == 1:
+            unique.update(paths)
+        else:
+            for path in paths:
+                first_chunk = read_first_chunk(path)
+                key = (size, first_chunk)
+                by_size_and_first_chunk[key].add(path)
+
+    by_hashes = collections.defaultdict(set)
+    for paths in by_size_and_first_chunk.values():
         if len(paths) == 1:
             unique.update(paths)
         else:
