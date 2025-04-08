@@ -16,8 +16,10 @@ def main():
     )
     args = parser.parse_args()
 
+    # must use resolve+absolute paths to handle
+    # mount points like /media/SOMEDIR (usually a link to /run/media/<username>/SOMEDIR)
     sources = [
-        pathlib.Path(line).absolute()
+        pathlib.Path(line).resolve().absolute()
         for line in args.data.read().splitlines()
     ]
     parents = {tuple(path.parents) for path in sources}
