@@ -14,7 +14,7 @@ identify_without_filename() {
 }
 
 print_delimiter() {
-    printf '\n%*s\n\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+    printf '\n%*s\n\n' "40" '' | tr ' ' -
 }
 
 if [ $# -eq 0 ]; then
