@@ -279,12 +279,13 @@ _TYPE_TO_MIME = {
 
 _MIME_SUFFIXES = {
     'image/bmp': ('.bmp',),
+    'image/gif': ('.gif',),
     'image/jpeg': ('.jpg', '.jpeg'),
     'image/jxl': ('.jxl',),
     'image/png': ('.png',),
-    'image/x-portable-pixmap': ('.ppm',),
     'image/tiff': ('.tiff',),
     'image/webp': ('.webp',),
+    'image/x-portable-pixmap': ('.ppm',),
 }
 
 # tiff support is experimental
