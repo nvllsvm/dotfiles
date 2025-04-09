@@ -339,6 +339,23 @@ def _sigint_handler(*_):
     sys.exit(130)
 
 
+async def is_animated_gif(path):
+    proc = await asyncio.create_subprocess_exec(
+        'vipsheader', '--all', '--'
+        '--field=vips-loader',
+        '--field=n-pages',
+        '--', path,
+        stdout=asyncio.subprocess.PIPE,
+    )
+    stdout, _ = await proc.communicate()
+    if proc.returncode:
+        raise ProcessError(proc)
+    vips_loader, n_pages = stdout.decode().splitlines()
+    if vips_loader != 'gifloader':
+        raise ValueError('not a gif file')
+    return int(n_pages) > 1
+
+
 async def convert_to_jpeg(source, dest):
     args = [
         'cjpegli',
@@ -466,6 +483,10 @@ async def _process_convert(path, source_mimetype, target_mimetype):
 
     if not has_proper_suffix:
         name = name + target_suffixes[0]
+
+    if source_mimetype == 'image/gif':
+        if await is_animated_gif(path):
+            raise NotImplementedError('gif is animated')
 
     dest = path.parent / name
     with contextlib.ExitStack() as stack:
