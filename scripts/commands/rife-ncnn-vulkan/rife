@@ -14,24 +14,31 @@ MODELS = sorted(
 
 
 async def rife_ncnn_vulkan(input_path_0, input_path_1, output_path):
-    # explicit input 0 and 1 args results in an overall smoother animation
-    proc = await asyncio.create_subprocess_exec(
-        "/usr/share/rife-ncnn-vulkan/rife-ncnn-vulkan",
-        "-m",
-        DEFAULT_MODEL,
-        "-0",
-        input_path_0,
-        "-1",
-        input_path_1,
-        "-o",
-        output_path,
-        "-u",  # UHD mode
-        "-x",  # spatial tta mode
-        "-z",  # temporal tta mode
-        stderr=asyncio.subprocess.DEVNULL,
-        stdout=asyncio.subprocess.DEVNULL,
-    )
-    await proc.wait()
+    # retry upon error due to seemingly random buffer overflows
+    num_retry = 5
+
+    for attempt in range(num_retry):
+        # explicit input 0 and 1 args results in an overall smoother animation
+        proc = await asyncio.create_subprocess_exec(
+            "/usr/share/rife-ncnn-vulkan/rife-ncnn-vulkan",
+            "-m",
+            DEFAULT_MODEL,
+            "-0",
+            input_path_0,
+            "-1",
+            input_path_1,
+            "-o",
+            output_path,
+            "-u",  # UHD mode
+            "-x",  # spatial tta mode
+            "-z",  # temporal tta mode
+            stderr=asyncio.subprocess.DEVNULL,
+            stdout=asyncio.subprocess.DEVNULL,
+        )
+        await proc.wait()
+        if not proc.returncode:
+            break
+
     if proc.returncode:
         raise ProcessError(proc)
 
@@ -96,6 +103,14 @@ async def main():
 
     input_paths = sorted(input_paths)
 
+    num_new_files = 0
+    wnum = len(input_paths)
+    for _ in range(args.num_passes):
+        wnum = (wnum * 2) - 1
+        len(input_paths) - 1
+    num_new_files = wnum - len(input_paths)
+    num_new_done = 0
+
     working_paths = input_paths.copy()
     for p in range(args.num_passes):
         pass_paths = []
@@ -105,8 +120,11 @@ async def main():
             output_path = args.output / f".rife_pass{p}_{i}.png"
             await rife_ncnn_vulkan(input_path_0, input_path_1, output_path)
             pass_paths.extend([input_path_0, output_path])
+            num_new_done += 1
+            print(f'\r({num_new_done} / {num_new_files})', end='', flush=True)
         pass_paths.append(input_path_1)
         working_paths = pass_paths
+    print()
 
     zwidth = len(str(len(working_paths)))
     for i, path in enumerate(working_paths):
