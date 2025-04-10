@@ -159,7 +159,7 @@ def main():
         "--rife-iterations",
         type=int,
         metavar="NUM",
-        default=3,
+        default=0,
         help="(default %(default)s)",
     )
     parser.add_argument(
