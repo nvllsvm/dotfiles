@@ -136,9 +136,9 @@ def ffprobe(path):
     return json.loads(proc.stdout)["streams"]
 
 
-def rife(source, target):
+def rife(source, target, num_passes=1):
     subprocess.run(
-        ["rife", source, target],
+        ["rife", "--num-passes", str(num_passes), source, target],
         check=True,
     )
 
@@ -163,12 +163,13 @@ def main():
         help="(default %(default)s)",
     )
     parser.add_argument(
-        "-f", "--framerate", default="30", metavar="FPS", help="(default %(default)s)"
+        "--fps", default="30", metavar="FPS", help="(default %(default)s)"
     )
-    parser.add_argument("--no-bounce", action="store_true")
-    parser.add_argument("--no-cycle", action="store_true")
+    parser.add_argument(
+        "-m", "--mode", choices=["bounce", "cycle", "oneshot"], default="oneshot"
+    )
     parser.add_argument("source", type=pathlib.Path)
-    parser.add_argument("--format", default="mp4", choices=["gif", "mp4", "png"])
+    parser.add_argument("-f", "--format", default="mp4", choices=["gif", "mp4", "png"])
     args = parser.parse_args()
 
     output = args.output
@@ -196,29 +197,40 @@ def main():
         sources = sorted(list(source.iterdir()))
 
         new = [*sources]
-        if args.no_bounce and not args.no_cycle:
-            new.append(sources[0])
-        else:
-            new.extend([*list(reversed(sources[:-1]))])
+        match args.mode:
+            case "cycle":
+                new.append(sources[0])
 
         for i, p in enumerate(new):
             shutil.copy(p, tmpdir / f"{i:032d}.png")
 
         if args.rife_iterations:
-            for i in range(args.rife_iterations):
-                print(f"Running rife ({i + 1} of {args.rife_iterations})")
+            print("Running rife")
+            tmpdir2 = exitstack.enter_context(
+                tempfile.TemporaryDirectory(dir=source.parent)
+            )
+            tmpdir2 = pathlib.Path(tmpdir2)
+            rife(tmpdir, tmpdir2, num_passes=args.rife_iterations)
+            shutil.rmtree(tmpdir)
+            shutil.move(tmpdir2, tmpdir)
+
+        sources = sorted(list(tmpdir.iterdir()))
+        match args.mode:
+            case "bounce":
+                sources = [*sources, *reversed(sources[1:-1])]
+                wz = len(str(len(sources)))
+
                 tmpdir2 = exitstack.enter_context(
                     tempfile.TemporaryDirectory(dir=source.parent)
                 )
                 tmpdir2 = pathlib.Path(tmpdir2)
-                rife(tmpdir, tmpdir2)
+
+                for i, path in enumerate(sources):
+                    shutil.copy(path, tmpdir2 / (str(i).zfill(wz) + ".png"))
                 shutil.rmtree(tmpdir)
                 shutil.move(tmpdir2, tmpdir)
-
-            if not args.no_cycle:
-                sources = sorted(list(tmpdir.iterdir()))
-                for i, path in enumerate(sources[-pow(2, args.rife_iterations) :]):
-                    path.unlink()
+            case "cycle":
+                sources[-1].unlink()
 
         match args.format:
             case "mp4":
@@ -226,7 +238,7 @@ def main():
                 ffmpeg_merge(
                     tmpdir,
                     output,
-                    framerate=args.framerate,
+                    framerate=args.fps,
                     loops=args.loops,
                 )
             case "gif":
@@ -234,7 +246,7 @@ def main():
                 gifski(
                     tmpdir,
                     output,
-                    framerate=args.framerate,
+                    framerate=args.fps,
                 )
             case "png":
                 shutil.copytree(tmpdir, output)
