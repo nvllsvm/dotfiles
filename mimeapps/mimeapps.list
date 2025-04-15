@@ -15,6 +15,7 @@ application/x-extension-xht=firefox.desktop
 application/x-extension-xhtml=firefox.desktop
 application/xhtml+xml=firefox.desktop
 audio/aac=mpv.desktop
+audio/AMR=mpv.desktop
 audio/flac=mpv.desktop
 audio/mp4=mpv.desktop
 audio/mpeg=mpv.desktop

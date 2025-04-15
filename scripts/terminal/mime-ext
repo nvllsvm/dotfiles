@@ -39,6 +39,9 @@ MIME_SUFFIXES = {
     'application/pdf': [
         '.pdf',
     ],
+    'audio/amr': [
+        '.amr'
+    ],
     'audio/flac': [
         '.flac'
     ],
@@ -60,6 +63,9 @@ MIME_SUFFIXES = {
     'image/png': [
         '.png'
     ],
+    'image/heic': [
+        '.heic',
+    ],
     'image/jpeg': [
         '.jpeg',
         '.jpg',
@@ -77,8 +83,8 @@ MIME_SUFFIXES = {
     'image/x-canon-cr3': [
         '.cr3',
     ],
-    'video/3gpp': [
-        '.3gp',
+    'video/quicktime': [
+        '.mov',
     ],
     'video/mp4': [
         '.mp4',
