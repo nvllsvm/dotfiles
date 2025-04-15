@@ -137,7 +137,10 @@ def main():
     for repo in CACHE_PATH.read_text().splitlines():
         repo_dir = CODE_ROOT_DIR / repo
         if not repo_dir.exists():
-            repo_dir, _, _ = parse_repo(repo)
+            try:
+                repo_dir, _, _ = parse_repo(repo)
+            except Exception:
+                continue
         if repo_dir.is_dir():
             cache.append(repo)
         else:
