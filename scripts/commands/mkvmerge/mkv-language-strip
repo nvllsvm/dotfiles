@@ -153,11 +153,11 @@ def main():
         subtitle_track_remove = mkv.matching_subtitle_tracks(invalid_languages)
 
         if audio_track_remove or subtitle_track_remove:
-            pending.append((path, audio_track_remove, subtitle_track_remove))
+            pending.append((mkv, audio_track_remove, subtitle_track_remove))
 
     if pending:
-        for (path, audio_track_remove, subtitle_track_remove) in tqdm.tqdm(pending):
-            log = [str(path)]
+        for (mkv, audio_track_remove, subtitle_track_remove) in tqdm.tqdm(pending):
+            log = [str(mkv.path)]
             if audio_track_remove:
                 log.append(f'(audio: {audio_track_remove})')
             if subtitle_track_remove:
