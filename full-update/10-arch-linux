@@ -33,8 +33,7 @@ if ! command -v yay > /dev/null 2>&1; then
 fi
 
 log 'Updating packages'
-yay -Syu --noconfirm --devel \
-    --ignore miopen-hip  # 6.3.2-1 broke krita ai diffusion. use 6.2.4-1 instead
+yay -Syu --noconfirm --devel
 
 if command -v pkgfile > /dev/null; then
     log 'Updating file cache'
