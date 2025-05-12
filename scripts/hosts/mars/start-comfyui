@@ -3,8 +3,15 @@ set -e
 cd ~/src/github/comfyanonymous/comfyui
 . ./venv_system/bin/activate
 
+# 2025-05-12 no longer needed
 # fix dwpose failing to detect ROCM
-export DWPOSE_ONNXRT_CHECKED='1'
-export AUX_ORT_PROVIDERS='ROCMExecutionProvider'
+#export DWPOSE_ONNXRT_CHECKED='1'
+#export AUX_ORT_PROVIDERS='ROCMExecutionProvider'
+
+# 2025-05-12 fixes miopen-hip >= 6.3.3
+export MIOPEN_FIND_MODE=1
+
+# 2025-05-12 maybe needed when miopen-hip permission issues
+#export MIOPEN_DISABLE_CACHE=1
 
 exec python main.py --listen 0.0.0.0
