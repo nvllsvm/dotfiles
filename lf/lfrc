@@ -13,6 +13,7 @@ map <c-n> :set relativenumber!
 set previewer preview
 map i $preview "$f" | less -R
 map r $lf-renamer
+map R $lf-renamer-allow-duplicates
 map f &lf-guifilemanager
 
 # working dir - blue

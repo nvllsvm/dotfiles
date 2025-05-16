@@ -8,11 +8,9 @@ import tempfile
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument("--allow-duplicates", action="store_true")
     parser.add_argument(
-        'data',
-        nargs='?',
-        default=sys.stdin,
-        type=argparse.FileType('r')
+        "data", nargs="?", default=sys.stdin, type=argparse.FileType("r")
     )
     args = parser.parse_args()
 
@@ -24,33 +22,35 @@ def main():
     ]
     parents = {tuple(path.parents) for path in sources}
     if len(parents) != 1:
-        raise RuntimeError('varying parents')
+        raise RuntimeError("varying parents")
     if len(sources) != len(set(sources)):
-        raise RuntimeError('duplicate sources')
+        raise RuntimeError("duplicate sources")
 
     with tempfile.NamedTemporaryFile() as tmp:
-        with open(tmp.name, 'w') as h:
-            h.write('\n'.join(path.name for path in sources))
-        subprocess.run(['nvim', tmp.name])
-        with open(tmp.name, 'r') as h:
-            targets = [
-                pathlib.Path(line.strip()).absolute()
-                for line in h.readlines()
-            ]
+        with open(tmp.name, "w") as h:
+            h.write("\n".join(path.name for path in sources))
+        subprocess.run(["nvim", tmp.name])
+        with open(tmp.name, "r") as h:
+            targets = [pathlib.Path(line.strip()).absolute() for line in h.readlines()]
 
-    if len(targets) != len(set(targets)):
-        raise RuntimeError('duplicate targets')
+    if not args.allow_duplicates:
+        if len(targets) != len(set(targets)):
+            raise RuntimeError("duplicate targets")
 
     if len(sources) != len(targets):
-        raise RuntimeError('num sources does not match num targets')
+        raise RuntimeError("num sources does not match num targets")
 
     for source, target in zip(sources, targets):
         if source == target:
             continue
         if target.exists():
-            raise RuntimeError(f'target exists: "{source}" -> "{target}"')
+            if args.allow_duplicates:
+                while target.exists():
+                    target = target.with_name(target.name + "_")
+            else:
+                raise RuntimeError(f'target exists: "{source}" -> "{target}"')
         source.rename(target)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
