@@ -124,6 +124,7 @@ if HOSTNAME in ('sol', 'mars', 'phobos'):
         'vorbis-tools',
         'wl-clipboard',
         'xsel',
+        'yazi',
         'yt-dlp',
         'zip',
         'zsh',
@@ -342,6 +343,18 @@ EXPECTED_PACKAGE_DEPENDENCIES = {
     'xdg-utils': {
         # needed to correctly identify .cbz as application/vnd.comicbook+zip
         'perl-file-mimeinfo',
+    },
+    'yazi': {
+        '7zip',
+        'chafa',
+        'fd',
+        'ffmpeg',
+        'fzf',
+        'imagemagick',
+        'jq',
+        'poppler',
+        'ripgrep',
+        'zoxide',
     },
     'yt-dlp': {
         'aria2',
