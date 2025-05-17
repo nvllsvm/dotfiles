@@ -72,7 +72,7 @@ else
             extract -l -- "$1"
             ;;
         application/x-cue)
-            extract -l -- "$1" 2>&1
+            extract -l -- "$1" 2>/dev/null || true
             print_delimiter
             cat -- "$1"
             ;;
