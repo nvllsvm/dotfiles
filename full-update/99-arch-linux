@@ -296,6 +296,9 @@ EXPECTED_PACKAGE_DEPENDENCIES = {
         'xz',
         'tk',
     },
+    'python-aiohttp': {
+        'python-aiodns',
+    },
     'steam': {
         'steam-native-runtime',
     },
