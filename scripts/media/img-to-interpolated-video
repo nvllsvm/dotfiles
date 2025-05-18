@@ -136,11 +136,12 @@ def ffprobe(path):
     return json.loads(proc.stdout)["streams"]
 
 
-def rife(source, target, num_passes=1):
-    subprocess.run(
-        ["rife", "--num-passes", str(num_passes), source, target],
-        check=True,
-    )
+def rife(source, target, model=None, num_passes=1):
+    args = ["rife", "--num-passes", str(num_passes)]
+    if model is not None:
+        args.extend(["--model", model])
+    args.extend(["--", source, target])
+    subprocess.run(args, check=True)
 
 
 def main():
@@ -162,6 +163,7 @@ def main():
         default=0,
         help="(default %(default)s)",
     )
+    parser.add_argument("--rife-model")
     parser.add_argument(
         "--fps", default="30", metavar="FPS", help="(default %(default)s)"
     )
@@ -210,7 +212,9 @@ def main():
                 tempfile.TemporaryDirectory(dir=source.parent)
             )
             tmpdir2 = pathlib.Path(tmpdir2)
-            rife(tmpdir, tmpdir2, num_passes=args.rife_iterations)
+            rife(
+                tmpdir, tmpdir2, model=args.rife_model, num_passes=args.rife_iterations
+            )
             shutil.rmtree(tmpdir)
             shutil.move(tmpdir2, tmpdir)
 
