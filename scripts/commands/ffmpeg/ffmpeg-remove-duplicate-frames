@@ -15,13 +15,20 @@ class ffprobe:
     @classmethod
     async def stream_info(cls, path):
         proc = await asyncio.create_subprocess_exec(
-            'ffprobe', '-v', 'error', '-show_streams',
-            '-print_format', 'json', '--', str(path),
-            stdout=asyncio.subprocess.PIPE)
+            "ffprobe",
+            "-v",
+            "error",
+            "-show_streams",
+            "-print_format",
+            "json",
+            "--",
+            str(path),
+            stdout=asyncio.subprocess.PIPE,
+        )
         stdout, _ = await proc.communicate()
         if proc.returncode != 0:
             raise cls.ProcessError
-        return json.loads(stdout)['streams']
+        return json.loads(stdout)["streams"]
 
 
 class ffmpeg:
@@ -31,11 +38,15 @@ class ffmpeg:
     @classmethod
     async def remove_duplicates(cls, source, target, avg_frame_rate):
         proc = await asyncio.create_subprocess_exec(
-            'ffmpeg', '-i', source,
-            '-vf', f'mpdecimate,setpts=N/{round(avg_frame_rate, 3)}/TB',
+            "ffmpeg",
+            "-i",
+            source,
+            "-vf",
+            f"mpdecimate,setpts=N/{round(avg_frame_rate, 3)}/TB",
             target,
             stdout=asyncio.subprocess.DEVNULL,
-            stderr=asyncio.subprocess.DEVNULL)
+            stderr=asyncio.subprocess.DEVNULL,
+        )
         await proc.communicate()
         if proc.returncode != 0:
             raise cls.ProcessError
@@ -47,16 +58,15 @@ async def _process_path(path):
 
     avg_frame_rate = None
     for stream in info:
-        avg_frame_rate = stream.get('avg_frame_rate')
+        avg_frame_rate = stream.get("avg_frame_rate")
         if avg_frame_rate:
-            x, y = avg_frame_rate.split('/')
+            x, y = avg_frame_rate.split("/")
             avg_frame_rate = int(x) / int(y)
 
     if not avg_frame_rate:
         raise RuntimeError
 
-    with tempfile.NamedTemporaryFile(dir=path.parent,
-                                     suffix=path.suffix) as tmpfile:
+    with tempfile.NamedTemporaryFile(dir=path.parent, suffix=path.suffix) as tmpfile:
         tmpfile = pathlib.Path(tmpfile.name)
         tmpfile.unlink()
         await ffmpeg.remove_duplicates(path, tmpfile, avg_frame_rate)
@@ -66,10 +76,15 @@ async def _process_path(path):
 
 async def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-n', metavar='NUM', dest='num_procs',
-                        type=int, default=1,
-                        help='number of parallel jobs (default: %(default)s)')
-    parser.add_argument('path', type=pathlib.Path, nargs='+')
+    parser.add_argument(
+        "-n",
+        metavar="NUM",
+        dest="num_procs",
+        type=int,
+        default=1,
+        help="number of parallel jobs (default: %(default)s)",
+    )
+    parser.add_argument("path", type=pathlib.Path, nargs="+")
     args = parser.parse_args()
 
     executor = async_executor.AsyncExecutor(args.num_procs)
@@ -80,5 +95,5 @@ async def main():
         result.result()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())
