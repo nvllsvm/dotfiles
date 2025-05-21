@@ -11,8 +11,8 @@ vim.o.wrap = false
 vim.o.cursorline = true
 vim.o.hidden = true
 
-vim.o.foldmethod = "syntax"
-vim.o.foldenable = true
+vim.wo.foldmethod = 'expr'
+vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
 
 -- case insensitive search
 vim.o.ignorecase = true
