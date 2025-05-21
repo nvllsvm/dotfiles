@@ -12,7 +12,7 @@ vim.o.cursorline = true
 vim.o.hidden = true
 
 vim.o.foldmethod = "syntax"
-vim.o.foldenable = false
+vim.o.foldenable = true
 
 -- case insensitive search
 vim.o.ignorecase = true

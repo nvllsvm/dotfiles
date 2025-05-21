@@ -31,7 +31,26 @@ return {
     "nvim-treesitter/nvim-treesitter",
     config = function()
         require("nvim-treesitter.configs").setup({
-            ensure_installed = { "lua", "markdown", "rust" },
+            ensure_installed = { 
+                "bash",
+                "c",
+                "c_sharp",
+                "cmake",
+                "cpp",
+                "css",
+                "csv",
+                "diff",
+                "dockerfile",
+                "html",
+                "json",
+                "latex",
+                "lua",
+                "lua", 
+                "markdown", 
+                "python", 
+                "rust", 
+                "yaml",
+            },
             sync_install = #vim.api.nvim_list_uis() == 0,
             highlight = {
                 enable = true,
