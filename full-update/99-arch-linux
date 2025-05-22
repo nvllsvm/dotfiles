@@ -177,7 +177,6 @@ if HOSTNAME in ('mars', 'phobos'):
         'piavpn-bin',
         'plasma6-runners-emojirunner',
         'podman',
-        'python-proton-vpn-network-manager',
         'rawtherapee',
         'signal-desktop',
         'slack-desktop',
