@@ -37,7 +37,7 @@ yay -Sy
 
 # ignore pipewire 1:1.4.3-1 due to mpv stutter https://gitlab.freedesktop.org/pipewire/pipewire/-/issues/4713
 pipewire_ver="$(pacman -Sdp --print-format '%v' pipewire)"
-if [ "$pipewire_ver" != '1:1.4.3-1' ]; then
+if [ "$(vercmp '1:1.4.3-1' "$pipewire_ver")" = '-1' ]; then
     printf 'error: unexpected pipewire version (%s)\n' "$pipewire_ver" >&2
     printf 'modify this script to resolve.' >&2
     exit 1
