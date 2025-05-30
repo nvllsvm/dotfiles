@@ -50,4 +50,5 @@ if command -v paccache > /dev/null; then
 fi
 
 log 'Locating .pac* files'
+sudo rm -f /etc/pacman.d/mirrorlist.pacnew
 sudo find /etc -regextype posix-extended -regex ".+\.pac(new|save)" 2> /dev/null || true
