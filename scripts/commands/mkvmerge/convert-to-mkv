@@ -7,29 +7,28 @@ import pathlib
 import tempfile
 
 VIDEO_EXTENSIONS = {
-    '.avi',
-    '.flv',
-    '.m2ts',
-    '.m4v',
-    '.mov',
-    '.mp4',
-    '.mpeg',
-    '.mpg',
-    '.ts',
-    '.vob',
-    '.webm',
+    ".avi",
+    ".flv",
+    ".m2ts",
+    ".m4v",
+    ".mov",
+    ".mp4",
+    ".mpeg",
+    ".mpg",
+    ".ts",
+    ".vob",
+    ".webm",
 }
 
 SUBTITLE_EXTENSIONS = {
-    '.ass',
-    '.srt',
-
+    ".ass",
+    ".srt",
     # both need to be present at the same time?
-    '.itx',
-    '.sub',
+    ".itx",
+    ".sub",
 }
 
-LOGGER = logging.getLogger('convert-to-mkv')
+LOGGER = logging.getLogger("convert-to-mkv")
 
 
 class ProcessError(Exception):
@@ -40,16 +39,16 @@ class ProcessError(Exception):
     def __str__(self):
         proc = self.process
 
-        text = f'exit {proc.returncode}'
+        text = f"exit {proc.returncode}"
         if self.message is not None:
-            text = f'{text} - {self.message}'
+            text = f"{text} - {self.message}"
 
         try:
-            args = proc._transport._extra['subprocess'].args
+            args = proc._transport._extra["subprocess"].args
         except (AttributeError, KeyError):
             pass
         else:
-            text = f'{text}: {args}'
+            text = f"{text}: {args}"
         return text
 
 
@@ -86,16 +85,18 @@ def all_files(root):
 
 
 async def mkvmerge(dest, *sources, delete_parts=True, title):
-    LOGGER.info('converting %s', dest)
-    with TempPath(dir=dest.parent, prefix='.convert-to-mkv_',
-                  suffix=dest.suffix + '.tmp') as tmp:
+    LOGGER.info("converting %s", dest)
+    with TempPath(
+        dir=dest.parent, prefix=".convert-to-mkv_", suffix=dest.suffix + ".tmp"
+    ) as tmp:
         args = [
-            'mkvmerge',
-            '--quiet',
-            '--output', tmp,
+            "mkvmerge",
+            "--quiet",
+            "--output",
+            tmp,
         ]
         if title is not None:
-            args.extend(['--title', title])
+            args.extend(["--title", title])
         args.extend(sources)
         proc = await asyncio.create_subprocess_exec(*args)
         await proc.communicate()
@@ -110,14 +111,16 @@ async def mkvmerge(dest, *sources, delete_parts=True, title):
 
 async def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--force', action='store_true',
-                        help='include files ending in .mkv')
-    parser.add_argument('--keep', action='store_true',
-                        help='keep original files after conversion')
-    parser.add_argument('path', nargs='+', type=pathlib.Path)
+    parser.add_argument(
+        "--force", action="store_true", help="include files ending in .mkv"
+    )
+    parser.add_argument(
+        "--keep", action="store_true", help="keep original files after conversion"
+    )
+    parser.add_argument("path", nargs="+", type=pathlib.Path)
     args = parser.parse_args()
 
-    logging.basicConfig(format='%(message)s', level=logging.INFO)
+    logging.basicConfig(format="%(message)s", level=logging.INFO)
 
     paths = set()
     for path in args.path:
@@ -128,13 +131,13 @@ async def main():
             paths.update(all_files(path))
 
     for path in sorted(paths):
-        if path.suffix.lower() in ('.mkv', *VIDEO_EXTENSIONS):
-            dest = path.with_suffix('.mkv')
+        if path.suffix.lower() in (".mkv", *VIDEO_EXTENSIONS):
+            dest = path.with_suffix(".mkv")
 
             # cannot use path.stem in glob as glob characters may be in path
             subtitle_paths = [
                 p
-                for p in path.parent.glob('*')
+                for p in path.parent.glob("*")
                 if p.name.lower().startswith(path.stem.lower())
                 and p.is_file()
                 and p.suffix.lower() in SUBTITLE_EXTENSIONS
@@ -142,7 +145,9 @@ async def main():
 
             if args.force or (dest != path) or subtitle_paths:
                 await mkvmerge(
-                    dest, path, *subtitle_paths,
+                    dest,
+                    path,
+                    *subtitle_paths,
                     delete_parts=not args.keep,
                     title=path.stem,
                 )
@@ -150,5 +155,5 @@ async def main():
             LOGGER.error('unrecognized extension: "%s"', path.suffix)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())

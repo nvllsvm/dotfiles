@@ -6,14 +6,11 @@ import pathlib
 import subprocess
 
 
-DEFAULT_LANGUAGES = {'eng', 'und', None}
+DEFAULT_LANGUAGES = {"eng", "und", None}
 
 
 def mkv_info(path):
-    proc = subprocess.run(
-        ['mkvmerge', '-J', path],
-        stdout=subprocess.PIPE,
-        check=True)
+    proc = subprocess.run(["mkvmerge", "-J", path], stdout=subprocess.PIPE, check=True)
     return json.loads(proc.stdout)
 
 
@@ -24,46 +21,41 @@ class MKVFile:
 
     def subtitle_tracks(self, languages=None):
         return [
-            track['id']
-            for track in self.metadata['tracks']
-            if track['type'] == 'subtitles'
-            and track['properties']['language'] in languages
+            track["id"]
+            for track in self.metadata["tracks"]
+            if track["type"] == "subtitles"
+            and track["properties"]["language"] in languages
         ]
 
     def audio_tracks(self, languages=None):
         return [
-            track['id']
-            for track in self.metadata['tracks']
-            if track['type'] == 'audio'
-            and track['properties']['language'] in languages
+            track["id"]
+            for track in self.metadata["tracks"]
+            if track["type"] == "audio" and track["properties"]["language"] in languages
         ]
 
     def video_tracks(self, languages=None):
         return [
-            track['id']
-            for track in self.metadata['tracks']
-            if track['type'] == 'video'
-            and track['properties']['language'] in languages
+            track["id"]
+            for track in self.metadata["tracks"]
+            if track["type"] == "video" and track["properties"]["language"] in languages
         ]
 
 
 def mkvmerge_tracks(path, include=None):
-    args = ['mkvextract', path, 'tracks']
+    args = ["mkvextract", path, "tracks"]
     if include:
-        args += [
-            f'{track}:{path}.track_{track}'
-            for track in include
-        ]
-    os.execvp('mkvextract', args)
+        args += [f"{track}:{path}.track_{track}" for track in include]
+    os.execvp("mkvextract", args)
 
 
 def main():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('path', type=pathlib.Path)
-    parser.add_argument('--subtitle', action='store_true')
-    parser.add_argument('--audio', action='store_true')
-    parser.add_argument('--video', action='store_true')
+    parser.add_argument("path", type=pathlib.Path)
+    parser.add_argument("--subtitle", action="store_true")
+    parser.add_argument("--audio", action="store_true")
+    parser.add_argument("--video", action="store_true")
     args = parser.parse_args()
 
     metadata = MKVFile(args.path)
@@ -81,5 +73,5 @@ def main():
     mkvmerge_tracks(args.path, include)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -9,14 +9,11 @@ import tempfile
 
 import tqdm
 
-DEFAULT_LANGUAGES = {'eng', 'und'}
+DEFAULT_LANGUAGES = {"eng", "und"}
 
 
 def mkv_info(path):
-    proc = subprocess.run(
-        ['mkvmerge', '-J', path],
-        stdout=subprocess.PIPE,
-        check=True)
+    proc = subprocess.run(["mkvmerge", "-J", path], stdout=subprocess.PIPE, check=True)
     return json.loads(proc.stdout)
 
 
@@ -27,25 +24,21 @@ class MKVFile:
 
     @property
     def languages(self):
-        return {
-            track['properties']['language']
-            for track in self.metadata['tracks']
-        }
+        return {track["properties"]["language"] for track in self.metadata["tracks"]}
 
     def matching_audio_tracks(self, languages):
         return [
-            track['id']
-            for track in self.metadata['tracks']
-            if track['type'] == 'audio'
-            and track['properties']['language'] in languages
+            track["id"]
+            for track in self.metadata["tracks"]
+            if track["type"] == "audio" and track["properties"]["language"] in languages
         ]
 
     def matching_subtitle_tracks(self, languages):
         return [
-            track['id']
-            for track in self.metadata['tracks']
-            if track['type'] == 'subtitles'
-            and track['properties']['language'] in languages
+            track["id"]
+            for track in self.metadata["tracks"]
+            if track["type"] == "subtitles"
+            and track["properties"]["language"] in languages
         ]
 
     @staticmethod
@@ -53,24 +46,22 @@ class MKVFile:
         track_command = []
         if tracks:
             track_command += [
-                f'--{track_type}-tracks',
-                '!' + ','.join(str(track) for track in tracks)
+                f"--{track_type}-tracks",
+                "!" + ",".join(str(track) for track in tracks),
             ]
         return track_command
 
     def remove_tracks(self, audio=[], subtitle=[]):
         with TempPath(dir=self.path.parent) as temp:
             args = [
-                'mkvmerge', '-o', temp,
-                *self.excluded_track_string('audio', audio),
-                *self.excluded_track_string('subtitle', subtitle),
-                self.path
+                "mkvmerge",
+                "-o",
+                temp,
+                *self.excluded_track_string("audio", audio),
+                *self.excluded_track_string("subtitle", subtitle),
+                self.path,
             ]
-            subprocess.run(
-                args,
-                stdout=subprocess.DEVNULL,
-                check=True
-            )
+            subprocess.run(args, stdout=subprocess.DEVNULL, check=True)
             temp.rename(self.path)
 
 
@@ -113,37 +104,29 @@ def find_mkv_files(*paths):
             elif path.is_dir():
                 stack.add(path)
 
-    return sorted(
-        path
-        for path in files
-        if path.suffix.lower() == '.mkv'
-    )
+    return sorted(path for path in files if path.suffix.lower() == ".mkv")
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('mkv', type=pathlib.Path, nargs='+')
+    parser.add_argument("mkv", type=pathlib.Path, nargs="+")
     parser.add_argument(
-        '-k',
-        '--keep',
-        action='append',
-        help='Language to keep',
+        "-k",
+        "--keep",
+        action="append",
+        help="Language to keep",
     )
-    parser.add_argument(
-        '-d',
-        '--dryrun',
-        action='store_true'
-    )
+    parser.add_argument("-d", "--dryrun", action="store_true")
     args = parser.parse_args()
 
     valid_languages = set(args.keep) if args.keep else DEFAULT_LANGUAGES
-    if 'und' in valid_languages:
+    if "und" in valid_languages:
         valid_languages.add(None)
 
     mkv_files = find_mkv_files(*args.mkv)
 
     if not mkv_files:
-        parser.error('no mkv files found')
+        parser.error("no mkv files found")
 
     pending = []
     for path in mkv_files:
@@ -156,19 +139,19 @@ def main():
             pending.append((mkv, audio_track_remove, subtitle_track_remove))
 
     if pending:
-        for (mkv, audio_track_remove, subtitle_track_remove) in tqdm.tqdm(pending):
+        for mkv, audio_track_remove, subtitle_track_remove in tqdm.tqdm(pending):
             log = [str(mkv.path)]
             if audio_track_remove:
-                log.append(f'(audio: {audio_track_remove})')
+                log.append(f"(audio: {audio_track_remove})")
             if subtitle_track_remove:
-                log.append(f'(subtitle: {subtitle_track_remove})')
+                log.append(f"(subtitle: {subtitle_track_remove})")
             print(*log)
 
             if not args.dryrun:
                 mkv.remove_tracks(
-                    audio=audio_track_remove,
-                    subtitle=subtitle_track_remove)
+                    audio=audio_track_remove, subtitle=subtitle_track_remove
+                )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
