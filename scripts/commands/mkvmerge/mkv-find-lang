@@ -38,6 +38,23 @@ def _parser_language(value):
     return value
 
 
+def _process_path(path, is_exclude_mode, languages):
+    path_languages = set()
+    for track in mkv_info(path)["tracks"]:
+        if track["type"] not in ("audio", "subtitles"):
+            continue
+        path_languages.add(track["properties"]["language"])
+
+    matched = False
+    if is_exclude_mode:
+        matched = bool(path_languages - languages)
+    else:
+        matched = bool(path_languages.intersection(languages))
+
+    if matched:
+        print(path)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("mkv", type=pathlib.Path, nargs="+")
@@ -66,20 +83,11 @@ def main():
         parser.error("no mkv files found")
 
     for path in mkv_files:
-        path_languages = set()
-        for track in mkv_info(path)["tracks"]:
-            if track["type"] not in ("audio", "subtitle"):
-                continue
-            path_languages.add(track["properties"]["language"])
-
-        matched = False
-        if is_exclude_mode:
-            matched = bool(path_languages - languages)
-        else:
-            matched = bool(path_languages.intersection(languages))
-
-        if matched:
-            print(path)
+        try:
+            _process_path(path, is_exclude_mode, languages)
+        except Exception:
+            print("error processing {path}")
+            raise
 
 
 if __name__ == "__main__":
