@@ -431,7 +431,7 @@ if HOSTNAME in ('mars', 'phobos'):
         'python-pytorch-opt-rocm',
     })
 
-if HOSTNAME == 'mars':
+if HOSTNAME in ('lounge-htpc', 'mars'):
     EXPECTED_PACKAGES.update({
         'linux',
         'linux-headers',
@@ -443,7 +443,7 @@ if HOSTNAME == 'phobos':
         'linux-flowx13-headers',
     })
 
-if HOSTNAME in ('mars', 'phobos', 'sol'):
+if HOSTNAME in ('lounge-htpc', 'mars', 'phobos', 'sol'):
     EXPECTED_PACKAGES.update({
         'linux-lts',
         'linux-lts-headers',
