@@ -1,0 +1,2 @@
+UUID=6507b754-4429-4135-a4d3-c090da59c4cb  	/         	ext4      	rw,relatime	0 1
+UUID=58AD-0841      	/boot     	vfat      	rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro	0 2
