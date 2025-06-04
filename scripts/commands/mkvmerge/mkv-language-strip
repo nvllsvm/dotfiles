@@ -107,6 +107,51 @@ def find_mkv_files(*paths):
     return sorted(path for path in files if path.suffix.lower() == ".mkv")
 
 
+class SizeDiffPrinter:
+    def __init__(self, num_items):
+        self._before_total = 0
+        self._after_total = 0
+        self._num_items = num_items
+        self._num_printed = 0
+        self._printed = False
+
+    @staticmethod
+    def format_diff(before, after):
+        diff = ((before - after) / before) * 100
+        if diff:
+            diff = '{:.2f}'.format(diff)
+            if not float(diff):
+                diff = f'<{diff}'
+        return diff
+
+    @staticmethod
+    def sizeof_fmt(num):
+        for unit in ['B', 'KB', 'MB', 'GB', 'TB', 'PB']:
+            if abs(num) < 1024.0:
+                break
+            num /= 1024.0
+        return f'{num:.1f}{unit}'
+
+    def print(self, before, after, name):
+        self._num_printed += 1
+        self._before_total += before
+        self._after_total += after
+        diff = self.format_diff(before, after)
+
+        s = f'{diff:>6}%' if diff else 7 * '-'
+        num_printed = str(self._num_printed).rjust(len(str(self._num_items)))
+        print(f'({num_printed}/{self._num_items})\t{s}\t{name}')
+
+    def print_total(self):
+        if self._num_printed:
+            if diff := self.format_diff(self._before_total, self._after_total):
+                fmt = self.sizeof_fmt(self._before_total - self._after_total)
+                print(f'Total: {diff}% ({fmt})')
+            else:
+                print('Total: -')
+
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("mkv", type=pathlib.Path, nargs="+")
@@ -145,7 +190,6 @@ def main():
                 log.append(f"(audio: {audio_track_remove})")
             if subtitle_track_remove:
                 log.append(f"(subtitle: {subtitle_track_remove})")
-            print(*log)
 
             if not args.dryrun:
                 mkv.remove_tracks(
