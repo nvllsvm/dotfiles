@@ -17,7 +17,7 @@ def flatten(root, delimiter):
                 stack.append((prefix, value))
             else:
                 if any(delimiter in part for part in prefix):
-                    raise ValueError('separator found in prefix')
+                    raise ValueError("separator found in prefix")
                 flat_key = delimiter.join(prefix)
                 if flat_key in flat:
                     raise KeyError(f'duplicate key "{flat_key}"')
@@ -26,13 +26,10 @@ def flatten(root, delimiter):
 
 
 def main():
-    parser = argparse.ArgumentParser('json-flat')
-    parser.add_argument('delimiter')
+    parser = argparse.ArgumentParser("json-flat")
+    parser.add_argument("delimiter")
     parser.add_argument(
-        'data',
-        nargs='?',
-        default=sys.stdin,
-        type=argparse.FileType('r')
+        "data", nargs="?", default=sys.stdin, type=argparse.FileType("r")
     )
     args = parser.parse_args()
 
@@ -41,5 +38,5 @@ def main():
     print(json.dumps(data, indent=2, sort_keys=True, ensure_ascii=False))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

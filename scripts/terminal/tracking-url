@@ -4,27 +4,20 @@ import subprocess
 import string
 
 CARRIERS = {
-    'fedex': 'https://www.fedex.com/fedextrack/?tracknumbers=',
-    'ups': 'https://www.ups.com/track?trackNums=',
-    'usps': 'https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=',
+    "fedex": "https://www.fedex.com/fedextrack/?tracknumbers=",
+    "ups": "https://www.ups.com/track?trackNums=",
+    "usps": "https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=",
 }
 
 
 class Clipboard:
     @staticmethod
     def copy(data):
-        subprocess.run(
-            ['cbcopy'],
-            input=data,
-            stdout=subprocess.DEVNULL,
-            check=True)
+        subprocess.run(["cbcopy"], input=data, stdout=subprocess.DEVNULL, check=True)
 
     @staticmethod
     def paste():
-        proc = subprocess.run(
-            ['cbpaste'],
-            stdout=subprocess.PIPE,
-            check=True)
+        proc = subprocess.run(["cbpaste"], stdout=subprocess.PIPE, check=True)
         return proc.stdout
 
 
@@ -33,19 +26,19 @@ def determine_carrier(tracking_id):
 
     if is_numeric:
         if 20 <= len(tracking_id) <= 35:
-            return 'usps'
+            return "usps"
         elif 12 <= len(tracking_id) <= 14:
-            return 'fedex'
+            return "fedex"
     else:
-        if len(tracking_id) == 18 and tracking_id.startswith('1Z'):
-            return 'ups'
-    raise ValueError('cannot determine carrier')
+        if len(tracking_id) == 18 and tracking_id.startswith("1Z"):
+            return "ups"
+    raise ValueError("cannot determine carrier")
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--carrier', choices=CARRIERS.keys())
-    parser.add_argument('id', nargs='?')
+    parser.add_argument("-c", "--carrier", choices=CARRIERS.keys())
+    parser.add_argument("id", nargs="?")
     args = parser.parse_args()
 
     tracking_id = (args.id or Clipboard.paste().decode()).strip()
@@ -59,5 +52,5 @@ def main():
     Clipboard.copy(url.encode())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

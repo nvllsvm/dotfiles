@@ -9,39 +9,39 @@ import tabulate
 def get_sms_messages(message_type=None):
     args = []
     if message_type is not None:
-        args.extend(['-t', message_type])
+        args.extend(["-t", message_type])
 
     proc = subprocess.run(
-        ['termux-sms-list', '-l', '999999', *args],
-        stdout=subprocess.PIPE,
-        check=True)
+        ["termux-sms-list", "-l", "999999", *args], stdout=subprocess.PIPE, check=True
+    )
     return json.loads(proc.stdout)
 
 
 def get_thread_name(messages):
-    return ','.join(sorted({
-        message.get('sender', message['number'])
-        for message in messages
-    }))
+    return ",".join(
+        sorted({message.get("sender", message["number"]) for message in messages})
+    )
 
 
 def show_message_summary():
     threads = collections.defaultdict(list)
-    for message in get_sms_messages(message_type='inbox'):
-        threads[message.pop('threadid')].append(message)
+    for message in get_sms_messages(message_type="inbox"):
+        threads[message.pop("threadid")].append(message)
 
     for thread, messages in threads.items():
-        messages = sorted(messages, key=lambda x: x['received'])
+        messages = sorted(messages, key=lambda x: x["received"])
 
     formatted = []
-    for thread in sorted(threads, key=lambda x: threads[x][-1]['received']):
+    for thread in sorted(threads, key=lambda x: threads[x][-1]["received"]):
         thread_name = get_thread_name(threads[thread])
-        content = threads[thread][-1]['body']
-        formatted.append((
-            thread,
-            thread_name,
-            content,
-        ))
+        content = threads[thread][-1]["body"]
+        formatted.append(
+            (
+                thread,
+                thread_name,
+                content,
+            )
+        )
 
     print(tabulate.tabulate(formatted, maxcolwidths=[8, 32, 40]))
 
@@ -50,5 +50,5 @@ def main():
     show_message_summary()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

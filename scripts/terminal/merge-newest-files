@@ -19,15 +19,15 @@ def all_files(root):
 def _args_path(value):
     path = pathlib.Path(value)
     if not path.is_dir():
-        raise ValueError('path must be a directory')
+        raise ValueError("path must be a directory")
     return path.absolute()
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dry-run', action='store_true')
-    parser.add_argument('source', type=_args_path)
-    parser.add_argument('target', type=_args_path)
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("source", type=_args_path)
+    parser.add_argument("target", type=_args_path)
     args = parser.parse_args()
 
     newer = set()
@@ -36,15 +36,14 @@ def main():
         source = args.source.joinpath(path)
         target = args.target.joinpath(path)
         if target.is_dir():
-            raise RuntimeError(
-                f'expected a file, but found a directory ({target})')
+            raise RuntimeError(f"expected a file, but found a directory ({target})")
         elif not target.exists():
             newer.add(path)
         elif source.stat().st_mtime > target.stat().st_mtime:
             newer.add(path)
 
     for path in sorted(newer):
-        print(f'{path}')
+        print(f"{path}")
         source = args.source.joinpath(path)
         target = args.target.joinpath(path)
 
@@ -53,5 +52,5 @@ def main():
             shutil.copy2(source, target)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -8,12 +8,10 @@ import subprocess
 
 if not sys.stdin.isatty():
     if len(sys.argv) > 1:
-        raise RuntimeError('unexpected arguments')
+        raise RuntimeError("unexpected arguments")
     data = sys.stdin.read()
 elif len(sys.argv) == 1:
-    proc = subprocess.run(
-        ['cbpaste'],
-        stdout=subprocess.PIPE)
+    proc = subprocess.run(["cbpaste"], stdout=subprocess.PIPE)
     if proc.returncode:
         sys.exit(proc.returncode)
     data = proc.stdout.decode()

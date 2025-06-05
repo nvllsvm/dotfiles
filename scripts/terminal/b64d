@@ -19,17 +19,15 @@ def maybe_base64_decode(value):
 
 if not sys.stdin.isatty():
     if len(sys.argv) > 1:
-        raise RuntimeError('unexpected arguments')
+        raise RuntimeError("unexpected arguments")
     data = sys.stdin.read()
 elif len(sys.argv) == 1:
-    proc = subprocess.run(
-        ['cbpaste'],
-        stdout=subprocess.PIPE)
+    proc = subprocess.run(["cbpaste"], stdout=subprocess.PIPE)
     if proc.returncode:
         sys.exit(proc.returncode)
     data = proc.stdout.decode()
 elif len(sys.argv) >= 2:
-    data = ' '.join(sys.argv[1:])
+    data = " ".join(sys.argv[1:])
 else:
     print(len(sys.argv))
     raise NotImplementedError
@@ -38,6 +36,6 @@ data = data.strip().encode()
 
 result = maybe_base64_decode(data)
 if result == data:
-    raise ValueError('cannot decode')
+    raise ValueError("cannot decode")
 
 sys.stdout.buffer.write(result)

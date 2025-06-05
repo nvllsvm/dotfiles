@@ -44,30 +44,23 @@ def calculate_size(value, is_nested=False):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '-n', '--nested', action='store_true',
+        "-n",
+        "--nested",
+        action="store_true",
         default=False,
-        help='Set if the input is a nested element of an item'
+        help="Set if the input is a nested element of an item",
     )
     parser.add_argument(
-        'json',
-        nargs='?',
-        default=sys.stdin,
-        type=argparse.FileType('r')
+        "json", nargs="?", default=sys.stdin, type=argparse.FileType("r")
     )
     args = parser.parse_args()
 
-    size = calculate_size(
-        json.load(args.json),
-        is_nested=args.nested
-    )
+    size = calculate_size(json.load(args.json), is_nested=args.nested)
     if size > MAX_SIZE:
-        print(
-            f'error: item size {size} larger than max {MAX_SIZE}',
-            file=sys.stderr
-        )
+        print(f"error: item size {size} larger than max {MAX_SIZE}", file=sys.stderr)
     else:
         print(size)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

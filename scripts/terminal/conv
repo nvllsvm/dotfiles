@@ -16,12 +16,12 @@ def _unit_argument(value):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('from_amount', type=_unit_argument)
-    parser.add_argument('to_unit', type=_unit_argument)
+    parser.add_argument("from_amount", type=_unit_argument)
+    parser.add_argument("to_unit", type=_unit_argument)
     args = parser.parse_args()
 
     print(args.from_amount.to(args.to_unit))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

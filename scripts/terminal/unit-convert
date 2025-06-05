@@ -2,34 +2,34 @@
 import argparse
 import string
 
-_ALLOWED_CHARS = set((*string.digits, *string.ascii_letters, '.', ' '))
+_ALLOWED_CHARS = set((*string.digits, *string.ascii_letters, ".", " "))
 
 
 BYTE_MAGNITUDE = {
-    1000: ['B', 'KB',  'MB',  'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
-    1024: ['B', 'KiB', 'MiB',  'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'],
+    1000: ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"],
+    1024: ["B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"],
 }
 
 
 METRIC_DISTANCE_TO_MM = {
-    'mm': 1,
-    'cm': 10,
-    'm': 1000,
-    'km': 1000000,
+    "mm": 1,
+    "cm": 10,
+    "m": 1000,
+    "km": 1000000,
 }
 
 
 IMPERIAL_DISTANCE_TO_IN = {
-    'in': 1,
-    'ft': 12,
-    'yd': 36,
-    'mile': 63360,
+    "in": 1,
+    "ft": 12,
+    "yd": 36,
+    "mile": 63360,
 }
 
 TEMPERATURE_UNITS = {
-    'c',
-    'k',
-    'f',
+    "c",
+    "k",
+    "f",
 }
 
 IN_TO_MM = 25.4
@@ -43,37 +43,37 @@ UNITS = set((*DISTANCE_UNITS, *TEMPERATURE_UNITS))
 
 def temperature_to_k(unit, value):
     match unit:
-        case 'k':
+        case "k":
             return value
-        case 'c':
+        case "c":
             return value + 273.15
-        case 'f':
-            return (value + 459.67) * (5/9)
+        case "f":
+            return (value + 459.67) * (5 / 9)
 
 
 def metric_to_mm(unit, value):
     match unit:
-        case 'mm':
+        case "mm":
             return value
-        case 'cm':
+        case "cm":
             return value * 10
-        case 'm':
+        case "m":
             return value * 100
-        case 'km':
+        case "km":
             return value * 100000
         case _:
-            raise NotImplementedError(f'unsupported unit: {unit}')
+            raise NotImplementedError(f"unsupported unit: {unit}")
 
 
 def imperial_to_in(unit, value):
     match unit:
-        case 'in':
+        case "in":
             return value
-        case 'ft':
+        case "ft":
             return value * 12
-        case 'yd':
+        case "yd":
             return value * 36
-        case 'mile':
+        case "mile":
             return value * 63360
 
 
@@ -82,7 +82,7 @@ def k_to_c(value):
 
 
 def k_to_f(value):
-    return (value / (5/9)) - 459.67
+    return (value / (5 / 9)) - 459.67
 
 
 def mm_to_in(value):
@@ -94,9 +94,9 @@ def in_to_mm(value):
 
 
 def _parse_from(value):
-    value = value.replace(' ', '')
+    value = value.replace(" ", "")
     if set(value) - _ALLOWED_CHARS:
-        raise ValueError('unsupported chars in from value')
+        raise ValueError("unsupported chars in from value")
 
     unit = []
     for char in reversed(value.lower()):
@@ -105,24 +105,27 @@ def _parse_from(value):
         else:
             break
 
-    unit = ''.join(reversed(unit))
-    num = float(value[:-(len(unit))])
+    unit = "".join(reversed(unit))
+    num = float(value[: -(len(unit))])
     return _normalize_unit(unit, num)
 
 
 def _parse_to(value):
     if value not in UNITS:
-        raise ValueError('unsupported unit')
+        raise ValueError("unsupported unit")
     return value
 
 
 def _normalize_unit(unit, value):
     if unit in METRIC_DISTANCE_TO_MM:
-        return value * METRIC_DISTANCE_TO_MM[unit], 'mm',
+        return (
+            value * METRIC_DISTANCE_TO_MM[unit],
+            "mm",
+        )
     elif unit in IMPERIAL_DISTANCE_TO_IN:
-        return value * IMPERIAL_DISTANCE_TO_IN[unit], 'in'
+        return value * IMPERIAL_DISTANCE_TO_IN[unit], "in"
     elif unit in TEMPERATURE_UNITS:
-        return temperature_to_k(unit, value), 'k'
+        return temperature_to_k(unit, value), "k"
     else:
         raise NotImplementedError(unit)
 
@@ -149,11 +152,11 @@ def _convert(value, from_unit, to_unit):
             raise ConvertError(from_unit, to_unit)
     elif from_unit in TEMPERATURE_UNITS:
         match to_unit:
-            case 'k':
+            case "k":
                 return value
-            case 'c':
+            case "c":
                 return k_to_c(value)
-            case 'f':
+            case "f":
                 return k_to_f(value)
             case _:
                 raise ConvertError(from_unit, to_unit)
@@ -163,8 +166,8 @@ def _convert(value, from_unit, to_unit):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('to_unit')
-    parser.add_argument('from_value', nargs='+')
+    parser.add_argument("to_unit")
+    parser.add_argument("from_value", nargs="+")
     args = parser.parse_args()
 
     for value in args.from_value:
@@ -174,5 +177,5 @@ def main():
         print(round(result, 6))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

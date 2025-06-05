@@ -6,7 +6,7 @@ import tempfile
 
 
 async def create_img(path):
-    if path.suffix != '.cue':
+    if path.suffix != ".cue":
         raise RuntimeError
     if path.is_dir():
         raise RuntimeError
@@ -14,7 +14,7 @@ async def create_img(path):
     files = []
     for line in path.read_text().splitlines():
         line = line.strip()
-        if not line.startswith('FILE '):
+        if not line.startswith("FILE "):
             continue
         parts = line.split('"')
         if len(parts) != 3:
@@ -27,18 +27,20 @@ async def create_img(path):
     if len(files) == 1:
         return
 
-    name = path.with_suffix('').name
+    name = path.with_suffix("").name
 
     with tempfile.TemporaryDirectory(
-            dir=path.parent, prefix='.archive_',
-            suffix=path.name + '.tmp') as tmp:
+        dir=path.parent, prefix=".archive_", suffix=path.name + ".tmp"
+    ) as tmp:
         tmp = pathlib.Path(tmp).absolute()
         proc = await asyncio.create_subprocess_exec(
-            'binmerge',
-            '--outdir', tmp,
+            "binmerge",
+            "--outdir",
+            tmp,
             path.absolute(),
             name,
-            cwd=path.parent.absolute())
+            cwd=path.parent.absolute(),
+        )
         await proc.communicate()
         assert proc.returncode == 0
         tmp_files = list(pathlib.Path(tmp).iterdir())
@@ -71,13 +73,13 @@ def _all_paths(root):
 
 async def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('path', type=pathlib.Path)
+    parser.add_argument("path", type=pathlib.Path)
     args = parser.parse_args()
 
     for path in _all_paths(args.path):
-        if path.suffix.lower() == '.cue':
+        if path.suffix.lower() == ".cue":
             await create_img(path)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())

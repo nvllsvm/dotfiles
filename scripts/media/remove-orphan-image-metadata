@@ -4,17 +4,19 @@ import pathlib
 
 
 METADATA_EXTENSIONS = {
-    '.arp',
-    '.xmp',
+    ".arp",
+    ".xmp",
 }
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description='remove orphan image metadata files ({})'.format(
-            ' '.join(sorted(METADATA_EXTENSIONS))))
-    parser.add_argument('-n', '--dry-run', action='store_true')
-    parser.add_argument('path', type=pathlib.Path)
+        description="remove orphan image metadata files ({})".format(
+            " ".join(sorted(METADATA_EXTENSIONS))
+        )
+    )
+    parser.add_argument("-n", "--dry-run", action="store_true")
+    parser.add_argument("path", type=pathlib.Path)
     args = parser.parse_args()
 
     if args.path.is_file():
@@ -32,7 +34,7 @@ def main():
     for path in files:
         if not path.stem:
             continue
-        if path.suffix.lower() not in ('.arp', '.xmp'):
+        if path.suffix.lower() not in (".arp", ".xmp"):
             continue
         if pathlib.Path(path.stem).exists():
             continue
@@ -41,5 +43,5 @@ def main():
             path.unlink()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

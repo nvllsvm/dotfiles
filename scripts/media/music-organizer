@@ -15,77 +15,77 @@ import magic  # package: python-magic
 import mutagen.flac
 import mutagen.mp3
 
-LIBRARY = pathlib.Path('/storage/Audio/Library')
+LIBRARY = pathlib.Path("/storage/Audio/Library")
 
-FLAC_EXT = '.flac'
-MP3_EXT = '.mp3'
-OPUS_EXT = '.opus'
+FLAC_EXT = ".flac"
+MP3_EXT = ".mp3"
+OPUS_EXT = ".opus"
 
 AUDIO_EXT = (FLAC_EXT, MP3_EXT, OPUS_EXT)
 
-IMAGE_EXT = ('.jpg', '.png')
-IMAGE_PREFIX = 'cover'
+IMAGE_EXT = (".jpg", ".png")
+IMAGE_PREFIX = "cover"
 
-CUE_EXT = ('.cue')
+CUE_EXT = ".cue"
 
 # preferred suffix is first in list
 MIME_SUFFIXES = {
-    'application/pdf': [
-        '.pdf',
+    "application/pdf": [
+        ".pdf",
     ],
-    'audio/flac': [
-        '.flac',
+    "audio/flac": [
+        ".flac",
     ],
-    'audio/mpeg': [
-        '.mp3',
+    "audio/mpeg": [
+        ".mp3",
     ],
-    'audio/ogg': [
-        '.ogg',
-        '.opus',
+    "audio/ogg": [
+        ".ogg",
+        ".opus",
     ],
-    'image/gif': [
-        '.gif',
+    "image/gif": [
+        ".gif",
     ],
-    'image/jpeg': [
-        '.jpg',
+    "image/jpeg": [
+        ".jpg",
     ],
-    'image/png': [
-        '.png',
+    "image/png": [
+        ".png",
     ],
-    'text/plain': [
-        '.txt',
-        '.accurip',
-        '.cue',
-        '.log',
-        '.nfo',
+    "text/plain": [
+        ".txt",
+        ".accurip",
+        ".cue",
+        ".log",
+        ".nfo",
     ],
 }
 
 
 EXPECTED_TAGS = (
-    'albumartist',
-    'album',
-    'artist',
-    'date',
-    'genre',
-    'title',
-    'tracknumber'
+    "albumartist",
+    "album",
+    "artist",
+    "date",
+    "genre",
+    "title",
+    "tracknumber",
 )
 
 
-LOGGER = logging.getLogger('music-organizer')
+LOGGER = logging.getLogger("music-organizer")
 
 
 def folder_name(tag_value):
     chars = []
     for c in tag_value:
-        if not chars and c == '.':
+        if not chars and c == ".":
             continue
-        if c in ('/', '\\', ':', '*', '?', '"', "'", '<', '>', '|'):
+        if c in ("/", "\\", ":", "*", "?", '"', "'", "<", ">", "|"):
             continue
         chars.append(c)
-    name = ''.join(chars)
-    return ' '.join(part for part in name.split())
+    name = "".join(chars)
+    return " ".join(part for part in name.split())
 
 
 def cue_track_count(path):
@@ -94,31 +94,34 @@ def cue_track_count(path):
     Also converts the file to UTF-8 if it's not
     """
     data = path.read_bytes()
-    text = data.decode(charset_normalizer.detect(data)['encoding'])
+    text = data.decode(charset_normalizer.detect(data)["encoding"])
     if data != text:
         path.write_text(text)
 
-    return sum(
-        1
-        for line in text.split('\n')
-        if line.strip().startswith('TRACK ')
-    )
+    return sum(1 for line in text.split("\n") if line.strip().startswith("TRACK "))
 
 
 def split_flac(flac_path, cue_path):
     parent = cue_path.absolute().parent
-    LOGGER.info(f'Splitting {flac_path}')
-    with tempfile.TemporaryDirectory(dir=parent,
-                                     prefix='.shntool_split') as tmpdir:
+    LOGGER.info(f"Splitting {flac_path}")
+    with tempfile.TemporaryDirectory(dir=parent, prefix=".shntool_split") as tmpdir:
         subprocess.run(
-            ['shntool', 'split', '-q',
-             '-d', tmpdir,
-             '-f', cue_path.name,
-             '-o', 'flac flac --best --verify --output-name split%f -',
-             '-t', '%n',
-             flac_path.name],
+            [
+                "shntool",
+                "split",
+                "-q",
+                "-d",
+                tmpdir,
+                "-f",
+                cue_path.name,
+                "-o",
+                "flac flac --best --verify --output-name split%f -",
+                "-t",
+                "%n",
+                flac_path.name,
+            ],
             cwd=parent,
-            check=True
+            check=True,
         )
         for path in pathlib.Path(tmpdir).iterdir():
             path.rename(parent / path.name)
@@ -134,12 +137,12 @@ def check_cue_files(root_path):
     cue_files = [p for p in paths if p.suffix in CUE_EXT]
 
     if len(cue_files) > 1:
-        LOGGER.error(f'Multiple .cue files: {root_path}')
+        LOGGER.error(f"Multiple .cue files: {root_path}")
     elif len(cue_files) == len(flac_files) == 1:
         cue_file = cue_files[0]
         num_tracks = cue_track_count(cue_file)
         if num_tracks == 0:
-            LOGGER.error(f'Bad cue file: {cue_file}')
+            LOGGER.error(f"Bad cue file: {cue_file}")
         elif num_tracks != 1:
             split_flac(flac_files[0], cue_file)
 
@@ -153,13 +156,11 @@ def organize_images(root_path):
     images = [p for p in paths if p.suffix in IMAGE_EXT]
     if len(images) == 1:
         image = images[0]
-        image.rename(
-            pathlib.Path(image.parent, IMAGE_PREFIX + image.suffix)
-        )
+        image.rename(pathlib.Path(image.parent, IMAGE_PREFIX + image.suffix))
     elif len(images) > 1:
-        LOGGER.error(f'Multiple images: {root_path}')
+        LOGGER.error(f"Multiple images: {root_path}")
     else:
-        LOGGER.error(f'No images: {root_path}')
+        LOGGER.error(f"No images: {root_path}")
 
 
 def check_metadata(path, metadata):
@@ -172,10 +173,12 @@ def check_metadata(path, metadata):
 
 def fix_metadata(path, metadata):
     for tag, values in metadata.items():
-        new_values = sorted({
-            unicodedata.normalize('NFC', ' '.join(v for v in value.split() if v))
-            for value in values
-        })
+        new_values = sorted(
+            {
+                unicodedata.normalize("NFC", " ".join(v for v in value.split() if v))
+                for value in values
+            }
+        )
         if new_values != sorted(values):
             metadata[tag] = new_values
             LOGGER.info(f'Fixing whitespace/unicode normalization in "{tag}": "{path}"')
@@ -184,19 +187,19 @@ def fix_metadata(path, metadata):
 
 def fix_tracknumber(path, metadata):
     try:
-        tracknumber = metadata['tracknumber'][0]
+        tracknumber = metadata["tracknumber"][0]
     except KeyError:
         return
 
-    if '/' in tracknumber:
-        tracknumber, all_tracks = tracknumber.split('/')
+    if "/" in tracknumber:
+        tracknumber, all_tracks = tracknumber.split("/")
 
         try:
             int(tracknumber)
         except ValueError:
             LOGGER.error(f'Unhandled tracknumber: "{tracknumber}"')
 
-        metadata['tracknumber'] = tracknumber
+        metadata["tracknumber"] = tracknumber
         LOGGER.info(f'Fixing track number: "{path}"')
         metadata.save()
 
@@ -209,7 +212,7 @@ def rename_extensions(path):
                 if f.suffix not in expected:
                     if f.suffix.lower() in expected:
                         safe_rename(f, f.stem + f.suffix.lower())
-                    elif mime == 'text/plain':
+                    elif mime == "text/plain":
                         LOGGER.error('Unhandled text/plain suffix: "%s"', f)
                     else:
                         safe_rename(f, f.stem + expected[0])
@@ -219,32 +222,30 @@ def rename_extensions(path):
 
 def rename_from_tags(path, metadata):
     try:
-        title = metadata['title'][0]
+        title = metadata["title"][0]
     except KeyError:
         return
 
     try:
-        tracknumber = int(metadata['tracknumber'][0])
+        tracknumber = int(metadata["tracknumber"][0])
     except ValueError:
         LOGGER.error(f'Cannot rename "{path}"')
         return
     # Only modify when under 10 to retain tracks >= 100
     if tracknumber < 10:
-        tracknumber = f'{tracknumber:02d}'
+        tracknumber = f"{tracknumber:02d}"
 
-    for char in ('/', '\\', '.', ':', '*', '?', '"', '<', '>', '|'):
-        title = title.replace(char, ' ')
-    title = ' '.join(title.split())
-    safe_rename(path, f'{tracknumber} - {title}{path.suffix}')
+    for char in ("/", "\\", ".", ":", "*", "?", '"', "<", ">", "|"):
+        title = title.replace(char, " ")
+    title = " ".join(title.split())
+    safe_rename(path, f"{tracknumber} - {title}{path.suffix}")
 
 
 def safe_rename(source, name):
     target = source.with_name(name)
     if source != target:
         if target.exists():
-            LOGGER.error(
-                f'Error renaming "{source}" to "{target}": already exists'
-            )
+            LOGGER.error(f'Error renaming "{source}" to "{target}": already exists')
         else:
             LOGGER.info(f'Renaming "{source}" to "{target}"')
             source.rename(target)
@@ -266,23 +267,23 @@ def set_permissions(path):
     if path.is_dir():
         os.chmod(
             path,
-            stat.S_IRUSR + stat.S_IRGRP + stat.S_IROTH +
-            stat.S_IXUSR + stat.S_IXGRP + stat.S_IXOTH +
-            stat.S_IWUSR
+            stat.S_IRUSR
+            + stat.S_IRGRP
+            + stat.S_IROTH
+            + stat.S_IXUSR
+            + stat.S_IXGRP
+            + stat.S_IXOTH
+            + stat.S_IWUSR,
         )
     else:
-        os.chmod(
-            path,
-            stat.S_IRUSR + stat.S_IRGRP + stat.S_IROTH +
-            stat.S_IWUSR
-        )
+        os.chmod(path, stat.S_IRUSR + stat.S_IRGRP + stat.S_IROTH + stat.S_IWUSR)
 
 
 def setup_logging(name, level=logging.INFO):
     logger = logging.getLogger()
     logger.setLevel(level)
 
-    fmt = logging.Formatter('%(levelname)s %(message)s')
+    fmt = logging.Formatter("%(levelname)s %(message)s")
 
     sh = logging.StreamHandler()
     sh.setLevel(level)
@@ -290,8 +291,8 @@ def setup_logging(name, level=logging.INFO):
     logger.addHandler(sh)
 
     fh = logging.FileHandler(
-        filename=pathlib.Path(tempfile.gettempdir()) / f'{name}.log',
-        mode='w')
+        filename=pathlib.Path(tempfile.gettempdir()) / f"{name}.log", mode="w"
+    )
     fh.setLevel(level)
     fh.setFormatter(fmt)
     logger.addHandler(fh)
@@ -299,12 +300,12 @@ def setup_logging(name, level=logging.INFO):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('directory', type=pathlib.Path)
-    parser.add_argument('--library', action='store_true')
-    parser.add_argument('-t', '--check-tags', action='store_true')
+    parser.add_argument("directory", type=pathlib.Path)
+    parser.add_argument("--library", action="store_true")
+    parser.add_argument("-t", "--check-tags", action="store_true")
     args = parser.parse_args()
 
-    setup_logging('music-organizer')
+    setup_logging("music-organizer")
 
     artists = set()
 
@@ -341,16 +342,16 @@ def main():
                     fix_tracknumber(path, metadata)
                     rename_from_tags(path, metadata)
                     try:
-                        albums.add(metadata['album'][0])
+                        albums.add(metadata["album"][0])
                     except KeyError:
                         missing_album = True
                     try:
-                        artists.update(metadata['artist'])
+                        artists.update(metadata["artist"])
                     except KeyError:
                         missing_artist = True
                     try:
-                        artists.update(metadata['albumartist'])
-                        albumartists.update(metadata['albumartist'])
+                        artists.update(metadata["albumartist"])
+                        albumartists.update(metadata["albumartist"])
                     except KeyError:
                         pass
                     tracks.append(path)
@@ -362,10 +363,13 @@ def main():
                 expected_album = folder_name(album)
                 if not expected_album:
                     LOGGER.error('invalid album name "%s"', root_path)
-                    raise RuntimeError('figure out what to do')
+                    raise RuntimeError("figure out what to do")
                 if root_path.name != expected_album:
-                    LOGGER.info('renaming album folder from "%s" to "%s"',
-                                root_path, expected_album)
+                    LOGGER.info(
+                        'renaming album folder from "%s" to "%s"',
+                        root_path,
+                        expected_album,
+                    )
                     new_root = root_path.with_name(expected_album)
                     if new_root.exists():
                         LOGGER.error('new root already exists "%s"', new_root)
@@ -376,27 +380,30 @@ def main():
 
             if len(albumartists) > 1:
                 LOGGER.error(f'Multiple albumartists in "{root_path}"')
-            elif not missing_artist \
-                    and not missing_album \
-                    and not albumartists \
-                    and len(artists) == len(albums) == 1:
+            elif (
+                not missing_artist
+                and not missing_album
+                and not albumartists
+                and len(artists) == len(albums) == 1
+            ):
                 artist = list(artists)[0]
                 for path in tracks:
                     metadata = mutagen.File(path, easy=True)
-                    LOGGER.info('Setting albumartist to "%s" (%s)',
-                                artist, path)
-                    metadata['albumartist'] = artist
+                    LOGGER.info('Setting albumartist to "%s" (%s)', artist, path)
+                    metadata["albumartist"] = artist
                     metadata.save()
 
             if len(albumartists) == 1 and args.library:
                 relative_root = root_path.relative_to(LIBRARY)
                 expected_root = LIBRARY.joinpath(
-                    folder_name(list(albumartists)[0]),
-                    *relative_root.parts[1:])
+                    folder_name(list(albumartists)[0]), *relative_root.parts[1:]
+                )
                 if expected_root != root_path:
-                    LOGGER.error('top-level should be "%s" for "%s"',
-                                 expected_root.relative_to(LIBRARY),
-                                 relative_root)
+                    LOGGER.error(
+                        'top-level should be "%s" for "%s"',
+                        expected_root.relative_to(LIBRARY),
+                        relative_root,
+                    )
 
     # audit artist title variations
     artist_variants = collections.defaultdict(set)
@@ -404,18 +411,14 @@ def main():
     valid_chars = string.ascii_lowercase + string.digits
 
     for artist in artists:
-        normalized = ''.join([
-            c
-            for c in artist.lower()
-            if c in valid_chars
-        ])
+        normalized = "".join([c for c in artist.lower() if c in valid_chars])
         if normalized:
             artist_variants[normalized].add(artist)
 
     for normalized, variants in artist_variants.items():
         if len(variants) > 1:
-            LOGGER.error('artist variants: %s - %s', normalized, variants)
+            LOGGER.error("artist variants: %s - %s", normalized, variants)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

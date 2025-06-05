@@ -8,26 +8,26 @@ import jinja2
 
 
 SYSTEM_UNITS = {
-    'fstrim.service',
-    'logrotate.service',
-    'man-db.service',
-    'shadow.service',
-    'systemd-tmpfiles-clean.service',
-    'zfs-scrub@storage.service',
-    'zpool-check-health-storage.service',
+    "fstrim.service",
+    "logrotate.service",
+    "man-db.service",
+    "shadow.service",
+    "systemd-tmpfiles-clean.service",
+    "zfs-scrub@storage.service",
+    "zpool-check-health-storage.service",
 }
 
 USER_UNITS = {
-    'check-update-dualsense-firmware.service',
-    'check-update-phobos-bios.service',
-    'check-update-mars-bios.service',
-    'git-repo-backup.service',
-    'gog-update.service',
-    'mbsync.service',
-    'sol-fix-permissions.service',
-    'sol-update-remotes.service',
-    'sol-ytdl-sub.service',
-    'vdirsyncer.service',
+    "check-update-dualsense-firmware.service",
+    "check-update-phobos-bios.service",
+    "check-update-mars-bios.service",
+    "git-repo-backup.service",
+    "gog-update.service",
+    "mbsync.service",
+    "sol-fix-permissions.service",
+    "sol-update-remotes.service",
+    "sol-ytdl-sub.service",
+    "vdirsyncer.service",
 }
 
 
@@ -90,40 +90,32 @@ table tr.failure {
 
 def send_html_email(content, subject):
     args = [
-        'sol-notification-mailx',
-        '-M', 'text/html',
-        '-s', subject,
+        "sol-notification-mailx",
+        "-M",
+        "text/html",
+        "-s",
+        subject,
     ]
     subprocess.run(args, input=content, text=True, check=True)
 
 
 def unit_properties(service, user=False):
-    args = [
-        'systemctl',
-        'show'
-    ]
+    args = ["systemctl", "show"]
     if user:
-        args.append('--user')
+        args.append("--user")
     args.append(service)
     proc = subprocess.run(args, check=True, stdout=subprocess.PIPE)
-    lines = [
-        line.strip()
-        for line in proc.stdout.decode().split('\n')
-        if line
-    ]
+    lines = [line.strip() for line in proc.stdout.decode().split("\n") if line]
     properties = collections.defaultdict(list)
     for line in lines:
-        prop, value = line.split('=', 1)
+        prop, value = line.split("=", 1)
         properties[prop].append(value)
-    return {
-        p[0] if len(p) == 1 else p: v
-        for p, v in dict(properties).items()
-    }
+    return {p[0] if len(p) == 1 else p: v for p, v in dict(properties).items()}
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dummy', action='store_true')
+    parser.add_argument("--dummy", action="store_true")
     args = parser.parse_args()
 
     template = jinja2.Template(TEMPLATE)
@@ -133,25 +125,25 @@ def main():
     for unit in SYSTEM_UNITS:
         properties = unit_properties(unit)
         units.append(properties)
-        if ''.join(properties['Result']) != 'success':
+        if "".join(properties["Result"]) != "success":
             success = False
     for unit in USER_UNITS:
         properties = unit_properties(unit, user=True)
         units.append(properties)
-        if ''.join(properties['Result']) != 'success':
+        if "".join(properties["Result"]) != "success":
             success = False
 
     output = template.render(units=units)
-    subject = '{} Report {}'.format(
-        '✅' if success else '❌',
-        datetime.datetime.now().strftime('%Y-%m-%d %H:%M'))
+    subject = "{} Report {}".format(
+        "✅" if success else "❌", datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+    )
 
     if args.dummy:
         print(output)
     else:
         send_html_email(output, subject)
-        print('Sent')
+        print("Sent")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

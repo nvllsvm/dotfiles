@@ -11,7 +11,7 @@ import tempfile
 import async_executor
 import mutagen
 
-LOGGER = logging.getLogger('reencode-lossless')
+LOGGER = logging.getLogger("reencode-lossless")
 
 
 def copy_tags(source, target):
@@ -31,26 +31,33 @@ class ffprobe:
     @classmethod
     async def stream_info(cls, path):
         proc = await asyncio.create_subprocess_exec(
-            'ffprobe', '-v', 'error', '-show_streams',
-            '-print_format', 'json', '--', str(path),
-            stdout=asyncio.subprocess.PIPE)
+            "ffprobe",
+            "-v",
+            "error",
+            "-show_streams",
+            "-print_format",
+            "json",
+            "--",
+            str(path),
+            stdout=asyncio.subprocess.PIPE,
+        )
         stdout, _ = await proc.communicate()
         if proc.returncode != 0:
             raise cls.ProcessError
 
-        return json.loads(stdout)['streams']
+        return json.loads(stdout)["streams"]
 
 
 async def decode_ape(source, fd):
     proc = await asyncio.create_subprocess_exec(
-        'mac', source, '-', '-d',
-        stderr=asyncio.subprocess.DEVNULL,
-        stdout=fd)
+        "mac", source, "-", "-d", stderr=asyncio.subprocess.DEVNULL, stdout=fd
+    )
 
     async def result():
         await proc.wait()
         if proc.returncode != 0:
             raise DecodeError(source)
+
     return result()
 
 
@@ -65,79 +72,86 @@ async def decode_m4a(source, fd):
 
     streams = await ffprobe.stream_info(source)
     for stream in streams:
-        if stream['codec_type'] == 'audio':
-            if stream['codec_name'] == 'alac':
+        if stream["codec_type"] == "audio":
+            if stream["codec_name"] == "alac":
                 if alac_stream is not None:
-                    raise InvalidFileType('multiple ALAC streams')
+                    raise InvalidFileType("multiple ALAC streams")
                 alac_stream = stream
             else:
-                raise InvalidFileType(
-                    f'unhandled audio type: {stream["codec_name"]}')
-        elif stream['codec_type'] == 'video':
-            if stream['codec_name'] not in ('mjpeg', 'png'):
-                raise InvalidFileType(
-                    f'unhandled video type: {stream["codec_name"]}')
+                raise InvalidFileType(f"unhandled audio type: {stream['codec_name']}")
+        elif stream["codec_type"] == "video":
+            if stream["codec_name"] not in ("mjpeg", "png"):
+                raise InvalidFileType(f"unhandled video type: {stream['codec_name']}")
         else:
-            raise InvalidFileType(
-                f'unhandled stream type: {stream["codec_type"]}')
+            raise InvalidFileType(f"unhandled stream type: {stream['codec_type']}")
 
     if alac_stream is None:
-        raise InvalidFileType('not ALAC file')
+        raise InvalidFileType("not ALAC file")
 
-    if alac_stream['sample_fmt'] != 's16p':
-        raise InvalidFileType('unhandled sample format')
-    if alac_stream['channels'] != 2:
-        raise InvalidFileType('unhandled channel count')
-    if alac_stream['channel_layout'] != 'stereo':
-        raise InvalidFileType('unhandled channel layout')
+    if alac_stream["sample_fmt"] != "s16p":
+        raise InvalidFileType("unhandled sample format")
+    if alac_stream["channels"] != 2:
+        raise InvalidFileType("unhandled channel count")
+    if alac_stream["channel_layout"] != "stereo":
+        raise InvalidFileType("unhandled channel layout")
 
     proc = await asyncio.create_subprocess_exec(
-        'ffmpeg', '-i', str(source), '-f', 'wav',
-        '-acodec', 'pcm_s16le', '-ac', '2', '-',
+        "ffmpeg",
+        "-i",
+        str(source),
+        "-f",
+        "wav",
+        "-acodec",
+        "pcm_s16le",
+        "-ac",
+        "2",
+        "-",
         stderr=asyncio.subprocess.DEVNULL,
-        stdout=fd)
+        stdout=fd,
+    )
 
     async def result():
         await proc.wait()
         if proc.returncode != 0:
             raise DecodeError(source)
+
     return result()
 
 
 async def decode_wv(source, fd):
     proc = await asyncio.create_subprocess_exec(
-        'wvunpack', '-q', source, '-o', '-',
-        stdout=fd)
+        "wvunpack", "-q", source, "-o", "-", stdout=fd
+    )
 
     async def result():
         await proc.wait()
         if proc.returncode != 0:
             raise DecodeError(source)
+
     return result()
 
 
 async def decode_flac(source, fd):
     proc = await asyncio.create_subprocess_exec(
-        'flac', '-csd', source,
-        stderr=asyncio.subprocess.DEVNULL,
-        stdout=fd)
+        "flac", "-csd", source, stderr=asyncio.subprocess.DEVNULL, stdout=fd
+    )
 
     async def result():
         await proc.wait()
         if proc.returncode != 0:
             raise DecodeError(source)
+
     return result()
 
 
 async def decode_wav(source, fd):
-    proc = await asyncio.create_subprocess_exec(
-        'cat', source,
-        stdout=fd)
+    proc = await asyncio.create_subprocess_exec("cat", source, stdout=fd)
 
     async def result():
         await proc.wait()
         if proc.returncode != 0:
             raise DecodeError(source)
+
     return result()
 
 
@@ -163,8 +177,14 @@ def TempPath(**kwargs):
 
 async def encode_flac(fd, dest):
     proc = await asyncio.create_subprocess_exec(
-        'flac', '--silent', '--best', '--verify', '--force',
-        '--output-name', dest, '-',
+        "flac",
+        "--silent",
+        "--best",
+        "--verify",
+        "--force",
+        "--output-name",
+        dest,
+        "-",
         stdin=fd,
         stderr=asyncio.subprocess.DEVNULL,
     )
@@ -173,13 +193,16 @@ async def encode_flac(fd, dest):
         await proc.wait()
         if proc.returncode != 0:
             raise EncodeError()
+
     return result()
 
 
 async def encode_wav(fd, dest):
     # seems dirty, but allows for async
     proc = await asyncio.create_subprocess_exec(
-        'tee', '--', dest,
+        "tee",
+        "--",
+        dest,
         stdin=fd,
         stdout=asyncio.subprocess.DEVNULL,
         stderr=asyncio.subprocess.DEVNULL,
@@ -189,6 +212,7 @@ async def encode_wav(fd, dest):
         await proc.wait()
         if proc.returncode != 0:
             raise EncodeError()
+
     return result()
 
 
@@ -201,26 +225,26 @@ class EncodeError(Exception):
 
 
 ENCODE_FORMAT = {
-    'flac': {
-        'encode_func': encode_flac,
-        'suffix': '.flac',
+    "flac": {
+        "encode_func": encode_flac,
+        "suffix": ".flac",
     },
-    'wav': {
-        'encode_func': encode_wav,
-        'suffix': '.wav',
+    "wav": {
+        "encode_func": encode_wav,
+        "suffix": ".wav",
     },
 }
 
 
-async def reencode(source, encode_format='flac'):
+async def reencode(source, encode_format="flac"):
     suffix = source.suffix.lower()
 
     decode_contexts = {
-        '.flac': decode_flac,
-        '.ape': decode_ape,
-        '.m4a': decode_m4a,
-        '.wv': decode_wv,
-        '.wav': decode_wav,
+        ".flac": decode_flac,
+        ".ape": decode_ape,
+        ".m4a": decode_m4a,
+        ".wv": decode_wv,
+        ".wav": decode_wav,
     }
 
     read, write = os.pipe()
@@ -228,8 +252,8 @@ async def reencode(source, encode_format='flac'):
     decode = await decode_contexts[suffix](source, write)
     os.close(write)
 
-    suffix = ENCODE_FORMAT[encode_format]['suffix']
-    encode_func = ENCODE_FORMAT[encode_format]['encode_func']
+    suffix = ENCODE_FORMAT[encode_format]["suffix"]
+    encode_func = ENCODE_FORMAT[encode_format]["encode_func"]
 
     before = source.stat().st_size
 
@@ -264,9 +288,7 @@ def all_files(root):
 
 
 async def run(args):
-    logging.basicConfig(
-        format='%(levelname)s %(message)s',
-        level=logging.INFO)
+    logging.basicConfig(format="%(levelname)s %(message)s", level=logging.INFO)
 
     paths = set()
     for path in args.path:
@@ -277,7 +299,7 @@ async def run(args):
 
     executor = async_executor.AsyncExecutor(args.numprocs)
     for path in paths:
-        if path.suffix.lower() in ('.flac', '.ape', '.m4a', '.wav', '.wv'):
+        if path.suffix.lower() in (".flac", ".ape", ".m4a", ".wav", ".wv"):
             executor.submit(reencode, path, encode_format=args.format)
 
     errors = []
@@ -296,7 +318,7 @@ async def run(args):
     size_diff_printer.print_total()
 
     for error in sorted(errors):
-        LOGGER.error('Error %s', error)
+        LOGGER.error("Error %s", error)
 
 
 class SizeDiffPrinter:
@@ -311,18 +333,18 @@ class SizeDiffPrinter:
     def format_diff(before, after):
         diff = ((before - after) / before) * 100
         if diff:
-            diff = '{:.2f}'.format(diff)
+            diff = "{:.2f}".format(diff)
             if not float(diff):
-                diff = f'<{diff}'
+                diff = f"<{diff}"
         return diff
 
     @staticmethod
     def sizeof_fmt(num):
-        for unit in ['B', 'KB', 'MB', 'GB', 'TB', 'PB']:
+        for unit in ["B", "KB", "MB", "GB", "TB", "PB"]:
             if abs(num) < 1024.0:
                 break
             num /= 1024.0
-        return f'{num:.1f}{unit}'
+        return f"{num:.1f}{unit}"
 
     def print(self, before, after, name):
         self._num_printed += 1
@@ -330,28 +352,28 @@ class SizeDiffPrinter:
         self._after_total += after
         diff = self.format_diff(before, after)
 
-        s = f'{diff:>6}%' if diff else 7 * '-'
+        s = f"{diff:>6}%" if diff else 7 * "-"
         num_printed = str(self._num_printed).rjust(len(str(self._num_items)))
-        print(f'({num_printed}/{self._num_items})\t{s}\t{name}')
+        print(f"({num_printed}/{self._num_items})\t{s}\t{name}")
 
     def print_total(self):
         if self._num_printed:
             if diff := self.format_diff(self._before_total, self._after_total):
                 fmt = self.sizeof_fmt(self._before_total - self._after_total)
-                print(f'Total: {diff}% ({fmt})')
+                print(f"Total: {diff}% ({fmt})")
             else:
-                print('Total: -')
+                print("Total: -")
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-n', dest='numprocs', metavar='NUMPROCS', type=int)
-    parser.add_argument('--format', choices=ENCODE_FORMAT, default='flac')
-    parser.add_argument('path', type=pathlib.Path, nargs='+')
+    parser.add_argument("-n", dest="numprocs", metavar="NUMPROCS", type=int)
+    parser.add_argument("--format", choices=ENCODE_FORMAT, default="flac")
+    parser.add_argument("path", type=pathlib.Path, nargs="+")
     args = parser.parse_args()
 
     asyncio.run(run(args))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

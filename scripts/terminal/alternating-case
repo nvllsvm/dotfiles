@@ -14,34 +14,28 @@ def mockingly(text):
             c = c.lower()
             next_upper = True
         chars.append(c)
-    return ''.join(chars)
+    return "".join(chars)
 
 
 class Clipboard:
     @staticmethod
     def get():
-        proc = subprocess.run(
-            ['cbpaste'],
-            stdout=subprocess.PIPE,
-            check=True)
+        proc = subprocess.run(["cbpaste"], stdout=subprocess.PIPE, check=True)
         return proc.stdout
 
     @staticmethod
     def set(data):
-        subprocess.run(
-            ['cbcopy'],
-            input=data.encode(),
-            check=True)
+        subprocess.run(["cbcopy"], input=data.encode(), check=True)
 
 
 if not sys.stdin.isatty():
     if len(sys.argv) > 1:
-        raise RuntimeError('unexpected arguments')
+        raise RuntimeError("unexpected arguments")
     data = sys.stdin.read()
 elif len(sys.argv) == 1:
     data = Clipboard.get().decode()
 elif len(sys.argv) >= 2:
-    data = ' '.join(sys.argv[1:])
+    data = " ".join(sys.argv[1:])
 else:
     raise NotImplementedError
 

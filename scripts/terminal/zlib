@@ -23,12 +23,10 @@ def _zlib_compress(handle):
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description='Compress or decompress zlib data')
-    parser.add_argument('-d', '--decompress', action='store_true')
+    parser = argparse.ArgumentParser(description="Compress or decompress zlib data")
+    parser.add_argument("-d", "--decompress", action="store_true")
     parser.add_argument(
-        'file', nargs='?', type=argparse.FileType('rb'),
-        default=sys.stdin.buffer
+        "file", nargs="?", type=argparse.FileType("rb"), default=sys.stdin.buffer
     )
     args = parser.parse_args()
 
@@ -37,5 +35,5 @@ def main():
         sys.stdout.buffer.write(chunk)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

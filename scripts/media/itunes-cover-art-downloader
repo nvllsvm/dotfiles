@@ -12,8 +12,8 @@ import PIL.Image
 import tqdm.asyncio
 import yarl
 
-SEARCH_URL = yarl.URL('https://itunes.apple.com/search')
-BASE_URL = yarl.URL('https://a5.mzstatic.com/us/r1000/0/')
+SEARCH_URL = yarl.URL("https://itunes.apple.com/search")
+BASE_URL = yarl.URL("https://a5.mzstatic.com/us/r1000/0/")
 
 CLIENT = httpx.AsyncClient()
 
@@ -24,47 +24,47 @@ PATH_LENGTH_MAX = 255
 
 
 class Entity(enum.StrEnum):
-    ALBUM = 'album'
-    APPLE_ID_MOVIE = 'id'
-    APP_IPAD = 'IpadSoftware'
-    APP_IPHONE_OR_UNIVERSAL = 'software'
-    APP_MACOS = 'macSoftware'
-    AUDIOBOOK = 'audiobook'
-    EBOOK = 'ebook'
-    MOVIE = 'movie'
-    MUSIC_VIDEO = 'musicVideo'
-    PODCAST = 'podcast'
-    TV_SHOW = 'tv'
+    ALBUM = "album"
+    APPLE_ID_MOVIE = "id"
+    APP_IPAD = "IpadSoftware"
+    APP_IPHONE_OR_UNIVERSAL = "software"
+    APP_MACOS = "macSoftware"
+    AUDIOBOOK = "audiobook"
+    EBOOK = "ebook"
+    MOVIE = "movie"
+    MUSIC_VIDEO = "musicVideo"
+    PODCAST = "podcast"
+    TV_SHOW = "tv"
 
 
-async def get_itunes_art(*terms, country='us', entity=Entity.ALBUM, limit=None):
+async def get_itunes_art(*terms, country="us", entity=Entity.ALBUM, limit=None):
     query = {
-        'country': country,
-        'entity': entity,
-        'term': ' '.join(terms),
+        "country": country,
+        "entity": entity,
+        "term": " ".join(terms),
     }
     if limit:
         limit = int(limit)
-        query['limit'] = limit
+        query["limit"] = limit
 
     url = SEARCH_URL.with_query(query)
     response = await CLIENT.get(str(url))
     response.raise_for_status()
 
     results = response.json()
-    if results['resultCount'] == 0:
+    if results["resultCount"] == 0:
         raise KeyError
-    if limit and results['resultCount'] == limit:
-        raise NotImplementedError('limit too low')
+    if limit and results["resultCount"] == limit:
+        raise NotImplementedError("limit too low")
 
-    for result in results['results']:
-        thumb_url = result['artworkUrl100']
+    for result in results["results"]:
+        thumb_url = result["artworkUrl100"]
         url = BASE_URL
-        for part in thumb_url.split('/')[5:-1]:
+        for part in thumb_url.split("/")[5:-1]:
             url = url / part
-        result['artworkUrl'] = str(url)
+        result["artworkUrl"] = str(url)
 
-    return results['results']
+    return results["results"]
 
 
 async def download_image(url):
@@ -74,7 +74,7 @@ async def download_image(url):
 
     image = PIL.Image.open(io.BytesIO(data))
     image.verify()
-    if image.format == 'TIFF':
+    if image.format == "TIFF":
         data = await convert_to_png(data)
     return data
 
@@ -82,24 +82,26 @@ async def download_image(url):
 def get_suffix(data):
     image = PIL.Image.open(io.BytesIO(data))
     match image.format:
-        case 'JPEG':
-            return '.jpg'
-        case 'PNG':
-            return '.png'
+        case "JPEG":
+            return ".jpg"
+        case "PNG":
+            return ".png"
         case _:
             raise ValueError(image.format)
 
 
 def build_image_path(name, suffix):
-    name = name.replace(os.sep, '').strip()
+    name = name.replace(os.sep, "").strip()
     if not name:
         raise ValueError()
     iteration = 0
     while True:
-        path = pathlib.Path(f'itunes_artwork_({name}){"_"*iteration}{suffix}')
+        path = pathlib.Path(f"itunes_artwork_({name}){'_' * iteration}{suffix}")
         if len(path.name.encode()) > PATH_LENGTH_MAX:
             suffix = path.suffix
-            name = path.name.encode()[0:PATH_LENGTH_MAX-len(suffix)] + suffix.encode()
+            name = (
+                path.name.encode()[0 : PATH_LENGTH_MAX - len(suffix)] + suffix.encode()
+            )
             path = path.with_name(name.decode())
         if not path.exists():
             break
@@ -111,7 +113,9 @@ async def convert_to_png(data):
     # use imagemagick instead of Pillow as Pillow's TIFF support doesn't
     # work without special compile flags
     proc = await asyncio.create_subprocess_exec(
-        'magick', '-', 'png:-',
+        "magick",
+        "-",
+        "png:-",
         stdin=asyncio.subprocess.PIPE,
         stdout=asyncio.subprocess.PIPE,
     )
@@ -123,21 +127,22 @@ async def convert_to_png(data):
 
 async def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-e', '--entity', choices=Entity, default=Entity.ALBUM)
-    parser.add_argument('--limit', type=int, default=DEFAULT_LIMIT)
-    parser.add_argument('terms', nargs='+')
+    parser.add_argument("-e", "--entity", choices=Entity, default=Entity.ALBUM)
+    parser.add_argument("--limit", type=int, default=DEFAULT_LIMIT)
+    parser.add_argument("terms", nargs="+")
     args = parser.parse_args()
 
     executor = async_executor.AsyncExecutor()
     task_names = {}
     for result in await get_itunes_art(
-            *args.terms, entity=args.entity, limit=args.limit):
-        name = ' - '.join(
+        *args.terms, entity=args.entity, limit=args.limit
+    ):
+        name = " - ".join(
             result[k]
-            for k in ('artistName', 'collectionName', 'trackName')
+            for k in ("artistName", "collectionName", "trackName")
             if result.get(k)
         )
-        task = executor.submit(download_image, result['artworkUrl'])
+        task = executor.submit(download_image, result["artworkUrl"])
         task_names[task] = name
 
     async for task in tqdm.asyncio.tqdm(executor):
@@ -153,5 +158,5 @@ async def main():
         path.write_bytes(data)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())

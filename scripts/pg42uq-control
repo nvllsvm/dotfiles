@@ -4,33 +4,37 @@ import asyncio
 
 
 class PG42UQ:
-    VOLUME_VCP = '0x62'
+    VOLUME_VCP = "0x62"
 
     def __init__(self):
         self.sleep_multipler = 0.03
 
     async def _ddcutil(self, *args):
         proc = await asyncio.create_subprocess_exec(
-            'ddcutil', '--sleep-multiplier', str(self.sleep_multipler),
+            "ddcutil",
+            "--sleep-multiplier",
+            str(self.sleep_multipler),
             *args,
-            stdout=asyncio.subprocess.PIPE)
+            stdout=asyncio.subprocess.PIPE,
+        )
         stdout, _ = await proc.communicate()
         if proc.returncode:
             raise RuntimeError
         return stdout
 
     async def get_volume(self):
-        result = await self._ddcutil('getvcp', '--brief', self.VOLUME_VCP)
-        return int(f'0{result[-4:-1].decode()}', 16)
+        result = await self._ddcutil("getvcp", "--brief", self.VOLUME_VCP)
+        return int(f"0{result[-4:-1].decode()}", 16)
 
     async def set_volume(self, volume):
-        await self._ddcutil('setvcp', self.VOLUME_VCP, str(volume))
+        await self._ddcutil("setvcp", self.VOLUME_VCP, str(volume))
 
 
 async def main():
     pg42uq = PG42UQ()
 
     import time
+
     while True:
         await pg42uq.set_volume(100)
         print(100)
@@ -42,12 +46,12 @@ async def main():
     print(await pg42uq.get_volume())
     exit()
     commands = {
-        'volume-up': _volume_up,
+        "volume-up": _volume_up,
     }
     parser = argparse.ArgumentParser()
-    parser.add_argument('command')
+    parser.add_argument("command")
     args = parser.parse_args()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())

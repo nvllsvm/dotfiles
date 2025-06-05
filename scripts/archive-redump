@@ -5,64 +5,64 @@ import pathlib
 
 
 INFO_SUFFIXES = (
-    ' (Track 0).bin',
-    ' (Track 00).bin',
-    ' (Track 01)(-LBA).bin',
-    ' (Track 1)(-LBA).bin',
-    ' (Track AA).bin',
-    '.c2',
-    '.ccd',
-    '.dat',
-    '.json',
-    '.sub',
-    '.toc',
-    '.txt',
+    " (Track 0).bin",
+    " (Track 00).bin",
+    " (Track 01)(-LBA).bin",
+    " (Track 1)(-LBA).bin",
+    " (Track AA).bin",
+    ".c2",
+    ".ccd",
+    ".dat",
+    ".json",
+    ".sub",
+    ".toc",
+    ".txt",
 )
 
 DUMP_SUFFIXES = (
-    '.bin',
-    '.cue',
-    '.iso',
+    ".bin",
+    ".cue",
+    ".iso",
 )
 
 DELETE_SUFFIXES = (
-    '.img',
-    '.scm',
+    ".img",
+    ".scm",
 )
 
 
 async def extract(*path, rm=False, force=False, parent=None):
-    args = ['extract']
+    args = ["extract"]
     if rm:
-        args.append('--rm')
+        args.append("--rm")
     if force:
-        args.append('--force')
+        args.append("--force")
     if parent:
-        args.extend(['-p', parent])
-    args.extend(['--', *path])
+        args.extend(["-p", parent])
+    args.extend(["--", *path])
     proc = await asyncio.create_subprocess_exec(*args)
     await proc.communicate()
     if proc.returncode:
-        raise RuntimeError(f'extract exit {proc.returncode}')
+        raise RuntimeError(f"extract exit {proc.returncode}")
 
 
 async def archive(*path, num_procs=1, rm=False):
-    args = ['archive']
+    args = ["archive"]
     if num_procs != 1:
-        args.extend(['-n', str(num_procs)])
+        args.extend(["-n", str(num_procs)])
     if rm:
-        args.append('--rm')
-    args.extend(['--', *path])
+        args.append("--rm")
+    args.extend(["--", *path])
     proc = await asyncio.create_subprocess_exec(*args)
     await proc.communicate()
     if proc.returncode:
-        raise RuntimeError(f'extract exit {proc.returncode}')
+        raise RuntimeError(f"extract exit {proc.returncode}")
 
 
 async def process_path(path, dump_name):
-    info_name = ' - '.join([v for v in ['info', dump_name] if v])
+    info_name = " - ".join([v for v in ["info", dump_name] if v])
     info_dest = path / info_name
-    dump_dest = path / 'dump'
+    dump_dest = path / "dump"
 
     dump_paths = []
     info_paths = []
@@ -71,10 +71,10 @@ async def process_path(path, dump_name):
 
     for path in path.iterdir():
         if path.is_dir():
-            raise NotImplementedError('child dir detected')
+            raise NotImplementedError("child dir detected")
 
         name = path.name
-        if name.endswith('.zip'):
+        if name.endswith(".zip"):
             archive_paths.append(path)
         elif name.endswith(INFO_SUFFIXES):
             info_paths.append(path)
@@ -86,9 +86,9 @@ async def process_path(path, dump_name):
             raise NotImplementedError(path)
 
     if not dump_paths:
-        raise RuntimeError('no dump found')
+        raise RuntimeError("no dump found")
     if len(archive_paths) > 1:
-        raise RuntimeError('multiple archives found')
+        raise RuntimeError("multiple archives found")
 
     dump_dest.mkdir()
     info_dest.mkdir()
@@ -110,14 +110,13 @@ async def process_path(path, dump_name):
 
 async def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-n', '--dump-name')
-    parser.add_argument('path', type=pathlib.Path, nargs='+')
+    parser.add_argument("-n", "--dump-name")
+    parser.add_argument("path", type=pathlib.Path, nargs="+")
     args = parser.parse_args()
 
     for path in args.path:
         await process_path(path, args.dump_name)
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())

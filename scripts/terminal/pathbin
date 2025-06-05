@@ -22,18 +22,25 @@ def _pretty_json(data):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='list executables in path')
+    parser = argparse.ArgumentParser(description="list executables in path")
     mutex_group = parser.add_mutually_exclusive_group()
     mutex_group.add_argument(
-        '-c', dest='group_command', action='store_true',
-        help=('group by command. directories are ordered as '
-              'they appear in the path list'))
+        "-c",
+        dest="group_command",
+        action="store_true",
+        help=(
+            "group by command. directories are ordered as they appear in the path list"
+        ),
+    )
     mutex_group.add_argument(
-        '-d', dest='group_directory', action='store_true',
-        help='group by directory')
+        "-d", dest="group_directory", action="store_true", help="group by directory"
+    )
     parser.add_argument(
-        'path', nargs='*', default=os.get_exec_path(),
-        help='paths to search (default: $PATH)')
+        "path",
+        nargs="*",
+        default=os.get_exec_path(),
+        help="paths to search (default: $PATH)",
+    )
     args = parser.parse_args()
 
     executables = []
@@ -57,9 +64,8 @@ def main():
 
     else:
         if executables:
-            print('\n'.join(
-                sorted(set(str(path.name) for path in executables))))
+            print("\n".join(sorted(set(str(path.name) for path in executables))))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

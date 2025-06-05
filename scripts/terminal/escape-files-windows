@@ -21,10 +21,10 @@ def all_files(root):
 def escape_path(path):
     new_parts = []
     for part in path.parts:
-        new_part = ''.join([c for c in part if c in VALID])
+        new_part = "".join([c for c in part if c in VALID])
 
         if not new_part:
-            raise ValueError(f'Unable to escape {path}')
+            raise ValueError(f"Unable to escape {path}")
         new_parts.append(new_part)
     return pathlib.Path(*new_parts)
 
@@ -50,10 +50,13 @@ def rename_files(root, dry_run=True):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('path', type=pathlib.Path, nargs='+')
-    parser.add_argument('-c', '--commit',
-                        action='store_true',
-                        help='commit renames to disk. otherwise dry run')
+    parser.add_argument("path", type=pathlib.Path, nargs="+")
+    parser.add_argument(
+        "-c",
+        "--commit",
+        action="store_true",
+        help="commit renames to disk. otherwise dry run",
+    )
     args = parser.parse_args()
 
     for path in args.path:
@@ -64,5 +67,5 @@ def main():
             rename_files(path, dry_run=False)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

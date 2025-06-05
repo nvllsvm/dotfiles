@@ -4,7 +4,7 @@ import string
 
 
 def rmac():
-    return ':'.join(
+    return ":".join(
         random.choice(string.hexdigits) + random.choice(string.hexdigits)
         for _ in range(6)
     ).lower()

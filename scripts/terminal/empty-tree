@@ -39,19 +39,21 @@ def empty_dirs(parent, include_parent=False):
 
 def main():
     parser = argparse.ArgumentParser(
-        description='List the tops of empty directory trees.'
+        description="List the tops of empty directory trees."
     )
     parser.add_argument(
-        '-p', '--parent', action='store_true',
-        help='allow the parent to be removed if empty')
-    parser.add_argument(
-        '-r', '--remove', action='store_true',
-        help='remove the trees from disk'
+        "-p",
+        "--parent",
+        action="store_true",
+        help="allow the parent to be removed if empty",
     )
     parser.add_argument(
-        '-q', '--quiet', action='store_true',
-        help='suppress non-error output')
-    parser.add_argument('path', type=pathlib.Path, nargs='*')
+        "-r", "--remove", action="store_true", help="remove the trees from disk"
+    )
+    parser.add_argument(
+        "-q", "--quiet", action="store_true", help="suppress non-error output"
+    )
+    parser.add_argument("path", type=pathlib.Path, nargs="*")
     args = parser.parse_args()
 
     paths = sorted(set(args.path)) or [pathlib.Path()]
@@ -76,5 +78,5 @@ def main():
                     pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -6,12 +6,7 @@ import sys
 pattern = re.compile(r'http[s]?://[^ \\\'"]*')
 
 parser = argparse.ArgumentParser()
-parser.add_argument(
-    'data',
-    nargs='?',
-    default=sys.stdin,
-    type=argparse.FileType('r')
-)
+parser.add_argument("data", nargs="?", default=sys.stdin, type=argparse.FileType("r"))
 args = parser.parse_args()
 
 for url in set(pattern.findall(args.data.read())):

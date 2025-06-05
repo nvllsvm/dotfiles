@@ -9,94 +9,84 @@ import sys
 import magic  # package: python-magic
 
 MIME_SUFFIXES = {
-    'application/x-dosexec': [
-        '.exe',
+    "application/x-dosexec": [
+        ".exe",
     ],
-    'application/vnd.microsoft.portable-executable': [
-        '.exe',
+    "application/vnd.microsoft.portable-executable": [
+        ".exe",
     ],
-    'application/x-7z-compressed': [
-        '.7z',
+    "application/x-7z-compressed": [
+        ".7z",
     ],
-    'application/x-ace-compressed': [
-        '.ace',
+    "application/x-ace-compressed": [
+        ".ace",
     ],
-    'application/zip': [
-        '.zip',
+    "application/zip": [
+        ".zip",
     ],
-    'application/x-bittorrent': [
-        '.torrent',
+    "application/x-bittorrent": [
+        ".torrent",
     ],
-    'application/gzip': [
-        '.gz',
+    "application/gzip": [
+        ".gz",
     ],
-    'application/x-rar': [
-        '.rar',
+    "application/x-rar": [
+        ".rar",
     ],
-    'application/x-tar': [
-        '.tar',
+    "application/x-tar": [
+        ".tar",
     ],
-    'application/pdf': [
-        '.pdf',
+    "application/pdf": [
+        ".pdf",
     ],
-    'audio/amr': [
-        '.amr'
+    "audio/amr": [".amr"],
+    "audio/flac": [".flac"],
+    "audio/mpeg": [".mp3"],
+    "audio/x-m4a": [".m4a"],
+    "image/avif": [
+        ".avif",
     ],
-    'audio/flac': [
-        '.flac'
+    "image/bmp": [
+        ".bmp",
     ],
-    'audio/mpeg': [
-        '.mp3'
+    "image/gif": [
+        ".gif",
     ],
-    'audio/x-m4a': [
-        '.m4a'
+    "image/png": [".png"],
+    "image/heic": [
+        ".heic",
     ],
-    'image/avif': [
-        '.avif',
+    "image/jpeg": [
+        ".jpeg",
+        ".jpg",
     ],
-    'image/bmp': [
-        '.bmp',
+    "image/tiff": [
+        ".tiff",
+        ".tif",
     ],
-    'image/gif': [
-        '.gif',
+    "image/webp": [
+        ".webp",
     ],
-    'image/png': [
-        '.png'
+    "image/x-canon-cr2": [
+        ".cr2",
     ],
-    'image/heic': [
-        '.heic',
+    "image/x-canon-cr3": [
+        ".cr3",
     ],
-    'image/jpeg': [
-        '.jpeg',
-        '.jpg',
+    "video/quicktime": [
+        ".mov",
     ],
-    'image/tiff': [
-        '.tiff',
-        '.tif',
+    "video/mp4": [
+        ".mp4",
     ],
-    'image/webp': [
-        '.webp',
+    "video/x-m4v": [
+        ".m4v",
     ],
-    'image/x-canon-cr2': [
-        '.cr2',
+    "video/mp2t": [
+        ".mp2t",
     ],
-    'image/x-canon-cr3': [
-        '.cr3',
-    ],
-    'video/quicktime': [
-        '.mov',
-    ],
-    'video/mp4': [
-        '.mp4',
-    ],
-    'video/x-m4v': [
-        '.m4v',
-    ],
-    'video/mp2t': [
-        '.mp2t',
-    ],
-    'text/html': [
-        '.html',
+    "text/html": [
+        ".html",
     ],
 }
 
@@ -118,11 +108,15 @@ def all_files(root):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--check', action='store_true', default=False)
-    parser.add_argument('--fix', action='store_true', default=False)
-    parser.add_argument('--force-fix', action='store_true', default=False,
-                        help='Set suffix for txt, octet-streams, and unknown')
-    parser.add_argument('path', type=pathlib.Path, nargs='+')
+    parser.add_argument("--check", action="store_true", default=False)
+    parser.add_argument("--fix", action="store_true", default=False)
+    parser.add_argument(
+        "--force-fix",
+        action="store_true",
+        default=False,
+        help="Set suffix for txt, octet-streams, and unknown",
+    )
+    parser.add_argument("path", type=pathlib.Path, nargs="+")
     args = parser.parse_args()
 
     exts = collections.defaultdict(set)
@@ -139,19 +133,18 @@ def main():
 
     if args.force_fix:
         for mime, paths in exts.items():
-            if mime == 'text/plain':
-                suffix = '.txt'
+            if mime == "text/plain":
+                suffix = ".txt"
             elif suffixes := MIME_SUFFIXES.get(mime):
                 suffix = suffixes[0]
             else:
-                suffix = '.unknown'
+                suffix = ".unknown"
             for path in paths:
                 if path.suffix == suffix:
                     continue
                 sep_count = 0
                 while True:
-                    target = path.with_name(
-                        f'{path.name}{"_"*sep_count}{suffix}')
+                    target = path.with_name(f"{path.name}{'_' * sep_count}{suffix}")
                     if target.exists():
                         sep_count += 1
                     else:
@@ -165,13 +158,13 @@ def main():
         invalid = collections.defaultdict(set)
         for mime, paths in exts.items():
             suffixes = MIME_SUFFIXES.get(mime)
-            if mime == 'text/plain' or not suffixes:
+            if mime == "text/plain" or not suffixes:
                 missing.add(mime)
                 if not args.fix:
                     continue
 
             for path in paths:
-                if mime == 'text/plain':
+                if mime == "text/plain":
                     if path.suffix in ALL_SUFFIXES:
                         invalid[mime].add(path)
                         continue
@@ -181,10 +174,7 @@ def main():
         for mime in sorted(missing):
             print(f'warning: suffix unknown for "{mime}"', file=sys.stderr)
 
-    exts = {
-        ext: sorted(str(p.resolve()) for p in paths)
-        for ext, paths in exts.items()
-    }
+    exts = {ext: sorted(str(p.resolve()) for p in paths) for ext, paths in exts.items()}
 
     print(json.dumps(exts, indent=2, sort_keys=True))
 
@@ -200,7 +190,7 @@ def main():
                         continue
                     sep_cnt = 0
                     while True:
-                        target = pathlib.Path(f'{path}{sep_cnt * "_"}{suffix}')
+                        target = pathlib.Path(f"{path}{sep_cnt * '_'}{suffix}")
                         if not target.exists():
                             break
                         sep_cnt += 1
@@ -209,5 +199,5 @@ def main():
             sys.exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

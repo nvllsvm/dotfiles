@@ -12,8 +12,8 @@ async def mkv_info(path):
     path = path.absolute()
 
     proc = await asyncio.create_subprocess_exec(
-        'mkvmerge', '-J', path,
-        stdout=asyncio.subprocess.PIPE)
+        "mkvmerge", "-J", path, stdout=asyncio.subprocess.PIPE
+    )
     stdout, _ = await proc.communicate()
     if proc.returncode:
         raise ProcessError(proc)
@@ -27,11 +27,14 @@ async def set_mkv_title(path, title):
     path = path.absolute()
 
     proc = await asyncio.create_subprocess_exec(
-        'mkvpropedit',
-        '--edit', 'info', 
-        '--set', f'title={title}',
+        "mkvpropedit",
+        "--edit",
+        "info",
+        "--set",
+        f"title={title}",
         path,
-        stdout=asyncio.subprocess.PIPE)
+        stdout=asyncio.subprocess.PIPE,
+    )
     stdout, _ = await proc.communicate()
     if proc.returncode:
         raise ProcessError(proc)
@@ -45,25 +48,25 @@ class ProcessError(Exception):
     def __str__(self):
         proc = self.process
 
-        text = f'exit {proc.returncode}'
+        text = f"exit {proc.returncode}"
         if self.message is not None:
-            text = f'{text} - {self.message}'
+            text = f"{text} - {self.message}"
 
         try:
-            args = proc._transport._extra['subprocess'].args
+            args = proc._transport._extra["subprocess"].args
         except (AttributeError, KeyError):
             pass
         else:
-            text = f'{text}: {args}'
+            text = f"{text}: {args}"
         return text
 
 
 def _parser_mkv_file(value):
     path = pathlib.Path(value)
     if not path.is_file():
-        raise ValueError('path must be file')
-    if path.suffix.lower() != '.mkv':
-        raise ValueError('path must end with .mkv')
+        raise ValueError("path must be file")
+    if path.suffix.lower() != ".mkv":
+        raise ValueError("path must end with .mkv")
     return path.absolute()
 
 
@@ -73,16 +76,17 @@ class TitleAlreadySet(Exception):
 
 async def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-f', '--force', action='store_true',
-                        help='overwrite the title if already set')
-    parser.add_argument('path', nargs='+', type=_parser_mkv_file)
+    parser.add_argument(
+        "-f", "--force", action="store_true", help="overwrite the title if already set"
+    )
+    parser.add_argument("path", nargs="+", type=_parser_mkv_file)
     args = parser.parse_args()
 
     for path in args.path:
         info = await mkv_info(path)
         file_title = path.stem
         try:
-            title = info['container']['properties']['title']
+            title = info["container"]["properties"]["title"]
         except KeyError:
             title = None
         if title != file_title:
@@ -92,5 +96,5 @@ async def main():
             await set_mkv_title(path, file_title)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())

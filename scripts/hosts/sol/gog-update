@@ -4,10 +4,10 @@ import pathlib
 import subprocess
 import sys
 
-CACHE_DIR = pathlib.Path('~/.cache/lgogdownloader').expanduser()
-CONFIG_DIR = pathlib.Path('~/.dotfiles/private/lgogdownloader').expanduser()
-GOG_DIR = pathlib.Path('/storage/Games/PC/GOG.com')
-IMAGE = 'ghcr.io/nvllsvm/lgogdownloader'
+CACHE_DIR = pathlib.Path("~/.cache/lgogdownloader").expanduser()
+CONFIG_DIR = pathlib.Path("~/.dotfiles/private/lgogdownloader").expanduser()
+GOG_DIR = pathlib.Path("/storage/Games/PC/GOG.com")
+IMAGE = "ghcr.io/nvllsvm/lgogdownloader"
 
 
 def files_to_mtime(root):
@@ -24,28 +24,34 @@ def files_to_mtime(root):
 
 def run_lgogdownloader(*, pull=True, shell=False):
     args = [
-        'podman', 'run',
-        '--rm',
-        '--name', 'gog-update',
-        '-e', 'HOME',
-        '-v', f'{GOG_DIR}:/downloads',
-        '-v', f'{CACHE_DIR}:/cache',
-        '-v', f'{CONFIG_DIR}:/config',
+        "podman",
+        "run",
+        "--rm",
+        "--name",
+        "gog-update",
+        "-e",
+        "HOME",
+        "-v",
+        f"{GOG_DIR}:/downloads",
+        "-v",
+        f"{CACHE_DIR}:/cache",
+        "-v",
+        f"{CONFIG_DIR}:/config",
     ]
     if pull:
-        args.append('--pull=always')
+        args.append("--pull=always")
     if shell:
-        args.append('-it')
+        args.append("-it")
     args.append(IMAGE)
     if shell:
-        args.extend(['--', 'sh', '-l'])
+        args.extend(["--", "sh", "-l"])
 
     subprocess.run(args, check=True)
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--shell', action='store_true')
+    parser.add_argument("--shell", action="store_true")
     args = parser.parse_args()
 
     if args.shell:
@@ -62,18 +68,18 @@ def main():
         try:
             before_mtime = before[path]
         except KeyError:
-            print('New:', path)
+            print("New:", path)
             continue
 
         try:
             after_mtime = after[path]
         except KeyError:
-            print('Deleted:', path)
+            print("Deleted:", path)
             continue
 
         if before_mtime != after_mtime:
-            print('Modified:', path)
+            print("Modified:", path)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

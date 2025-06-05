@@ -17,64 +17,53 @@ def find_executables(directory):
 
 
 def main():
-    dotfiles = pathlib.Path(os.environ['DOTFILES'])
+    dotfiles = pathlib.Path(os.environ["DOTFILES"])
     try:
-        dotfiles_private = pathlib.Path(os.environ['DOTFILES_PRIVATE'])
+        dotfiles_private = pathlib.Path(os.environ["DOTFILES_PRIVATE"])
     except KeyError:
         dotfiles_private = None
 
-    dest = dotfiles / '.bin'
+    dest = dotfiles / ".bin"
     dest.mkdir(exist_ok=True)
 
     all_commands = set()
-    for path in os.environ['PATH'].split(':'):
+    for path in os.environ["PATH"].split(":"):
         path = pathlib.Path(path)
         if not path.is_dir():
             continue
         if path == dest:
             continue
-        all_commands.update(
-            p.name
-            for p in find_executables(path)
-        )
+        all_commands.update(p.name for p in find_executables(path))
 
     # TODO fix this outside of this script
-    if shutil.which('termux-info'):
-        hostname = 'termux'
+    if shutil.which("termux-info"):
+        hostname = "termux"
     else:
         hostname = socket.gethostname()
 
     sources = [
-        dotfiles / 'scripts' / 'hosts' / hostname,
+        dotfiles / "scripts" / "hosts" / hostname,
     ]
     if dotfiles_private:
-        sources.append(dotfiles_private / 'scripts' / 'hosts' / hostname)
+        sources.append(dotfiles_private / "scripts" / "hosts" / hostname)
 
-    for path in (dotfiles / 'scripts' / 'commands').iterdir():
+    for path in (dotfiles / "scripts" / "commands").iterdir():
         if path.name in all_commands:
             sources.append(path)
 
-    sources.append(dotfiles / 'scripts' / 'terminal')
+    sources.append(dotfiles / "scripts" / "terminal")
     if dotfiles_private:
-        sources.append(dotfiles_private / 'scripts' / 'terminal')
+        sources.append(dotfiles_private / "scripts" / "terminal")
 
     match hostname:
-        case 'mars':
-            sources.extend([
-                dotfiles / 'scripts' / 'media'
-            ])
-        case 'phobos':
-            sources.extend([
-                dotfiles / 'scripts' / 'media'
-            ])
-        case 'sol':
-            sources.append(dotfiles / 'scripts' / 'media')
+        case "mars":
+            sources.extend([dotfiles / "scripts" / "media"])
+        case "phobos":
+            sources.extend([dotfiles / "scripts" / "media"])
+        case "sol":
+            sources.append(dotfiles / "scripts" / "media")
 
-    sources = [
-        path
-        for path in sources
-        if path.is_dir()
-    ]
+    sources = [path for path in sources if path.is_dir()]
 
     links = {}
     for source in sources:
@@ -101,5 +90,5 @@ def main():
         target.symlink_to(path)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

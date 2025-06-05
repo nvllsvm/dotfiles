@@ -5,20 +5,18 @@ import subprocess
 
 
 class MakeMKV:
-
     @staticmethod
     def titles(path):
         proc = subprocess.run(
-            ['makemkvcon', 'info', f'iso:{path}'],
-            stdout=subprocess.PIPE,
-            check=True)
+            ["makemkvcon", "info", f"iso:{path}"], stdout=subprocess.PIPE, check=True
+        )
 
         titles = set()
         lines = proc.stdout.decode().splitlines()
         for line in reversed(lines):
-            if line.startswith('Total '):
+            if line.startswith("Total "):
                 break
-            if line.startswith('Title '):
+            if line.startswith("Title "):
                 title_id = int(line.split(maxsplit=1)[1])
                 titles.add(title_id)
 
@@ -27,23 +25,24 @@ class MakeMKV:
     @staticmethod
     def title_to_mkv(path, dest_dir, title_id):
         subprocess.run(
-            ['makemkvcon', 'mkv', f'iso:{path}', str(title_id), dest_dir],
+            ["makemkvcon", "mkv", f"iso:{path}", str(title_id), dest_dir],
             stdout=subprocess.DEVNULL,
-            check=True)
+            check=True,
+        )
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('iso', type=pathlib.Path, nargs='+')
+    parser.add_argument("iso", type=pathlib.Path, nargs="+")
     args = parser.parse_args()
 
     for iso in args.iso:
-        dest_dir = iso.parent / iso.name.removesuffix('.iso')
+        dest_dir = iso.parent / iso.name.removesuffix(".iso")
         dest_dir.mkdir(parents=True, exist_ok=True)
         for title in MakeMKV.titles(iso):
-            print(f'Remuxing {iso} title {title}')
+            print(f"Remuxing {iso} title {title}")
             MakeMKV.title_to_mkv(iso, dest_dir, title)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

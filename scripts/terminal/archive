@@ -19,7 +19,7 @@ import tempfile
 import zipfile
 
 
-LOGGER = logging.getLogger('archive-extract')
+LOGGER = logging.getLogger("archive-extract")
 
 
 @contextlib.contextmanager
@@ -62,34 +62,33 @@ async def create_zip(path, dest, fast=False, password=None):
     if path.is_dir():
         cwd = path
         paths = sorted(
-            path.relative_to(cwd)
-            for path in _all_paths(path)
-            if path != cwd
+            path.relative_to(cwd) for path in _all_paths(path) if path != cwd
         )
     else:
         cwd = path.parent
         paths = (path.relative_to(cwd),)
 
-    level = '-0' if fast else '-9'
+    level = "-0" if fast else "-9"
 
     # zip cli thinks existing file means
     dest.unlink()
 
     proc = await asyncio.create_subprocess_exec(
-        'zip',
+        "zip",
         level,
-        '-nw',  # treat wildcards as regular characters
-        '-X',  # exclude extra file attributes, prevents EpubCheck error
-        '-@',  # read paths from stdin
-        '-q',  # quiet
+        "-nw",  # treat wildcards as regular characters
+        "-X",  # exclude extra file attributes, prevents EpubCheck error
+        "-@",  # read paths from stdin
+        "-q",  # quiet
         dest,
         cwd=cwd,
-        stdin=asyncio.subprocess.PIPE)
-    proc.stdin.write(b'\n'.join(bytes(p) for p in paths))
+        stdin=asyncio.subprocess.PIPE,
+    )
+    proc.stdin.write(b"\n".join(bytes(p) for p in paths))
     proc.stdin.close()
     await proc.wait()
     if proc.returncode != 0:
-        raise RuntimeError('exit code {proc.returncode}')
+        raise RuntimeError("exit code {proc.returncode}")
     if not fast:
         await optimize_zip(dest)
 
@@ -99,34 +98,37 @@ async def create_7z(path, dest, fast=False, password=None):
     dest.unlink()
 
     args = [
-        '-mx=0' if fast else '-mx=9',
+        "-mx=0" if fast else "-mx=9",
     ]
 
     if password is not None:
         if not password:
-            raise ValueError('password cannot be empty')
+            raise ValueError("password cannot be empty")
         # encrypt file names
-        args.append('-mhe')
-        args.append(f'-p{password}')
+        args.append("-mhe")
+        args.append(f"-p{password}")
 
     if path.is_dir():
         # avoid having all archive nested under a single folder
         cwd = path
-        source = '.'
+        source = "."
     else:
         cwd = path.parent
         source = path
 
     proc = await asyncio.create_subprocess_exec(
         cli_7zip.bin(),
-        'a',  # create archive
+        "a",  # create archive
         *args,
-        '--', dest, source,
+        "--",
+        dest,
+        source,
         cwd=cwd,
-        stdout=asyncio.subprocess.PIPE)
+        stdout=asyncio.subprocess.PIPE,
+    )
     await proc.wait()
     if proc.returncode != 0:
-        raise RuntimeError('exit code {proc.returncode}')
+        raise RuntimeError("exit code {proc.returncode}")
 
 
 async def create_epub(path, dest, fast=False, password=None):
@@ -135,25 +137,23 @@ async def create_epub(path, dest, fast=False, password=None):
     if path.is_dir():
         cwd = path
         paths = sorted(
-            path.relative_to(cwd)
-            for path in _all_paths(path)
-            if path != cwd
+            path.relative_to(cwd) for path in _all_paths(path) if path != cwd
         )
     else:
-        raise RuntimeError('epub requires source directory')
+        raise RuntimeError("epub requires source directory")
 
-    level = '-0' if fast else '-9'
+    level = "-0" if fast else "-9"
 
     # zip cli thinks existing file means
     dest.unlink()
 
     def _path_rank(x):
         x = str(x)
-        if x == 'mimetype':
+        if x == "mimetype":
             rank = 0
-        elif x.startswith('META-INF/') or x == 'META-INF':
+        elif x.startswith("META-INF/") or x == "META-INF":
             rank = 1
-        elif x.startswith('OEBPS/') or x == 'OEBPS':
+        elif x.startswith("OEBPS/") or x == "OEBPS":
             rank = 2
         else:
             rank = 3
@@ -162,20 +162,21 @@ async def create_epub(path, dest, fast=False, password=None):
     paths = sorted(paths, key=_path_rank)
 
     proc = await asyncio.create_subprocess_exec(
-        'zip',
+        "zip",
         level,
-        '-nw',  # treat wildcards as regular characters
-        '-X',  # exclude extra file attributes, prevents EpubCheck error
-        '-@',  # read paths from stdin
-        '-q',  # quiet
+        "-nw",  # treat wildcards as regular characters
+        "-X",  # exclude extra file attributes, prevents EpubCheck error
+        "-@",  # read paths from stdin
+        "-q",  # quiet
         dest,
         cwd=cwd,
-        stdin=asyncio.subprocess.PIPE)
-    proc.stdin.write(b'\n'.join(bytes(p) for p in paths))
+        stdin=asyncio.subprocess.PIPE,
+    )
+    proc.stdin.write(b"\n".join(bytes(p) for p in paths))
     proc.stdin.close()
     await proc.wait()
     if proc.returncode != 0:
-        raise RuntimeError('exit code {proc.returncode}')
+        raise RuntimeError("exit code {proc.returncode}")
     if not fast:
         await optimize_zip(dest)
 
@@ -186,13 +187,14 @@ async def create_gzip(path, dest, fast=False, password=None):
     if path.is_dir():
         raise RuntimeError
 
-    with open(dest, 'wb') as dest_handle:
+    with open(dest, "wb") as dest_handle:
         proc = await asyncio.create_subprocess_exec(
-            'gzip',
-            '-c',  # stdout
-            '-1' if fast else '-9',
+            "gzip",
+            "-c",  # stdout
+            "-1" if fast else "-9",
             path,
-            stdout=dest_handle)
+            stdout=dest_handle,
+        )
         await proc.wait()
     assert proc.returncode == 0
 
@@ -205,18 +207,19 @@ async def create_xz(path, dest, fast=False, password=None):
 
     args = []
     if fast:
-        args.append('-0')
+        args.append("-0")
     else:
-        args.extend(['-9', '--extreme'])
+        args.extend(["-9", "--extreme"])
 
-    with open(dest, 'wb') as dest_handle:
+    with open(dest, "wb") as dest_handle:
         proc = await asyncio.create_subprocess_exec(
-            'xz',
-            '-c',  # stdout
-            '--threads=0',  # as many as processor cores
+            "xz",
+            "-c",  # stdout
+            "--threads=0",  # as many as processor cores
             *args,
             path,
-            stdout=dest_handle)
+            stdout=dest_handle,
+        )
         await proc.wait()
     assert proc.returncode == 0
 
@@ -225,11 +228,11 @@ async def create_zstd(path, dest, fast=False, password=None):
     if path.is_dir():
         raise RuntimeError
 
-    level = '-1' if fast else '-22'
+    level = "-1" if fast else "-22"
 
     zstd_proc = await asyncio.create_subprocess_exec(
-        'zstd', '--quiet', '-f', '-T0', '--ultra', level, '-o', dest,
-        '--', path)
+        "zstd", "--quiet", "-f", "-T0", "--ultra", level, "-o", dest, "--", path
+    )
     await zstd_proc.wait()
     assert zstd_proc.returncode == 0
 
@@ -240,21 +243,23 @@ async def create_rvz(path, dest, fast=False, password=None):
     if path.is_dir():
         raise RuntimeError
 
-    level = '1' if fast else '22'
+    level = "1" if fast else "22"
 
     # need tempdir to allow for concurrent processes
     with tempfile.TemporaryDirectory(
-            dir=dest.parent, prefix='.archive_',
-            suffix=dest.name + '.tmp') as tmp:
+        dir=dest.parent, prefix=".archive_", suffix=dest.name + ".tmp"
+    ) as tmp:
         proc = await asyncio.create_subprocess_exec(
-            'dolphin-tool', 'convert',
-            f'--user={tmp}',
-            f'--compression_level={level}',
-            '--format=rvz',
-            '--block_size=131072',
-            '--compression=zstd',
-            f'--input={path}',
-            f'--output={dest}')
+            "dolphin-tool",
+            "convert",
+            f"--user={tmp}",
+            f"--compression_level={level}",
+            "--format=rvz",
+            "--block_size=131072",
+            "--compression=zstd",
+            f"--input={path}",
+            f"--output={dest}",
+        )
         await proc.wait()
         assert proc.returncode == 0
         raise NotImplementedError
@@ -265,11 +270,15 @@ async def create_iso(path, dest, fast=False, password=None):
         raise NotImplementedError
     volid = path.name[:32]
     proc = await asyncio.create_subprocess_exec(
-        'mkisofs',
-        '-J',  # joilet dir records (long filenames)
-        '-volid', volid,
-        '-o', dest,
-        '--', path)
+        "mkisofs",
+        "-J",  # joilet dir records (long filenames)
+        "-volid",
+        volid,
+        "-o",
+        dest,
+        "--",
+        path,
+    )
     await proc.wait()
     if proc.returncode:
         raise ProcessError(proc)
@@ -281,21 +290,22 @@ async def create_nsz(path, dest, fast=False, password=None):
     if path.is_dir():
         raise RuntimeError
 
-    level = '1' if fast else '22'
+    level = "1" if fast else "22"
 
     # need tempdir to allow for concurrent processes
     with tempfile.TemporaryDirectory(
-            dir=dest.parent, prefix='.archive_',
-            suffix=dest.name + '.tmp') as tmp:
+        dir=dest.parent, prefix=".archive_", suffix=dest.name + ".tmp"
+    ) as tmp:
         proc = await asyncio.create_subprocess_exec(
-            'nsz',
-            '-C',  # compress
-            '--long',
-            f'--level={level}',
-            f'--output={tmp}',
+            "nsz",
+            "-C",  # compress
+            "--long",
+            f"--level={level}",
+            f"--output={tmp}",
             path,
             # DEVNULL causes issues, idk why
-            stdout=asyncio.subprocess.PIPE)
+            stdout=asyncio.subprocess.PIPE,
+        )
         await proc.communicate()
         assert proc.returncode == 0
         tmp_files = list(pathlib.Path(tmp).iterdir())
@@ -316,15 +326,22 @@ async def create_tar(path, dest, fast=False, password=None):
         paths = (path,)
 
     tar_proc = await asyncio.create_subprocess_exec(
-        'tar', 'cf', dest, '-C', cwd, '--no-recursion',
-        '--verbatim-files-from', '--null', '-T', '-',
-        stdin=asyncio.subprocess.PIPE)
+        "tar",
+        "cf",
+        dest,
+        "-C",
+        cwd,
+        "--no-recursion",
+        "--verbatim-files-from",
+        "--null",
+        "-T",
+        "-",
+        stdin=asyncio.subprocess.PIPE,
+    )
 
-    tar_proc.stdin.write(b'\0'.join(
-        bytes(p.relative_to(cwd))
-        for p in paths
-        if p != cwd
-    ))
+    tar_proc.stdin.write(
+        b"\0".join(bytes(p.relative_to(cwd)) for p in paths if p != cwd)
+    )
     tar_proc.stdin.close()
 
     await asyncio.gather(tar_proc.wait())
@@ -342,22 +359,30 @@ async def create_tar_gz(path, dest, fast=False, password=None):
         paths = (path,)
 
     if fast:
-        gzip_arg = 'gzip --fast'
+        gzip_arg = "gzip --fast"
     else:
-        gzip_arg = 'gzip --best'
+        gzip_arg = "gzip --best"
 
     # TODO specify gzip compression level
     tar_proc = await asyncio.create_subprocess_exec(
-        'tar', 'cf', dest, '-C', cwd, '--no-recursion',
-        '-I', gzip_arg,
-        '--verbatim-files-from', '--null', '-T', '-',
-        stdin=asyncio.subprocess.PIPE)
+        "tar",
+        "cf",
+        dest,
+        "-C",
+        cwd,
+        "--no-recursion",
+        "-I",
+        gzip_arg,
+        "--verbatim-files-from",
+        "--null",
+        "-T",
+        "-",
+        stdin=asyncio.subprocess.PIPE,
+    )
 
-    tar_proc.stdin.write(b'\0'.join(
-        bytes(p.relative_to(cwd))
-        for p in paths
-        if p != cwd
-    ))
+    tar_proc.stdin.write(
+        b"\0".join(bytes(p.relative_to(cwd)) for p in paths if p != cwd)
+    )
     tar_proc.stdin.close()
 
     await tar_proc.wait()
@@ -376,21 +401,29 @@ async def create_tar_xz(path, dest, fast=False, password=None):
 
     args = []
     if fast:
-        args.append('-0')
+        args.append("-0")
     else:
-        args.extend(['-9', '--extreme'])
+        args.extend(["-9", "--extreme"])
 
     # TODO specify xz compression level
     tar_proc = await asyncio.create_subprocess_exec(
-        'tar', 'czf', dest, '-C', cwd, '--no-recursion',
-        '--verbatim-files-from', '--null', '--threads=0', *args, '-',
-        stdin=asyncio.subprocess.PIPE)
+        "tar",
+        "czf",
+        dest,
+        "-C",
+        cwd,
+        "--no-recursion",
+        "--verbatim-files-from",
+        "--null",
+        "--threads=0",
+        *args,
+        "-",
+        stdin=asyncio.subprocess.PIPE,
+    )
 
-    tar_proc.stdin.write(b'\0'.join(
-        bytes(p.relative_to(cwd))
-        for p in paths
-        if p != cwd
-    ))
+    tar_proc.stdin.write(
+        b"\0".join(bytes(p.relative_to(cwd)) for p in paths if p != cwd)
+    )
     tar_proc.stdin.close()
 
     await tar_proc.wait()
@@ -412,31 +445,39 @@ async def create_tar_zstd(path, dest, fast=False, sparse=False, password=None):
         cwd = path.parent
         paths = (path,)
 
-    level = '-1' if fast else '-22'
+    level = "-1" if fast else "-22"
 
     read, write = os.pipe()
 
     args = []
     if sparse:
-        args.append('--sparse')
+        args.append("--sparse")
 
     tar_proc = await asyncio.create_subprocess_exec(
-        'tar', 'cf', '-', '-C', cwd, '--no-recursion',
-        *args, '--verbatim-files-from', '--null', '-T', '-',
+        "tar",
+        "cf",
+        "-",
+        "-C",
+        cwd,
+        "--no-recursion",
+        *args,
+        "--verbatim-files-from",
+        "--null",
+        "-T",
+        "-",
         stdin=asyncio.subprocess.PIPE,
-        stdout=write)
+        stdout=write,
+    )
     os.close(write)
 
     zstd_proc = await asyncio.create_subprocess_exec(
-        'zstd', '--quiet', '-f', '-T0', '--ultra', level, '-o', dest,
-        stdin=read)
+        "zstd", "--quiet", "-f", "-T0", "--ultra", level, "-o", dest, stdin=read
+    )
     os.close(read)
 
-    tar_proc.stdin.write(b'\0'.join(
-        bytes(p.relative_to(cwd))
-        for p in paths
-        if p != cwd
-    ))
+    tar_proc.stdin.write(
+        b"\0".join(bytes(p.relative_to(cwd)) for p in paths if p != cwd)
+    )
     tar_proc.stdin.close()
 
     await asyncio.gather(tar_proc.wait(), zstd_proc.wait())
@@ -445,7 +486,8 @@ async def create_tar_zstd(path, dest, fast=False, sparse=False, password=None):
 
 async def optimize_zip(path):
     proc = await asyncio.create_subprocess_exec(
-        'advzip', '--recompress', '--shrink-insane', '--quiet', path)
+        "advzip", "--recompress", "--shrink-insane", "--quiet", path
+    )
     await proc.wait()
     assert proc.returncode == 0
 
@@ -455,10 +497,8 @@ def _build_archive_dest(source, suffix, parent=None):
     increment = 0
     while True:
         dest = parent / pathlib.Path(
-            ''.join([
-                source.name,
-                f'_{increment}' if increment else '',
-                suffix]))
+            "".join([source.name, f"_{increment}" if increment else "", suffix])
+        )
 
         if not dest.exists():
             dest.parent.mkdir(exist_ok=True, parents=True)
@@ -468,90 +508,72 @@ def _build_archive_dest(source, suffix, parent=None):
 
 
 def _build_archive_dest_nsz(source, suffix, parent=None):
-    if source.suffix.lower() == '.nsp':
-        source = source.with_suffix('')
+    if source.suffix.lower() == ".nsp":
+        source = source.with_suffix("")
     return _build_archive_dest(source, suffix, parent)
 
 
 _FORMATS = {
-    '7z': {
-        'func': create_7z,
-        'suffix': '.7z',
+    "7z": {
+        "func": create_7z,
+        "suffix": ".7z",
     },
-    'cbz': {
-        'func': create_zip,
-        'suffix': '.cbz',
+    "cbz": {
+        "func": create_zip,
+        "suffix": ".cbz",
     },
-    'epub': {
-        'func': create_epub,
-        'suffix': '.epub',
+    "epub": {
+        "func": create_epub,
+        "suffix": ".epub",
     },
-    'iso': {
-        'func': create_iso,
-        'suffix': '.iso',
+    "iso": {
+        "func": create_iso,
+        "suffix": ".iso",
     },
-    'gz': {
-        'func': create_gzip,
-        'suffix': '.gz',
+    "gz": {
+        "func": create_gzip,
+        "suffix": ".gz",
     },
-    'nsz': {
-        'func': create_nsz,
-        'suffix': '.nsz',
-        'build_dest': _build_archive_dest_nsz,
+    "nsz": {
+        "func": create_nsz,
+        "suffix": ".nsz",
+        "build_dest": _build_archive_dest_nsz,
     },
-    'rvz': {
-        'func': create_rvz,
-        'suffix': '.rvz'
+    "rvz": {"func": create_rvz, "suffix": ".rvz"},
+    "tar": {"func": create_tar, "suffix": ".tar"},
+    "tar.gz": {"func": create_tar_gz, "suffix": ".tar.gz"},
+    "tar.xz": {"func": create_tar_xz, "suffix": ".tar.xz"},
+    "tar.zst": {"func": create_tar_zstd, "suffix": ".tar.zst"},
+    "xz": {
+        "func": create_xz,
+        "suffix": ".xz",
     },
-    'tar': {
-        'func': create_tar,
-        'suffix': '.tar'
+    "zip": {
+        "func": create_zip,
+        "suffix": ".zip",
     },
-    'tar.gz': {
-        'func': create_tar_gz,
-        'suffix': '.tar.gz'
-    },
-    'tar.xz': {
-        'func': create_tar_xz,
-        'suffix': '.tar.xz'
-    },
-    'tar.zst': {
-        'func': create_tar_zstd,
-        'suffix': '.tar.zst'
-    },
-    'xz': {
-        'func': create_xz,
-        'suffix': '.xz',
-    },
-    'zip': {
-        'func': create_zip,
-        'suffix': '.zip',
-    },
-    'zst': {
-        'func': create_zstd,
-        'suffix': '.zst'
-    },
-    'sparse:tar.zst': {
-        'func': create_sparse_tar_zstd,
-        'suffix': '.tar.zst'
-    }
+    "zst": {"func": create_zstd, "suffix": ".zst"},
+    "sparse:tar.zst": {"func": create_sparse_tar_zstd, "suffix": ".tar.zst"},
 }
 
 
-async def process(source, archive_format, remove, fast=False, parent=None, password=None, dest=None):
+async def process(
+    source, archive_format, remove, fast=False, parent=None, password=None, dest=None
+):
     formats = _FORMATS[archive_format]
 
     source = source.absolute()
-    suffix = formats['suffix']
+    suffix = formats["suffix"]
 
     if dest is None:
-        build_dest = formats.get('build_dest', _build_archive_dest)
+        build_dest = formats.get("build_dest", _build_archive_dest)
         dest = build_dest(source, suffix, parent=parent)
 
     before = sum(path.lstat().st_size for path in _all_paths(source))
-    with TempPath(dir=dest.parent, prefix='.archive_',
-                  suffix=source.name + '.tmp') as tmp:
-        await formats['func'](source, tmp, fast, password=password)
+    with TempPath(
+        dir=dest.parent, prefix=".archive_", suffix=source.name + ".tmp"
+    ) as tmp:
+        await formats["func"](source, tmp, fast, password=password)
         tmp.rename(dest)
     after = dest.lstat().st_size
 
@@ -571,7 +593,7 @@ def _num_procs(value):
     elif value > 0:
         return value
     else:
-        raise argparse.ArgumentError('invalid num_procs')
+        raise argparse.ArgumentError("invalid num_procs")
 
 
 class SizeDiffPrinter:
@@ -586,18 +608,18 @@ class SizeDiffPrinter:
     def format_diff(before, after):
         diff = ((before - after) / before) * 100
         if diff:
-            diff = '{:.2f}'.format(diff)
+            diff = "{:.2f}".format(diff)
             if not float(diff):
-                diff = f'<{diff}'
+                diff = f"<{diff}"
         return diff
 
     @staticmethod
     def sizeof_fmt(num):
-        for unit in ['B', 'KB', 'MB', 'GB', 'TB', 'PB']:
+        for unit in ["B", "KB", "MB", "GB", "TB", "PB"]:
             if abs(num) < 1024.0:
                 break
             num /= 1024.0
-        return f'{num:.1f}{unit}'
+        return f"{num:.1f}{unit}"
 
     def print(self, before, after, name):
         self._num_printed += 1
@@ -605,59 +627,71 @@ class SizeDiffPrinter:
         self._after_total += after
         diff = self.format_diff(before, after)
 
-        s = f'{diff:>6}%' if diff else 7 * '-'
+        s = f"{diff:>6}%" if diff else 7 * "-"
         num_printed = str(self._num_printed).rjust(len(str(self._num_items)))
-        print(f'({num_printed}/{self._num_items})\t{s}\t{name}')
+        print(f"({num_printed}/{self._num_items})\t{s}\t{name}")
 
     def print_total(self):
         if self._num_printed:
             if diff := self.format_diff(self._before_total, self._after_total):
                 fmt = self.sizeof_fmt(self._before_total - self._after_total)
-                print(f'Total: {diff}% ({fmt})')
+                print(f"Total: {diff}% ({fmt})")
             else:
-                print('Total: -')
+                print("Total: -")
 
 
 def main_archive():
-    parser = argparse.ArgumentParser(
-        usage='%(prog)s [OPTIONS] source [source ...]')
+    parser = argparse.ArgumentParser(usage="%(prog)s [OPTIONS] source [source ...]")
 
-    group_format = parser.add_argument_group('format')
+    group_format = parser.add_argument_group("format")
     group_format.add_argument(
-        '-f', metavar='FORMAT', choices=_FORMATS,
-        dest='format', default='7z',
-        help='archive format: %(choices)s (default: %(default)s)')
+        "-f",
+        metavar="FORMAT",
+        choices=_FORMATS,
+        dest="format",
+        default="7z",
+        help="archive format: %(choices)s (default: %(default)s)",
+    )
     group_format.add_argument(
-        '--fast', default=False, action='store_true',
-        help='increase archiving speed at the expense of compression')
+        "--fast",
+        default=False,
+        action="store_true",
+        help="increase archiving speed at the expense of compression",
+    )
 
     parser.add_argument(
-        '--rm', default=False, action='store_true',
-        help='remove source after success')
+        "--rm", default=False, action="store_true", help="remove source after success"
+    )
     parser.add_argument(
-        '-n', metavar='NUM', dest='num_procs',
-        type=_num_procs, default=1,
-        help='number of parallel jobs (default: %(default)s)')
+        "-n",
+        metavar="NUM",
+        dest="num_procs",
+        type=_num_procs,
+        default=1,
+        help="number of parallel jobs (default: %(default)s)",
+    )
     parser.add_argument(
-        '-p', dest='parent', metavar='DIR', type=pathlib.Path,
-        help='parent directory to save the archive in')
+        "-p",
+        dest="parent",
+        metavar="DIR",
+        type=pathlib.Path,
+        help="parent directory to save the archive in",
+    )
+    parser.add_argument("--password", help="archive password")
     parser.add_argument(
-        '--password', help='archive password')
-    parser.add_argument(
-        '-o', '--output', metavar='FILE', type=pathlib.Path,
-        help='output filename')
-    parser.add_argument(
-        'source', type=lambda p: pathlib.Path(p).absolute(), nargs='+')
+        "-o", "--output", metavar="FILE", type=pathlib.Path, help="output filename"
+    )
+    parser.add_argument("source", type=lambda p: pathlib.Path(p).absolute(), nargs="+")
 
     args = parser.parse_args()
 
     if args.output is not None:
         if len(args.source) != 1:
             raise parser.ArgumentError(
-                'may only specify -o/--output when archiving a single source')
+                "may only specify -o/--output when archiving a single source"
+            )
         if args.output.exists():
-            raise parser.ArgumentError(
-                '-o/--ouput path already exists')
+            raise parser.ArgumentError("-o/--ouput path already exists")
 
     async def run(args):
         has_error = False
@@ -671,16 +705,23 @@ def main_archive():
             else:
                 sources.append(source)
 
-            executor.submit(process, source, args.format, args.rm, args.fast,
-                            parent=args.parent, password=args.password,
-                            dest=args.output)
+            executor.submit(
+                process,
+                source,
+                args.format,
+                args.rm,
+                args.fast,
+                parent=args.parent,
+                password=args.password,
+                dest=args.output,
+            )
 
         size_diff_printer = SizeDiffPrinter(num_items=len(executor))
         async for future in executor:
             try:
                 dest, before, after = future.result()
             except FileExistsError as e:
-                print(f'error: file exists {e}', file=sys.stderr)
+                print(f"error: file exists {e}", file=sys.stderr)
                 has_error = True
             except Exception as e:
                 print(e, file=sys.stderr)
@@ -696,13 +737,13 @@ class nsz:
     @staticmethod
     @functools.cache
     def check():
-        if not shutil.which('nsz'):
+        if not shutil.which("nsz"):
             raise KeyError
 
     @classmethod
     async def contents(cls, path):
         cls._check_is_nsz(path)
-        return [path.with_suffix('.nsp').name.encode()]
+        return [path.with_suffix(".nsp").name.encode()]
 
     @classmethod
     async def extract(cls, path, dest, paths=None, password=None, overwrite=False):
@@ -711,23 +752,24 @@ class nsz:
             raise NotImplementedError
         if overwrite:
             raise NotImplementedError
-        target = (dest / path.name).with_suffix('.nsp')
+        target = (dest / path.name).with_suffix(".nsp")
         if target.exists():
             raise RuntimeError
         with tempfile.TemporaryDirectory(
-                dir=dest, prefix='.extract_',
-                suffix=dest.name + '.tmp') as tmp:
+            dir=dest, prefix=".extract_", suffix=dest.name + ".tmp"
+        ) as tmp:
             proc = await asyncio.create_subprocess_exec(
-                'nsz',
-                '-D',  # decompress
-                f'--output={tmp}',
+                "nsz",
+                "-D",  # decompress
+                f"--output={tmp}",
                 path,
                 stdin=asyncio.subprocess.PIPE,
-                stdout=asyncio.subprocess.PIPE)
+                stdout=asyncio.subprocess.PIPE,
+            )
 
             # if prod keys are missing, the presents the error, but doesn't
             # exit until enter is pressed. ugh
-            stdout, _ = await proc.communicate(b'\n')
+            stdout, _ = await proc.communicate(b"\n")
 
             if proc.returncode != 0:
                 raise ProcessError(proc, stdout.decode())
@@ -741,19 +783,19 @@ class nsz:
             tmp_file.rename(target)
 
     @classmethod
-    async def volumes(cls, path, password=''):
+    async def volumes(cls, path, password=""):
         cls._check_is_nsz(path)
         return [path]
 
     @staticmethod
     def _check_is_nsz(path):
-        if path.suffix.lower() != '.nsz':
-            raise ValueError('does not end with .nsz')
+        if path.suffix.lower() != ".nsz":
+            raise ValueError("does not end with .nsz")
 
 
 class cli_7zip:
-    _PART_RE = re.compile(r'(.*\.part)(\d+)(\.rar)$')
-    _ALT_PART_RE = re.compile(r'(.*\.)(\d+)$')
+    _PART_RE = re.compile(r"(.*\.part)(\d+)(\.rar)$")
+    _ALT_PART_RE = re.compile(r"(.*\.)(\d+)$")
 
     @staticmethod
     @functools.cache
@@ -762,7 +804,7 @@ class cli_7zip:
         As of late 2024, Arch Linux has `7z` for the official 7-zip.
         Termux still has `7z` for p7zip and `7zz` for the official 7-zip.
         """
-        for name in ('7zz', '7z'):
+        for name in ("7zz", "7z"):
             if shutil.which(name):
                 return name
         raise KeyError
@@ -772,30 +814,29 @@ class cli_7zip:
         cls.bin()
 
     @classmethod
-    async def extract(cls, path, dest, paths=None, password='',
-                      overwrite=False):
+    async def extract(cls, path, dest, paths=None, password="", overwrite=False):
         args = [
             cls.bin(),
-            '-bd',  # disable progress indicator
-            '-bb0',  # quietest log level
+            "-bd",  # disable progress indicator
+            "-bb0",  # quietest log level
         ]
 
         kwargs = {
             # prevent prompt when files already exist
-            'stdin': asyncio.subprocess.DEVNULL,
+            "stdin": asyncio.subprocess.DEVNULL,
         }
 
         if overwrite:
-            args.append('-aoa')  # overwrite all without prompting
+            args.append("-aoa")  # overwrite all without prompting
 
         if dest == sys.stdout.buffer:
-            args.extend(['e', f'-p{password}', '-spd', '-so', '--', str(path)])
+            args.extend(["e", f"-p{password}", "-spd", "-so", "--", str(path)])
         else:
-            args.extend([
-                'x', f'-p{password}', '-spe', '-spd', f'-o{dest}', '--', str(path)
-            ])
+            args.extend(
+                ["x", f"-p{password}", "-spe", "-spd", f"-o{dest}", "--", str(path)]
+            )
             # supress output that shows even at the quiest log level
-            kwargs['stdout'] = asyncio.subprocess.DEVNULL
+            kwargs["stdout"] = asyncio.subprocess.DEVNULL
 
         if paths:
             args.extend(paths)
@@ -808,80 +849,87 @@ class cli_7zip:
     @classmethod
     async def contents(cls, path):
         # -ba flag removes table and header formatting
-        args = [cls.bin(), '-ba', 'l', '-slt', '--', str(path)]
+        args = [cls.bin(), "-ba", "l", "-slt", "--", str(path)]
         proc = await asyncio.create_subprocess_exec(
-            *args, stdout=asyncio.subprocess.PIPE)
+            *args, stdout=asyncio.subprocess.PIPE
+        )
         stdout, _ = await proc.communicate()
         if proc.returncode:
             raise ProcessError(proc)
 
         contents = []
         current = {
-            'is_dir': False,
+            "is_dir": False,
         }
         for line in stdout.splitlines():
             if not line:
                 if current:
                     contents.append(current)
                     current = {
-                        'is_dir': False,
+                        "is_dir": False,
                     }
                 continue
-            key, value = line.split(b' = ', maxsplit=1)
+            key, value = line.split(b" = ", maxsplit=1)
             key = key.decode()
             if key in current:
                 raise RuntimeError
             match key:
-                case 'Path':
-                    current['path'] = value
+                case "Path":
+                    current["path"] = value
                 # seems to be for zip files
-                case 'Folder':
-                    if value == b'+':
-                        current['is_dir'] = True
-                case 'Attributes':
+                case "Folder":
+                    if value == b"+":
+                        current["is_dir"] = True
+                case "Attributes":
                     parts = value.split()
-                    if parts and parts[0] == b'D':
-                        current['is_dir'] = True
-                case 'Size':
-                    current['size'] = int(value)
-                case 'Modified':
+                    if parts and parts[0] == b"D":
+                        current["is_dir"] = True
+                case "Size":
+                    current["size"] = int(value)
+                case "Modified":
                     dt = value.decode()
                     if not dt:
                         continue
                     dt_frac = 0
-                    if '.' in dt:
-                        dt, dt_frac = dt.split('.')
+                    if "." in dt:
+                        dt, dt_frac = dt.split(".")
                     # ns not supported by datetime
-                    current['mtime'] = float('{}.{}'.format(
-                        int(datetime.datetime\
-                            .strptime(dt, '%Y-%m-%d %H:%M:%S')\
-                            .timestamp()),
-                        int(dt_frac)))
+                    current["mtime"] = float(
+                        "{}.{}".format(
+                            int(
+                                datetime.datetime.strptime(
+                                    dt, "%Y-%m-%d %H:%M:%S"
+                                ).timestamp()
+                            ),
+                            int(dt_frac),
+                        )
+                    )
                 case _:
                     pass
-        if current.get('Path'):
+        if current.get("Path"):
             contents.append(current)
 
         new_contents = {}
         for c in contents:
-            if c.pop('is_dir'):
+            if c.pop("is_dir"):
                 continue
-            new_contents[c.pop('path')] = c
+            new_contents[c.pop("path")] = c
         return new_contents
 
     @classmethod
-    async def volumes(cls, path, password=''):
-        args = [cls.bin(), 'l', f'-p{password}', '--', str(path)]
+    async def volumes(cls, path, password=""):
+        args = [cls.bin(), "l", f"-p{password}", "--", str(path)]
         proc = await asyncio.create_subprocess_exec(
-            *args, stdout=asyncio.subprocess.PIPE)
+            *args, stdout=asyncio.subprocess.PIPE
+        )
         stdout, _ = await proc.communicate()
         if proc.returncode:
             raise ProcessError(proc)
 
         num_volumes = 1
         for line in reversed(stdout.splitlines()):
-            if line.startswith(b'Volumes = '):
-                num_volumes = int(line.split(b' = ')[1])
+            if line.startswith(b"Volumes = "):
+                num_volumes = int(line.split(b" = ")[1])
                 break
 
         if num_volumes > 1:
@@ -889,18 +937,19 @@ class cli_7zip:
                 prefix, vol_num, suffix = found.groups()
             elif found := cls._ALT_PART_RE.search(str(path)):
                 prefix, vol_num = found.groups()
-                suffix = ''
+                suffix = ""
             else:
                 raise NotImplementedError
 
             volumes = [
-                pathlib.Path('{}{}{}'.format(
-                    prefix, str(i).rjust(len(vol_num), '0'), suffix))
+                pathlib.Path(
+                    "{}{}{}".format(prefix, str(i).rjust(len(vol_num), "0"), suffix)
+                )
                 for i in range(1, num_volumes + 1)
             ]
             for v in volumes:
                 if not v.is_file():
-                    raise RuntimeError(f'missing volume {v}')
+                    raise RuntimeError(f"missing volume {v}")
         else:
             volumes = [path]
         return volumes
@@ -910,33 +959,36 @@ class dolphin_tool_gcm:
     @staticmethod
     @functools.cache
     def check():
-        if not shutil.which('dolphin-tool'):
+        if not shutil.which("dolphin-tool"):
             raise KeyError
 
     @staticmethod
     async def contents(path):
         proc = await asyncio.create_subprocess_exec(
-            'dolphin-tool', 'extract',
-            '--list',
-            '--input', path,
-            stdout=asyncio.subprocess.PIPE)
+            "dolphin-tool",
+            "extract",
+            "--list",
+            "--input",
+            path,
+            stdout=asyncio.subprocess.PIPE,
+        )
         stdout, _ = await proc.communicate()
         if proc.returncode:
             raise ProcessError(proc)
-        return [
-            line.split(maxsplit=3)[-1]
-            for line in stdout.splitlines()
-        ]
+        return [line.split(maxsplit=3)[-1] for line in stdout.splitlines()]
 
     @staticmethod
     async def extract(path, dest, paths=None, password=None, overwrite=False):
         if paths:
             raise NotImplementedError
         args = [
-            'dolphin-tool', 'extract',
-            '--quiet',
-            '--input', path,
-            '--output', dest,
+            "dolphin-tool",
+            "extract",
+            "--quiet",
+            "--input",
+            path,
+            "--output",
+            dest,
         ]
         args.append(path)
         proc = await asyncio.create_subprocess_exec(
@@ -949,65 +1001,67 @@ class dolphin_tool_gcm:
             raise ProcessError(proc)
 
     @classmethod
-    async def volumes(cls, path, password=''):
+    async def volumes(cls, path, password=""):
         cls._check_is_gcm(path)
         return [path]
 
     @staticmethod
     def _check_is_gcm(path):
-        if path.suffix.lower() != '.gcm':
-            raise ValueError('does not end with .gcm')
+        if path.suffix.lower() != ".gcm":
+            raise ValueError("does not end with .gcm")
 
 
 class dolphin_tool_rvz:
     @staticmethod
     @functools.cache
     def check():
-        if not shutil.which('dolphin-tool'):
+        if not shutil.which("dolphin-tool"):
             raise KeyError
 
     @classmethod
     async def contents(cls, path):
         cls._check_is_rvz(path)
-        return [path.with_suffix('.gcm').name.encode()]
+        return [path.with_suffix(".gcm").name.encode()]
 
     @classmethod
     async def extract(cls, path, dest, paths=None, password=None, overwrite=False):
         cls._check_is_rvz(path)
         if paths:
             raise NotImplementedError
-        target = dest / path.with_suffix('.gcm').name
+        target = dest / path.with_suffix(".gcm").name
         if target.is_file():
             if overwrite:
                 target.unlink()
             else:
-                raise RuntimeError('target already exists')
+                raise RuntimeError("target already exists")
         proc = await asyncio.create_subprocess_exec(
-            'dolphin-tool', 'convert',
-            '--format=iso',
-            f'--input={path}',
-            f'--output={target}',
-            stdout=asyncio.subprocess.DEVNULL)
+            "dolphin-tool",
+            "convert",
+            "--format=iso",
+            f"--input={path}",
+            f"--output={target}",
+            stdout=asyncio.subprocess.DEVNULL,
+        )
         await proc.wait()
         if proc.returncode:
             raise ProcessError(proc)
 
     @classmethod
-    async def volumes(cls, path, password=''):
+    async def volumes(cls, path, password=""):
         cls._check_is_rvz(path)
         return [path]
 
     @staticmethod
     def _check_is_rvz(path):
-        if path.suffix.lower() != '.rvz':
-            raise ValueError('does not end with .rvz')
+        if path.suffix.lower() != ".rvz":
+            raise ValueError("does not end with .rvz")
 
 
 class udisksctl:
     @staticmethod
     @functools.cache
     def check():
-        if not shutil.which('udisksctl'):
+        if not shutil.which("udisksctl"):
             raise KeyError
 
     @classmethod
@@ -1020,8 +1074,7 @@ class udisksctl:
                 )
 
     @classmethod
-    async def extract(cls, path, dest, paths=None, password=None,
-                      overwrite=False):
+    async def extract(cls, path, dest, paths=None, password=None, overwrite=False):
         if paths:
             raise NotImplementedError
         if overwrite:
@@ -1040,20 +1093,17 @@ class udisksctl:
                 path.chmod(0o644)
 
     @staticmethod
-    async def volumes(path, password=''):
+    async def volumes(path, password=""):
         return [path]
 
     @staticmethod
     def _info(block_device=None, object_path=None):
-        args = ['udisksctl', 'info']
+        args = ["udisksctl", "info"]
         if block_device is not None:
-            args.extend(['--block-device', block_device])
+            args.extend(["--block-device", block_device])
         if object_path is not None:
-            args.extend(['--object-path', object_path])
-        proc = subprocess.run(
-            args,
-            stdout=subprocess.PIPE,
-            check=True)
+            args.extend(["--object-path", object_path])
+        proc = subprocess.run(args, stdout=subprocess.PIPE, check=True)
         output = proc.stdout.decode().strip()
 
         backing_file = None
@@ -1069,13 +1119,13 @@ class udisksctl:
                     raise RuntimeError
                 data = {}
             if line[2].strip():
-                current_section = line.strip().removesuffix(':')
+                current_section = line.strip().removesuffix(":")
                 current_key = None
                 if current_section in data:
                     raise RuntimeError
                 data[current_section] = {}
             if line[4].strip():
-                current_key, value = line.strip().split(':', maxsplit=1)
+                current_key, value = line.strip().split(":", maxsplit=1)
                 value = value.strip()
                 if value:
                     data[current_section].setdefault(current_key, [])
@@ -1094,57 +1144,79 @@ class udisksctl:
     @contextlib.contextmanager
     def _loop_context(path):
         proc = subprocess.run(
-            ['udisksctl', 'loop-setup', '--no-user-interaction',
-             '--read-only', '--file', path],
+            [
+                "udisksctl",
+                "loop-setup",
+                "--no-user-interaction",
+                "--read-only",
+                "--file",
+                path,
+            ],
             stdout=subprocess.PIPE,
-            check=True)
+            check=True,
+        )
         # strip trailing period
         output = proc.stdout.decode().strip()
-        start = f'Mapped file {path} as '
-        if output.startswith(start) and output.endswith('.'):
-            device = output.replace(start, '', 1)[:-1]
+        start = f"Mapped file {path} as "
+        if output.startswith(start) and output.endswith("."):
+            device = output.replace(start, "", 1)[:-1]
         else:
-            raise RuntimeError(f'udisksctl error: {output}')
+            raise RuntimeError(f"udisksctl error: {output}")
 
         try:
             yield device
         finally:
             subprocess.run(
-                ['udisksctl', 'loop-delete', '--no-user-interaction',
-                 '--block-device', device],
+                [
+                    "udisksctl",
+                    "loop-delete",
+                    "--no-user-interaction",
+                    "--block-device",
+                    device,
+                ],
                 stdout=subprocess.DEVNULL,
-                check=True)
+                check=True,
+            )
 
     @staticmethod
     @contextlib.contextmanager
     def _udisksctl_mount_context(device):
         info = udisksctl._info(block_device=device)
-        if info.get('org.freedesktop.UDisks2.Filesystem'):
+        if info.get("org.freedesktop.UDisks2.Filesystem"):
             raise NotImplementedError
         else:
             filesystems = []
-            partitions = info['org.freedesktop.UDisks2.PartitionTable']['Partitions']
+            partitions = info["org.freedesktop.UDisks2.PartitionTable"]["Partitions"]
             for part in partitions:
-                if part.startswith('/org/freedesktop/UDisks2/block_devices/'):
-                    bd = '/dev/{}'.format(part.removeprefix('/org/freedesktop/UDisks2/block_devices/'))
+                if part.startswith("/org/freedesktop/UDisks2/block_devices/"):
+                    bd = "/dev/{}".format(
+                        part.removeprefix("/org/freedesktop/UDisks2/block_devices/")
+                    )
                     part_info = udisksctl._info(block_device=bd)
                 else:
                     raise NotImplementedError
-                if part_info.get('org.freedesktop.UDisks2.Filesystem'):
+                if part_info.get("org.freedesktop.UDisks2.Filesystem"):
                     filesystems.append(bd)
             if len(filesystems) != 1:
                 raise NotImplementedError
             device = filesystems[0]
         proc = subprocess.run(
-            ['udisksctl', 'mount', '--no-user-interaction',
-             '--options', 'ro',
-             '--block-device', device],
+            [
+                "udisksctl",
+                "mount",
+                "--no-user-interaction",
+                "--options",
+                "ro",
+                "--block-device",
+                device,
+            ],
             stderr=subprocess.DEVNULL,
-            stdout=subprocess.PIPE)
+            stdout=subprocess.PIPE,
+        )
 
         if proc.returncode:
             mount_info = udisksctl._info(device)
-            path = mount_info['mount_point']
+            path = mount_info["mount_point"]
 
             if path is None:
                 # udisksctl doesn't recognize some floppy images as mountable
@@ -1154,36 +1226,38 @@ class udisksctl:
                 return
         else:
             output = proc.stdout.decode().strip()
-            start = f'Mounted {device} at '
+            start = f"Mounted {device} at "
             if output.startswith(start):
-                path = output.replace(start, '', 1)
+                path = output.replace(start, "", 1)
             else:
-                raise RuntimeError(f'udisksctl error: {output}')
+                raise RuntimeError(f"udisksctl error: {output}")
 
         try:
             yield path
         finally:
             subprocess.run(
-                ['udisksctl', 'unmount', '--no-user-interaction',
-                 '--block-device', device],
+                [
+                    "udisksctl",
+                    "unmount",
+                    "--no-user-interaction",
+                    "--block-device",
+                    device,
+                ],
                 stdout=subprocess.DEVNULL,
-                check=True)
+                check=True,
+            )
 
     @staticmethod
     @contextlib.contextmanager
     def _mount_context(device):
         if os.getuid() != 0:
-            raise RuntimeError('must extracted as root')
+            raise RuntimeError("must extracted as root")
         with tempfile.TemporaryDirectory() as tmp:
             try:
-                subprocess.run(
-                    ['mount', '-o', 'loop,ro', device, tmp],
-                    check=True)
+                subprocess.run(["mount", "-o", "loop,ro", device, tmp], check=True)
                 yield tmp
             finally:
-                subprocess.run(
-                    ['umount', tmp],
-                    check=True)
+                subprocess.run(["umount", tmp], check=True)
 
     @staticmethod
     def _child_paths(root):
@@ -1201,49 +1275,53 @@ class unzip:
     @staticmethod
     @functools.cache
     def check():
-        if not shutil.which('unzip'):
+        if not shutil.which("unzip"):
             raise KeyError
 
     @staticmethod
     async def contents(path):
         proc = await asyncio.create_subprocess_exec(
-            'unzip',
-            '-O', 'UTF-8',  # encoding for DOS, Windows, OS/2
-            '-I', 'UTF-8',  # encoding for UNIX, other
-            '-qq', '-l', path,
-            stdout=asyncio.subprocess.PIPE)
+            "unzip",
+            "-O",
+            "UTF-8",  # encoding for DOS, Windows, OS/2
+            "-I",
+            "UTF-8",  # encoding for UNIX, other
+            "-qq",
+            "-l",
+            path,
+            stdout=asyncio.subprocess.PIPE,
+        )
         stdout, _ = await proc.communicate()
         if proc.returncode:
             raise ProcessError(proc)
-        return [
-            line.split(maxsplit=3)[-1]
-            for line in stdout.splitlines()
-        ]
+        return [line.split(maxsplit=3)[-1] for line in stdout.splitlines()]
 
     @staticmethod
     async def extract(path, dest, paths=None, password=None, overwrite=False):
         if paths:
             raise NotImplementedError
         args = [
-            'unzip',
-            '-O', 'UTF-8',  # encoding for DOS, Windows, OS/2
-            '-I', 'UTF-8',  # encoding for UNIX, other
-            '-qq',
-            '-d', dest,
+            "unzip",
+            "-O",
+            "UTF-8",  # encoding for DOS, Windows, OS/2
+            "-I",
+            "UTF-8",  # encoding for UNIX, other
+            "-qq",
+            "-d",
+            dest,
         ]
         if overwrite:
-            args.append('-o')  # overwrite without prompting
+            args.append("-o")  # overwrite without prompting
         args.append(path)
         proc = await asyncio.create_subprocess_exec(
-            *args,
-            stdin=asyncio.subprocess.DEVNULL,
-            stdout=asyncio.subprocess.PIPE)
+            *args, stdin=asyncio.subprocess.DEVNULL, stdout=asyncio.subprocess.PIPE
+        )
         await proc.communicate()
         if proc.returncode:
             raise ProcessError(proc)
 
     @staticmethod
-    async def volumes(path, password=''):
+    async def volumes(path, password=""):
         return [path]
 
 
@@ -1251,24 +1329,24 @@ class unarchiver:
     @staticmethod
     @functools.cache
     def check():
-        for cmd in ('lsar', 'unar'):
+        for cmd in ("lsar", "unar"):
             if not shutil.which(cmd):
                 raise KeyError
 
     @staticmethod
     async def contents(path):
         proc = await asyncio.create_subprocess_exec(
-            'lsar', '-json', '--', path,
-            stdout=asyncio.subprocess.PIPE)
+            "lsar", "-json", "--", path, stdout=asyncio.subprocess.PIPE
+        )
         stdout, _ = await proc.communicate()
         if proc.returncode:
             raise ProcessError(proc)
         info = json.loads(stdout)
         contents = set()
-        for item in info['lsarContents']:
-            name = item['XADFileName']
-            if item.get('XADIsResourceFork', 0):
-                name += '.rsrc'
+        for item in info["lsarContents"]:
+            name = item["XADFileName"]
+            if item.get("XADIsResourceFork", 0):
+                name += ".rsrc"
             name = name.encode()
             if name in contents:
                 raise RuntimeError
@@ -1280,57 +1358,54 @@ class unarchiver:
         if paths:
             raise NotImplementedError
         args = [
-            'unar',
-            '-quiet',
-            '-output-directory', dest,
+            "unar",
+            "-quiet",
+            "-output-directory",
+            dest,
         ]
         if overwrite:
-            args.append('-force-overwrite')  # overwrite without prompting
-        args.extend(['--', path])
+            args.append("-force-overwrite")  # overwrite without prompting
+        args.extend(["--", path])
         proc = await asyncio.create_subprocess_exec(
-            *args,
-            stdin=asyncio.subprocess.DEVNULL,
-            stdout=asyncio.subprocess.PIPE)
+            *args, stdin=asyncio.subprocess.DEVNULL, stdout=asyncio.subprocess.PIPE
+        )
         await proc.communicate()
         if proc.returncode:
             raise ProcessError(proc)
 
     @staticmethod
-    async def volumes(path, password=''):
+    async def volumes(path, password=""):
         proc = await asyncio.create_subprocess_exec(
-            'lsar', '-json', '--', path,
-            stdout=asyncio.subprocess.PIPE)
+            "lsar", "-json", "--", path, stdout=asyncio.subprocess.PIPE
+        )
         stdout, _ = await proc.communicate()
         if proc.returncode:
             raise ProcessError(proc)
         info = json.loads(stdout)
-        return [
-            name
-            for name in info['lsarProperties']['XADVolumes']
-        ]
-
+        return [name for name in info["lsarProperties"]["XADVolumes"]]
 
 
 class cabextract:
     @staticmethod
     @functools.cache
     def check():
-        if not shutil.which('cabextract'):
+        if not shutil.which("cabextract"):
             raise KeyError
 
     @staticmethod
     async def contents(path):
         proc = await asyncio.create_subprocess_exec(
-            'cabextract', '--list', '--quiet', '--', path,
+            "cabextract",
+            "--list",
+            "--quiet",
+            "--",
+            path,
             stdout=asyncio.subprocess.PIPE,
         )
         stdout, _ = await proc.communicate()
         if proc.returncode:
             raise ProcessError(proc)
-        return [
-            line.split(maxsplit=6)[-1]
-            for line in stdout.splitlines()[2:]
-        ]
+        return [line.split(maxsplit=6)[-1] for line in stdout.splitlines()[2:]]
 
     @staticmethod
     async def extract(path, dest, paths=None, password=None, overwrite=False):
@@ -1339,14 +1414,19 @@ class cabextract:
         if overwrite:
             raise NotImplementedError
         proc = await asyncio.create_subprocess_exec(
-            'cabextract', '--quiet', '--directory', dest, '--', path,
+            "cabextract",
+            "--quiet",
+            "--directory",
+            dest,
+            "--",
+            path,
         )
         await proc.communicate()
         if proc.returncode:
             raise ProcessError(proc)
 
     @staticmethod
-    async def volumes(path, password=''):
+    async def volumes(path, password=""):
         return [path]
 
 
@@ -1354,14 +1434,14 @@ class unshield:
     @staticmethod
     @functools.cache
     def check():
-        if not shutil.which('unshield'):
+        if not shutil.which("unshield"):
             raise KeyError
 
     @staticmethod
     async def contents(path):
         proc = await asyncio.create_subprocess_exec(
-            'unshield', 'l', '--', path,
-            stdout=asyncio.subprocess.PIPE)
+            "unshield", "l", "--", path, stdout=asyncio.subprocess.PIPE
+        )
         stdout, _ = await proc.communicate()
         if proc.returncode:
             raise ProcessError(proc)
@@ -1369,9 +1449,7 @@ class unshield:
         for line in stdout.splitlines()[1:-2]:
             # convert windows-separated (\) path to local
             p = pathlib.Path(
-                pathlib.PureWindowsPath(
-                    line.strip().split(maxsplit=1)[-1].decode()
-                )
+                pathlib.PureWindowsPath(line.strip().split(maxsplit=1)[-1].decode())
             )
             contents.append(bytes(p))
         return contents
@@ -1383,14 +1461,14 @@ class unshield:
         if overwrite:
             raise NotImplementedError
         proc = await asyncio.create_subprocess_exec(
-            'unshield', 'x', '-d', dest, '--', path,
-            stdout=asyncio.subprocess.DEVNULL)
+            "unshield", "x", "-d", dest, "--", path, stdout=asyncio.subprocess.DEVNULL
+        )
         await proc.wait()
         if proc.returncode != 0:
-            raise RuntimeError('exit code {proc.returncode}')
+            raise RuntimeError("exit code {proc.returncode}")
 
     @staticmethod
-    async def volumes(path, password=''):
+    async def volumes(path, password=""):
         return [path]
 
 
@@ -1398,33 +1476,36 @@ class xorriso:
     @staticmethod
     @functools.cache
     def check():
-        if not shutil.which('xorriso'):
+        if not shutil.which("xorriso"):
             raise KeyError
 
     @staticmethod
     async def contents(path):
         proc = await asyncio.create_subprocess_exec(
-            'xorriso',
-            '-osirrox', 'on',
-            '-indev', path,
-            '-abort_on', 'WARNING',
-            '-find', '/',
-            '-exec', 'lsdl',
+            "xorriso",
+            "-osirrox",
+            "on",
+            "-indev",
+            path,
+            "-abort_on",
+            "WARNING",
+            "-find",
+            "/",
+            "-exec",
+            "lsdl",
             stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.DEVNULL)
+            stderr=asyncio.subprocess.DEVNULL,
+        )
         stdout, _ = await proc.communicate()
         if proc.returncode:
             raise ProcessError(proc)
 
         parents = {}
         for line in stdout.splitlines():
-            name = line.split(b"'", maxsplit=1)[-1][:-1]\
-                .decode()\
-                .strip()\
-                .lstrip('/')
+            name = line.split(b"'", maxsplit=1)[-1][:-1].decode().strip().lstrip("/")
             if not name:
                 continue
-            if line.startswith(b'd'):
+            if line.startswith(b"d"):
                 parents.setdefault(name, set())
             else:
                 parent = pathlib.Path(name).parent.name
@@ -1436,7 +1517,7 @@ class xorriso:
             if children:
                 paths.update(child.encode() for child in children)
             else:
-                paths.add(parent.encode() + b'/')
+                paths.add(parent.encode() + b"/")
         return paths
 
     @staticmethod
@@ -1446,16 +1527,27 @@ class xorriso:
         if overwrite:
             raise NotImplementedError
         proc = await asyncio.create_subprocess_exec(
-            'xorriso', '-osirrox', 'on', '-indev', path,
-            '-chmod_r', 'u+rw', '/', '--', '-extract', '/', dest,
-            '-rollback_end',
-            stderr=subprocess.DEVNULL)
+            "xorriso",
+            "-osirrox",
+            "on",
+            "-indev",
+            path,
+            "-chmod_r",
+            "u+rw",
+            "/",
+            "--",
+            "-extract",
+            "/",
+            dest,
+            "-rollback_end",
+            stderr=subprocess.DEVNULL,
+        )
         await proc.wait()
         if proc.returncode:
             raise ProcessError(proc)
 
     @staticmethod
-    async def volumes(path, password=''):
+    async def volumes(path, password=""):
         return [path]
 
 
@@ -1463,14 +1555,14 @@ class unrar:
     @staticmethod
     @functools.cache
     def check():
-        if not shutil.which('unrar'):
+        if not shutil.which("unrar"):
             raise KeyError
 
     @staticmethod
     async def contents(path):
         proc = await asyncio.create_subprocess_exec(
-            'unrar', 'vb', '-v', '--', path,
-            stdout=asyncio.subprocess.PIPE)
+            "unrar", "vb", "-v", "--", path, stdout=asyncio.subprocess.PIPE
+        )
         stdout, _ = await proc.communicate()
         if proc.returncode:
             raise ProcessError(proc)
@@ -1482,47 +1574,57 @@ class unrar:
         if paths:
             raise NotImplementedError
         if overwrite:
-            args.append('-o+')
+            args.append("-o+")
 
         if password is not None:
-            args.append(f'-p{password}')
+            args.append(f"-p{password}")
 
         proc = await asyncio.create_subprocess_exec(
-            'unrar', 'x', '-idc', '-idd', '-idn', '-idp', '-idq', *args,
-            '--', path, dest,
-            stdin=asyncio.subprocess.DEVNULL)
+            "unrar",
+            "x",
+            "-idc",
+            "-idd",
+            "-idn",
+            "-idp",
+            "-idq",
+            *args,
+            "--",
+            path,
+            dest,
+            stdin=asyncio.subprocess.DEVNULL,
+        )
         await proc.communicate()
         if proc.returncode:
             raise ProcessError(proc)
 
     @staticmethod
-    async def volumes(path, password=''):
+    async def volumes(path, password=""):
         proc = await asyncio.create_subprocess_exec(
-            'unrar', 'vt', '-v', '--', path,
-            stdout=asyncio.subprocess.PIPE)
+            "unrar", "vt", "-v", "--", path, stdout=asyncio.subprocess.PIPE
+        )
         stdout, _ = await proc.communicate()
         if proc.returncode:
             raise ProcessError(proc)
         return [
             path.parent / line.split(maxsplit=1)[-1]
             for line in stdout.decode().splitlines()
-            if line.startswith('Archive: ')
+            if line.startswith("Archive: ")
         ]
 
 
 class cuefile:
     TRACK_TYPE_SUFFIXES = {
-        'AUDIO': '.wav',
-        'MODE1/2352': '.iso',
-        'MODE2/2352': '.iso',
+        "AUDIO": ".wav",
+        "MODE1/2352": ".iso",
+        "MODE2/2352": ".iso",
     }
 
     @staticmethod
     @functools.cache
     def check():
-        for cmd in ('bchunk', 'binmerge'):
+        for cmd in ("bchunk", "binmerge"):
             if not shutil.which(cmd):
-                raise KeyError(f'missing {cmd}')
+                raise KeyError(f"missing {cmd}")
 
     @classmethod
     async def contents(cls, path):
@@ -1533,26 +1635,25 @@ class cuefile:
             suffix = cls.TRACK_TYPE_SUFFIXES[track_type]
             trackname = name
             if len(parts) > 1:
-                trackname = f'{trackname}{i+1:02}'
+                trackname = f"{trackname}{i + 1:02}"
             trackname += suffix
             contents.append(trackname.encode())
         return contents
 
     @staticmethod
     def _content_name(cue_path):
-        expected = '.cue'
+        expected = ".cue"
         path = pathlib.Path(cue_path)
-        if path.suffix.lower() != '.cue':
-            raise NotImplementedError('must end with .cue')
+        if path.suffix.lower() != ".cue":
+            raise NotImplementedError("must end with .cue")
         # remove any case
-        name = path.name[:-len(expected)]
+        name = path.name[: -len(expected)]
         if not name:
             raise RuntimeError
         return name
 
     @classmethod
-    async def extract(cls, path, dest, paths=None, password=None,
-                      overwrite=False):
+    async def extract(cls, path, dest, paths=None, password=None, overwrite=False):
         if paths:
             raise NotImplementedError
         if overwrite:
@@ -1566,30 +1667,33 @@ class cuefile:
 
         # TODO check if contents already exist
         volumes = await cls.volumes(path)
-        unique_files = set([
-            filename
-            for filename, _ in cls._parse_cue(path)
-        ])
+        unique_files = set([filename for filename, _ in cls._parse_cue(path)])
         name = cls._content_name(path)
         with tempfile.TemporaryDirectory(
-                dir=dest, prefix='.extract_',
-                suffix=dest.name + '.tmp') as tmp:
+            dir=dest, prefix=".extract_", suffix=dest.name + ".tmp"
+        ) as tmp:
             if len(unique_files) > 1:
                 proc = await asyncio.create_subprocess_exec(
-                    'binmerge',
-                    '--outdir', tmp,
-                    path.absolute(), 'merged',
+                    "binmerge",
+                    "--outdir",
+                    tmp,
+                    path.absolute(),
+                    "merged",
                 )
                 await proc.communicate()
                 if proc.returncode:
                     raise ProcessError(proc)
-                source_cue = 'merged.cue'
-                source_bin = 'merged.bin'
+                source_cue = "merged.cue"
+                source_bin = "merged.bin"
             else:
                 source_cue = volumes[0]
                 source_bin = volumes[1]
             proc = await asyncio.create_subprocess_exec(
-                'bchunk', '-w', source_bin, source_cue, 'chunk',
+                "bchunk",
+                "-w",
+                source_bin,
+                source_cue,
+                "chunk",
                 stdout=asyncio.subprocess.DEVNULL,
                 cwd=tmp,
             )
@@ -1606,8 +1710,8 @@ class cuefile:
                 results[source] = target
             else:
                 for source in pathlib.Path(tmp).iterdir():
-                    if source.name.startswith('chunk'):
-                        target = dest / (name + source.name.removeprefix('chunk'))
+                    if source.name.startswith("chunk"):
+                        target = dest / (name + source.name.removeprefix("chunk"))
                         if target.exists():
                             raise RuntimeError
                         results[source] = target
@@ -1620,17 +1724,18 @@ class cuefile:
         current_file = None
         for line in path.read_text().splitlines():
             line = line.strip()
-            if line.startswith('FILE '):
-                file_path = line\
-                    .split(maxsplit=1)[1]\
-                    .rsplit(maxsplit=1)[0]\
-                    .removeprefix('"')\
+            if line.startswith("FILE "):
+                file_path = (
+                    line.split(maxsplit=1)[1]
+                    .rsplit(maxsplit=1)[0]
+                    .removeprefix('"')
                     .removesuffix('"')
+                )
                 file_path = path.parent / pathlib.Path(file_path)
                 if not file_path.is_file():
-                    raise ValueError('file(s) specified in cue does not exist')
+                    raise ValueError("file(s) specified in cue does not exist")
                 current_file = file_path
-            elif current_file and line.startswith('TRACK '):
+            elif current_file and line.startswith("TRACK "):
                 _, _, track_type = line.split()
                 files.append((current_file, track_type))
         if len(files) == 0:
@@ -1641,10 +1746,7 @@ class cuefile:
     async def volumes(cls, path, password=None):
         if password is not None:
             raise NotImplementedError
-        files = set([
-            filename
-            for filename, _ in cls._parse_cue(path)
-        ])
+        files = set([filename for filename, _ in cls._parse_cue(path)])
         return [path, *files]
 
 
@@ -1654,19 +1756,19 @@ class unace:
     @staticmethod
     @functools.cache
     def check():
-        if not shutil.which('unace'):
+        if not shutil.which("unace"):
             raise KeyError
 
     @staticmethod
     async def contents(path):
         proc = await asyncio.create_subprocess_exec(
-            'unace', 'l', path,
-            stdout=asyncio.subprocess.PIPE)
+            "unace", "l", path, stdout=asyncio.subprocess.PIPE
+        )
         stdout, _ = await proc.communicate()
         if proc.returncode:
             raise ProcessError(proc)
 
-        magic_string = b'Date    Time     Packed      Size  Ratio  File'
+        magic_string = b"Date    Time     Packed      Size  Ratio  File"
         lines = None
         for line in stdout.splitlines():
             line = line.strip()
@@ -1675,40 +1777,37 @@ class unace:
             elif line.startswith(magic_string):
                 lines = []
 
-        if lines[-1].startswith(b'listed:'):
+        if lines[-1].startswith(b"listed:"):
             lines = lines[:-1]
         else:
-            raise RuntimeError('unable to parse unace output')
+            raise RuntimeError("unable to parse unace output")
 
-        return sorted(set(
-            line.split(maxsplit=5)[-1]
-            for line in lines
-            if line
-        ))
+        return sorted(set(line.split(maxsplit=5)[-1] for line in lines if line))
 
     @classmethod
     async def extract(cls, path, dest, paths=None, password=None, overwrite=False):
         if paths:
             raise NotImplementedError
-        args = ['unace', 'x']
+        args = ["unace", "x"]
         if overwrite:
-            args.append('-o')
+            args.append("-o")
         if password:
             raise NotImplementedError
         dest = str(dest)
-        if not dest.endswith('/'):
-            dest += '/'
+        if not dest.endswith("/"):
+            dest += "/"
         args.extend([path, dest])
         proc = await asyncio.create_subprocess_exec(
             *args,
             cwd=dest,  # only way to specify dest dir
-            stdout=asyncio.subprocess.DEVNULL)
+            stdout=asyncio.subprocess.DEVNULL,
+        )
         await proc.wait()
         if proc.returncode:
             raise ProcessError(proc)
 
     @staticmethod
-    async def volumes(path, password=''):
+    async def volumes(path, password=""):
         return [path]
 
 
@@ -1716,31 +1815,35 @@ class innoextract:
     @staticmethod
     @functools.cache
     def check():
-        if not shutil.which('innoextract'):
-            raise KeyError('innoextract command not found')
+        if not shutil.which("innoextract"):
+            raise KeyError("innoextract command not found")
 
         # needed for GOG only ? (*.bin files)
-        if not shutil.which('unrar'):
-            raise KeyError('unrar command not found')
+        if not shutil.which("unrar"):
+            raise KeyError("unrar command not found")
 
     @classmethod
     async def contents(cls, path):
         # safe to pass --gog flag to non-gog installers
         proc = await asyncio.create_subprocess_exec(
-            'innoextract', '--gog', '--exclude-temp',
-            '--silent',  # recommended for easily parsable output https://github.com/dscharrer/innoextract/issues/78#issuecomment-468518100
-            '--list-checksums',
-            '--list-sizes',
-             '--', str(path),
+            "innoextract",
+            "--gog",
+            "--exclude-temp",
+            "--silent",  # recommended for easily parsable output https://github.com/dscharrer/innoextract/issues/78#issuecomment-468518100
+            "--list-checksums",
+            "--list-sizes",
+            "--",
+            str(path),
             stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.DEVNULL)
+            stderr=asyncio.subprocess.DEVNULL,
+        )
         stdout, _ = await proc.communicate()
         if proc.returncode:
             raise ProcessError(proc)
 
         contents = {}
         for line in stdout.splitlines():
-            if line.endswith(b'/'):
+            if line.endswith(b"/"):
                 contents[line] = {}
             else:
                 name, info = cls._parse_line_size_checksum(line)
@@ -1759,17 +1862,17 @@ class innoextract:
         file_size, hash_type, hash_value, name = parts
 
         try:
-            info['size'] = int(file_size)
+            info["size"] = int(file_size)
         except ValueError:
             return line, {}
 
         match hash_type:
-            case b'MD5':
-                info['md5'] = hash_value.decode()
+            case b"MD5":
+                info["md5"] = hash_value.decode()
                 if len(hash_value) != 32:
                     raise RuntimeError
-            case b'SHA-1':
-                info['sha1'] = hash_value.decode()
+            case b"SHA-1":
+                info["sha1"] = hash_value.decode()
                 if len(hash_value) != 40:
                     raise RuntimeError
             case _:
@@ -1780,11 +1883,12 @@ class innoextract:
     @classmethod
     async def extract(cls, path, dest, paths=None, password=None, overwrite=False):
         args = [
-            'innoextract',
-            '--silent',
+            "innoextract",
+            "--silent",
             # safe to pass --gog flag to non-gog installers
-            '--gog',
-            '--exclude-temp', '--extract',
+            "--gog",
+            "--exclude-temp",
+            "--extract",
         ]
 
         output_dir = dest
@@ -1795,22 +1899,31 @@ class innoextract:
                 contents = await cls.contents(path)
                 for include_path in paths:
                     if include_path.encode() in contents:
-                        include_path = f'/{include_path}'
-                        args.extend(['--include', include_path])
+                        include_path = f"/{include_path}"
+                        args.extend(["--include", include_path])
                     else:
-                        raise RuntimeError('specified path is not included in the archive')
+                        raise RuntimeError(
+                            "specified path is not included in the archive"
+                        )
 
                 # stdout
                 if not isinstance(dest, pathlib.Path):
                     if len(paths) != 1:
-                        raise ValueError('only one path can be specified when extracting to stdout')
-                    stdout_tmpdir = exitstack.enter_context(tempfile.TemporaryDirectory())
+                        raise ValueError(
+                            "only one path can be specified when extracting to stdout"
+                        )
+                    stdout_tmpdir = exitstack.enter_context(
+                        tempfile.TemporaryDirectory()
+                    )
                     output_dir = stdout_tmpdir
 
-            args.extend([
-                '--output-dir', output_dir,
-                path,
-            ])
+            args.extend(
+                [
+                    "--output-dir",
+                    output_dir,
+                    path,
+                ]
+            )
 
             if overwrite:
                 raise NotImplementedError
@@ -1824,21 +1937,21 @@ class innoextract:
                 tmp_paths = list(pathlib.Path(stdout_tmpdir).iterdir())
                 if len(tmp_paths) != 1:
                     raise RuntimeError
-                with open(tmp_paths[0], 'rb') as handle:
+                with open(tmp_paths[0], "rb") as handle:
                     while data := handle.read(io.DEFAULT_BUFFER_SIZE):
                         dest.write(data)
                         dest.flush()
 
     @staticmethod
-    async def volumes(path, password=''):
+    async def volumes(path, password=""):
         volumes = [path]
 
         # probably a gog installer
-        if path.name.startswith('setup_') and path.suffix == '.exe':
+        if path.name.startswith("setup_") and path.suffix == ".exe":
             base = path.stem
             num = 1
             while True:
-                binpath = path.parent / f'{base}-{num}.bin'
+                binpath = path.parent / f"{base}-{num}.bin"
                 if not binpath.is_file():
                     break
                 volumes.append(binpath)
@@ -1862,8 +1975,7 @@ class gog_linux:
             return sorted(c.encode() for c in contents)
 
     @classmethod
-    async def extract(cls, path, dest, paths=None, password=None,
-                      overwrite=False):
+    async def extract(cls, path, dest, paths=None, password=None, overwrite=False):
         if paths:
             raise NotImplementedError
         if overwrite:
@@ -1881,22 +1993,22 @@ class gog_linux:
 
     @staticmethod
     def _local_target(zi):
-        if zi.filename.startswith('data/noarch/'):
+        if zi.filename.startswith("data/noarch/"):
             if target := zi.filename[12:]:
                 return target
 
     @staticmethod
-    async def volumes(path, password=''):
+    async def volumes(path, password=""):
         return [path]
 
     @staticmethod
     @contextlib.contextmanager
     def _zipfile(path):
-        with open(path, 'rb') as f:
+        with open(path, "rb") as f:
             FILESIZE_RE = re.compile(r'filesizes="(\d+?)"')
             OFFSET_RE = re.compile(r'offset=`head -n (\d+?) "\$0"')
 
-            beginning = f.read(10240).decode(errors='ignore')
+            beginning = f.read(10240).decode(errors="ignore")
             offset_match = OFFSET_RE.search(beginning)
             script_lines = int(offset_match.group(1))
 
@@ -1928,21 +2040,24 @@ class gnu_tar:
     def check():
         try:
             proc = subprocess.run(
-                ['tar', '--version'],
-                stdout=subprocess.PIPE,
-                check=True)
+                ["tar", "--version"], stdout=subprocess.PIPE, check=True
+            )
         except FileNotFoundError:
             raise KeyError
 
-        if 'GNU tar' not in proc.stdout.decode().splitlines()[0]:
+        if "GNU tar" not in proc.stdout.decode().splitlines()[0]:
             raise KeyError
 
     @staticmethod
     async def contents(path):
         proc = await asyncio.create_subprocess_exec(
-            'tar', 'tf', str(path), '--force-local',
+            "tar",
+            "tf",
+            str(path),
+            "--force-local",
             stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL)
+            stderr=subprocess.DEVNULL,
+        )
         stdout, _ = await proc.communicate()
         if proc.returncode:
             raise ProcessError(proc)
@@ -1950,16 +2065,16 @@ class gnu_tar:
 
     @staticmethod
     async def extract(path, dest, paths=None, password=None, overwrite=False):
-        args = ['tar', 'xf', path, '--force-local']
+        args = ["tar", "xf", path, "--force-local"]
         if dest == sys.stdout.buffer:
-            args.append('--to-stdout')
+            args.append("--to-stdout")
         else:
-            args.append(f'--one-top-level={dest}')
+            args.append(f"--one-top-level={dest}")
 
         if overwrite:
-            args.append('--overwrite')
+            args.append("--overwrite")
         else:
-            args.append('--keep-old-files')
+            args.append("--keep-old-files")
 
         if paths:
             args.extend(paths)
@@ -1970,7 +2085,7 @@ class gnu_tar:
             raise ProcessError(proc)
 
     @staticmethod
-    async def volumes(path, password=''):
+    async def volumes(path, password=""):
         return [path]
 
 
@@ -1978,12 +2093,12 @@ class gzip:
     @staticmethod
     @functools.cache
     def check():
-        if not shutil.which('gzip'):
+        if not shutil.which("gzip"):
             raise KeyError
 
     @staticmethod
     async def contents(path):
-        return [path.with_suffix('').name.encode()]
+        return [path.with_suffix("").name.encode()]
 
     @staticmethod
     async def extract(path, dest, paths=None, password=None, overwrite=False):
@@ -1991,17 +2106,17 @@ class gzip:
             raise NotImplementedError
         if overwrite:
             raise NotImplementedError
-        target = dest / path.with_suffix('').name
-        with open(target, 'w') as handle:
+        target = dest / path.with_suffix("").name
+        with open(target, "w") as handle:
             proc = await asyncio.create_subprocess_exec(
-                'gzip', '-d', '-c', '--', path,
-                stdout=handle)
+                "gzip", "-d", "-c", "--", path, stdout=handle
+            )
             await proc.wait()
             if proc.returncode:
                 raise ProcessError(proc)
 
     @staticmethod
-    async def volumes(path, password=''):
+    async def volumes(path, password=""):
         return [path]
 
 
@@ -2009,18 +2124,20 @@ class cpio:
     @staticmethod
     @functools.cache
     def check():
-        if not shutil.which('cpio'):
+        if not shutil.which("cpio"):
             raise KeyError
 
     @staticmethod
     async def contents(path):
         proc = await asyncio.create_subprocess_exec(
-            'cpio',
-            '--list',
-            '--no-absolute-filenames',
-            '--quiet',  # suppress last line containing block count
-            '--file', path,
-            stdout=asyncio.subprocess.PIPE)
+            "cpio",
+            "--list",
+            "--no-absolute-filenames",
+            "--quiet",  # suppress last line containing block count
+            "--file",
+            path,
+            stdout=asyncio.subprocess.PIPE,
+        )
         stdout, _ = await proc.communicate()
         if proc.returncode:
             raise ProcessError(proc)
@@ -2035,19 +2152,22 @@ class cpio:
         if path == dest:
             raise RuntimeError
         proc = await asyncio.create_subprocess_exec(
-            'cpio',
-            '--extract',
-            '--directory', dest,
-            '--make-directories',
-            '--no-absolute-filenames',
-            '--preserve-modification-time',
-            '--file', path)
+            "cpio",
+            "--extract",
+            "--directory",
+            dest,
+            "--make-directories",
+            "--no-absolute-filenames",
+            "--preserve-modification-time",
+            "--file",
+            path,
+        )
         await proc.wait()
         if proc.returncode:
             raise ProcessError(proc)
 
     @staticmethod
-    async def volumes(path, password=''):
+    async def volumes(path, password=""):
         return [path]
 
 
@@ -2055,12 +2175,12 @@ class pbzip2:
     @staticmethod
     @functools.cache
     def check():
-        if not shutil.which('pbzip2'):
+        if not shutil.which("pbzip2"):
             raise KeyError
 
     @staticmethod
     async def contents(path):
-        return [path.with_suffix('').name.encode()]
+        return [path.with_suffix("").name.encode()]
 
     @staticmethod
     async def extract(path, dest, paths=None, password=None, overwrite=False):
@@ -2069,18 +2189,18 @@ class pbzip2:
         if overwrite:
             raise NotImplementedError
         with contextlib.ExitStack() as exit_stack:
-            args = ['pbzip2', '-d', '-c', '--', path]
+            args = ["pbzip2", "-d", "-c", "--", path]
             kwargs = {}
             if dest != sys.stdout.buffer:
-                target = dest / path.with_suffix('').name
-                kwargs['stdout'] = exit_stack.enter_context(open(target, 'w'))
+                target = dest / path.with_suffix("").name
+                kwargs["stdout"] = exit_stack.enter_context(open(target, "w"))
             proc = await asyncio.create_subprocess_exec(*args, **kwargs)
             await proc.wait()
             if proc.returncode:
                 raise ProcessError(proc)
 
     @staticmethod
-    async def volumes(path, password=''):
+    async def volumes(path, password=""):
         return [path]
 
 
@@ -2088,12 +2208,12 @@ class pigz:
     @staticmethod
     @functools.cache
     def check():
-        if not shutil.which('pigz'):
+        if not shutil.which("pigz"):
             raise KeyError
 
     @staticmethod
     async def contents(path):
-        return [path.with_suffix('').name.encode()]
+        return [path.with_suffix("").name.encode()]
 
     @staticmethod
     async def extract(path, dest, paths=None, password=None, overwrite=False):
@@ -2101,21 +2221,23 @@ class pigz:
             raise NotImplementedError
         if overwrite:
             raise NotImplementedError
-        target = dest / path.with_suffix('').name
-        with open(target, 'w') as handle:
+        target = dest / path.with_suffix("").name
+        with open(target, "w") as handle:
             proc = await asyncio.create_subprocess_exec(
-                'pigz',
-                '-d',  # decompress
-                '-k',  # keep original file
-                '-c',  # write to stdout
-                '--', path,
-                stdout=handle)
+                "pigz",
+                "-d",  # decompress
+                "-k",  # keep original file
+                "-c",  # write to stdout
+                "--",
+                path,
+                stdout=handle,
+            )
             await proc.wait()
             if proc.returncode:
                 raise ProcessError(proc)
 
     @staticmethod
-    async def volumes(path, password=''):
+    async def volumes(path, password=""):
         return [path]
 
 
@@ -2123,12 +2245,12 @@ class pixz:
     @staticmethod
     @functools.cache
     def check():
-        if not shutil.which('pixz'):
+        if not shutil.which("pixz"):
             raise KeyError
 
     @staticmethod
     async def contents(path):
-        return [path.with_suffix('').name.encode()]
+        return [path.with_suffix("").name.encode()]
 
     @staticmethod
     async def extract(path, dest, paths=None, password=None, overwrite=False):
@@ -2136,19 +2258,21 @@ class pixz:
             raise NotImplementedError
         if overwrite:
             raise NotImplementedError
-        target = dest / path.with_suffix('').name
+        target = dest / path.with_suffix("").name
         proc = await asyncio.create_subprocess_exec(
-            'pixz',
-            '-d',  # decompress
-            '-k',  # keep original input
-            '--', path,
-            target)
+            "pixz",
+            "-d",  # decompress
+            "-k",  # keep original input
+            "--",
+            path,
+            target,
+        )
         await proc.wait()
         if proc.returncode:
             raise ProcessError(proc)
 
     @staticmethod
-    async def volumes(path, password=''):
+    async def volumes(path, password=""):
         return [path]
 
 
@@ -2156,12 +2280,12 @@ class bzip2:
     @staticmethod
     @functools.cache
     def check():
-        if not shutil.which('bzip2'):
+        if not shutil.which("bzip2"):
             raise KeyError
 
     @staticmethod
     async def contents(path):
-        return [path.with_suffix('').name.encode()]
+        return [path.with_suffix("").name.encode()]
 
     @staticmethod
     async def extract(path, dest, paths=None, password=None, overwrite=False):
@@ -2169,17 +2293,17 @@ class bzip2:
             raise NotImplementedError
         if overwrite:
             raise NotImplementedError
-        target = dest / path.with_suffix('').name
-        with open(target, 'w') as handle:
+        target = dest / path.with_suffix("").name
+        with open(target, "w") as handle:
             proc = await asyncio.create_subprocess_exec(
-                'bzip2', '-d', '-c', '--', path,
-                stdout=handle)
+                "bzip2", "-d", "-c", "--", path, stdout=handle
+            )
             await proc.wait()
             if proc.returncode:
                 raise ProcessError(proc)
 
     @staticmethod
-    async def volumes(path, password=''):
+    async def volumes(path, password=""):
         return [path]
 
 
@@ -2187,12 +2311,12 @@ class xz:
     @staticmethod
     @functools.cache
     def check():
-        if not shutil.which('xz'):
+        if not shutil.which("xz"):
             raise KeyError
 
     @staticmethod
     async def contents(path):
-        return [path.with_suffix('').name.encode()]
+        return [path.with_suffix("").name.encode()]
 
     @staticmethod
     async def extract(path, dest, paths=None, password=None, overwrite=False):
@@ -2200,17 +2324,17 @@ class xz:
             raise NotImplementedError
         if overwrite:
             raise NotImplementedError
-        target = dest / path.with_suffix('').name
-        with open(target, 'w') as handle:
+        target = dest / path.with_suffix("").name
+        with open(target, "w") as handle:
             proc = await asyncio.create_subprocess_exec(
-                'xz', '-d', '-c', '--', path,
-                stdout=handle)
+                "xz", "-d", "-c", "--", path, stdout=handle
+            )
             await proc.wait()
             if proc.returncode:
                 raise ProcessError(proc)
 
     @staticmethod
-    async def volumes(path, password=''):
+    async def volumes(path, password=""):
         return [path]
 
 
@@ -2218,26 +2342,26 @@ class lz4:
     @staticmethod
     @functools.cache
     def check():
-        if not shutil.which('lz4'):
+        if not shutil.which("lz4"):
             raise KeyError
 
     @staticmethod
     async def contents(path):
-        return [path.with_suffix('').name]
+        return [path.with_suffix("").name]
 
     @staticmethod
     async def extract(path, dest, paths=None, password=None, overwrite=False):
         if paths:
             raise NotImplementedError
-        args = ['lz4', '-d']
+        args = ["lz4", "-d"]
         if overwrite:
-            args.append('-f')
-        target = dest / path.with_suffix('').name
-        args.extend(['--', path, target])
+            args.append("-f")
+        target = dest / path.with_suffix("").name
+        args.extend(["--", path, target])
         subprocess.run(args, stdin=subprocess.PIPE, check=True)
 
     @staticmethod
-    async def volumes(path, password=''):
+    async def volumes(path, password=""):
         return [path]
 
 
@@ -2245,22 +2369,22 @@ class zstd:
     @staticmethod
     @functools.cache
     def check():
-        if not shutil.which('zstd'):
+        if not shutil.which("zstd"):
             raise KeyError
 
     @staticmethod
     async def contents(path):
-        return [path.with_suffix('').name.encode()]
+        return [path.with_suffix("").name.encode()]
 
     @staticmethod
     async def extract(path, dest, paths=None, password=None, overwrite=False):
         if paths:
             raise NotImplementedError
-        args = ['zstd', '-d', '--quiet', '--output-dir-flat', dest]
+        args = ["zstd", "-d", "--quiet", "--output-dir-flat", dest]
         if overwrite:
-            args.append('-f')
+            args.append("-f")
 
-        args.extend(['--', path])
+        args.extend(["--", path])
 
         proc = await asyncio.create_subprocess_exec(*args)
         await proc.wait()
@@ -2268,7 +2392,7 @@ class zstd:
             raise ProcessError(proc)
 
     @staticmethod
-    async def volumes(path, password=''):
+    async def volumes(path, password=""):
         return [path]
 
 
@@ -2276,21 +2400,21 @@ class brotli:
     @staticmethod
     @functools.cache
     def check():
-        if not shutil.which('brotli'):
+        if not shutil.which("brotli"):
             raise KeyError
 
     @staticmethod
     async def contents(path):
-        return [path.with_suffix('').name]
+        return [path.with_suffix("").name]
 
     @staticmethod
     async def extract(path, dest, paths=None, password=None, overwrite=False):
         if paths:
             raise NotImplementedError
-        args = ['brotli', '--decompress', '--stdout']
+        args = ["brotli", "--decompress", "--stdout"]
         if overwrite:
-            args.append('--force')
-        args.extend(['--', path])
+            args.append("--force")
+        args.extend(["--", path])
 
         proc = await asyncio.create_subprocess_exec(*args)
         await proc.wait()
@@ -2298,7 +2422,7 @@ class brotli:
             raise ProcessError(proc)
 
     @staticmethod
-    async def volumes(path, password=''):
+    async def volumes(path, password=""):
         return [path]
 
 
@@ -2306,15 +2430,18 @@ class unsquashfs:
     @staticmethod
     @functools.cache
     def check():
-        if not shutil.which('unsquashfs'):
+        if not shutil.which("unsquashfs"):
             raise KeyError
 
     @staticmethod
     async def contents(path):
         proc = await asyncio.create_subprocess_exec(
-            'unsquashfs', '-lc', str(path),
+            "unsquashfs",
+            "-lc",
+            str(path),
             stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL)
+            stderr=subprocess.DEVNULL,
+        )
         stdout, _ = await proc.communicate()
         if proc.returncode:
             raise ProcessError(proc)
@@ -2326,10 +2453,11 @@ class unsquashfs:
             raise NotImplementedError
 
         args = [
-            'unsquashfs',
-            '-quiet',
-            '-force',  # fails to extract even when extracting to empty dir
-            '-dest', str(dest),
+            "unsquashfs",
+            "-quiet",
+            "-force",  # fails to extract even when extracting to empty dir
+            "-dest",
+            str(dest),
             str(path),
         ]
 
@@ -2339,7 +2467,7 @@ class unsquashfs:
             raise ProcessError(proc)
 
     @staticmethod
-    async def volumes(path, password=''):
+    async def volumes(path, password=""):
         return [path]
 
 
@@ -2349,13 +2477,13 @@ def _build_extract_dest(path, parent, child):
     parent = parent.absolute()
 
     if child:
-        if len(path.suffixes) > 1 and path.suffixes[-2].lower() == '.tar':
+        if len(path.suffixes) > 1 and path.suffixes[-2].lower() == ".tar":
             dest = parent / pathlib.Path(path.stem).stem
         else:
             dest = parent / pathlib.Path(path.stem)
 
         while dest.exists():
-            dest = dest.with_name(f'{dest.name}_')
+            dest = dest.with_name(f"{dest.name}_")
     else:
         dest = parent
     dest.mkdir(parents=True, exist_ok=True)
@@ -2365,20 +2493,20 @@ def _build_extract_dest(path, parent, child):
 async def _get_class(path):
     suffixes = [suffix.lower() for suffix in path.suffixes]
 
-    with open(path, 'rb') as f:
+    with open(path, "rb") as f:
         start = f.read(16)
 
         # tar
-        if start.startswith(b'ustar\x0000'):
+        if start.startswith(b"ustar\x0000"):
             return gnu_tar
         # tar
-        elif start.startswith(b'ustar  \x00'):
+        elif start.startswith(b"ustar  \x00"):
             return gnu_tar
         # rar < 5.0
-        elif start.startswith(b'Rar!\x1a\x07\x00'):
+        elif start.startswith(b"Rar!\x1a\x07\x00"):
             return unrar
         # rar >= 5.0
-        elif start.startswith(b'Rar!\x1a\x07\x01\x00'):
+        elif start.startswith(b"Rar!\x1a\x07\x01\x00"):
             return unrar
         # 7-zip
         elif start.startswith(b"7z\xbc\xaf'\x1c"):
@@ -2386,10 +2514,11 @@ async def _get_class(path):
         # zip
         # zip (empty)
         # zip (spanned)
-        elif \
-                start.startswith(b'PK\x03\x04') or \
-                start.startswith(b'PK\x05\x06') or \
-                start.startswith(b'PK\x07\x08'):
+        elif (
+            start.startswith(b"PK\x03\x04")
+            or start.startswith(b"PK\x05\x06")
+            or start.startswith(b"PK\x07\x08")
+        ):
             try:
                 # better handling of multipart
                 cli_7zip.check()
@@ -2397,19 +2526,19 @@ async def _get_class(path):
             except KeyError:
                 return unzip
         # microsoft cabinet file
-        elif start.startswith(b'MSCF'):
+        elif start.startswith(b"MSCF"):
             return cabextract
         # unshield CAB
-        elif start.startswith(b'ISc('):
+        elif start.startswith(b"ISc("):
             return unshield
         # lz4
         elif start.startswith(b'\x04"M\x18'):
             return lz4
         # gzip
-        elif start.startswith(b'\x1f\x8b'):
-            if len(suffixes) >= 1 and suffixes[-1] == '.tgz':
+        elif start.startswith(b"\x1f\x8b"):
+            if len(suffixes) >= 1 and suffixes[-1] == ".tgz":
                 return gnu_tar
-            elif len(suffixes) >= 2 and suffixes[-2] == '.tar':
+            elif len(suffixes) >= 2 and suffixes[-2] == ".tar":
                 return gnu_tar
             else:
                 try:
@@ -2418,8 +2547,8 @@ async def _get_class(path):
                 except KeyError:
                     return gzip
         # bzip2
-        elif start.startswith(b'BZh'):
-            if len(suffixes) >= 2 and suffixes[-2] == '.tar':
+        elif start.startswith(b"BZh"):
+            if len(suffixes) >= 2 and suffixes[-2] == ".tar":
                 return gnu_tar
             else:
                 try:
@@ -2428,10 +2557,10 @@ async def _get_class(path):
                 except KeyError:
                     return bzip2
         # xz
-        elif start.startswith(b'\xfd7zXZ\x00'):
-            if len(suffixes) >= 1 and suffixes[-1] == '.txz':
+        elif start.startswith(b"\xfd7zXZ\x00"):
+            if len(suffixes) >= 1 and suffixes[-1] == ".txz":
                 return gnu_tar
-            elif len(suffixes) >= 2 and suffixes[-2] == '.tar':
+            elif len(suffixes) >= 2 and suffixes[-2] == ".tar":
                 return gnu_tar
             else:
                 try:
@@ -2440,21 +2569,22 @@ async def _get_class(path):
                 except KeyError:
                     return xz
         # zstandard
-        elif start.startswith(b'(\xb5/\xfd'):
-            if len(suffixes) >= 2 and suffixes[-2] == '.tar':
+        elif start.startswith(b"(\xb5/\xfd"):
+            if len(suffixes) >= 2 and suffixes[-2] == ".tar":
                 return gnu_tar
             else:
                 return zstd
         # cpio (new ASCII (SVR4))
         # cpio (CRC)
         # cpio (standard ASCII)
-        elif \
-                start.startswith(b'070701') or \
-                start.startswith(b'070702') or \
-                start.startswith(b'070707'):
+        elif (
+            start.startswith(b"070701")
+            or start.startswith(b"070702")
+            or start.startswith(b"070707")
+        ):
             return cpio
         # exe
-        elif start.startswith(b'MZ'):
+        elif start.startswith(b"MZ"):
             # TODO: add additional innoextract validation
             innoextract.check()
             try:
@@ -2472,34 +2602,41 @@ async def _get_class(path):
                 pass
 
         # squashfs
-        elif start.startswith(b'hsqs'):
+        elif start.startswith(b"hsqs"):
             return unsquashfs
 
         # debian .deb
-        elif start.startswith(b'!<arch>\x0a'):
+        elif start.startswith(b"!<arch>\x0a"):
             return cli_7zip
 
         # stuffit .sit
-        elif start.startswith(b'StuffIt (c)1997-'):
+        elif start.startswith(b"StuffIt (c)1997-"):
             return unarchiver
 
-        elif start.startswith(b'#!/bin/sh\n'):
+        elif start.startswith(b"#!/bin/sh\n"):
             f.seek(271)
-            if f.read(58) == b'# with modifications for mojosetup and GOG.com installer.\n':  # noqa: E501
+            if (
+                f.read(58)
+                == b"# with modifications for mojosetup and GOG.com installer.\n"
+            ):  # noqa: E501
                 return gog_linux
 
-        elif start[7:14] == b'**ACE**':
+        elif start[7:14] == b"**ACE**":
             return unace
 
         # iso9660, udf
         f.seek(32769)
-        if f.read(5) in (
-                b'CD001',  # contains an ISO 9660 file system
-                b'BEA01',  # beginning of the extended descriptor section
-                b'NSR02',  # contains a UDF file system
-                b'NSR03',  # this volume contains a UDF file system
-                b'BOOT2',  # includes information concerning boot loader location and entry point address
-                b'TEA01'):  # end of the extended descriptor section
+        if (
+            f.read(5)
+            in (
+                b"CD001",  # contains an ISO 9660 file system
+                b"BEA01",  # beginning of the extended descriptor section
+                b"NSR02",  # contains a UDF file system
+                b"NSR03",  # this volume contains a UDF file system
+                b"BOOT2",  # includes information concerning boot loader location and entry point address
+                b"TEA01",
+            )
+        ):  # end of the extended descriptor section
             try:
                 await xorriso.contents(path)
                 return xorriso
@@ -2507,29 +2644,29 @@ async def _get_class(path):
                 pass
 
     if suffixes := [suffix.lower() for suffix in path.suffixes]:
-        if suffixes[-1] == '.cue':
+        if suffixes[-1] == ".cue":
             await cuefile.contents(path)
             try:
                 await cuefile.contents(path)
                 return cuefile
             except Exception:
                 pass
-        if suffixes[-1] == '.rvz':
+        if suffixes[-1] == ".rvz":
             return dolphin_tool_rvz
-        if suffixes[-1] == '.gcm':
+        if suffixes[-1] == ".gcm":
             return dolphin_tool_gcm
-        if suffixes[-1] == '.nsz':
+        if suffixes[-1] == ".nsz":
             return nsz
         # ffs - brotli doesn't have a file signature
-        if suffixes[-1] == '.br':
+        if suffixes[-1] == ".br":
             return brotli
-        elif suffixes[-1] == '.img':
+        elif suffixes[-1] == ".img":
             return cli_7zip
         # non-iso9660 ex. bluray
-        elif suffixes[-1] == '.iso':
+        elif suffixes[-1] == ".iso":
             return udisksctl
         # some tars lack file signature
-        elif suffixes[-1] == '.tar':
+        elif suffixes[-1] == ".tar":
             return gnu_tar
 
     # 7z supports a bunch of things
@@ -2551,34 +2688,34 @@ class ProcessError(Exception):
     def __str__(self):
         proc = self.process
 
-        text = f'exit {proc.returncode}'
+        text = f"exit {proc.returncode}"
         if self.message is not None:
-            text = f'{text} - {self.message}'
+            text = f"{text} - {self.message}"
 
         try:
-            args = proc._transport._extra['subprocess'].args
+            args = proc._transport._extra["subprocess"].args
         except (AttributeError, KeyError):
             pass
         else:
-            text = f'{text}: {args}'
+            text = f"{text}: {args}"
         return text
 
 
 def format_contents(paths):
     file_parents = set()
     for path in paths:
-        is_file = not path.endswith(b'/')
+        is_file = not path.endswith(b"/")
         if is_file:
             parent = []
-            for part in tuple(path.strip(b'/').split(b'/')[:-1]):
+            for part in tuple(path.strip(b"/").split(b"/")[:-1]):
                 parent.append(part)
                 file_parents.add(tuple(parent))
 
     contents = set()
 
     for path in paths:
-        if path.endswith(b'/'):
-            parts = tuple(path.strip(b'/').split(b'/'))
+        if path.endswith(b"/"):
+            parts = tuple(path.strip(b"/").split(b"/"))
             if parts not in file_parents:
                 contents.add(path)
         else:
@@ -2594,9 +2731,9 @@ class AsyncExecutor:
     def __init__(self, max_concurrent=None):
         if max_concurrent is not None:
             if not isinstance(max_concurrent, int):
-                raise TypeError('max_concurrent must type int')
+                raise TypeError("max_concurrent must type int")
             if max_concurrent < 0:
-                raise ValueError('max_concurrent must be greater than 0')
+                raise ValueError("max_concurrent must be greater than 0")
         self._max_concurrent = max_concurrent or os.cpu_count()
         self._queued = []
         self._pending = set()
@@ -2634,42 +2771,40 @@ class AsyncExecutor:
         if not self._completed:
             self._fill()
             self._completed, self._pending = await asyncio.wait(
-                self._pending, return_when=asyncio.FIRST_COMPLETED)
+                self._pending, return_when=asyncio.FIRST_COMPLETED
+            )
 
         return self._completed.pop()
 
 
 async def process_archive(cls, volumes, path, paths, password, args):
     if not args.quiet and not args.stdout:
-        print('Extracting', path)
+        print("Extracting", path)
     if args.child:
         dest = _build_extract_dest(path, args.parent, args.child)
         with tempfile.TemporaryDirectory(
-                dir=dest.parent, prefix='.extract_',
-                suffix=dest.name + '.tmp') as tmp:
+            dir=dest.parent, prefix=".extract_", suffix=dest.name + ".tmp"
+        ) as tmp:
             tmp = pathlib.Path(tmp)
 
             await cls.extract(
-                volumes[0],
-                tmp,
-                paths=paths,
-                password=password,
-                overwrite=args.force)
+                volumes[0], tmp, paths=paths, password=password, overwrite=args.force
+            )
 
             tmp.rename(dest)
             if args.rm:
                 for path in volumes:
                     path.unlink()
     else:
-        dest = sys.stdout.buffer if args.stdout else _build_extract_dest(
-            path, args.parent, args.child)
+        dest = (
+            sys.stdout.buffer
+            if args.stdout
+            else _build_extract_dest(path, args.parent, args.child)
+        )
 
         await cls.extract(
-            volumes[0],
-            dest,
-            paths=paths,
-            password=password,
-            overwrite=args.force)
+            volumes[0], dest, paths=paths, password=password, overwrite=args.force
+        )
 
         if args.rm:
             for path in volumes:
@@ -2684,60 +2819,62 @@ def pretty_json(data):
 
     :param data: Python data object
     """
-    return json.dumps(
-        data,
-        indent=2,
-        sort_keys=True,
-        ensure_ascii=False
-    )
+    return json.dumps(data, indent=2, sort_keys=True, ensure_ascii=False)
 
 
 async def main_extract():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '-p', dest='parent', metavar='DIR', type=pathlib.Path,
-        help='parent directory to extract to')
+        "-p",
+        dest="parent",
+        metavar="DIR",
+        type=pathlib.Path,
+        help="parent directory to extract to",
+    )
     parser.add_argument(
-        '-c', dest='child', action='store_true',
-        help='extract each archive to a unique child directory')
+        "-c",
+        dest="child",
+        action="store_true",
+        help="extract each archive to a unique child directory",
+    )
     parser.add_argument(
-        '--stdout', action='store_true',
-        help='extract a specifc file to stdout')
+        "--stdout", action="store_true", help="extract a specifc file to stdout"
+    )
+    parser.add_argument("-l", "--list", action="store_true", help="list contents")
+    parser.add_argument("--json", action="store_true", help="output as json")
     parser.add_argument(
-        '-l', '--list', action='store_true',
-        help='list contents')
+        "--base64", action="store_true", help="output base64-encoded filenames"
+    )
+    parser.add_argument("--volumes", action="store_true", help="list volumes")
     parser.add_argument(
-        '--json', action='store_true',
-        help='output as json')
+        "-f",
+        "--force",
+        action="store_true",
+        help="overwrite existing files/directories",
+    )
     parser.add_argument(
-        '--base64', action='store_true',
-        help='output base64-encoded filenames')
+        "--rm", action="store_true", help="remove archive after successful extraction"
+    )
+    parser.add_argument("--password", action="store_true", help="prompt for password")
     parser.add_argument(
-        '--volumes', action='store_true',
-        help='list volumes')
+        "-n",
+        metavar="NUM",
+        dest="num_procs",
+        type=_num_procs,
+        default=1,
+        help="number of parallel jobs (default: %(default)s)",
+    )
     parser.add_argument(
-        '-f', '--force', action='store_true',
-        help='overwrite existing files/directories')
-    parser.add_argument(
-        '--rm', action='store_true',
-        help='remove archive after successful extraction')
-    parser.add_argument(
-        '--password', action='store_true',
-        help='prompt for password')
-    parser.add_argument(
-        '-n', metavar='NUM', dest='num_procs', type=_num_procs, default=1,
-        help='number of parallel jobs (default: %(default)s)')
-    parser.add_argument(
-        '-q', '--quiet', action='store_true',
-        help='suppress non-error output')
-    parser.add_argument('--verbose', action='store_true')
-    parser.add_argument('archive', nargs='+', type=pathlib.Path)
+        "-q", "--quiet", action="store_true", help="suppress non-error output"
+    )
+    parser.add_argument("--verbose", action="store_true")
+    parser.add_argument("archive", nargs="+", type=pathlib.Path)
     args = parser.parse_args()
 
     if args.verbose:
         logging.basicConfig(level=logging.DEBUG)
 
-    password = getpass.getpass('Password: ') if args.password else None
+    password = getpass.getpass("Password: ") if args.password else None
 
     executor = AsyncExecutor(args.num_procs)
 
@@ -2762,27 +2899,21 @@ async def main_extract():
             continue
 
         cls = await _get_class(path)
-        LOGGER.debug('Using %s for %s', cls, path)
+        LOGGER.debug("Using %s for %s", cls, path)
         cls.check()
         if args.list:
             contents = await cls.contents(path)
             if args.base64:
-                contents = {
-                    base64.b64encode(k): v
-                    for k, v in contents.items()
-                }
+                contents = {base64.b64encode(k): v for k, v in contents.items()}
             if args.json:
                 if isinstance(contents, (list, set)):
                     contents = {k: {} for k in contents}
-                print(pretty_json({
-                    k.decode(): v
-                    for k, v in contents.items()
-                }))
+                print(pretty_json({k.decode(): v for k, v in contents.items()}))
             else:
                 contents = format_contents(contents)
 
                 # avoid errors with non-unicode file names
-                sys.stdout.buffer.write(b'\n'.join(contents) + b'\n')
+                sys.stdout.buffer.write(b"\n".join(contents) + b"\n")
                 sys.stdout.buffer.flush()
         else:
             try:
@@ -2792,13 +2923,16 @@ async def main_extract():
                 error_paths.append(path)
                 continue
             if args.volumes and volumes:
-                sys.stdout.buffer.write(b'\n'.join(sorted(str(v).encode() for v in volumes)) + b'\n')
+                sys.stdout.buffer.write(
+                    b"\n".join(sorted(str(v).encode() for v in volumes)) + b"\n"
+                )
                 sys.stdout.buffer.flush()
                 continue
 
             all_volumes.update(volumes)
             task = executor.submit(
-                process_archive, cls, volumes, path, paths, password, args)
+                process_archive, cls, volumes, path, paths, password, args
+            )
             task_to_path[task] = path
 
     async for task in executor:
@@ -2814,8 +2948,8 @@ async def main_extract():
         sys.exit(1)
 
 
-if __name__ == '__main__':
-    if sys.argv[0].endswith('archive'):
+if __name__ == "__main__":
+    if sys.argv[0].endswith("archive"):
         main_archive()
     else:
         asyncio.run(main_extract())

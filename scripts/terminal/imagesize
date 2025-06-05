@@ -6,15 +6,15 @@ import PIL.Image
 
 
 SUFFIXES = {
-    '.bmp',
-    '.gif',
-    '.jpeg',
-    '.jpg',
-    '.png',
-    '.png',
-    '.tif',
-    '.tiff',
-    '.webp',
+    ".bmp",
+    ".gif",
+    ".jpeg",
+    ".jpg",
+    ".png",
+    ".png",
+    ".tif",
+    ".tiff",
+    ".webp",
 }
 
 
@@ -32,7 +32,7 @@ def all_files(root):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('path', type=pathlib.Path, nargs='+')
+    parser.add_argument("path", type=pathlib.Path, nargs="+")
     args = parser.parse_args()
 
     paths = {}
@@ -56,5 +56,5 @@ def main():
         print(*value, path)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

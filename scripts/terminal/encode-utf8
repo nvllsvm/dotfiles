@@ -8,23 +8,23 @@ import charset_normalizer
 def convert_to_utf8(path):
     path = pathlib.Path(path)
     data = path.read_bytes()
-    text = data.decode(charset_normalizer.detect(data)['encoding'])
+    text = data.decode(charset_normalizer.detect(data)["encoding"])
     text_utf8 = text.encode()
     if data != text_utf8:
-        print(f'Encoding {path}')
+        print(f"Encoding {path}")
         path.write_bytes(text_utf8)
     else:
-        print(f'Already encoded {path}')
+        print(f"Already encoded {path}")
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Reencode files in UTF-8')
-    parser.add_argument('path', nargs='+')
+    parser = argparse.ArgumentParser(description="Reencode files in UTF-8")
+    parser.add_argument("path", nargs="+")
     args = parser.parse_args()
 
     for path in args.path:
         convert_to_utf8(path)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

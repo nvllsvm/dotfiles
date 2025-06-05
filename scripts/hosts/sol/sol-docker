@@ -7,61 +7,58 @@ import sys
 
 import tabulate
 
-COMPOSE_PROJECT_NAME = 'sol-docker'
-SOL_DOCKER_PATH = pathlib.Path('~/src/git.nullsum.net/nvllsvm/sol-docker').expanduser()
+COMPOSE_PROJECT_NAME = "sol-docker"
+SOL_DOCKER_PATH = pathlib.Path("~/src/git.nullsum.net/nvllsvm/sol-docker").expanduser()
 
 
 KILLABLE = [
-    'omada-controller',
-    'rtl_433_mqtt',
-    'wakeonlan',
-    'zigbee2mqtt',
-    'zwavejs2mqtt',
+    "omada-controller",
+    "rtl_433_mqtt",
+    "wakeonlan",
+    "zigbee2mqtt",
+    "zwavejs2mqtt",
 ]
 
 
 def docker_compose(*args, exec=False, **kwargs):
     env = os.environ.copy()
-    env.update({
-        'COMPOSE_PROJECT_NAME': COMPOSE_PROJECT_NAME,
-        'COMPOSE_FILE': str(SOL_DOCKER_PATH / 'docker-compose.yaml'),
-    })
+    env.update(
+        {
+            "COMPOSE_PROJECT_NAME": COMPOSE_PROJECT_NAME,
+            "COMPOSE_FILE": str(SOL_DOCKER_PATH / "docker-compose.yaml"),
+        }
+    )
     if exec:
-        os.execlpe('docker', 'docker', 'compose', *args, env)
+        os.execlpe("docker", "docker", "compose", *args, env)
     else:
-        return subprocess.run(
-            ['docker', 'compose', *args], env=env, **kwargs)
+        return subprocess.run(["docker", "compose", *args], env=env, **kwargs)
 
 
 def _command_restart():
-    docker_compose('kill', *KILLABLE)
-    docker_compose('rm', '-fs')
-    docker_compose('up', '-d', check=True)
+    docker_compose("kill", *KILLABLE)
+    docker_compose("rm", "-fs")
+    docker_compose("up", "-d", check=True)
 
 
 def _command_status():
-    proc = docker_compose('ps', '--all', '--format=json',
-                          stdout=subprocess.PIPE)
-    data = [
-        json.loads(line)
-        for line in proc.stdout.splitlines()
-    ]
+    proc = docker_compose("ps", "--all", "--format=json", stdout=subprocess.PIPE)
+    data = [json.loads(line) for line in proc.stdout.splitlines()]
 
     containers = []
     for item in data:
-        match item['State']:
-            case 'running':
-                state = '✅'
+        match item["State"]:
+            case "running":
+                state = "✅"
             case _:
-                state = '❌'
-        containers.append([state, item['Service'], item['Status']])
+                state = "❌"
+        containers.append([state, item["Service"], item["Status"]])
     containers = sorted(containers, key=lambda x: x[1])
-    print(tabulate.tabulate(containers, tablefmt='plain'))
+    print(tabulate.tabulate(containers, tablefmt="plain"))
 
 
 COMMANDS = {
-    'restart': _command_restart,
-    'status': _command_status,
+    "restart": _command_restart,
+    "status": _command_status,
 }
 
 
@@ -77,5 +74,5 @@ def main():
         _command_status()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

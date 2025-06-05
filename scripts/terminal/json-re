@@ -6,19 +6,15 @@ import sys
 
 
 def main():
-    parser = argparse.ArgumentParser('json-flat')
-    parser.add_argument('--key', metavar='PATTERN', help='key pattern')
-    parser.add_argument('--value', metavar='PATTERN', help='value pattern')
+    parser = argparse.ArgumentParser("json-flat")
+    parser.add_argument("--key", metavar="PATTERN", help="key pattern")
+    parser.add_argument("--value", metavar="PATTERN", help="value pattern")
     parser.add_argument(
-        '-i', dest='ignorecase', action='store_true',
-        help='ignore case')
+        "-i", dest="ignorecase", action="store_true", help="ignore case"
+    )
+    parser.add_argument("-v", dest="invert", action="store_true", help="invert match")
     parser.add_argument(
-        '-v', dest='invert', action='store_true', help='invert match')
-    parser.add_argument(
-        'data',
-        nargs='?',
-        default=sys.stdin,
-        type=argparse.FileType('r')
+        "data", nargs="?", default=sys.stdin, type=argparse.FileType("r")
     )
     args = parser.parse_args()
 
@@ -52,5 +48,5 @@ def main():
     print(json.dumps(filtered, indent=2, sort_keys=True))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

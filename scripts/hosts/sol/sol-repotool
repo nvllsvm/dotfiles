@@ -6,7 +6,7 @@ import shutil
 import subprocess
 
 
-DATABASE = 'sol'
+DATABASE = "sol"
 
 
 @dataclasses.dataclass
@@ -16,50 +16,63 @@ class Package:
 
 
 class Database:
-    def __init__(self, name, /,
-                 aurutils_cache=None,
-                 directory=None,
-                 ):
+    def __init__(
+        self,
+        name,
+        /,
+        aurutils_cache=None,
+        directory=None,
+    ):
         self.name = name
 
-        self.directory = \
-            pathlib.Path(directory) \
-            if directory is not None \
-            else pathlib.Path('/var/cache/pacman') / name
+        self.directory = (
+            pathlib.Path(directory)
+            if directory is not None
+            else pathlib.Path("/var/cache/pacman") / name
+        )
 
-        self.aurutils_cache = \
-            pathlib.Path(aurutils_cache) \
-            if aurutils_cache is not None \
-            else pathlib.Path('~/.cache/aurutils/sync').expanduser()
+        self.aurutils_cache = (
+            pathlib.Path(aurutils_cache)
+            if aurutils_cache is not None
+            else pathlib.Path("~/.cache/aurutils/sync").expanduser()
+        )
 
-        self.db_tar = self.directory / f'{self.name}.db.tar'
-        self.db_tar_link = self.directory / f'{self.name}.db'
-        self.files_tar = self.directory / f'{self.name}.files.tar'
-        self.db_files_link = self.directory / f'{self.name}.files'
+        self.db_tar = self.directory / f"{self.name}.db.tar"
+        self.db_tar_link = self.directory / f"{self.name}.db"
+        self.files_tar = self.directory / f"{self.name}.files.tar"
+        self.db_files_link = self.directory / f"{self.name}.files"
 
-        #if self.db_tar.is_file():
+        # if self.db_tar.is_file():
         #    subprocess.run(
         #        ['repo-add', '--sign', self.db_tar],
         #        check=True)
 
     def _sign_database(self):
-        tar_link = self.directory / f'{self.name}.db'
-        files_link = self.directory / f'{self.name}.files'
+        tar_link = self.directory / f"{self.name}.db"
+        files_link = self.directory / f"{self.name}.files"
 
         for path in paths:
-            dest = path.with_name(path.name + '.sig')
+            dest = path.with_name(path.name + ".sig")
             subprocess.run(
-                ['gpg', '--yes', '--detach-sign', '--use-agent', '--no-armor',
-                 '--output', dest, path],
-                check=True)
+                [
+                    "gpg",
+                    "--yes",
+                    "--detach-sign",
+                    "--use-agent",
+                    "--no-armor",
+                    "--output",
+                    dest,
+                    path,
+                ],
+                check=True,
+            )
 
     def cleanup(self):
         for path in self.aurutils_cache.iterdir():
-            for subpath in (path / 'src', path / 'pkg'):
+            for subpath in (path / "src", path / "pkg"):
                 if not subpath.exists():
                     continue
-                subprocess.run(
-                    ['chmod', '-R', '777', '--', subpath], check=True)
+                subprocess.run(["chmod", "-R", "777", "--", subpath], check=True)
                 try:
                     shutil.rmtree(subpath)
                 except FileNotFoundError:
@@ -67,9 +80,10 @@ class Database:
 
     def packages(self):
         proc = subprocess.run(
-            ['aur', 'repo', '--database', self.name, '--list'],
+            ["aur", "repo", "--database", self.name, "--list"],
             stdout=subprocess.PIPE,
-            check=True)
+            check=True,
+        )
 
         packages = []
         for line in proc.stdout.decode().splitlines():
@@ -78,13 +92,10 @@ class Database:
         return packages
 
     def prune(self):
-        packages = {
-            package.name
-            for package in self.packages()
-        }
+        packages = {package.name for package in self.packages()}
         for path in self.aurutils_cache.iterdir():
             if path.name not in packages:
-                print('Clearing cache for', path.name)
+                print("Clearing cache for", path.name)
                 shutil.rmtree(path)
         self._pacsync()
         self._paccache()
@@ -92,19 +103,24 @@ class Database:
 
     def sync(self):
         subprocess.run(
-            ['rsync', '-avz', '--progress', '--delete-after',
-             '/var/cache/pacman/sol/',
-             'nullsum.net:~/srv/http/repo/arch/x86_64'],
-            check=True)
+            [
+                "rsync",
+                "-avz",
+                "--progress",
+                "--delete-after",
+                "/var/cache/pacman/sol/",
+                "nullsum.net:~/srv/http/repo/arch/x86_64",
+            ],
+            check=True,
+        )
 
     def remove(self, *packages):
         for package in packages:
             # run per-package to avoid one package's error
             # from stopping removal of the others
-            subprocess.run(
-                ['repo-remove', '--sign', self.db_tar, package])
+            subprocess.run(["repo-remove", "--sign", self.db_tar, package])
 
-            paths = (self.directory).glob(f'{package}*.pkg.*')
+            paths = (self.directory).glob(f"{package}*.pkg.*")
             for path in paths:
                 path.unlink()
             try:
@@ -117,11 +133,20 @@ class Database:
     @staticmethod
     def _sign(path):
         path = pathlib.Path(path)
-        dest = path.with_name(path.name + '.sig')
+        dest = path.with_name(path.name + ".sig")
         subprocess.run(
-            ['gpg', '--yes', '--detach-sign', '--use-agent', '--no-armor',
-             '--output', dest, path],
-            check=True)
+            [
+                "gpg",
+                "--yes",
+                "--detach-sign",
+                "--use-agent",
+                "--no-armor",
+                "--output",
+                dest,
+                path,
+            ],
+            check=True,
+        )
 
     def add(self, *packages):
         self._pacsync()
@@ -130,26 +155,31 @@ class Database:
         for package in packages:
             maybe_path = pathlib.Path(package)
             if maybe_path.is_file():
-                subprocess.run(
-                    ['sudo', 'cp', maybe_path, self.directory],
-                    check=True)
-                subprocess.run(
-                    ['repo-add', self.db_tar, maybe_path],
-                    check=True)
+                subprocess.run(["sudo", "cp", maybe_path, self.directory], check=True)
+                subprocess.run(["repo-add", self.db_tar, maybe_path], check=True)
                 self._sign(self.directory / maybe_path.name)
             else:
                 proc = subprocess.run(
-                    ['aur', 'depends', '--', package],
+                    ["aur", "depends", "--", package],
                     stdout=subprocess.PIPE,
-                    check=True)
+                    check=True,
+                )
                 for line in proc.stdout.decode().splitlines():
                     _, name = line.split()
                     packages_and_deps.add(name)
 
         if packages_and_deps:
             subprocess.run(
-                ['aur', 'sync', '--no-view', '--no-confirm', '--no-ver',
-                 f'--database={self.name}', '--', *packages_and_deps],
+                [
+                    "aur",
+                    "sync",
+                    "--no-view",
+                    "--no-confirm",
+                    "--no-ver",
+                    f"--database={self.name}",
+                    "--",
+                    *packages_and_deps,
+                ],
             )
         self._pacsync()
         self.sync()
@@ -160,11 +190,18 @@ class Database:
         self.aurutils_cache.mkdir(exist_ok=True, parents=True)
 
         subprocess.run(
-            ['aur', 'sync',
-             '--no-view', '--no-confirm', f'--database={self.name}',
-             '--no-ver', '--upgrades'],
+            [
+                "aur",
+                "sync",
+                "--no-view",
+                "--no-confirm",
+                f"--database={self.name}",
+                "--no-ver",
+                "--upgrades",
+            ],
             cwd=self.aurutils_cache,
-            check=True)
+            check=True,
+        )
         self._pacsync()
         self._paccache()
         self.sync()
@@ -221,15 +258,14 @@ class Database:
 
     def _paccache(self):
         subprocess.run(
-            ['paccache', '--remove', '--keep', '1',
-             '--cachedir', self.directory],
-            check=True)
+            ["paccache", "--remove", "--keep", "1", "--cachedir", self.directory],
+            check=True,
+        )
 
     def _pacsync(self):
         subprocess.run(
-            ['sudo', 'pacsync', self.name],
-            stderr=subprocess.DEVNULL,
-            check=True)
+            ["sudo", "pacsync", self.name], stderr=subprocess.DEVNULL, check=True
+        )
 
 
 def db_list():
@@ -272,56 +308,56 @@ def db_sign(all=False):
     database = Database(DATABASE)
     if all:
         for path in database.directory.iterdir():
-            if not path.name.endswith('.pkg.tar.zst'):
+            if not path.name.endswith(".pkg.tar.zst"):
                 continue
             database._sign(path)
-    #database._sign_database()
+    # database._sign_database()
     database.sync()
 
 
 def main():
     parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers(dest='command', metavar='COMMAND', required=True)
+    subparsers = parser.add_subparsers(dest="command", metavar="COMMAND", required=True)
 
-    add_parser = subparsers.add_parser('add', help='')
-    add_parser.add_argument('--rm', action='store_true')
-    add_parser.add_argument('package', nargs='+')
+    add_parser = subparsers.add_parser("add", help="")
+    add_parser.add_argument("--rm", action="store_true")
+    add_parser.add_argument("package", nargs="+")
 
-    list_parser = subparsers.add_parser('list', help='')
-    prune_parser = subparsers.add_parser('prune', help='')
+    list_parser = subparsers.add_parser("list", help="")
+    prune_parser = subparsers.add_parser("prune", help="")
 
-    remove_parser = subparsers.add_parser('remove', help='')
-    remove_parser.add_argument('package', nargs='+')
+    remove_parser = subparsers.add_parser("remove", help="")
+    remove_parser.add_argument("package", nargs="+")
 
-    sign_parser = subparsers.add_parser('sign', help='')
-    sign_parser.add_argument('--all', action='store_true')
+    sign_parser = subparsers.add_parser("sign", help="")
+    sign_parser.add_argument("--all", action="store_true")
 
-    sync_parser = subparsers.add_parser('sync', help='')
+    sync_parser = subparsers.add_parser("sync", help="")
 
-    update_parser = subparsers.add_parser('update', help='')
+    update_parser = subparsers.add_parser("update", help="")
 
     args = parser.parse_args()
 
     match args.command:
-        case 'prune':
+        case "prune":
             db_prune()
-        case 'update':
+        case "update":
             db_update()
-        case 'add':
+        case "add":
             db_add(args.package, delete=args.rm)
-        case 'remove':
+        case "remove":
             db_remove(args.package)
-        case 'list':
+        case "list":
             db_list()
-        case 'sign':
+        case "sign":
             db_sign(all=args.all)
-        case 'sync':
+        case "sync":
             db_sync()
         case _:
             raise ValueError
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
 """
 repotool_update() {

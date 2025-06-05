@@ -27,47 +27,51 @@ def TempPath(**kwargs):
 
 
 def bin_to_flac(source, target):
-    with TempPath(dir=source.parent, prefix='.bin2flac_') as tmp:
+    with TempPath(dir=source.parent, prefix=".bin2flac_") as tmp:
         subprocess.run(
-            ['flac',
-             '--force',
-             '--endian=little',
-             '--channels=2',
-             '--bps=16',
-             '--sample-rate=44100',
-             '--sign=signed',
-             '--force-raw-format',
-             source,
-             '-o', tmp],
-            check=True)
+            [
+                "flac",
+                "--force",
+                "--endian=little",
+                "--channels=2",
+                "--bps=16",
+                "--sample-rate=44100",
+                "--sign=signed",
+                "--force-raw-format",
+                source,
+                "-o",
+                tmp,
+            ],
+            check=True,
+        )
         tmp.rename(target)
 
 
 def _parser_bin(value):
     path = pathlib.Path(value)
     if not path.is_file():
-        raise ValueError('not a file')
-    if path.suffix.lower() != '.bin':
-        raise ValueError('must end with .bin')
+        raise ValueError("not a file")
+    if path.suffix.lower() != ".bin":
+        raise ValueError("must end with .bin")
     return path
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--rm', action='store_true')
-    parser.add_argument('bin', type=_parser_bin)
+    parser.add_argument("--rm", action="store_true")
+    parser.add_argument("bin", type=_parser_bin)
     args = parser.parse_args()
 
     print(args.bin)
-    target = args.bin.with_suffix('.flac')
+    target = args.bin.with_suffix(".flac")
     print(target)
     if target.exists():
-        raise RuntimeError('target exists')
+        raise RuntimeError("target exists")
 
     bin_to_flac(args.bin, target)
     if args.rm:
         args.bin.unlink()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

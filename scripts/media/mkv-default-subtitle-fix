@@ -6,46 +6,44 @@ import subprocess
 
 
 def is_mkv(path):
-    with open(path, 'rb') as handle:
-        return handle.read(4) == b'\x1aE\xdf\xa3'
+    with open(path, "rb") as handle:
+        return handle.read(4) == b"\x1aE\xdf\xa3"
 
 
 def mkv_info(path):
-    proc = subprocess.run(
-        ['mkvmerge', '-J', path],
-        stdout=subprocess.PIPE,
-        check=True)
+    proc = subprocess.run(["mkvmerge", "-J", path], stdout=subprocess.PIPE, check=True)
     return json.loads(proc.stdout)
 
 
 def process(path):
     if not is_mkv(path):
-        print('Skipping, not mkv', path)
+        print("Skipping, not mkv", path)
         return
 
     info = mkv_info(path)
 
-    subs = (
-        track
-        for track in info['tracks']
-        if track['type'] == 'subtitles'
-    )
+    subs = (track for track in info["tracks"] if track["type"] == "subtitles")
 
     for sub in subs:
-        selector = 'track:={}'.format(sub['properties']['uid'])
-        if sub['properties']['language'] in ('eng', 'und'):
+        selector = "track:={}".format(sub["properties"]["uid"])
+        if sub["properties"]["language"] in ("eng", "und"):
             continue
-        if sub['properties']['default_track'] \
-                or sub['properties']['forced_track']:
-            print('Unsetting default & forced flags', path)
+        if sub["properties"]["default_track"] or sub["properties"]["forced_track"]:
+            print("Unsetting default & forced flags", path)
             subprocess.run(
-                ['mkvpropedit',
-                 '--edit', selector,
-                 '--set', 'flag-default=false',
-                 '--set', 'flag-forced=false',
-                 str(path)],
+                [
+                    "mkvpropedit",
+                    "--edit",
+                    selector,
+                    "--set",
+                    "flag-default=false",
+                    "--set",
+                    "flag-forced=false",
+                    str(path),
+                ],
                 stdout=subprocess.DEVNULL,
-                check=True)
+                check=True,
+            )
 
 
 def all_files(root):
@@ -62,7 +60,7 @@ def all_files(root):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('path', nargs='*', type=pathlib.Path)
+    parser.add_argument("path", nargs="*", type=pathlib.Path)
     args = parser.parse_args()
 
     paths = set()
@@ -80,5 +78,5 @@ def main():
             raise
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

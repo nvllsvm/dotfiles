@@ -20,34 +20,28 @@ def all_paths(root):
 def _args_path(value):
     path = pathlib.Path(value)
     if not path.is_dir():
-        raise ValueError('path must be a directory')
+        raise ValueError("path must be a directory")
     return path
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('path', type=_args_path,
-                        nargs='?', default=pathlib.Path())
+    parser.add_argument("path", type=_args_path, nargs="?", default=pathlib.Path())
     args = parser.parse_args()
 
     case_insensitive = collections.defaultdict(list)
     for path in all_paths(args.path):
         path = path.relative_to(args.path)
-        key = tuple(
-            part.lower()
-            for part in path.parts
-        )
+        key = tuple(part.lower() for part in path.parts)
         case_insensitive[key].append(path)
 
     collisions = {
-        key: values
-        for key, values in case_insensitive.items()
-        if len(values) > 1
+        key: values for key, values in case_insensitive.items() if len(values) > 1
     }
     if collisions:
         print(json.dumps(collisions, indent=2, sort_keys=True))
         sys.exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

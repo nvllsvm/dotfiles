@@ -5,61 +5,56 @@ import subprocess
 
 
 def nmap_scan(address):
-    proc = subprocess.run(
-        ['nmap', '-oG', '-', '-sn', address],
-        stdout=subprocess.PIPE
-    )
+    proc = subprocess.run(["nmap", "-oG", "-", "-sn", address], stdout=subprocess.PIPE)
     parts = [
         l.strip().split()
         for l in proc.stdout.decode().splitlines()
-        if not l.startswith('#')
+        if not l.startswith("#")
     ]
-    return [
-        [part[1], part[2][1:-1]]
-        for part in parts
-    ]
+    return [[part[1], part[2][1:-1]] for part in parts]
 
 
-def render_table(rows, delimiter='\t'):
+def render_table(rows, delimiter="\t"):
     # find the maximum column lengths
     column_len_max = {}
     for row in rows:
-        column_len_max.update({
-            index: max(len(column), column_len_max.get(index) or 0)
-            for index, column in enumerate(row)
-        })
+        column_len_max.update(
+            {
+                index: max(len(column), column_len_max.get(index) or 0)
+                for index, column in enumerate(row)
+            }
+        )
 
     # add column padding
     new_rows = []
     for row in rows:
         new_row = [
-            column + (column_len_max[index]-len(column)) * ' '
+            column + (column_len_max[index] - len(column)) * " "
             for index, column in enumerate(row)
         ]
 
         # add missing columns to row
-        new_row.extend([
-            column_len_max[index] * ' '
-            for index in range(len(new_row), len(column_len_max))
-        ])
+        new_row.extend(
+            [
+                column_len_max[index] * " "
+                for index in range(len(new_row), len(column_len_max))
+            ]
+        )
 
         # concatenate columns
         new_rows.append(delimiter.join(new_row))
 
-    return '\n'.join(new_rows)
+    return "\n".join(new_rows)
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('address')
+    parser.add_argument("address")
     args = parser.parse_args()
 
-    hosts = sorted(
-        nmap_scan(args.address),
-        key=lambda x: ipaddress.ip_address(x[0])
-    )
+    hosts = sorted(nmap_scan(args.address), key=lambda x: ipaddress.ip_address(x[0]))
     print(render_table(hosts))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
