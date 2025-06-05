@@ -140,6 +140,7 @@ async def main():
                             [
                                 track["properties"].get("language", "und"),
                                 track["codec"],
+                                track["properties"].get("track_name", None),
                             ]
                         )
                     case "subtitles":
