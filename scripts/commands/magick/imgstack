@@ -11,12 +11,12 @@ class MagickStack(enum.StrEnum):
 
 
 async def magick_stack(*sources, target, mode):
-    args = ['magick', *sources]
+    args = ["magick", *sources]
     match mode:
         case MagickStack.HORIZONTAL:
-            args.extend(['-append'])
+            args.extend(["-append"])
         case MagickStack.VERTICAL:
-            args.extend(['-gravity', 'center', '-append'])
+            args.extend(["-gravity", "center", "-append"])
         case _:
             raise ValueError
     args.append(target)
@@ -35,31 +35,28 @@ class ProcessError(Exception):
     def __str__(self):
         proc = self.process
 
-        text = f'exit {proc.returncode}'
+        text = f"exit {proc.returncode}"
         if self.message is not None:
-            text = f'{text} - {self.message}'
+            text = f"{text} - {self.message}"
 
         try:
-            args = proc._transport._extra['subprocess'].args
+            args = proc._transport._extra["subprocess"].args
         except (AttributeError, KeyError):
             pass
         else:
-            text = f'{text}: {args}'
+            text = f"{text}: {args}"
         return text
 
 
 async def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-m', '--mode', choices=MagickStack, required=True)
-    parser.add_argument('-o', '--output', type=pathlib.Path, required=True)
-    parser.add_argument(
-        'paths', metavar='path', type=pathlib.Path, nargs='+')
+    parser.add_argument("-m", "--mode", choices=MagickStack, required=True)
+    parser.add_argument("-o", "--output", type=pathlib.Path, required=True)
+    parser.add_argument("paths", metavar="path", type=pathlib.Path, nargs="+")
     args = parser.parse_args()
 
-    await magick_stack(*args.paths, 
-                       target=args.output, 
-                       mode=args.mode)
+    await magick_stack(*args.paths, target=args.output, mode=args.mode)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())

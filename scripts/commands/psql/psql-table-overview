@@ -14,7 +14,7 @@ SELECT table_schema,
 """
 
 
-def flatten_dict(root, separator='/'):
+def flatten_dict(root, separator="/"):
     stack = [([], root)]
     flat = {}
     while stack:
@@ -27,7 +27,7 @@ def flatten_dict(root, separator='/'):
                 stack.append((prefix, value))
             else:
                 if any(separator in part for part in prefix):
-                    raise ValueError('separator found in prefix')
+                    raise ValueError("separator found in prefix")
                 flat_key = separator.join(prefix)
                 if flat_key in flat:
                     raise KeyError(f'duplicate key "{flat_key}"')
@@ -42,11 +42,12 @@ def pretty_json(data):
 def get_tree(url):
     schemas = {}
     proc = subprocess.run(
-        ['psql', url, '--no-psqlrc', '--tuples-only', '--csv', '--command', SQL],
+        ["psql", url, "--no-psqlrc", "--tuples-only", "--csv", "--command", SQL],
         stdout=subprocess.PIPE,
-        check=True)
+        check=True,
+    )
     for line in proc.stdout.decode().splitlines():
-        schema, table, _, column_name = line.split(',')
+        schema, table, _, column_name = line.split(",")
         schemas.setdefault(schema, {})
         schemas[schema].setdefault(table, [])
         schemas[schema][table].append(column_name)
@@ -55,25 +56,22 @@ def get_tree(url):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--flat', action='store_true')
-    parser.add_argument('--schema', action='append')
-    parser.add_argument('url')
+    parser.add_argument("--flat", action="store_true")
+    parser.add_argument("--schema", action="append")
+    parser.add_argument("url")
     args = parser.parse_args()
 
     tree = get_tree(args.url)
     if args.schema:
-        tree = {
-            key: value
-            for key, value in tree.items()
-            if key in args.schema
-        }
+        tree = {key: value for key, value in tree.items() if key in args.schema}
 
     if args.flat:
-        for key, values in flatten_dict(tree, '.').items():
+        for key, values in flatten_dict(tree, ".").items():
             for value in values:
-                print('.'.join([key, value]))
+                print(".".join([key, value]))
     else:
         print(pretty_json(tree))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

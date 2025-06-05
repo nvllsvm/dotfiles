@@ -2,6 +2,7 @@
 """
 Execute command on multiple SSH hosts
 """
+
 import argparse
 import getpass
 import signal
@@ -14,13 +15,13 @@ BUFFER_SIZE = 64
 
 
 class Style:
-    FG_RED = '\u001b[31m'
-    FG_GREEN = '\u001b[32m'
-    FG_YELLOW = '\u001b[33m'
-    FG_BLUE = '\u001b[34m'
-    FG_MAGENTA = '\u001b[35m'
-    FG_CYAN = '\u001b[36m'
-    RESET = '\u001b[0m'
+    FG_RED = "\u001b[31m"
+    FG_GREEN = "\u001b[32m"
+    FG_YELLOW = "\u001b[33m"
+    FG_BLUE = "\u001b[34m"
+    FG_MAGENTA = "\u001b[35m"
+    FG_CYAN = "\u001b[36m"
+    RESET = "\u001b[0m"
 
 
 class _OutputMuxer:
@@ -56,40 +57,32 @@ class _OutputMuxer:
         self._maybe_write(sys.stderr.buffer, self._stderr_pending, key, data)
 
     def _maybe_write(self, output_buffer, pending, key, data):
-        data = pending.pop(key, b'') + data
+        data = pending.pop(key, b"") + data
         lines = data.splitlines(True)
-        if not lines[-1].endswith(b'\n'):
+        if not lines[-1].endswith(b"\n"):
             pending[key] = lines.pop()
-        data = b''.join(lines)
+        data = b"".join(lines)
         self._write(output_buffer, data, key)
 
     def _write_pending(self, output_buffer, pending):
         for key, data in pending.items():
-            if not data.endswith(b'\n'):
-                data = data + b'\n'
+            if not data.endswith(b"\n"):
+                data = data + b"\n"
             self._write(output_buffer, data, key)
 
     def _write(self, output_buffer, data, key):
         if output_buffer.isatty():
-            prefix = ''.join([
-                self._key_color(key),
-                key,
-                Style.RESET,
-                ' '
-            ]).encode()
-            data = b''.join([
-                prefix + d
-                for d in data.splitlines(True)
-            ])
+            prefix = "".join([self._key_color(key), key, Style.RESET, " "]).encode()
+            data = b"".join([prefix + d for d in data.splitlines(True)])
         output_buffer.write(data)
         output_buffer.flush()
 
 
 def main():
-    parser = argparse.ArgumentParser(prog='ssh-multi-mux', description=__doc__)
-    parser.add_argument('command')
-    parser.add_argument('--sudo', action='store_true')
-    parser.add_argument('host', nargs='*')
+    parser = argparse.ArgumentParser(prog="ssh-multi-mux", description=__doc__)
+    parser.add_argument("command")
+    parser.add_argument("--sudo", action="store_true")
+    parser.add_argument("host", nargs="*")
     args = parser.parse_args()
 
     if args.sudo:
@@ -112,7 +105,7 @@ def main():
         ssh.connect(host)
         stdin, stdout, __ = ssh.exec_command(command)
         if args.sudo:
-            stdin.write(password + '\n')
+            stdin.write(password + "\n")
             stdin.flush()
         channel = stdout.channel
         channel.setblocking(0)
@@ -121,11 +114,11 @@ def main():
     with _OutputMuxer() as muxer:
         if sys.stdout.isatty():
             for host in channels:
-                print('{}+ {}{}{}'.format(
-                    Style.FG_GREEN,
-                    muxer._key_color(host),
-                    host,
-                    Style.RESET))
+                print(
+                    "{}+ {}{}{}".format(
+                        Style.FG_GREEN, muxer._key_color(host), host, Style.RESET
+                    )
+                )
 
         while channels:
             for host, channel in list(channels.items()):
@@ -137,8 +130,8 @@ def main():
                         muxer.write_stderr(host, stderr_data)
                     continue
 
-                stdout_data = ''
-                stderr_data = ''
+                stdout_data = ""
+                stderr_data = ""
                 try:
                     stdout_data = channel.recv(BUFFER_SIZE)
                 except socket.timeout:
@@ -154,5 +147,5 @@ def main():
                     muxer.write_stderr(host, stderr_data)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

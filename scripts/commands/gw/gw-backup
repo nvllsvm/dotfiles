@@ -6,15 +6,14 @@ import hashlib
 import pathlib
 
 DRIVE_MODEL_BY_GW_SERAIL = {
-    'GW0045C5A0704800000705070F':
-        'Sony MPF920 T/B63 MAY2008 (Rev A00) (CN-0UH650-12591-85S-4K92)'
+    "GW0045C5A0704800000705070F": "Sony MPF920 T/B63 MAY2008 (Rev A00) (CN-0UH650-12591-85S-4K92)"
 }
 
 
 class Greaseweazle:
     @staticmethod
     async def info():
-        args = ['gw', '--time', 'info']
+        args = ["gw", "--time", "info"]
         proc = await asyncio.create_subprocess_exec(
             *args,
             stdout=asyncio.subprocess.PIPE,
@@ -22,12 +21,12 @@ class Greaseweazle:
         )
         stdout, stderr = await proc.communicate()
         if proc.returncode:
-            raise RuntimeError(f'exit {proc.returncode}')
+            raise RuntimeError(f"exit {proc.returncode}")
         return args, stdout.decode(), stderr.decode()
 
     @staticmethod
     async def read(dest):
-        args = ['gw', '--time', 'read', '--', str(dest)]
+        args = ["gw", "--time", "read", "--", str(dest)]
         proc = await asyncio.create_subprocess_exec(
             *args,
             stdout=asyncio.subprocess.PIPE,
@@ -35,12 +34,20 @@ class Greaseweazle:
         )
         stdout, stderr = await proc.communicate()
         if proc.returncode:
-            raise RuntimeError(f'exit {proc.returncode}')
+            raise RuntimeError(f"exit {proc.returncode}")
         return args, stdout.decode(), stderr.decode()
 
     @staticmethod
     async def convert(source, dest, image_format):
-        args = ['gw', '--time', 'convert', f'--format={image_format}', '--', str(source), str(dest)]
+        args = [
+            "gw",
+            "--time",
+            "convert",
+            f"--format={image_format}",
+            "--",
+            str(source),
+            str(dest),
+        ]
         proc = await asyncio.create_subprocess_exec(
             *args,
             stdout=asyncio.subprocess.PIPE,
@@ -48,7 +55,7 @@ class Greaseweazle:
         )
         stdout, stderr = await proc.communicate()
         if proc.returncode:
-            raise RuntimeError(f'exit {proc.returncode}')
+            raise RuntimeError(f"exit {proc.returncode}")
         return args, stdout.decode(), stderr.decode()
 
 
@@ -56,15 +63,15 @@ def multi_hash(path):
     hasher_md5 = hashlib.md5()
     hasher_sha1 = hashlib.sha1()
     hasher_sha256 = hashlib.sha256()
-    with open(path, 'rb') as handle:
+    with open(path, "rb") as handle:
         while data := handle.read(65536):
             hasher_md5.update(data)
             hasher_sha1.update(data)
             hasher_sha256.update(data)
     return {
-        'md5': hasher_md5.hexdigest(),
-        'sha1': hasher_sha1.hexdigest(),
-        'sha256': hasher_sha256.hexdigest(),
+        "md5": hasher_md5.hexdigest(),
+        "sha1": hasher_sha1.hexdigest(),
+        "sha256": hasher_sha256.hexdigest(),
     }
 
 
@@ -73,81 +80,80 @@ async def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '--name',
-        default=datetime.datetime.now().strftime('dump_%Y%m%d_%H%M%S'))
-    parser.add_argument('--image-format', default='ibm.scan')
-    parser.add_argument('--image-suffix', default='img')
-    parser.add_argument('--convert', action='store_true')
-    parser.add_argument('--no-convert', action='store_true')
+        "--name", default=datetime.datetime.now().strftime("dump_%Y%m%d_%H%M%S")
+    )
+    parser.add_argument("--image-format", default="ibm.scan")
+    parser.add_argument("--image-suffix", default="img")
+    parser.add_argument("--convert", action="store_true")
+    parser.add_argument("--no-convert", action="store_true")
     args = parser.parse_args()
 
     parent = pathlib.Path(args.name)
     parent.mkdir(exist_ok=False, parents=True)
-    raw_path = parent / f'{args.name}.scp'
-    image_path = parent / f'{args.name}.{args.image_suffix}'
+    raw_path = parent / f"{args.name}.scp"
+    image_path = parent / f"{args.name}.{args.image_suffix}"
 
     loglines = []
-    log_path = parent / f'{args.name}.log'
+    log_path = parent / f"{args.name}.log"
     if log_path.exists():
         loglines.extend(log_path.read_text().splitlines())
 
-    loglines.append(
-        'START ' + datetime.datetime.now().astimezone().isoformat())
-    loglines.append(f'dest {raw_path}')
+    loglines.append("START " + datetime.datetime.now().astimezone().isoformat())
+    loglines.append(f"dest {raw_path}")
 
-    loglines.append('')
-    loglines.append('INFO')
+    loglines.append("")
+    loglines.append("INFO")
     cmd_args, stdout, stderr = await Greaseweazle.info()
-    loglines.append(f'cmd args: {cmd_args}')
-    loglines.extend([f'stdout: {line}' for line in stdout.splitlines()])
-    loglines.extend([f'stderr: {line}' for line in stderr.splitlines()])
+    loglines.append(f"cmd args: {cmd_args}")
+    loglines.extend([f"stdout: {line}" for line in stdout.splitlines()])
+    loglines.extend([f"stderr: {line}" for line in stderr.splitlines()])
     for line in stderr.splitlines():
-        if line.startswith('  Serial: '):
-            gw_serial = line.split(':')[1].strip()
+        if line.startswith("  Serial: "):
+            gw_serial = line.split(":")[1].strip()
             drive_model = DRIVE_MODEL_BY_GW_SERAIL[gw_serial]
-    loglines.append(f'Drive Model: {drive_model}')
+    loglines.append(f"Drive Model: {drive_model}")
 
     if not args.convert:
         if raw_path.exists():
             raise RuntimeError()
 
-        loglines.append('')
-        loglines.append('READ')
+        loglines.append("")
+        loglines.append("READ")
         cmd_args, stdout, stderr = await Greaseweazle.read(raw_path)
-        loglines.append(f'cmd args: {cmd_args}')
-        loglines.extend([f'stdout: {line}' for line in stdout.splitlines()])
-        loglines.extend([f'stderr: {line}' for line in stderr.splitlines()])
+        loglines.append(f"cmd args: {cmd_args}")
+        loglines.extend([f"stdout: {line}" for line in stdout.splitlines()])
+        loglines.extend([f"stderr: {line}" for line in stderr.splitlines()])
 
-        loglines.append('')
-        loglines.append('RAW HASHES')
-        loglines.append(f'path: {raw_path}')
+        loglines.append("")
+        loglines.append("RAW HASHES")
+        loglines.append(f"path: {raw_path}")
         hashes = multi_hash(raw_path)
         for hash_type in sorted(hashes):
             hash_value = hashes[hash_type]
-            loglines.append(f'{hash_type}: {hash_value}')
+            loglines.append(f"{hash_type}: {hash_value}")
 
     if not args.no_convert:
-        loglines.append('')
-        loglines.append('CONVERT')
+        loglines.append("")
+        loglines.append("CONVERT")
         cmd_args, stdout, stderr = await Greaseweazle.convert(
-            raw_path, image_path, image_format=args.image_format)
-        loglines.append(f'cmd args: {cmd_args}')
-        loglines.extend([f'stdout: {line}' for line in stdout.splitlines()])
-        loglines.extend([f'stderr: {line}' for line in stderr.splitlines()])
+            raw_path, image_path, image_format=args.image_format
+        )
+        loglines.append(f"cmd args: {cmd_args}")
+        loglines.extend([f"stdout: {line}" for line in stdout.splitlines()])
+        loglines.extend([f"stderr: {line}" for line in stderr.splitlines()])
 
-        loglines.append('')
-        loglines.append('IMAGE HASHES')
-        loglines.append(f'path: {image_path}')
+        loglines.append("")
+        loglines.append("IMAGE HASHES")
+        loglines.append(f"path: {image_path}")
         hashes = multi_hash(image_path)
         for hash_type in sorted(hashes):
             hash_value = hashes[hash_type]
-            loglines.append(f'{hash_type}: {hash_value}')
+            loglines.append(f"{hash_type}: {hash_value}")
 
-    loglines.append('')
-    loglines.append(
-        'END ' + datetime.datetime.now().astimezone().isoformat())
-    log_path.write_text('\n'.join(loglines))
+    loglines.append("")
+    loglines.append("END " + datetime.datetime.now().astimezone().isoformat())
+    log_path.write_text("\n".join(loglines))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())

@@ -4,45 +4,45 @@ import pathlib
 
 
 ATTRIBUTE_MAP = {
-    'color00': 'COLOR0',
-    'color01': 'COLOR1',
-    'color02': 'COLOR2',
-    'color03': 'COLOR3',
-    'color04': 'COLOR4',
-    'color05': 'COLOR5',
-    'color06': 'COLOR6',
-    'color07': 'COLOR7',
-    'color08': 'COLOR8',
-    'color09': 'COLOR9',
-    'color10': 'COLOR10',
-    'color11': 'COLOR11',
-    'color12': 'COLOR12',
-    'color13': 'COLOR13',
-    'color14': 'COLOR14',
-    'color15': 'COLOR15',
-    'color16': 'COLOR16',
-    'color17': 'COLOR17',
-    'color18': 'COLOR18',
-    'color19': 'COLOR19',
-    'color20': 'COLOR20',
-    'color21': 'COLOR21',
-    'color_background': 'BACKGROUND',
-    'color_foreground': 'FOREGROUND'
+    "color00": "COLOR0",
+    "color01": "COLOR1",
+    "color02": "COLOR2",
+    "color03": "COLOR3",
+    "color04": "COLOR4",
+    "color05": "COLOR5",
+    "color06": "COLOR6",
+    "color07": "COLOR7",
+    "color08": "COLOR8",
+    "color09": "COLOR9",
+    "color10": "COLOR10",
+    "color11": "COLOR11",
+    "color12": "COLOR12",
+    "color13": "COLOR13",
+    "color14": "COLOR14",
+    "color15": "COLOR15",
+    "color16": "COLOR16",
+    "color17": "COLOR17",
+    "color18": "COLOR18",
+    "color19": "COLOR19",
+    "color20": "COLOR20",
+    "color21": "COLOR21",
+    "color_background": "BACKGROUND",
+    "color_foreground": "FOREGROUND",
 }
 
 
 def base16_export(path, uppercase=False):
     attributes = {}
-    for line in path.read_text().split('\n'):
+    for line in path.read_text().split("\n"):
         line = line.strip()
-        if not line.startswith('color'):
+        if not line.startswith("color"):
             continue
 
-        attribute, remaining = line.split('=')
+        attribute, remaining = line.split("=")
 
         color = remaining.split()[0]
-        for char in ('"', '$', '/'):
-            color = color.replace(char, '')
+        for char in ('"', "$", "/"):
+            color = color.replace(char, "")
 
         color = attributes.get(color, color)
         attributes[attribute] = color.upper() if uppercase else color.lower()
@@ -50,25 +50,25 @@ def base16_export(path, uppercase=False):
 
 
 def main():
-    parser = argparse.ArgumentParser('base16-export')
-    default = '~/.base16_theme'
-    parser.add_argument('--uppercase', action='store_true')
+    parser = argparse.ArgumentParser("base16-export")
+    default = "~/.base16_theme"
+    parser.add_argument("--uppercase", action="store_true")
     parser.add_argument(
-        '--theme',
-        metavar='FILE',
+        "--theme",
+        metavar="FILE",
         type=pathlib.Path,
         default=pathlib.Path(default).expanduser(),
-        help=f'(default: {default})'
+        help=f"(default: {default})",
     )
     args = parser.parse_args()
     attributes = base16_export(args.theme, uppercase=args.uppercase)
     print(
-        '\n'.join(
+        "\n".join(
             f"export BASE16_{ATTRIBUTE_MAP[attribute]}='{color}'"
             for attribute, color in attributes.items()
         )
     )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

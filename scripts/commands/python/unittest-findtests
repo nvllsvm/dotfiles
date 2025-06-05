@@ -6,43 +6,41 @@ import pathlib
 import subprocess
 import unittest
 
-LOGGER = logging.getLogger('unittest-findtests')
+LOGGER = logging.getLogger("unittest-findtests")
 
 
 def find_tests(name):
     tests = set()
     try:
-        for suite in unittest.defaultTestLoader.discover(name,
-                                                         top_level_dir=name):
-            LOGGER.debug('suite %r', suite)
+        for suite in unittest.defaultTestLoader.discover(name, top_level_dir=name):
+            LOGGER.debug("suite %r", suite)
             for case in suite:
-                LOGGER.debug('case %r', case)
+                LOGGER.debug("case %r", case)
                 try:
                     iter_case = iter(case)
                 except TypeError as e:
-                    LOGGER.debug('case error %r', e)
+                    LOGGER.debug("case error %r", e)
                     continue
                 for test in iter_case:
-                    fullname = '.'.join([
-                        test.__module__,
-                        test.__class__.__qualname__,
-                        test._testMethodName
-                    ])
-                    LOGGER.debug('found %s', fullname)
+                    fullname = ".".join(
+                        [
+                            test.__module__,
+                            test.__class__.__qualname__,
+                            test._testMethodName,
+                        ]
+                    )
+                    LOGGER.debug("found %s", fullname)
                     tests.add(fullname)
     except (AssertionError, ImportError) as e:
-        LOGGER.debug('loader error %r', e)
+        LOGGER.debug("loader error %r", e)
     relative = name.relative_to(pathlib.Path())
-    return {
-        '.'.join((*relative.parts, test))
-        for test in tests
-    }
+    return {".".join((*relative.parts, test)) for test in tests}
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--verbose', action='store_true')
-    parser.add_argument('path', type=pathlib.Path, nargs='?')
+    parser.add_argument("--verbose", action="store_true")
+    parser.add_argument("path", type=pathlib.Path, nargs="?")
     args = parser.parse_args()
 
     if args.verbose:
@@ -65,8 +63,8 @@ def main():
             for path in paths:
                 tests.update(find_tests(path))
 
-    print('\n'.join(sorted(tests)))
+    print("\n".join(sorted(tests)))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,18 +1,19 @@
 #!/usr/bin/env python
 """Show Python module filesystem paths"""
+
 import argparse
 import os.path
 import pkgutil
 
 
 def main():
-    parser = argparse.ArgumentParser('whpy', description=__doc__)
-    parser.add_argument('module')
+    parser = argparse.ArgumentParser("whpy", description=__doc__)
+    parser.add_argument("module")
     args = parser.parse_args()
 
     loader = pkgutil.get_loader(args.module)
     if loader is None:
-        parser.error('module not found')
+        parser.error("module not found")
 
     # Use get_filename for Python 2 compatibility
     try:
@@ -21,10 +22,10 @@ def main():
         path = None
 
     if path is None:
-        parser.error('built-in module')
+        parser.error("built-in module")
 
     print(path)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

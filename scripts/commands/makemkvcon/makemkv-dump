@@ -11,12 +11,14 @@ class makemkv:
     async def list_drives():
         drives = {}
         proc = await asyncio.create_subprocess_exec(
-            'makemkvcon', 'f', '--list',
+            "makemkvcon",
+            "f",
+            "--list",
             stdout=asyncio.subprocess.PIPE,
         )
         stdout, _ = await proc.communicate()
         if proc.returncode:
-            raise RuntimeError(f'exit {proc.returncode}')
+            raise RuntimeError(f"exit {proc.returncode}")
         lines = stdout.decode().splitlines()
         num_drives = int(lines[0].split()[1])
 
@@ -38,31 +40,37 @@ class makemkv:
     @staticmethod
     async def drive_info(device):
         proc = await asyncio.create_subprocess_exec(
-            'makemkvcon', 'f', '--verbose', '--info', f'--drive={device}',
+            "makemkvcon",
+            "f",
+            "--verbose",
+            "--info",
+            f"--drive={device}",
             stdout=asyncio.subprocess.PIPE,
         )
         stdout, _ = await proc.communicate()
         if proc.returncode:
-            raise RuntimeError(f'exit {proc.returncode}')
+            raise RuntimeError(f"exit {proc.returncode}")
         return stdout.decode().splitlines()
 
     @staticmethod
     async def disc_info(device):
         proc = await asyncio.create_subprocess_exec(
-            'makemkvcon', 'info', f'dev:{device}',
+            "makemkvcon",
+            "info",
+            f"dev:{device}",
             stdout=asyncio.subprocess.PIPE,
         )
         stdout, _ = await proc.communicate()
         if proc.returncode:
-            raise RuntimeError(f'exit {proc.returncode}')
+            raise RuntimeError(f"exit {proc.returncode}")
         return stdout.decode().splitlines()
 
     @staticmethod
     async def backup(drive, dest, decrypt=True):
-        args = ['makemkvcon', 'backup', '-r']
+        args = ["makemkvcon", "backup", "-r"]
         if decrypt:
-            args.append('--decrypt')
-        args.extend([f'disc:{drive}', dest])
+            args.append("--decrypt")
+        args.extend([f"disc:{drive}", dest])
         proc = await asyncio.create_subprocess_exec(
             *args,
             stdout=asyncio.subprocess.PIPE,
@@ -70,17 +78,17 @@ class makemkv:
         )
         stdout, stderr = await proc.communicate()
         if proc.returncode:
-            raise RuntimeError(f'exit {proc.returncode}')
+            raise RuntimeError(f"exit {proc.returncode}")
         return args, stdout.decode(), stderr.decode()
 
 
 async def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--no-decrypt', action='store_true')
-    parser.add_argument('--drive')
+    parser.add_argument("--no-decrypt", action="store_true")
+    parser.add_argument("--drive")
     parser.add_argument(
-        '--name',
-        default=datetime.datetime.now().strftime('dump_%Y%m%d_%H%M%S'))
+        "--name", default=datetime.datetime.now().strftime("dump_%Y%m%d_%H%M%S")
+    )
 
     args = parser.parse_args()
 
@@ -90,48 +98,46 @@ async def main():
         drives = await makemkv.list_drives()
         match len(drives):
             case 0:
-                raise RuntimeError('no drives detected')
+                raise RuntimeError("no drives detected")
             case 1:
                 drive = list(drives.keys())[0]
             case _:
-                raise RuntimeError('multiple drives detected')
+                raise RuntimeError("multiple drives detected")
 
     drive_info = await makemkv.drive_info(drive)
     disc_info = await makemkv.disc_info(drive)
 
     parent = pathlib.Path(args.name)
     parent.mkdir(exist_ok=False, parents=True)
-    dump_path = parent / 'dump'
-    log_path = parent / 'dump.log'
+    dump_path = parent / "dump"
+    log_path = parent / "dump.log"
 
     loglines = []
-    loglines.append(
-        'START ' + datetime.datetime.now().astimezone().isoformat())
+    loglines.append("START " + datetime.datetime.now().astimezone().isoformat())
 
-    loglines.append('')
-    loglines.append('DRIVE INFO')
+    loglines.append("")
+    loglines.append("DRIVE INFO")
     loglines.extend(drive_info)
 
-    loglines.append('')
-    loglines.append('DISC INFO')
+    loglines.append("")
+    loglines.append("DISC INFO")
     loglines.extend(disc_info)
 
-    loglines.append('')
-    loglines.append('BACKUP')
+    loglines.append("")
+    loglines.append("BACKUP")
     cmd_args, stdout, stderr = await makemkv.backup(
         drive=drive,
         dest=dump_path,
         decrypt=False if args.no_decrypt else True,
     )
-    loglines.append(f'cmd args: {cmd_args}')
-    loglines.extend([f'stdout: {line}' for line in stdout.splitlines()])
-    loglines.extend([f'stderr: {line}' for line in stderr.splitlines()])
+    loglines.append(f"cmd args: {cmd_args}")
+    loglines.extend([f"stdout: {line}" for line in stdout.splitlines()])
+    loglines.extend([f"stderr: {line}" for line in stderr.splitlines()])
 
-    loglines.append('')
-    loglines.append(
-        'END ' + datetime.datetime.now().astimezone().isoformat())
-    log_path.write_text('\n'.join(loglines))
+    loglines.append("")
+    loglines.append("END " + datetime.datetime.now().astimezone().isoformat())
+    log_path.write_text("\n".join(loglines))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())

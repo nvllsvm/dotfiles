@@ -7,7 +7,7 @@ import sys
 import urllib.parse
 
 
-SSH_CONFIG_PATH = pathlib.Path('~/.ssh/config').expanduser()
+SSH_CONFIG_PATH = pathlib.Path("~/.ssh/config").expanduser()
 
 
 def ssh_hostmap():
@@ -19,9 +19,9 @@ def ssh_hostmap():
         if not line:
             continue
         key, value = line.split(maxsplit=1)
-        if key.lower() == 'host':
+        if key.lower() == "host":
             host = value
-        elif key.lower() == 'hostname':
+        elif key.lower() == "hostname":
             hostmap[host] = value
     return hostmap
 
@@ -31,9 +31,10 @@ class Git:
     def toplevel(path):
         wdir = path.parent if path.is_file() else path
         proc = subprocess.run(
-            ['git', '-C', wdir, 'rev-parse', '--show-toplevel'],
+            ["git", "-C", wdir, "rev-parse", "--show-toplevel"],
             stdout=subprocess.PIPE,
-            check=True)
+            check=True,
+        )
         lines = proc.stdout.decode().splitlines()
         if len(lines) != 1:
             raise RuntimeError(lines)
@@ -42,11 +43,12 @@ class Git:
     @staticmethod
     def remote_url(path):
         wdir = path.parent if path.is_file() else path
-        for remote in ('upstream', 'origin'):
+        for remote in ("upstream", "origin"):
             proc = subprocess.run(
-                ['git', '-C', wdir, 'remote', 'get-url', remote],
+                ["git", "-C", wdir, "remote", "get-url", remote],
                 stdout=subprocess.PIPE,
-                stderr=subprocess.DEVNULL)
+                stderr=subprocess.DEVNULL,
+            )
             if proc.returncode == 0:
                 return remote, proc.stdout.decode().strip()
         raise RuntimeError
@@ -55,15 +57,14 @@ class Git:
     def remote_branches(path):
         wdir = path.parent if path.is_file() else path
         proc = subprocess.run(
-            ['git', '-C', wdir, 'branch', '--all'],
-            stdout=subprocess.PIPE,
-            check=True)
+            ["git", "-C", wdir, "branch", "--all"], stdout=subprocess.PIPE, check=True
+        )
 
         branches = {}
         for line in proc.stdout.decode().splitlines():
             name = line[2:].split()[0]
-            if name.startswith('remotes/'):
-                _, remote, branch, *_ = name.split('/')
+            if name.startswith("remotes/"):
+                _, remote, branch, *_ = name.split("/")
                 branches.setdefault(remote, set())
                 branches[remote].add(branch)
         return branches
@@ -72,9 +73,10 @@ class Git:
     def current_branch(path):
         wdir = path.parent if path.is_file() else path
         proc = subprocess.run(
-            ['git', '-C', wdir, 'branch', '--show-current'],
+            ["git", "-C", wdir, "branch", "--show-current"],
             stdout=subprocess.PIPE,
-            check=True)
+            check=True,
+        )
         return proc.stdout.decode().strip()
 
 
@@ -84,20 +86,20 @@ def get_url(path, lines):
     path = path.absolute()
 
     remote, remote_url = Git.remote_url(path)
-    if remote_url.lower().startswith(('http://', 'https://')):
+    if remote_url.lower().startswith(("http://", "https://")):
         url = remote_url
-    elif ':' in remote_url:
-        host, urlpath = remote_url.split(':', maxsplit=1)
+    elif ":" in remote_url:
+        host, urlpath = remote_url.split(":", maxsplit=1)
         try:
             hostname = ssh_hostmap()[host]
         except KeyError:
-            if '@' in host:
-                host = host.split('@', maxsplit=1)[-1]
-                hostname = host.split(':', maxsplit=1)[0]
-        if hostname == 'aur.archlinux.org':
-            url = f'https://aur.archlinux.org/packages/{urlpath}'
+            if "@" in host:
+                host = host.split("@", maxsplit=1)[-1]
+                hostname = host.split(":", maxsplit=1)[0]
+        if hostname == "aur.archlinux.org":
+            url = f"https://aur.archlinux.org/packages/{urlpath}"
         else:
-            url = f'https://{hostname}/{urlpath}'
+            url = f"https://{hostname}/{urlpath}"
     else:
         raise NotImplementedError(remote_url)
 
@@ -108,7 +110,7 @@ def get_url(path, lines):
         branches = Git.remote_branches(path)
         current_branch = Git.current_branch(path)
 
-        for branch in (current_branch, 'main', 'master'):
+        for branch in (current_branch, "main", "master"):
             if branch in branches[remote]:
                 preferred = branch
                 break
@@ -118,26 +120,26 @@ def get_url(path, lines):
 
         start, end = lines if lines else (None, None)
         # purposefully fuzzy for the sake of internal deployments
-        if 'github' in netloc:
-            url = '/'.join([url, 'blob', preferred, *path_parts])
+        if "github" in netloc:
+            url = "/".join([url, "blob", preferred, *path_parts])
             if start:
-                url = f'{url}#L{start}'
+                url = f"{url}#L{start}"
                 if end:
-                    url = f'{url}-L{end}'
-        elif 'gitlab' in netloc:
-            url = '/'.join([url, '-', 'blob', preferred, *path_parts])
+                    url = f"{url}-L{end}"
+        elif "gitlab" in netloc:
+            url = "/".join([url, "-", "blob", preferred, *path_parts])
             if start:
-                url = f'{url}#L{start}'
+                url = f"{url}#L{start}"
                 if end:
-                    url = f'{url}-{end}'
+                    url = f"{url}-{end}"
         else:
-            print('error: unhandled git host', file=sys.stderr)
+            print("error: unhandled git host", file=sys.stderr)
     return url
 
 
 def _parser_lines(value):
-    if '-' in value:
-        start, end = value.split('-')
+    if "-" in value:
+        start, end = value.split("-")
         return int(start), int(end)
     else:
         return int(value), None
@@ -145,15 +147,15 @@ def _parser_lines(value):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('path', type=pathlib.Path, nargs='?')
-    parser.add_argument('-l', '--lines', type=_parser_lines)
+    parser.add_argument("path", type=pathlib.Path, nargs="?")
+    parser.add_argument("-l", "--lines", type=_parser_lines)
     args = parser.parse_args()
 
     url = get_url(args.path, lines=args.lines)
     print(url)
-    if sys.stdout.isatty() and not os.environ.get('SSH_TTY'):
-        subprocess.run(['open', url])
+    if sys.stdout.isatty() and not os.environ.get("SSH_TTY"):
+        subprocess.run(["open", url])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

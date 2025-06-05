@@ -18,11 +18,10 @@ def parse_links(header):
         rel = None
         for param in params:
             key, _, value, _ = re.match(
-                r"^\s*(\S*)\s*=\s*(['\"]?)(.*?)(\2)\s*$",
-                param, re.M
+                r"^\s*(\S*)\s*=\s*(['\"]?)(.*?)(\2)\s*$", param, re.M
             ).groups()
 
-            if key == 'rel':
+            if key == "rel":
                 if rel is None:
                     rel = value
                 else:
@@ -37,19 +36,16 @@ def parse_links(header):
 
 
 class DockerRegistry:
-
     def __init__(self, url):
         self.url = url
 
     def get_tags(self, image_path):
-        accept_header = 'application/vnd.docker.distribution.manifest.v2+json'
+        accept_header = "application/vnd.docker.distribution.manifest.v2+json"
         status_code, _, body = self.request(
-            'GET',
-            f'/v2/{image_path}/tags/list',
-            headers={'Accept': accept_header}
+            "GET", f"/v2/{image_path}/tags/list", headers={"Accept": accept_header}
         )
         try:
-            tags = json.loads(body)['tags']
+            tags = json.loads(body)["tags"]
         except KeyError:
             raise DockerNotFound
 
@@ -59,39 +55,35 @@ class DockerRegistry:
 
     def get_repositories(self):
         repos = set()
-        path = '/v2/_catalog'
+        path = "/v2/_catalog"
 
         while path:
-            _, headers, body = self.request('GET', path)
-            for repo in json.loads(body)['repositories']:
+            _, headers, body = self.request("GET", path)
+            for repo in json.loads(body)["repositories"]:
                 repos.add(repo)
             try:
-                path = parse_links(headers['Link'])['next']
+                path = parse_links(headers["Link"])["next"]
             except KeyError:
                 path = None
         return repos
 
     def get_tag_manifest(self, image_path, tag):
-        accept_header = 'application/vnd.docker.distribution.manifest.v2+json'
+        accept_header = "application/vnd.docker.distribution.manifest.v2+json"
         _, headers, _ = self.request(
-            'HEAD',
-            f'/v2/{image_path}/manifests/{tag}',
-            headers={'Accept': accept_header}
+            "HEAD",
+            f"/v2/{image_path}/manifests/{tag}",
+            headers={"Accept": accept_header},
         )
-        return headers['etag'].replace('"', '')
+        return headers["etag"].replace('"', "")
 
     def delete_manifest(self, image_path, manifest):
-        self.request(
-            'DELETE',
-            f'/v2/{image_path}/manifests/{manifest}'
-        )
+        self.request("DELETE", f"/v2/{image_path}/manifests/{manifest}")
 
     def request(self, method, path, data=None, headers={}, timeout=30):
         url = urllib.parse.urlunsplit(
             urllib.parse.urlsplit(self.url)._replace(path=path)
         )
-        r = urllib.request.Request(
-            url, data=data, headers=headers, method=method)
+        r = urllib.request.Request(url, data=data, headers=headers, method=method)
         try:
             response = urllib.request.urlopen(r, timeout=timeout)
         except urllib.error.HTTPError as error:
@@ -104,15 +96,15 @@ class DockerNotFound(Exception):
 
 
 def split_tag(image):
-    vals = image.split(':')
+    vals = image.split(":")
     if len(vals) == 1:
         image_path = vals[0]
-        tag = 'latest'
+        tag = "latest"
     elif len(vals) == 2:
         image_path = vals[0]
         tag = vals[1]
     else:
-        raise ValueError('invalid image')
+        raise ValueError("invalid image")
     return image_path, tag
 
 
@@ -122,47 +114,38 @@ def main():
 
     sp = parser.add_subparsers()
 
-    sp_repos = sp.add_parser('repos')
-    sp_repos.set_defaults(mode='repos')
+    sp_repos = sp.add_parser("repos")
+    sp_repos.set_defaults(mode="repos")
 
-    sp_tags = sp.add_parser('tags')
-    sp_tags.set_defaults(mode='tags')
-    sp_tags.add_argument('path', help='image path')
+    sp_tags = sp.add_parser("tags")
+    sp_tags.set_defaults(mode="tags")
+    sp_tags.add_argument("path", help="image path")
 
-    sp_delete = sp.add_parser('delete')
-    sp_delete.set_defaults(mode='delete')
-    sp_delete.add_argument('image', help='image with tag')
+    sp_delete = sp.add_parser("delete")
+    sp_delete.set_defaults(mode="delete")
+    sp_delete.add_argument("image", help="image with tag")
 
-    parser.add_argument(
-        '--url', help='Docker registry URL', required=True
-    )
+    parser.add_argument("--url", help="Docker registry URL", required=True)
     args = parser.parse_args()
 
     api = DockerRegistry(args.url)
 
     try:
-        if args.mode == 'repos':
-            print('\n'.join(sorted(api.get_repositories())))
-        elif args.mode == 'tags':
+        if args.mode == "repos":
+            print("\n".join(sorted(api.get_repositories())))
+        elif args.mode == "tags":
             tags = api.get_tags(args.path)
-            versions = [
-                t
-                for t in tags
-            ]
-            print('\n'.join(
-                sorted(
-                    [str(v) for v in versions]
-                )
-            ))
+            versions = [t for t in tags]
+            print("\n".join(sorted([str(v) for v in versions])))
 
-        elif args.mode == 'delete':
+        elif args.mode == "delete":
             image_path, tag = split_tag(args.image)
             manifest = api.get_tag_manifest(image_path, tag)
             api.delete_manifest(image_path, manifest)
     except DockerNotFound:
-        print('error: object not found', file=sys.stderr)
+        print("error: object not found", file=sys.stderr)
         sys.exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

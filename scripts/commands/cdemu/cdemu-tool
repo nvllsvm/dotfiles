@@ -9,25 +9,25 @@ import pathlib
 import shutil
 import time
 
-DBUS_SESSION_BUS_ADDRESS = os.environ['DBUS_SESSION_BUS_ADDRESS']
-XDG_RUNTIME_DIR = pathlib.Path(os.environ['XDG_RUNTIME_DIR'])
+DBUS_SESSION_BUS_ADDRESS = os.environ["DBUS_SESSION_BUS_ADDRESS"]
+XDG_RUNTIME_DIR = pathlib.Path(os.environ["XDG_RUNTIME_DIR"])
 
 
 class cdemu_proxy:
-
     def __init__(self):
         cdemu_cli = importlib.machinery.SourceFileLoader(
-            'cdemu', shutil.which('cdemu')).load_module()
-        self.proxy = cdemu_cli.CDEmuDaemonProxy('session')
+            "cdemu", shutil.which("cdemu")
+        ).load_module()
+        self.proxy = cdemu_cli.CDEmuDaemonProxy("session")
         self.device = 0
 
     async def status(self):
         is_loaded, filenames = self.proxy.DeviceGetStatus(self.device)
         dev_sr, dev_sg = self.proxy.DeviceGetMapping(self.device)
         return {
-            'dev_sr': dev_sr,
-            'dev_sg': dev_sg,
-            'filenames': filenames,
+            "dev_sr": dev_sr,
+            "dev_sg": dev_sg,
+            "filenames": filenames,
         }
 
     async def wait_for_device_ready(self):
@@ -47,26 +47,25 @@ class cdemu_proxy:
                 await asyncio.sleep(0.25)
 
     async def load(self, *paths):
-        paths = [
-            str(pathlib.Path(p).absolute())
-            for p in paths
-        ]
+        paths = [str(pathlib.Path(p).absolute()) for p in paths]
         self.proxy.DeviceLoad(self.device, paths, {})
 
 
 async def systemd_run_load(*files):
-    name = f'cdemu-tool@{str(time.time_ns())}'
+    name = f"cdemu-tool@{str(time.time_ns())}"
     proc = await asyncio.create_subprocess_exec(
-        'systemd-run',
-        '--user',
-        '--collect',
-        '--quiet',
-        f'--property=RuntimeDirectory=cdemu-tool/{name}',
-        f'--unit={name}',
-        f'--setenv=CDEMU_TOOL_NAME={name}',
-        '--',
-        'dbus-run-session',
-        'cdemu-tool', 'systemd-load', *files,
+        "systemd-run",
+        "--user",
+        "--collect",
+        "--quiet",
+        f"--property=RuntimeDirectory=cdemu-tool/{name}",
+        f"--unit={name}",
+        f"--setenv=CDEMU_TOOL_NAME={name}",
+        "--",
+        "dbus-run-session",
+        "cdemu-tool",
+        "systemd-load",
+        *files,
     )
     await proc.communicate()
     if proc.returncode:
@@ -90,21 +89,21 @@ def safe_write(path, data):
                 pass
 
 
-
 async def systemd_stop(name):
     proc = await asyncio.create_subprocess_exec(
-        'systemctl', '--user', 'stop', f'{name}.service')
+        "systemctl", "--user", "stop", f"{name}.service"
+    )
     await proc.communicate()
     if proc.returncode:
         raise RuntimeError
 
 
 def get_devices():
-    parent = XDG_RUNTIME_DIR / 'cdemu-tool'
+    parent = XDG_RUNTIME_DIR / "cdemu-tool"
     devices = []
     try:
         for parent in parent.iterdir():
-            path = parent / 'info.json'
+            path = parent / "info.json"
             info = json.loads(path.read_text())
             devices.append(info)
         return devices
@@ -125,25 +124,22 @@ class _Parser:
         else:
             data = {}
             for device in devices:
-                dev = device['dev_sr']
+                dev = device["dev_sr"]
                 if dev in data:
                     raise RuntimeError
-                data[dev] = device['filenames']
+                data[dev] = device["filenames"]
             for dev in sorted(data):
                 print(dev)
                 for filename in data[dev]:
-                    print(' ', filename)
+                    print(" ", filename)
 
     @staticmethod
     async def load(args):
-        files = [
-            path.absolute()
-            for path in args.file
-        ]
+        files = [path.absolute() for path in args.file]
         name = await systemd_run_load(*files)
         while True:
             for device in get_devices():
-                if device['name'] == name:
+                if device["name"] == name:
                     print(pretty_json(device))
                     return
             await asyncio.sleep(0.25)
@@ -152,59 +148,58 @@ class _Parser:
     async def remove(args):
         devices = get_devices()
         for device in devices:
-            if device['dev_sr'] == args.device:
-                await systemd_stop(device['name'])
+            if device["dev_sr"] == args.device:
+                await systemd_stop(device["name"])
                 return
-        raise KeyError('device not found')
+        raise KeyError("device not found")
 
     @staticmethod
     async def systemd_load(args):
-        proc = await asyncio.create_subprocess_exec('cdemu-daemon')
+        proc = await asyncio.create_subprocess_exec("cdemu-daemon")
         cdemu = cdemu_proxy()
         await cdemu.wait_for_device_ready()
         await cdemu.load(*args.file)
         await cdemu.wait_for_device_loaded()
         status = await cdemu.status()
 
-        name = os.environ['CDEMU_TOOL_NAME']
+        name = os.environ["CDEMU_TOOL_NAME"]
         info = {
-            'name': name,
-            'filenames': [str(path) for path in args.file],
-            'dbus_session_bus_address': DBUS_SESSION_BUS_ADDRESS,
-            'dev_sr': status['dev_sr'],
-            'dev_sg': status['dev_sg'],
+            "name": name,
+            "filenames": [str(path) for path in args.file],
+            "dbus_session_bus_address": DBUS_SESSION_BUS_ADDRESS,
+            "dev_sr": status["dev_sr"],
+            "dev_sg": status["dev_sg"],
         }
-        runtime_directory = pathlib.Path(os.environ['RUNTIME_DIRECTORY'])
-        safe_write((runtime_directory / 'info.json'), json.dumps(info))
+        runtime_directory = pathlib.Path(os.environ["RUNTIME_DIRECTORY"])
+        safe_write((runtime_directory / "info.json"), json.dumps(info))
 
         await proc.communicate()
 
 
 async def main():
     parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers(
-        dest='command', metavar='COMMAND', required=True)
+    subparsers = parser.add_subparsers(dest="command", metavar="COMMAND", required=True)
 
-    load_parser = subparsers.add_parser('load', help='')
+    load_parser = subparsers.add_parser("load", help="")
     load_parser.set_defaults(func=_Parser.load)
-    load_parser.add_argument('file', type=pathlib.Path, nargs='+')
+    load_parser.add_argument("file", type=pathlib.Path, nargs="+")
 
-    remove_parser = subparsers.add_parser('remove', help='')
+    remove_parser = subparsers.add_parser("remove", help="")
     remove_parser.set_defaults(func=_Parser.remove)
-    remove_parser.add_argument('device')
+    remove_parser.add_argument("device")
 
-    status_parser = subparsers.add_parser('status', help='')
+    status_parser = subparsers.add_parser("status", help="")
     status_parser.set_defaults(func=_Parser.status)
-    status_parser.add_argument('--json', action='store_true')
+    status_parser.add_argument("--json", action="store_true")
 
-    systemd_load_parser = subparsers.add_parser('systemd-load', help='')
+    systemd_load_parser = subparsers.add_parser("systemd-load", help="")
     systemd_load_parser.set_defaults(func=_Parser.systemd_load)
-    systemd_load_parser.add_argument('file', type=pathlib.Path, nargs='+')
+    systemd_load_parser.add_argument("file", type=pathlib.Path, nargs="+")
 
     args = parser.parse_args()
 
     await args.func(args)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())

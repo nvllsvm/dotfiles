@@ -5,22 +5,23 @@ import subprocess
 
 def pip_index_versions(package):
     proc = subprocess.run(
-        ['pip', 'index', 'versions', '--ignore-requires-python', package],
+        ["pip", "index", "versions", "--ignore-requires-python", package],
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL,
-        check=True)
+        check=True,
+    )
 
     for line in proc.stdout.decode().splitlines():
-        new_line = line.removeprefix('Available versions: ')
+        new_line = line.removeprefix("Available versions: ")
         if new_line != line:
-            return new_line.split(', ')
+            return new_line.split(", ")
     raise RuntimeError
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-a', '--all', action='store_true')
-    parser.add_argument('package')
+    parser.add_argument("-a", "--all", action="store_true")
+    parser.add_argument("package")
     args = parser.parse_args()
 
     # seems to be sorted newest to oldest
@@ -32,5 +33,5 @@ def main():
         print(versions[0])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

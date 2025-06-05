@@ -8,9 +8,9 @@ import async_executor
 
 def get_dump_profile(log_path):
     for line in log_path.read_text().splitlines():
-        if line.startswith('current profile: '):
-            return line.removeprefix('current profile: ').strip()
-    raise RuntimeError('cannot determine dump profile')
+        if line.startswith("current profile: "):
+            return line.removeprefix("current profile: ").strip()
+    raise RuntimeError("cannot determine dump profile")
 
 
 async def process_path(path):
@@ -19,11 +19,16 @@ async def process_path(path):
 
     profile = get_dump_profile(path)
 
-    if profile.startswith('CD-'):
+    if profile.startswith("CD-"):
         proc = await asyncio.create_subprocess_exec(
-            'redumper',
-            'protection', 'split', 'hash', 'info', 'skeleton',
-            '--image-name', image_name,
+            "redumper",
+            "protection",
+            "split",
+            "hash",
+            "info",
+            "skeleton",
+            "--image-name",
+            image_name,
             cwd=cwd,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
@@ -31,11 +36,14 @@ async def process_path(path):
         await proc.communicate()
         if proc.returncode != 0:
             raise RuntimeError
-    elif profile.startswith(('DVD-', 'BD-', 'HD ')):
+    elif profile.startswith(("DVD-", "BD-", "HD ")):
         proc = await asyncio.create_subprocess_exec(
-            'redumper',
-            'hash', 'info', 'skeleton',
-            '--image-name', image_name,
+            "redumper",
+            "hash",
+            "info",
+            "skeleton",
+            "--image-name",
+            image_name,
             cwd=cwd,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
@@ -44,19 +52,19 @@ async def process_path(path):
         if proc.returncode != 0:
             raise RuntimeError
     else:
-        raise RuntimeError(f'profile not implemented: {profile}')
+        raise RuntimeError(f"profile not implemented: {profile}")
 
 
 async def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-n', dest='num_procs', type=int, default=1)
-    parser.add_argument('path', type=pathlib.Path, nargs='+')
+    parser.add_argument("-n", dest="num_procs", type=int, default=1)
+    parser.add_argument("path", type=pathlib.Path, nargs="+")
     args = parser.parse_args()
 
     paths = set()
     for path in args.path:
         if not path.is_dir():
-            raise ValueError('path must be directory')
+            raise ValueError("path must be directory")
         stack = [path]
         while stack:
             log_paths = []
@@ -68,17 +76,17 @@ async def main():
                     stack.append(p)
                 else:
                     match p.suffix:
-                        case '.log':
+                        case ".log":
                             log_paths.append(p)
-                        case '.scram':
+                        case ".scram":
                             scram_paths.append(p)
-                        case '.bin':
+                        case ".bin":
                             needs_finalization = False
-                        case '.iso':
+                        case ".iso":
                             needs_finalization = False
-                        case '.hash':
+                        case ".hash":
                             needs_finalization = False
-                        case '.skeleton':
+                        case ".skeleton":
                             needs_finalization = False
             if needs_finalization and (len(log_paths) == len(scram_paths) == 1):
                 paths.add(log_paths[0])
@@ -94,10 +102,10 @@ async def main():
         try:
             task.result()
         except Exception:
-            print(f'⚠️ ERROR: {path}')
+            print(f"⚠️ ERROR: {path}")
         else:
-            print(f'✅ Success: {path}')
+            print(f"✅ Success: {path}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())

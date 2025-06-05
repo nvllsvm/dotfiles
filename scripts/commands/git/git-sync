@@ -6,24 +6,19 @@ import shutil
 import subprocess
 import urllib.parse
 
-CODE_ROOT_DIR = pathlib.Path('~/src').expanduser()
-CACHE_PATH = pathlib.Path('~/.cache/gs').expanduser()
+CODE_ROOT_DIR = pathlib.Path("~/src").expanduser()
+CACHE_PATH = pathlib.Path("~/.cache/gs").expanduser()
 CACHE_ITEM_LIMIT = 1000
 
 
 class Git:
     @staticmethod
     def clone(repository, directory):
-        subprocess.run(
-            ['git', 'clone', repository, directory],
-            check=True
-        )
+        subprocess.run(["git", "clone", repository, directory], check=True)
 
     @staticmethod
     def fetch(directory):
-        subprocess.run(
-            ['git', '-C', str(directory), 'fetch', '--all'],
-            check=True)
+        subprocess.run(["git", "-C", str(directory), "fetch", "--all"], check=True)
 
 
 def _find_git_repos(root):
@@ -31,7 +26,7 @@ def _find_git_repos(root):
     while stack:
         for path in stack.pop().iterdir():
             if path.is_dir():
-                if path.name == '.git':
+                if path.name == ".git":
                     yield path.parent.absolute()
                 else:
                     stack.append(path)
@@ -40,15 +35,11 @@ def _find_git_repos(root):
 def _find_git_repos(root):
     all_repos = set()
     proc = subprocess.run(
-        ['fd', 
-         '--unrestricted', 
-         '--type=d',
-         '--print0',
-         r'^\.git$',
-         '--', root],
+        ["fd", "--unrestricted", "--type=d", "--print0", r"^\.git$", "--", root],
         stdout=subprocess.PIPE,
-        check=True)
-    for item in proc.stdout.split(b'\0'):
+        check=True,
+    )
+    for item in proc.stdout.split(b"\0"):
         if not item:
             continue
         path = pathlib.Path(item.decode())
@@ -68,55 +59,55 @@ def _find_git_repos(root):
 
 
 class SrcName(enum.StrEnum):
-    ARCH_LINUX_AUR = 'aur'
-    CODEBERG = 'codeberg'
-    GITHUB = 'github'
-    GITLAB = 'gitlab'
-    NULLSUM_NET = 'git.nullsum.net'
+    ARCH_LINUX_AUR = "aur"
+    CODEBERG = "codeberg"
+    GITHUB = "github"
+    GITLAB = "gitlab"
+    NULLSUM_NET = "git.nullsum.net"
 
 
 def parse_repo(repo):
     repo = repo.lower()
     parsed = urllib.parse.urlparse(repo)
-    path = parsed.path.strip('/')
-    if parsed.scheme in ('http', 'https'):
+    path = parsed.path.strip("/")
+    if parsed.scheme in ("http", "https"):
         # TODO: parse .ssh/config for HostName
         match parsed.netloc:
-            case 'codeberg.org':
+            case "codeberg.org":
                 host = SrcName.CODEBERG
-                parts = path.split('/')
+                parts = path.split("/")
                 if len(parts) < 2:
-                    raise RuntimeError('invalid codeberg url')
-                path = '/'.join(parts[0:])
-            case 'github.com' | 'www.github.com':
+                    raise RuntimeError("invalid codeberg url")
+                path = "/".join(parts[0:])
+            case "github.com" | "www.github.com":
                 host = SrcName.GITHUB
-                parts = path.split('/')
+                parts = path.split("/")
                 if len(parts) < 2:
-                    raise RuntimeError('invalid github url')
-                path = '/'.join(parts[0:2])
-            case 'gitlab.com' | 'www.gitlab.com':
+                    raise RuntimeError("invalid github url")
+                path = "/".join(parts[0:2])
+            case "gitlab.com" | "www.gitlab.com":
                 host = SrcName.GITLAB
-                parts = path.split('/')
+                parts = path.split("/")
                 if len(parts) < 2:
-                    raise RuntimeError('invalid gitlab url')
-                path = '/'.join(parts[0:])
-            case 'aur.archlinux.org':
+                    raise RuntimeError("invalid gitlab url")
+                path = "/".join(parts[0:])
+            case "aur.archlinux.org":
                 host = SrcName.ARCH_LINUX_AUR
-                parts = path.split('/')
-                if parts[0] == 'packages':
+                parts = path.split("/")
+                if parts[0] == "packages":
                     path = parts[1]
-            case 'git.nullsum.net':
+            case "git.nullsum.net":
                 host = SrcName.NULLSUM_NET
-                parts = path.split('/')
+                parts = path.split("/")
                 if len(parts) < 2:
-                    raise RuntimeError('invalid git.nullsum.net url')
-                path = '/'.join(parts)
+                    raise RuntimeError("invalid git.nullsum.net url")
+                path = "/".join(parts)
             case _:
-                raise NotImplementedError(f'unhandled netloc: {parsed.netloc}')
+                raise NotImplementedError(f"unhandled netloc: {parsed.netloc}")
     elif parsed.scheme:
         host = parsed.scheme
     else:
-        raise ValueError('missing git host')
+        raise ValueError("missing git host")
 
     repo_path = path
     repo_dir = CODE_ROOT_DIR / host.lower() / repo_path.lower()
@@ -124,10 +115,10 @@ def parse_repo(repo):
 
 
 def main():
-    parser = argparse.ArgumentParser('git-sync')
-    parser.add_argument('--show-cache', action='store_true')
-    parser.add_argument('--rm', action='store_true')
-    parser.add_argument('repo', nargs='?')
+    parser = argparse.ArgumentParser("git-sync")
+    parser.add_argument("--show-cache", action="store_true")
+    parser.add_argument("--rm", action="store_true")
+    parser.add_argument("repo", nargs="?")
     args = parser.parse_args()
 
     CACHE_PATH.touch()
@@ -156,16 +147,10 @@ def main():
             if host is None:
                 repos.append(str(repo))
             else:
-                repos.append(f'{host}:{"/".join(repo.parts[1:])}')
-        cache_index = {
-            name: index
-            for index, name in enumerate(cache)
-        }
-        repos = sorted(
-            repos,
-            key=lambda x: (cache_index.get(x, -1), x)
-        )
-        print('\n'.join(repos))
+                repos.append(f"{host}:{'/'.join(repo.parts[1:])}")
+        cache_index = {name: index for index, name in enumerate(cache)}
+        repos = sorted(repos, key=lambda x: (cache_index.get(x, -1), x))
+        print("\n".join(repos))
     elif args.repo is None:
         for repo_dir in _find_git_repos(pathlib.Path().absolute()):
             print(repo_dir)
@@ -187,7 +172,7 @@ def main():
                 cache.remove(repo)
         else:
             if not repo_dir.exists():
-                repo = f'{host}:{path}'
+                repo = f"{host}:{path}"
                 Git.clone(repo, repo_dir)
 
             cache_modified = True
@@ -197,8 +182,8 @@ def main():
             print(repo_dir)
 
     if cache_modified:
-        CACHE_PATH.write_text('\n'.join(cache[-CACHE_ITEM_LIMIT:]))
+        CACHE_PATH.write_text("\n".join(cache[-CACHE_ITEM_LIMIT:]))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

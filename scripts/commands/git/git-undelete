@@ -6,16 +6,16 @@ import sys
 
 
 class GitRepo:
-
     def __init__(self, path):
         self.path = path
         self._working_tree_dir = None
 
     async def working_tree_dir(self):
         if not self._working_tree_dir:
-            args = ['git', 'rev-parse', '--show-toplevel']
+            args = ["git", "rev-parse", "--show-toplevel"]
             proc = await asyncio.create_subprocess_exec(
-                *args, stdout=asyncio.subprocess.PIPE)
+                *args, stdout=asyncio.subprocess.PIPE
+            )
             await proc.wait()
             if proc.returncode:
                 raise RuntimeError(proc.returncode)
@@ -24,43 +24,45 @@ class GitRepo:
         return self._working_tree_dir
 
     async def historic_paths(self):
-        args = ['git']
+        args = ["git"]
         if self.path:
-            args.extend(['-C', str(self.path)])
-        args.extend([
-            'log',
-            '--pretty=format:',
-            '--name-only',
-            '--diff-filter=A',
-        ])
+            args.extend(["-C", str(self.path)])
+        args.extend(
+            [
+                "log",
+                "--pretty=format:",
+                "--name-only",
+                "--diff-filter=A",
+            ]
+        )
 
         proc = await asyncio.create_subprocess_exec(
-            *args, stdout=asyncio.subprocess.PIPE)
+            *args, stdout=asyncio.subprocess.PIPE
+        )
         stdout, _ = await proc.communicate()
         if proc.returncode:
             raise RuntimeError(proc.returncode)
 
-        return {
-            line
-            for line in stdout.decode().splitlines()
-            if line
-        }
+        return {line for line in stdout.decode().splitlines() if line}
 
     async def lastest_commit_for_path(self, path):
-        args = ['git']
+        args = ["git"]
         if self.path:
-            args.extend(['-C', str(self.path)])
-        args.extend([
-            'rev-list',
-            '-n',
-            '1',
-            'HEAD',
-            '--',
-            str(path),
-        ])
+            args.extend(["-C", str(self.path)])
+        args.extend(
+            [
+                "rev-list",
+                "-n",
+                "1",
+                "HEAD",
+                "--",
+                str(path),
+            ]
+        )
 
         proc = await asyncio.create_subprocess_exec(
-            *args, stdout=asyncio.subprocess.PIPE)
+            *args, stdout=asyncio.subprocess.PIPE
+        )
         await proc.wait()
         if proc.returncode:
             raise RuntimeError(proc.returncode)
@@ -68,15 +70,17 @@ class GitRepo:
         return stdout.strip().decode()
 
     async def restore_path(self, path, commit):
-        args = ['git']
+        args = ["git"]
         if self.path:
-            args.extend(['-C', str(self.path)])
-        args.extend([
-            'checkout',
-            f'{commit}^',
-            '--',
-            str(path),
-        ])
+            args.extend(["-C", str(self.path)])
+        args.extend(
+            [
+                "checkout",
+                f"{commit}^",
+                "--",
+                str(path),
+            ]
+        )
 
         proc = await asyncio.create_subprocess_exec(*args)
         await proc.wait()
@@ -86,17 +90,16 @@ class GitRepo:
 
 async def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-C', metavar='path', dest='repo_path')
-    parser.add_argument('--list', action='store_true',
-                        help='list all deleted files')
-    parser.add_argument('paths', nargs='*')
+    parser.add_argument("-C", metavar="path", dest="repo_path")
+    parser.add_argument("--list", action="store_true", help="list all deleted files")
+    parser.add_argument("paths", nargs="*")
     args = parser.parse_args()
 
     repo = GitRepo(path=args.repo_path)
 
     if args.list:
         if args.paths:
-            parser.error('paths cannot be specified when using --list')
+            parser.error("paths cannot be specified when using --list")
             parser.exit(1)
 
         repo_root = pathlib.Path(await repo.working_tree_dir())
@@ -113,5 +116,5 @@ async def main():
             await repo.restore_path(path, commit)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())

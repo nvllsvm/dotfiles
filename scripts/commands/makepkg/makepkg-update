@@ -3,14 +3,11 @@ import pathlib
 import subprocess
 import shutil
 
-if not shutil.which('updpkgsums'):
-    subprocess.run(['yay', '-S', '--noconfirm', 'pacman-contrib'], check=True)
+if not shutil.which("updpkgsums"):
+    subprocess.run(["yay", "-S", "--noconfirm", "pacman-contrib"], check=True)
 
-subprocess.run(['updpkgsums'], check=True)
+subprocess.run(["updpkgsums"], check=True)
 
-proc = subprocess.run(
-    ['makepkg', '--printsrcinfo'],
-    stdout=subprocess.PIPE,
-    check=True)
+proc = subprocess.run(["makepkg", "--printsrcinfo"], stdout=subprocess.PIPE, check=True)
 
-pathlib.Path('.SRCINFO').write_text(proc.stdout.decode())
+pathlib.Path(".SRCINFO").write_text(proc.stdout.decode())
