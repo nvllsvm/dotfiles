@@ -9,7 +9,11 @@ import tempfile
 
 import tqdm
 
-DEFAULT_LANGUAGES = {"eng", "und"}
+DEFAULT_LANGUAGES = {
+    "eng",  # english
+    "und",  # undefined / not-set
+    "zxx",  # non-linguistic (eg. instrumental)
+}
 
 
 def mkv_info(path):
