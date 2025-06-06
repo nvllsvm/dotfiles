@@ -9,9 +9,6 @@ fi
 if ! command -v pipx > /dev/null; then
     pip install pipx
 fi
-if ! command -v flake8 > /dev/null; then
-    pipx install flake8
-fi
 if ! command -v pyright > /dev/null; then
     pipx install pyright
 fi
