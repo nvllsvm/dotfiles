@@ -12,6 +12,7 @@ if [[ $OSTYPE == darwin* ]]; then
     export LANG=en_US.UTF-8
     export HOMEBREW_NO_ANALYTICS=1
 
+    setopt no_nomatch
     manpath=(
         /usr/local/opt/*/libexec/gnuman
         /usr/local/share/man
@@ -33,4 +34,5 @@ if [[ $OSTYPE == darwin* ]]; then
         /usr/local/opt/*/share/zsh/site-functions
         "$fpath[@]"
     )
+    setopt nomatch
 fi
