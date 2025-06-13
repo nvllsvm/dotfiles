@@ -21,6 +21,7 @@ EXPECTED_PACKAGES = {
     'gnu-tar',
     'htop',
     'hyperfine',
+    'imagemagick',
     'innoextract',
     'iperf3',
     'jpegoptim',
