@@ -89,6 +89,7 @@ if HOSTNAME in ('sol', 'mars', 'phobos'):
         'python',
         'python-async-executor',
         'python-dbus-fast',
+        'python-flake8',
         'python-httpx',
         'python-magic',
         'python-mozjpeg-lossless-optimization',

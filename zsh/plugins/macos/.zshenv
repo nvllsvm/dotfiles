@@ -4,7 +4,6 @@ if [[ $OSTYPE == darwin* ]]; then
     # (normally runs: eval `/usr/libexec/path_helper -s`)
     setopt no_global_rcs
     path=(
-        /usr/local/bin
         "$path[@]"
         /Library/Apple/usr/bin
     )
@@ -12,27 +11,18 @@ if [[ $OSTYPE == darwin* ]]; then
     export LANG=en_US.UTF-8
     export HOMEBREW_NO_ANALYTICS=1
 
-    setopt no_nomatch
     manpath=(
-        /usr/local/opt/*/libexec/gnuman
-        /usr/local/share/man
+        /opt/homebrew/opt/*/libexec/gnuman
         /usr/share/man
         "$manpath[@]"
     )
 
     path=(
         "$DOTFILES/scripts/macos"
-        /usr/local/opt/curl-openssl/bin
-        /usr/local/opt/file-formula/bin
-        /usr/local/opt/sqlite/bin
-        /usr/local/opt/*/libexec/gnubin
-        /usr/local/sbin
+	/opt/homebrew/bin
+        /opt/homebrew/opt/coreutils/libexec/gnubin
+        /opt/homebrew/opt/gnu-tar/libexec/gnubin
+        /opt/homebrew/opt/curl/bin
         "$path[@]"
     )
-
-    fpath=(
-        /usr/local/opt/*/share/zsh/site-functions
-        "$fpath[@]"
-    )
-    setopt nomatch
 fi
