@@ -19,10 +19,15 @@ if [[ $OSTYPE == darwin* ]]; then
 
     path=(
         "$DOTFILES/scripts/macos"
-	/opt/homebrew/bin
+        /opt/homebrew/bin
         /opt/homebrew/opt/coreutils/libexec/gnubin
         /opt/homebrew/opt/gnu-tar/libexec/gnubin
         /opt/homebrew/opt/curl/bin
         "$path[@]"
+    )
+
+    fpath=(
+        /opt/homebrew/share/zsh/site-functions
+        "$fpath[@]"
     )
 fi

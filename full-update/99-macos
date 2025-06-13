@@ -1,0 +1,106 @@
+#!/usr/bin/env python3
+import asyncio
+import json
+import platform
+
+if platform.uname().system != 'Darwin':
+    exit()
+
+EXPECTED_PACKAGES = {
+    'advancecomp',
+    'aria2',
+    'bat',
+    'coreutils',
+    'curl',
+    'curlie',
+    'dash',
+    'fd',
+    'fzf',
+    'gifsicle',
+    'git',
+    'gnu-tar',
+    'htop',
+    'hyperfine',
+    'innoextract',
+    'iperf3',
+    'jpegoptim',
+    'jq',
+    'lf',
+    'moreutils',
+    'neovim',
+    'node',
+    'openssh',
+    'oxipng',
+    'pipx',
+    'pyright',
+    'rar',
+    'ripgrep',
+    'rsync',
+    'ruff',
+    'sevenzip',  # aka _the_ 7zip
+    'tmux',
+    'unzip',
+    'yazi',
+    'zip',
+    'zsh',
+    'zstd',
+}
+
+
+class Homebrew:
+    @staticmethod
+    async def get_installed():
+        proc = await asyncio.create_subprocess_exec(
+            'brew', 'info', '--json', '--installed',
+            stdout=asyncio.subprocess.PIPE,
+        )
+        stdout, _ = await proc.communicate()
+        if proc.returncode:
+            raise ProcessError(proc)
+        installed = {}
+        for i in json.loads(stdout):
+            full_name = i['full_name']
+            if full_name in installed:
+                raise RuntimeError('duplicate full_name {full_name}')
+            installed[full_name] = i
+        return installed
+
+    @staticmethod
+    async def install(packages):
+        proc = await asyncio.create_subprocess_exec(
+            'brew', 'install', '--', *packages)
+        await proc.wait()
+        if proc.returncode:
+            raise ProcessError(proc)
+
+
+class ProcessError(Exception):
+    def __init__(self, process, message=None):
+        self.process = process
+        self.message = message
+
+    def __str__(self):
+        proc = self.process
+
+        text = f'exit {proc.returncode}'
+        if self.message is not None:
+            text = f'{text} - {self.message}'
+
+        try:
+            args = proc._transport._extra['subprocess'].args
+        except (AttributeError, KeyError):
+            pass
+        else:
+            text = f'{text}: {args}'
+        return text
+
+
+async def main():
+    installed = await Homebrew.get_installed()
+    missing = EXPECTED_PACKAGES - set(installed)
+    if missing:
+        await Homebrew.install(missing)
+
+
+if __name__ == '__main__':
+    asyncio.run(main())

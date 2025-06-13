@@ -18,6 +18,21 @@ case "$1" in
         fi
 esac
 
+clipboard_macos() {
+    if command -v pbcopy > /dev/null; then
+        case "$MODE" in
+            copy)
+                pbcopy
+                ;;
+            paste)
+                pbpaste
+                ;;
+        esac
+    else
+        return 1
+    fi
+}
+
 clipboard_wayland() {
     if [ -n "$WAYLAND_DISPLAY" ]; then
         case "$MODE" in
@@ -68,5 +83,6 @@ clipboard_termux() {
 clipboard_termux \
     || clipboard_wayland \
     || clipboard_termux \
+    || clipboard_macos \
     || clipboard_tmux \
     || (echo error: no suitable clipboard command detected >&2; exit 1)
