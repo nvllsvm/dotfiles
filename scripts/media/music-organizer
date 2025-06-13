@@ -28,6 +28,8 @@ IMAGE_PREFIX = "cover"
 
 CUE_EXT = ".cue"
 
+IGNORED_PATH_CHARS = {"&", "/", "\\", ".", ":", "*", "?", '"', "<", ">", "|"}
+
 # preferred suffix is first in list
 MIME_SUFFIXES = {
     "application/pdf": [
@@ -81,7 +83,7 @@ def folder_name(tag_value):
     for c in tag_value:
         if not chars and c == ".":
             continue
-        if c in ("/", "\\", ":", "*", "?", '"', "'", "<", ">", "|"):
+        if c in IGNORED_PATH_CHARS:
             continue
         chars.append(c)
     name = "".join(chars)
@@ -235,10 +237,10 @@ def rename_from_tags(path, metadata):
     if tracknumber < 10:
         tracknumber = f"{tracknumber:02d}"
 
-    for char in ("/", "\\", ".", ":", "*", "?", '"', "<", ">", "|"):
+    for char in IGNORED_PATH_CHARS:
         title = title.replace(char, " ")
     title = " ".join(title.split())
-    safe_rename(path, f"{tracknumber} - {title}{path.suffix}")
+    safe_rename(path, f"{tracknumber} {title}{path.suffix}")
 
 
 def safe_rename(source, name):
