@@ -114,7 +114,7 @@ class Redump:
         for system in systems:
             LOGGER.debug("Downloading dat for %s", system)
             url = f"http://redump.org/datfile/{system}"
-            response = await client.get(url)
+            response = await client.get(url, timeout=15)
             response.raise_for_status()
             archive = zipfile.ZipFile(io.BytesIO(response.content))
             if len(archive.namelist()) != 1:
