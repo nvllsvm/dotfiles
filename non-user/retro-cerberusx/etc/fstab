@@ -1,7 +1,7 @@
 LABEL=LINUX / ext4 rw,relatime 0 1
 
-/dev/sda1  /mnt/win98  auto  noauto,x-systemd.automount,rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,umask=0000  0 0
-/dev/sda2  /mnt/winxp  auto  noauto,x-systemd.automount,rw,nosuid,nodev,relatime,user_id=0,group_id=0,allow_other,umask=0000  0 0
+/dev/sda1  /mnt/win98  auto  noauto,x-systemd.automount,rw,uid=ar,gid=ar,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,umask=0000  0 0
+/dev/sda2  /mnt/winxp  auto  noauto,x-systemd.automount,rw,uid=ar,gid=ar,nosuid,nodev,relatime,allow_other,umask=0000  0 0
 
 //sol.nullsum.lan/public    /mnt/sol/public     cifs  _netdev,noauto,x-systemd.automount,username=ar,password=,uid=ar,gid=ar  0 0
 //sol.nullsum.lan/storage   /mnt/sol/storage    cifs  _netdev,noauto,x-systemd.automount,username=ar,password=,uid=ar,gid=ar  0 0
