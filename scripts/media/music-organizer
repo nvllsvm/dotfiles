@@ -188,6 +188,11 @@ def fix_metadata(path, metadata):
             LOGGER.info(f'Fixing whitespace/unicode normalization in "{tag}": "{path}"')
             metadata.save()
 
+        for v in (tag, *values):
+            for c in v:
+                if not c.isprintable():
+                    LOGGER.error(f'Non-printable character detected in "{tag}": "{path}"')
+
 
 def fix_tracknumber(path, metadata):
     try:
