@@ -85,6 +85,8 @@ def folder_name(tag_value):
             continue
         if c in IGNORED_PATH_CHARS:
             continue
+        if not c.isprintable():
+            raise ValueError('unprintable character')
         chars.append(c)
     name = "".join(chars)
     return " ".join(part for part in name.split())
