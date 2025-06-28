@@ -5,7 +5,7 @@ else
     yazi() {
         local cwdfile
         local ret
-        cwdfile=/tmp/"yazicwd_$$"
+        cwdfile=/tmp/"yazicwd"
         "$__yazi" --cwd-file="${cwdfile}" "$@"
         ret=$?
         if [ $ret = 0 ]; then
