@@ -26,7 +26,6 @@ EXPECTED_PACKAGES = {
     'iperf3',
     'jpegoptim',
     'jq',
-    'lf',
     'moreutils',
     'neovim',
     'node',

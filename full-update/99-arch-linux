@@ -62,7 +62,6 @@ if HOSTNAME in ('sol', 'mars', 'phobos'):
         'jq',
         'ledger',
         'less',
-        'lf',
         'mac',
         'mediainfo',
         'moreutils',
