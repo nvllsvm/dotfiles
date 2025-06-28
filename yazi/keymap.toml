@@ -1,0 +1,7 @@
+[mgr]
+prepend_keymap = [
+    { on = "<Up>", run = "arrow -1" },
+    { on = "<Down>", run = "arrow 1" },
+    { on = "k", run = "arrow -1" },
+    { on = "j", run = "arrow 1" },
+]
