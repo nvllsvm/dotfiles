@@ -2,25 +2,32 @@ require("session"):setup {
     sync_yanked = true,
 }
 
--- Setup function that runs when yazi starts
-local function setup()
-    -- Function to send OSC 7 sequence
-    local function send_osc7()
-        local cwd = tostring(cx.active.current.cwd)
-        local hostname = os.getenv("HOSTNAME") or os.getenv("HOST") or "localhost"
-        local osc7 = string.format('\027]7;file://%s%s\027\\', hostname, cwd)
+local old_cwd = ""
+
+-- Store the original Status:name function
+local original_status_name = Status.name
+
+function Status:name()
+    local cwd = tostring(cx.active.current.cwd)
+    
+    -- Send OSC7 when directory changes
+    if cwd ~= old_cwd then
+        local osc7 = string.format('\027]7;%s\027\\', cwd)
         
-        -- Write directly to terminal
-        io.stderr:write(osc7)
-        io.stderr:flush()
+        local tty = io.open("/dev/tty", "w")
+        if tty then
+            tty:write(osc7)
+            tty:flush()
+            tty:close()
+        end
+        
+        old_cwd = cwd
     end
     
-    -- Subscribe to directory change events
-    ps.sub("cd", send_osc7)
-    
-    -- Also send on initial load
-    send_osc7()
+    -- Call the original function if it exists, otherwise return empty
+    if original_status_name then
+        return original_status_name(self)
+    else
+        return ui.Line("")
+    end
 end
-
--- Call setup
-setup()
