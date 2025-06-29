@@ -7,7 +7,7 @@ import sys
 CACHE_DIR = pathlib.Path("~/.cache/lgogdownloader").expanduser()
 CONFIG_DIR = pathlib.Path("~/.dotfiles/private/lgogdownloader").expanduser()
 GOG_DIR = pathlib.Path("/storage/Games/PC/GOG.com")
-IMAGE = "ghcr.io/nvllsvm/lgogdownloader"
+IMAGE = "ghcr.io/andrewrabert/lgogdownloader"
 
 
 def files_to_mtime(root):
