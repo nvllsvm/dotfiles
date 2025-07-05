@@ -438,6 +438,7 @@ if HOSTNAME in ('lounge-htpc', 'mars'):
 
 if HOSTNAME in ('lounge-htpc', 'mars', 'phobos'):
     EXPECTED_PACKAGES.update({
+        'breeze-plymouth',
         'plymouth',
         'plymouth-kcm',
     })
