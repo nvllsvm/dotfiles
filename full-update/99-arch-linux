@@ -436,6 +436,12 @@ if HOSTNAME in ('lounge-htpc', 'mars'):
         'linux-headers',
     })
 
+if HOSTNAME in ('lounge-htpc', 'mars', 'phobos'):
+    EXPECTED_PACKAGES.update({
+        'plymouth',
+        'plymouth-kcm',
+    })
+
 if HOSTNAME == 'phobos':
     EXPECTED_PACKAGES.update({
         'linux-flowx13',
