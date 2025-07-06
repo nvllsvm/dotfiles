@@ -273,6 +273,10 @@ EXPECTED_PACKAGE_DEPENDENCIES = {
         'kdegraphics-mobipocket',
         'unrar',
     },
+    'perl-image-exiftool': {
+        'perl-archive-zip',
+        'perl-io-compress-brotli',
+    },
     'print-manager': {
         'system-config-printer',
     },

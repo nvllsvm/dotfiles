@@ -2,6 +2,7 @@
 import argparse
 import asyncio
 import contextlib
+import json
 import os
 import pathlib
 import signal
@@ -186,6 +187,41 @@ async def optimize_tiff(source, dest, fast=False, strip=False, bigtiff=False):
         raise ProcessError(proc)
 
 
+class exiftool:
+    TIFF_TAGS = [
+        "Make",
+        "Model",
+        "ModifyDate",
+        "Software",
+    ]
+
+    @staticmethod
+    async def to_json(path):
+        proc = await asyncio.create_subprocess_exec(
+            "exiftool", "-quiet", "-json", "--", path, stdout=asyncio.subprocess.PIPE
+        )
+        stdout, _ = await proc.communicate()
+        if proc.returncode:
+            raise ProcessError(proc)
+        return json.loads(stdout)
+
+    @staticmethod
+    async def from_json(path, json_data):
+        with TempPath() as tmp:
+            tmp.write_text(json.dumps(json_data))
+            proc = await asyncio.create_subprocess_exec(
+                "exiftool",
+                "-quiet",
+                f"-json={tmp}",
+                "--",
+                path,
+                stdout=asyncio.subprocess.PIPE,
+            )
+            await proc.wait()
+            if proc.returncode:
+                raise ProcessError(proc)
+
+
 class exiv2:
     EXIF_ORIENTATION = {
         "top, left": 1,
@@ -302,7 +338,7 @@ _MIME_SUFFIXES = {
     "image/jpeg": (".jpg", ".jpeg"),
     "image/jxl": (".jxl",),
     "image/png": (".png",),
-    "image/tiff": (".tiff",),
+    "image/tiff": (".tiff", ".tif"),
     "image/webp": (".webp",),
     "image/x-portable-pixmap": (".ppm",),
 }
@@ -400,10 +436,27 @@ async def convert_to_jpeg(source, dest):
     dest.write_bytes(data)
 
 
+async def convert_djxl(source, dest):
+    args = [
+        "djxl",
+        "--",
+        source,
+        dest,
+    ]
+    proc = await asyncio.create_subprocess_exec(
+        *args,
+        stderr=asyncio.subprocess.DEVNULL,
+    )
+    await proc.wait()
+    if proc.returncode != 0:
+        raise ProcessError(proc)
+
+
 async def convert_to_ppm(source, dest):
     args = [
         "vips",
         "ppmsave",
+        "--keep=none",
         "--",
         source,
         dest,
@@ -461,6 +514,33 @@ async def convert_to_jxl(source, dest, fast=False):
             dest,
         ]
     )
+    proc = await asyncio.create_subprocess_exec(*args)
+    await proc.wait()
+    if proc.returncode != 0:
+        raise ProcessError(proc)
+
+
+async def convert_to_tiff_vips(source, dest):
+    args = [
+        "vips",
+        "tiffsave",
+        source,
+        dest,
+    ]
+    proc = await asyncio.create_subprocess_exec(*args)
+    await proc.wait()
+    if proc.returncode != 0:
+        raise ProcessError(proc)
+
+
+async def convert_to_jxl_vips(source, dest):
+    args = [
+        "vips",
+        "jxlsave",
+        source,
+        dest,
+        "--lossless=true",
+    ]
     proc = await asyncio.create_subprocess_exec(*args)
     await proc.wait()
     if proc.returncode != 0:
@@ -534,21 +614,62 @@ async def _process_convert(path, source_mimetype, target_mimetype):
             case "image/png":
                 await convert_to_png(path, temp_path)
                 temp_path.rename(dest)
+            case "image/tiff":
+                match source_mimetype:
+                    case "image/jxl":
+                        metadata = await exiftool.to_json(path)
+                        if len(metadata) != 1:
+                            raise RuntimeError
+                        metadata = metadata[0]
+                        await convert_to_tiff_vips(path, temp_path)
+                        new_metadata = {}
+                        for key in exiftool.TIFF_TAGS:
+                            if key in metadata:
+                                new_metadata[key] = metadata[key]
+                        await exiftool.from_json(temp_path, new_metadata)
+                    case _:
+                        await convert_to_tiff_vips(path, temp_path)
+                temp_path.rename(dest)
             case "image/jxl":
-                await convert_to_jxl(path, temp_path)
+                match source_mimetype:
+                    case "image/tiff":
+                        metadata = await exiftool.to_json(path)
+                        if len(metadata) != 1:
+                            raise RuntimeError
+                        metadata = metadata[0]
+                        await convert_to_jxl_vips(path, temp_path)
+                        new_metadata = {}
+                        for key in exiftool.TIFF_TAGS:
+                            if key in metadata:
+                                new_metadata[key] = metadata[key]
+                        await exiftool.from_json(temp_path, new_metadata)
+                    case _:
+                        await convert_to_jxl(path, temp_path)
                 temp_path.rename(dest)
             case "image/jpeg":
-                source_path = path
-                if source_mimetype == "image/webp":
-                    source_path = stack.enter_context(
-                        TempPath(
-                            dir=path.parent,
-                            prefix=".imgconvert_",
-                            suffix=path.name + ".tmp",
+                match source_mimetype:
+                    case "image/webp":
+                        temp_path_2 = stack.enter_context(
+                            TempPath(
+                                dir=path.parent,
+                                prefix=".imgconvert_",
+                                suffix=path.name + ".tmp",
+                            )
                         )
-                    )
-                    await convert_to_ppm(path, source_path)
-                await convert_to_jpeg(source_path, temp_path)
+                        await convert_to_ppm(path, temp_path_2)
+                        await convert_to_jpeg(temp_path_2, temp_path)
+                    case "image/jxl":
+                        temp_path_2 = stack.enter_context(
+                            TempPath(
+                                dir=path.parent,
+                                prefix=".imgconvert_",
+                                suffix=path.name + ".jpg",
+                            )
+                        )
+                        await convert_djxl(path, temp_path_2)
+                        temp_path_2.rename(temp_path)
+                    case _:
+                        await convert_to_jpeg(path, temp_path)
                 temp_path.rename(dest)
             case _:
                 raise RuntimeError("invalid target_type")
@@ -704,7 +825,7 @@ async def main_convert():
         "-f",
         "--format",
         dest="format",
-        choices=("bmp", "jpeg", "jxl", "png", "ppm"),
+        choices=("bmp", "jpeg", "jxl", "png", "ppm", "tiff"),
         required=True,
     )
     parser.add_argument("paths", metavar="path", nargs="+", type=_parser_path_file)
