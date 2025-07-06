@@ -191,14 +191,28 @@ class exiftool:
     TIFF_TAGS = [
         "Make",
         "Model",
-        "ModifyDate",
+        "ResolutionUnit",
         "Software",
+        "XResolution",
+        "YResolution",
     ]
+
+    TIFF_TAG_MAP = {
+        "SubSecCreateDate": "CreateDate",
+        "SubSecDateTimeOriginal": "DateTimeOriginal",
+        "SubSecModifyDate": "ModifyDate",
+    }
 
     @staticmethod
     async def to_json(path):
         proc = await asyncio.create_subprocess_exec(
-            "exiftool", "-quiet", "-json", "--", path, stdout=asyncio.subprocess.PIPE
+            "exiftool",
+            "-overwrite_original",
+            "-quiet",
+            "-json",
+            "--",
+            path,
+            stdout=asyncio.subprocess.PIPE,
         )
         stdout, _ = await proc.communicate()
         if proc.returncode:
@@ -211,6 +225,7 @@ class exiftool:
             tmp.write_text(json.dumps(json_data))
             proc = await asyncio.create_subprocess_exec(
                 "exiftool",
+                "-overwrite_original",
                 "-quiet",
                 f"-json={tmp}",
                 "--",
@@ -626,6 +641,14 @@ async def _process_convert(path, source_mimetype, target_mimetype):
                         for key in exiftool.TIFF_TAGS:
                             if key in metadata:
                                 new_metadata[key] = metadata[key]
+                        for k1, k2 in exiftool.TIFF_TAG_MAP.items():
+                            if k1 in metadata:
+                                v = metadata[k1]
+                            elif k2 in metadata:
+                                v = metadata[k2]
+                            else:
+                                continue
+                            new_metadata[k1] = v
                         await exiftool.from_json(temp_path, new_metadata)
                     case _:
                         await convert_to_tiff_vips(path, temp_path)
@@ -642,6 +665,14 @@ async def _process_convert(path, source_mimetype, target_mimetype):
                         for key in exiftool.TIFF_TAGS:
                             if key in metadata:
                                 new_metadata[key] = metadata[key]
+                        for k1, k2 in exiftool.TIFF_TAG_MAP.items():
+                            if k1 in metadata:
+                                v = metadata[k1]
+                            elif k2 in metadata:
+                                v = metadata[k2]
+                            else:
+                                continue
+                            new_metadata[k1] = v
                         await exiftool.from_json(temp_path, new_metadata)
                     case _:
                         await convert_to_jxl(path, temp_path)
