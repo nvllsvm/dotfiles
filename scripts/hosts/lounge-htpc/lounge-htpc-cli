@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 http_request() {
-    curl -v "http://127.0.0.1${1}"
+    curl -X POST -v "http://127.0.0.1${1}"
 }
 
 is_any_sink_running() {
@@ -36,7 +36,7 @@ case "$1" in
         http_request /volume/down
         ;;
     volume-mute-toggle)
-        http_request /volume/mute/toggle
+        http_request /mute/toggle
         ;;
     power-toggle)
         http_request /power/toggle
