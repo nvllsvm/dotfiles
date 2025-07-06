@@ -56,10 +56,11 @@ return {
                 enable = true,
                 disable = { 
                     -- breaks gx on urls
-                    'markdown',
+                    "markdown",
                 },
             },
         })
     end,
   },
+  {"dense-analysis/ale"},
 }
