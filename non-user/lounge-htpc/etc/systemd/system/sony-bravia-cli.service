@@ -1,0 +1,11 @@
+[Unit]
+Description=Start sony-bravia-cli HTTP server
+
+[Service]
+Type=simple
+User=root
+Restart=always
+ExecStart=/usr/bin/sony-bravia-cli --dev /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_B001CPKZ-if00-port0 http-server --host 0.0.0.0 --port 80
+
+[Install]
+WantedBy=multi-user.target
