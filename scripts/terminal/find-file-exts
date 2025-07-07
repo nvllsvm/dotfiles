@@ -4,16 +4,23 @@ import collections
 import pathlib
 
 
-def all_files(root):
-    stack = [root]
+def all_files(*paths):
+    stack = []
     files = set()
+    for path in paths:
+        if not path.exists():
+            raise ValueError(f"path does not exist: {path}")
+        elif path.is_file():
+            files.add(path)
+        elif path.is_dir():
+            stack.append(path)
     while stack:
         for path in stack.pop().iterdir():
             if path.is_dir():
                 stack.append(path)
             else:
                 files.add(path)
-    return files
+    return sorted(files)
 
 
 def main():
