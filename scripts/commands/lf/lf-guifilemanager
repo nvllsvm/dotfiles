@@ -1,6 +1,0 @@
-#!/usr/bin/env sh
-if command -v kioclient > /dev/null; then
-    exec kioclient exec -- "$PWD"
-else
-    exit 1
-fi
