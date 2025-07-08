@@ -20,7 +20,9 @@ except ImportError:
 
 HOSTNAME = socket.gethostname()
 
-EXPECTED_PACKAGES = set()
+EXPECTED_PACKAGES = {
+    'logrotate',
+}
 
 if HOSTNAME in ('sol', 'mars', 'phobos'):
     EXPECTED_PACKAGES.update({
