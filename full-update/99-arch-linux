@@ -155,6 +155,7 @@ if HOSTNAME in ('mars', 'phobos'):
         'base16-shell-preview',
         'chromium',
         'discord',
+        'discover',
         'docker',
         'docker-compose',
         'dolphin',
