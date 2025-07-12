@@ -2591,7 +2591,6 @@ async def _get_class(path):
                 await innoextract.contents(path)
                 return innoextract
             except Exception:
-                raise
                 pass
 
             unzip.check()
