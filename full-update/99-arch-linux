@@ -176,7 +176,6 @@ if HOSTNAME in ('mars', 'phobos'):
         'mtpfs',
         'obs-studio',
         'okular',
-        'piavpn-bin',
         'plasma6-runners-emojirunner',
         'podman',
         'rawtherapee',
