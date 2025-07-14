@@ -1289,11 +1289,12 @@ class unzip:
             "-qq",
             "-l",
             path,
+            stderr=asyncio.subprocess.PIPE,
             stdout=asyncio.subprocess.PIPE,
         )
-        stdout, _ = await proc.communicate()
+        stdout, stderr = await proc.communicate()
         if proc.returncode:
-            raise ProcessError(proc)
+            raise ProcessError(proc, stderr.decode())
         return [line.split(maxsplit=3)[-1] for line in stdout.splitlines()]
 
     @staticmethod
